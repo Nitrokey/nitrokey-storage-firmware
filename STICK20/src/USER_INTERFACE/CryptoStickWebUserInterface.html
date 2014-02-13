@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Crypto Stick Web User Interface</title>
+
+  
+  
+  <style type="text/css">
+/*
+This style is based on works of Veerle Pieters
+http://veerle.duoh.com/blog/comments/a_css_styled_table/
+*/
+
+body {
+	font: normal 12px auto "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+	color: #4f6b72;
+	background: #E6EAE9;
+	text-align: left;
+}
+
+h1 {
+	font-family: "Georgia", "Times New Roman", Times, serif;
+	font-size: 2em;
+	color: #8F8781;
+	font-weight: normal;
+    margin:0em;
+    padding:.4em 0em 1em 0em;
+	text-align: left;
+}
+
+h2 {	border-bottom: 1px solid #C1DAD7;
+		margin-top: 10px;
+}
+
+a {
+	color: #c75f3e;
+}
+
+table {
+	padding: 0;
+	margin: 0;
+	margin-left:auto;
+	margin-right:auto;
+	border-left: 1px solid #C1DAD7;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-top: 1px solid #C1DAD7;
+}
+
+caption {
+	margin-left:auto;
+	padding: 0 0 5px 0;
+	font: italic 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+	text-align: left;
+}
+
+th {
+	font: bold 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+	color: #4f6b72;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-top: 1px solid #C1DAD7;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	text-align: left;
+	padding: 6px 6px 6px 12px;
+	background: #CAE8EA url(../images/bg_header.jpg) no-repeat;
+}
+
+th.nobg {
+	border-top: 0;
+	border-left: 0;
+	border-right: 1px solid #C1DAD7;
+	background: none;
+}
+
+td {
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	background: #fff;
+	padding: 6px 6px 6px 12px;
+	color: #4f6b72;
+}
+
+td.alt {
+	background: #F5FAFA;
+	color: #797268;
+}
+
+td.total {
+	font-weight: bold;
+}
+
+td.completeTotal {
+	font-weight: bold;
+	color: red;
+}
+
+th.label {
+	border-left: 1px solid #C1DAD7;
+	border-top: 0;
+	background: #fff url(../images/bullet1.gif) no-repeat;
+	font: bold 10px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+}
+
+th.labelalt {
+	border-left: 1px solid #C1DAD7;
+	border-top: 0;
+	background: #f5fafa url(../images/bullet2.gif) no-repeat;
+	font: bold 10px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+	color: #797268;
+}
+</style>
+</head>
+
+<body>
+<h1>Crypto Stick User Interface</h1>
+
+<h2 style="font-family: Helvetica,Arial,sans-serif;">Use</h2>
+
+<form name="Unlock">
+  <fieldset><legend>Unlock Crypted Storage</legend>
+	User PIN: <input name="Password" type="password"> 
+	<button value="Unlock" name="Unlock" onclick='saveFile("d:\data.txt","01 "+this.form.Password.value)'>Unlock</button><br>
+  </fieldset>
+</form>
+<br>
+
+<form name="Lock">
+  <fieldset><legend>Lock Crypted Storage</legend>
+	<button value="Lock" name="Lock" onclick='saveFile("d:\data.txt","02 ")'>Lock</button><br>	
+  </fieldset>
+</form>
+<br>
+
+<h2 style="font-family: Helvetica,Arial,sans-serif;">Configuration</h2>
+
+<form action="changeuserpin" name="changeuserpin">
+  <fieldset><legend>Change User PIN</legend>
+	Current Admin PIN:       <input name="adminpin" type="password"><br>
+	New User PIN:            <input name="userpin"  type="password"><br>
+	Type new User PIN again: <input name="userpin2" type="password"><br>
+	<button value="ValueChangeUserPIN" name="ValueChangeUserPIN" onclick='saveFile("d:\data.txt",this.form.adminpin.value)'>Change User PIN</button><br> 
+  </fieldset>
+</form>
+
+<br>
+
+<form action="changeadminpin" name="changeadminpin">
+  <fieldset><legend>Change Admin PIN</legend>
+	Current Admin PIN:        <input name="adminpin1" type="password"><br>
+	New Admin PIN:            <input name="newadminpin"  type="password"><br>
+	Type new Admin PIN again: <input name="newadminpin2" type="password"><br>
+	<button value="ValueChangeUserPIN" name="ValueChangeUserPIN" onclick='saveFile("d:\data.txt",this.form.adminpin1.value)'>Change Admin PIN</button><br> 
+  </fieldset>
+</form>
+
+<br>
+
+<br>
+
+
+<form action="importkeys" name="importkeys">
+  <fieldset><legend>Import Secret Keys</legend><input name="importkey" type="file"><br>
+  <button value="Import" name="Import">Import</button><br>
+  </fieldset>
+</form>
+
+<br>
+
+<form action="generatekeys" name="generatekeys">
+  <fieldset><legend>Generate Keys</legend> 
+  <span style="font-weight: bold;">Warning: All data on the crypted storage will be lost.</span><br>
+  Admin PIN: <input name="AdminGenerateKeys" type="password">
+  <button value="GenerateKeys" name="GenerateKeys" onclick='saveFile("d:\data.txt",this.form.AdminGenerateKeys.value)'>GenerateKeys</button><br>
+  </fieldset>
+</form>
+
+<br>
+
+<form action="exportkeys" name="exportkeys">
+  <fieldset><legend>Export Public Key</legend> <button value="Export" name="Export">Export Public Key</button><br>
+  </fieldset>
+</form>
+
+<br>
+
+<form action="formatstorage" name="formatstorage">
+  <fieldset><legend>Format storage</legend><span style="font-weight: bold;">Warning: All data on the storage will be lost.</span><br>
+  <button value="Format" name="Format">Format Storage</button><br>
+  </fieldset>
+</form>
+
+<br>
+<form  name="firmwareupdate">
+  <fieldset><legend>Enable firmware update mode</legend> 
+  <span style="font-weight: bold;">Warning: You have to update the device, there is no way back</span><br>
+  Admin PIN: <input name="AdminUsbUpdate" type="password">
+  <button value="AdminUsbUpdateB" name="AdminUsbUpdateB" onclick='saveFile("d:\data.txt","03 "+this.form.AdminUsbUpdate.value)'>Enable firmware update mode</button><br>
+  </fieldset>
+</form>
+
+<br>
+
+/* For firefox */
+<script>
+function saveFile(fileName, val)
+{   
+	try {      netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');   } 
+	catch (e) 
+	{      
+		alert('Permission denied.');   
+	}   
+	var Path = window.location.pathname;   
+	var Drive = Path.substr(1,2);   
+	var pName = fileName;   
+	var file = Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);   
+	file.initWithPath(pName);   
+	if (file.exists() == false) 
+	{     
+		file.create( Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 420 );   
+	}   
+	var outputStream = Components.classes['@mozilla.org/network/file-output-stream;1'].createInstance(Components.interfaces.nsIFileOutputStream);   
+	outputStream.init( file, 0x04 | 0x08 | 0x20, 420, 0 );   
+	var result = outputStream.write(val, val.length );  
+	outputStream.close();}
+</script>
+
+</body>
+
+</html>

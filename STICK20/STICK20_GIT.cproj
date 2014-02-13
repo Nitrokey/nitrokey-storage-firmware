@@ -1,0 +1,1320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>6.1</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC32.C</ToolchainName>
+    <ProjectGuid>b19eb321-4623-42d6-8259-b5d025dafc16</ProjectGuid>
+    <Name>USB_MASS_DEBUG</Name>
+    <avrdevice>AT32uc3a3256s</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <AvrProjectType>Importer</AvrProjectType>
+    <OutputType>Executable</OutputType>
+    <Language>C</Language>
+    <OutputFileName>USB_MASS</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <avrtool>com.atmel.avrdbg.tool.jtagicemkii</avrtool>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <OverrideVtor>false</OverrideVtor>
+    <CacheFlash>true</CacheFlash>
+    <ProgFlashFromRam>true</ProgFlashFromRam>
+    <RamSnippetAddress>0x20000000</RamSnippetAddress>
+    <UncachedRange />
+    <OverrideVtorValue>exception_table</OverrideVtorValue>
+    <BootSegment>2</BootSegment>
+    <eraseonlaunchrule>4</eraseonlaunchrule>
+    <AsfFrameworkConfig>
+      <framework-data xmlns="">
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.11.0" />
+        </dependencies>
+      </framework-data>
+    </AsfFrameworkConfig>
+    <avrtoolinterface>JTAG</avrtoolinterface>
+    <com_atmel_avrdbg_tool_jtagicemkii>
+      <ToolOptions>
+        <InterfaceProperties>
+          <JtagEnableExtResetOnStartSession>false</JtagEnableExtResetOnStartSession>
+          <JtagInChain>false</JtagInChain>
+          <JtagDevicesBefore>0</JtagDevicesBefore>
+          <JtagDevicesAfter>0</JtagDevicesAfter>
+          <JtagInstrBitsBefore>0</JtagInstrBitsBefore>
+          <JtagInstrBitsAfter>0</JtagInstrBitsAfter>
+          <JtagDbgClock>0</JtagDbgClock>
+        </InterfaceProperties>
+        <InterfaceName>JTAG</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.jtagicemkii</ToolType>
+      <ToolNumber>00B000002983</ToolNumber>
+      <ToolName>JTAGICE mkII</ToolName>
+    </com_atmel_avrdbg_tool_jtagicemkii>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <Avr32Gcc>
+        <avr32gcc.common.outputfiles.hex>True</avr32gcc.common.outputfiles.hex>
+        <avr32gcc.common.outputfiles.lss>True</avr32gcc.common.outputfiles.lss>
+        <avr32gcc.common.outputfiles.eep>True</avr32gcc.common.outputfiles.eep>
+        <avr32gcc.common.outputfiles.srec>True</avr32gcc.common.outputfiles.srec>
+        <avr32gcc.compiler.preprocessor.DoNotSearchSystemDirectories>false</avr32gcc.compiler.preprocessor.DoNotSearchSystemDirectories>
+        <avr32gcc.compiler.preprocessor.PreprocessOnly>false</avr32gcc.compiler.preprocessor.PreprocessOnly>
+        <avr32gcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>BOARD=EVK1104</Value>
+            <Value>FREERTOS_USED</Value>
+          </ListValues>
+        </avr32gcc.compiler.symbols.DefSymbols>
+        <avr32gcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/AES</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/GCC/AVR32_UC3</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FAT</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/SCSI_DECODER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/MCI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src</Value>
+            <Value>../src/VIRTUAL_MEM</Value>
+            <Value>../src/USHELL</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/AES</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/ADC</Value>
+            <Value>../src/Tools</Value>
+            <Value>../src/USER_INTERFACE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/HID</Value>
+          </ListValues>
+        </avr32gcc.compiler.directories.IncludePaths>
+        <avr32gcc.compiler.optimization.OtherFlags>-fdata-sections</avr32gcc.compiler.optimization.OtherFlags>
+        <avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>true</avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+        <avr32gcc.compiler.optimization.EnableFastFloatingPointLibrary>false</avr32gcc.compiler.optimization.EnableFastFloatingPointLibrary>
+        <avr32gcc.compiler.optimization.EnableUnsafeMatchOptimizations>false</avr32gcc.compiler.optimization.EnableUnsafeMatchOptimizations>
+        <avr32gcc.compiler.optimization.EnableFastMath>false</avr32gcc.compiler.optimization.EnableFastMath>
+        <avr32gcc.compiler.optimization.GeneratePositionIndependentCode>false</avr32gcc.compiler.optimization.GeneratePositionIndependentCode>
+        <avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>true</avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>
+        <avr32gcc.compiler.optimization.ForceDoubleWordAlignment>false</avr32gcc.compiler.optimization.ForceDoubleWordAlignment>
+        <avr32gcc.compiler.optimization.PutLargeImmediatesInConstPool>false</avr32gcc.compiler.optimization.PutLargeImmediatesInConstPool>
+        <avr32gcc.compiler.optimization.DoNotInitializeGotRegisterBeforeUsing>false</avr32gcc.compiler.optimization.DoNotInitializeGotRegisterBeforeUsing>
+        <avr32gcc.compiler.optimization.UseSectionRoDataForReadOnlyData>false</avr32gcc.compiler.optimization.UseSectionRoDataForReadOnlyData>
+        <avr32gcc.compiler.optimization.GenerateGprofInformation>false</avr32gcc.compiler.optimization.GenerateGprofInformation>
+        <avr32gcc.compiler.optimization.GenerateProfInformation>false</avr32gcc.compiler.optimization.GenerateProfInformation>
+        <avr32gcc.compiler.warnings.AllWarnings>true</avr32gcc.compiler.warnings.AllWarnings>
+        <avr32gcc.compiler.warnings.CheckSyntaxOnly>false</avr32gcc.compiler.warnings.CheckSyntaxOnly>
+        <avr32gcc.compiler.warnings.Pedantic>false</avr32gcc.compiler.warnings.Pedantic>
+        <avr32gcc.compiler.warnings.PedanticWarningsAsErrors>false</avr32gcc.compiler.warnings.PedanticWarningsAsErrors>
+        <avr32gcc.compiler.warnings.InhibitAllWarnings>false</avr32gcc.compiler.warnings.InhibitAllWarnings>
+        <avr32gcc.compiler.miscellaneous.OtherFlags>-c -fmessage-length=0</avr32gcc.compiler.miscellaneous.OtherFlags>
+        <avr32gcc.compiler.miscellaneous.SupportAnsiPrograms>false</avr32gcc.compiler.miscellaneous.SupportAnsiPrograms>
+        <avr32gcc.linker.general.DoNotUseStandardStartFiles>true</avr32gcc.linker.general.DoNotUseStandardStartFiles>
+        <avr32gcc.linker.general.DoNotUseDefaultLibraries>false</avr32gcc.linker.general.DoNotUseDefaultLibraries>
+        <avr32gcc.linker.general.NoStartupOrDefaultLibs>false</avr32gcc.linker.general.NoStartupOrDefaultLibs>
+        <avr32gcc.linker.general.OmitAllSymbolInformation>false</avr32gcc.linker.general.OmitAllSymbolInformation>
+        <avr32gcc.linker.general.NoSharedLibraries>false</avr32gcc.linker.general.NoSharedLibraries>
+        <avr32gcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>newlib_addons-at32ucr2-speed_opt</Value>
+          </ListValues>
+        </avr32gcc.linker.libraries.Libraries>
+        <avr32gcc.linker.libraries.LibrarySearchPaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+          </ListValues>
+        </avr32gcc.linker.libraries.LibrarySearchPaths>
+        <avr32gcc.linker.optimization.GarbageCollectUnusedSections>true</avr32gcc.linker.optimization.GarbageCollectUnusedSections>
+        <avr32gcc.linker.optimization.EnableFastFloatingPointLibrary>false</avr32gcc.linker.optimization.EnableFastFloatingPointLibrary>
+        <avr32gcc.linker.optimization.EnableUnsafeMatchOptimizations>false</avr32gcc.linker.optimization.EnableUnsafeMatchOptimizations>
+        <avr32gcc.linker.optimization.EnableFastMath>false</avr32gcc.linker.optimization.EnableFastMath>
+        <avr32gcc.linker.optimization.GeneratePositionIndependentCode>false</avr32gcc.linker.optimization.GeneratePositionIndependentCode>
+        <avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>true</avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>
+        <avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>true</avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>
+        <avr32gcc.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/AES</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/GCC/AVR32_UC3</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FAT</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/SCSI_DECODER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/MCI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src/CCID/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/AES</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/ADC</Value>
+            <Value>../src/Tools</Value>
+            <Value>../src/USER_INTERFACE</Value>
+          </ListValues>
+        </avr32gcc.assembler.general.IncludePaths>
+        <avr32gcc.assembler.general.AnounceVersion>false</avr32gcc.assembler.general.AnounceVersion>
+        <avr32gcc.preprocessingassembler.general.AssemblerFlags>-Wa,-g</avr32gcc.preprocessingassembler.general.AssemblerFlags>
+        <avr32gcc.preprocessingassembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/AES</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/GCC/AVR32_UC3</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FAT</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/SCSI_DECODER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/MCI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/AES</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/ADC</Value>
+            <Value>../src/Tools</Value>
+            <Value>../src/USER_INTERFACE</Value>
+          </ListValues>
+        </avr32gcc.preprocessingassembler.general.IncludePaths>
+        <avr32gcc.preprocessingassembler.general.SuppressWarnings>false</avr32gcc.preprocessingassembler.general.SuppressWarnings>
+        <avr32gcc.preprocessingassembler.general.AnounceVersion>false</avr32gcc.preprocessingassembler.general.AnounceVersion>
+      </Avr32Gcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <Avr32Gcc>
+        <avr32gcc.common.outputfiles.hex>True</avr32gcc.common.outputfiles.hex>
+        <avr32gcc.common.outputfiles.lss>True</avr32gcc.common.outputfiles.lss>
+        <avr32gcc.common.outputfiles.eep>True</avr32gcc.common.outputfiles.eep>
+        <avr32gcc.common.outputfiles.srec>True</avr32gcc.common.outputfiles.srec>
+        <avr32gcc.compiler.preprocessor.DoNotSearchSystemDirectories>false</avr32gcc.compiler.preprocessor.DoNotSearchSystemDirectories>
+        <avr32gcc.compiler.preprocessor.PreprocessOnly>false</avr32gcc.compiler.preprocessor.PreprocessOnly>
+        <avr32gcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>BOARD=EVK1104</Value>
+            <Value>FREERTOS_USED</Value>
+          </ListValues>
+        </avr32gcc.compiler.symbols.DefSymbols>
+        <avr32gcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/USER_INTERFACE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/AES</Value>
+            <Value>../src/CCID/LOCAL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/GCC/AVR32_UC3</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FAT</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/SCSI_DECODER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/MCI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src</Value>
+            <Value>../src/VIRTUAL_MEM</Value>
+            <Value>../src/USHELL</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/ADC</Value>
+            <Value>../src/Tools</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/HID</Value>
+          </ListValues>
+        </avr32gcc.compiler.directories.IncludePaths>
+        <avr32gcc.compiler.optimization.OtherFlags>-fdata-sections</avr32gcc.compiler.optimization.OtherFlags>
+        <avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>true</avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+        <avr32gcc.compiler.optimization.EnableFastFloatingPointLibrary>false</avr32gcc.compiler.optimization.EnableFastFloatingPointLibrary>
+        <avr32gcc.compiler.optimization.EnableUnsafeMatchOptimizations>false</avr32gcc.compiler.optimization.EnableUnsafeMatchOptimizations>
+        <avr32gcc.compiler.optimization.EnableFastMath>false</avr32gcc.compiler.optimization.EnableFastMath>
+        <avr32gcc.compiler.optimization.GeneratePositionIndependentCode>false</avr32gcc.compiler.optimization.GeneratePositionIndependentCode>
+        <avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>true</avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>
+        <avr32gcc.compiler.optimization.ForceDoubleWordAlignment>false</avr32gcc.compiler.optimization.ForceDoubleWordAlignment>
+        <avr32gcc.compiler.optimization.PutLargeImmediatesInConstPool>false</avr32gcc.compiler.optimization.PutLargeImmediatesInConstPool>
+        <avr32gcc.compiler.optimization.DoNotInitializeGotRegisterBeforeUsing>false</avr32gcc.compiler.optimization.DoNotInitializeGotRegisterBeforeUsing>
+        <avr32gcc.compiler.optimization.UseSectionRoDataForReadOnlyData>false</avr32gcc.compiler.optimization.UseSectionRoDataForReadOnlyData>
+        <avr32gcc.compiler.optimization.DebugLevel>Maximum (-g3)</avr32gcc.compiler.optimization.DebugLevel>
+        <avr32gcc.compiler.optimization.GenerateGprofInformation>false</avr32gcc.compiler.optimization.GenerateGprofInformation>
+        <avr32gcc.compiler.optimization.GenerateProfInformation>false</avr32gcc.compiler.optimization.GenerateProfInformation>
+        <avr32gcc.compiler.warnings.AllWarnings>true</avr32gcc.compiler.warnings.AllWarnings>
+        <avr32gcc.compiler.warnings.CheckSyntaxOnly>false</avr32gcc.compiler.warnings.CheckSyntaxOnly>
+        <avr32gcc.compiler.warnings.Pedantic>false</avr32gcc.compiler.warnings.Pedantic>
+        <avr32gcc.compiler.warnings.PedanticWarningsAsErrors>false</avr32gcc.compiler.warnings.PedanticWarningsAsErrors>
+        <avr32gcc.compiler.warnings.InhibitAllWarnings>false</avr32gcc.compiler.warnings.InhibitAllWarnings>
+        <avr32gcc.compiler.miscellaneous.OtherFlags>-c -fmessage-length=0</avr32gcc.compiler.miscellaneous.OtherFlags>
+        <avr32gcc.compiler.miscellaneous.SupportAnsiPrograms>false</avr32gcc.compiler.miscellaneous.SupportAnsiPrograms>
+        <avr32gcc.linker.general.DoNotUseStandardStartFiles>true</avr32gcc.linker.general.DoNotUseStandardStartFiles>
+        <avr32gcc.linker.general.DoNotUseDefaultLibraries>false</avr32gcc.linker.general.DoNotUseDefaultLibraries>
+        <avr32gcc.linker.general.NoStartupOrDefaultLibs>false</avr32gcc.linker.general.NoStartupOrDefaultLibs>
+        <avr32gcc.linker.general.OmitAllSymbolInformation>false</avr32gcc.linker.general.OmitAllSymbolInformation>
+        <avr32gcc.linker.general.NoSharedLibraries>false</avr32gcc.linker.general.NoSharedLibraries>
+        <avr32gcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>newlib_addons-at32ucr2-speed_opt</Value>
+          </ListValues>
+        </avr32gcc.linker.libraries.Libraries>
+        <avr32gcc.linker.libraries.LibrarySearchPaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+          </ListValues>
+        </avr32gcc.linker.libraries.LibrarySearchPaths>
+        <avr32gcc.linker.optimization.GarbageCollectUnusedSections>true</avr32gcc.linker.optimization.GarbageCollectUnusedSections>
+        <avr32gcc.linker.optimization.EnableFastFloatingPointLibrary>false</avr32gcc.linker.optimization.EnableFastFloatingPointLibrary>
+        <avr32gcc.linker.optimization.EnableUnsafeMatchOptimizations>false</avr32gcc.linker.optimization.EnableUnsafeMatchOptimizations>
+        <avr32gcc.linker.optimization.EnableFastMath>false</avr32gcc.linker.optimization.EnableFastMath>
+        <avr32gcc.linker.optimization.GeneratePositionIndependentCode>false</avr32gcc.linker.optimization.GeneratePositionIndependentCode>
+        <avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>true</avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>
+        <avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>true</avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>
+        <avr32gcc.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/AES</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/GCC/AVR32_UC3</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FAT</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/SCSI_DECODER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/MCI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src/CCID/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/ADC</Value>
+            <Value>../src/Tools</Value>
+            <Value>../src/USER_INTERFACE</Value>
+          </ListValues>
+        </avr32gcc.assembler.general.IncludePaths>
+        <avr32gcc.assembler.general.AnounceVersion>false</avr32gcc.assembler.general.AnounceVersion>
+        <avr32gcc.assembler.debugging.DebugLevel>Default (-g)</avr32gcc.assembler.debugging.DebugLevel>
+        <avr32gcc.preprocessingassembler.general.AssemblerFlags>-Wa,-g</avr32gcc.preprocessingassembler.general.AssemblerFlags>
+        <avr32gcc.preprocessingassembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/AES</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/GCC/AVR32_UC3</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/FAT</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/SCSI_DECODER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/USB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/MCI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/ADC</Value>
+            <Value>../src/Tools</Value>
+            <Value>../src/USER_INTERFACE</Value>
+          </ListValues>
+        </avr32gcc.preprocessingassembler.general.IncludePaths>
+        <avr32gcc.preprocessingassembler.general.SuppressWarnings>false</avr32gcc.preprocessingassembler.general.SuppressWarnings>
+        <avr32gcc.preprocessingassembler.general.AnounceVersion>false</avr32gcc.preprocessingassembler.general.AnounceVersion>
+        <avr32gcc.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</avr32gcc.preprocessingassembler.debugging.DebugLevel>
+      </Avr32Gcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+  <ItemGroup>
+    <None Include="fuses_read.fuses">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="fuses_write.fuses">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src" />
+    <Compile Include="src\global.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\mass_storage_example.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\mass_storage_example.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\tools.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\tools.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\CCID" />
+    <Folder Include="src\CCID\LOCAL_ACCESS" />
+    <Compile Include="src\CCID\LOCAL_ACCESS\Debug_T1.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\LOCAL_ACCESS\Debug_T1.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\LOCAL_ACCESS\OpenPGP_V20.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\LOCAL_ACCESS\OpenPGP_V20.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\CCID\UNIT_TEST" />
+    <Compile Include="src\CCID\UNIT_TEST\SIM_USB_CCID.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\UNIT_TEST\SIM_USB_CCID.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\CCID\USART" />
+    <Compile Include="src\CCID\USART\ISO7816_ADPU.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\USART\ISO7816_ADPU.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\USART\ISO7816_Prot_T0.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\USART\ISO7816_Prot_T0.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\USART\ISO7816_Prot_T1.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\USART\ISO7816_Prot_T1.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\USART\ISO7816_USART.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\USART\ISO7816_USART.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\USART\ISO7816_USART_INT.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CCID\USART\ISO7816_USART_INT.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\Cipher" />
+    <Folder Include="src\Cipher\Xts" />
+    <Compile Include="src\Cipher\Xts\aes.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Cipher\Xts\aescrypt.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Cipher\Xts\aeskey.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Cipher\Xts\aesopt.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Cipher\Xts\aestab.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Cipher\Xts\aestab.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Cipher\Xts\brg_endian.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Cipher\Xts\brg_types.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Cipher\Xts\modetest.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Cipher\Xts\mode_hdr.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Cipher\Xts\xts.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Cipher\Xts\xts.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\Cipher\Xts\xts.readme.txt">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\CONFIG" />
+    <Compile Include="src\CONFIG\conf_access.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CONFIG\conf_at45dbx.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CONFIG\conf_explorer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CONFIG\conf_sd_mmc_mci.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CONFIG\conf_sd_mmc_spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CONFIG\conf_usb.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CONFIG\FreeRTOSConfig.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\CONFIG\FreeRTOSConfig.h.bak">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\FILE_IO" />
+    <Compile Include="src\FILE_IO\FileAccessInterface.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\FILE_IO\FileAccessInterface.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\HighLevelFunctions" />
+    <Compile Include="src\HighLevelFunctions\FlashStorage.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\HighLevelFunctions\FlashStorage.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\HighLevelFunctions\HandleAesStorageKey.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\HighLevelFunctions\HandleAesStorageKey.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\HighLevelFunctions\HiddenVolume.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\HighLevelFunctions\HiddenVolume.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\HighLevelFunctions\MatrixPassword.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\HighLevelFunctions\MatrixPassword.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\INTERNAL_WORK" />
+    <Compile Include="src\INTERNAL_WORK\internal_work.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\INTERNAL_WORK\internal_work.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\OTP" />
+    <Compile Include="src\OTP\aes.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\OTP\aes.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\OTP\hmac-sha1.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\OTP\hmac-sha1.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\OTP\hotp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\OTP\hotp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\OTP\keyboard.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\OTP\keyboard.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\OTP\report_protocol.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\OTP\report_protocol.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\OTP\sha1.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\OTP\sha1.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\ASM" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\ASM\trampoline.x">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\BOARDS" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\BOARDS\board.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\BOARDS\EVK1104" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\BOARDS\EVK1104\evk1104.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\BOARDS\EVK1104\led.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\BOARDS\EVK1104\led.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH\AT45DBX" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH\AT45DBX\at45dbx.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH\AT45DBX\at45dbx.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH\AT45DBX\at45dbx_mem.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH\AT45DBX\at45dbx_mem.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\SD_MMC" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\SD_MMC\SD_MMC_MCI" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\SD_MMC\SD_MMC_MCI\sd_mmc_cmd.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\SD_MMC\SD_MMC_MCI\sd_mmc_mci.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\SD_MMC\SD_MMC_MCI\sd_mmc_mci.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\SD_MMC\SD_MMC_MCI\sd_mmc_mci_mem.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\SD_MMC\SD_MMC_MCI\sd_mmc_mci_mem.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\ADC" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\ADC\adc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\ADC\adc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\AES" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\AES\aes.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\AES\aes.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\AES\aes_1231.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\AES\ram_aes_ram_example.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\CPU" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\CPU\CYCLE_COUNTER" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\CPU\CYCLE_COUNTER\cycle_counter.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\FLASHC" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\FLASHC\flashc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\FLASHC\flashc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\GPIO" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\GPIO\gpio.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\GPIO\gpio.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\INTC" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\INTC\intc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\INTC\intc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\MCI" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\MCI\mci.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\MCI\mci.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM\pm.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM\pm.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM\pm_conf_clocks.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM\power_clocks_lib.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM\power_clocks_lib.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\SPI" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\SPI\spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\SPI\spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\TC" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\TC\tc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\TC\tc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USART" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USART\usart.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USART\usart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\usbb.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\usb_drv.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\usb_drv.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\usb_task.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\usb_task.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\DEVICE" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\DEVICE\usb_descriptors.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\DEVICE\usb_descriptors.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\DEVICE\usb_device_task.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\DEVICE\usb_device_task.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\DEVICE\usb_specific_request.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\DEVICE\usb_specific_request.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\DEVICE\usb_standard_request.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\DEVICE\usb_standard_request.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\HOST" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\HOST\usb_host_enum.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\HOST\usb_host_enum.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\HOST\usb_host_task.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USBB\ENUM\HOST\usb_host_task.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\FAT" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FAT\fat.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FAT\fat.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FAT\fat_unusual.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FAT\file.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FAT\file.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FAT\fsaccess.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FAT\fsaccess.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FAT\fs_com.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FAT\navigation.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FAT\navigation.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\croutine.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\list.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\queue.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\tasks.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\include" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\include\croutine.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\include\FreeRTOS.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\include\list.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\include\mpu_wrappers.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\include\portable.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\include\projdefs.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\include\queue.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\include\semphr.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\include\StackMacros.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\include\task.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\portable" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\portable\GCC" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\portable\GCC\AVR32_UC3" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\portable\GCC\AVR32_UC3\exception.x">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\portable\GCC\AVR32_UC3\port.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\portable\GCC\AVR32_UC3\portmacro.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\portable\MemMang" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\FREERTOS\Source\portable\MemMang\heap_3.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\MEMORY" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\MEMORY\CTRL_ACCESS" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\MEMORY\CTRL_ACCESS\ctrl_access.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\MEMORY\CTRL_ACCESS\ctrl_access.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\aes.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\arc4.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\base64.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\bignum.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\camellia.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\certs.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\debug.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\des.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\dhm.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\havege.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\md2.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\md4.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\md5.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\net.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\padlock.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\rsa.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\sha1.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\sha2.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\sha4.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\ssl_cli.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\ssl_srv.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\ssl_tls.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\timing.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\x509parse.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\xtea.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\aes.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\arc4.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\base64.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\bignum.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\bn_mul.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\camellia.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\certs.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\config.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\debug.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\des.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\dhm.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\havege.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\md2.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\md4.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\md5.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\net.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\openssl.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\padlock.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\rsa.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\sha1.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\sha2.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\sha4.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\ssl.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\timing.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\x509.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\POLARSSL\include\polarssl\xtea.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\usb_ids.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\HID" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\HID\hid.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\MASS_STORAGE" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\MASS_STORAGE\device_mass_storage_task.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\MASS_STORAGE\device_mass_storage_task.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\MASS_STORAGE\host_mass_storage_task.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\MASS_STORAGE\host_mass_storage_task.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\MASS_STORAGE\HOST_MEM" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\MASS_STORAGE\HOST_MEM\host_mem.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\MASS_STORAGE\HOST_MEM\host_mem.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\MASS_STORAGE\SCSI_DECODER" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\MASS_STORAGE\SCSI_DECODER\scsi_decoder.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\USB\CLASS\MASS_STORAGE\SCSI_DECODER\scsi_decoder.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS" />
+    <None Include="src\SOFTWARE_FRAMEWORK\UTILS\at32uc3a3-isp.bin">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\compiler.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\conf_isp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\SOFTWARE_FRAMEWORK\UTILS\isp_mycfg_w1.bin">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\parts.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\SOFTWARE_FRAMEWORK\UTILS\StartApp.bat">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\DEBUG" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\DEBUG\debug.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\DEBUG\debug.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\DEBUG\print_funcs.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\DEBUG\print_funcs.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS" />
+    <None Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\libnewlib_addons-at32ucr2-speed_opt.a">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE\nlao_cpu.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE\nlao_exceptions.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE\nlao_interrupts.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE\nlao_io.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE\nlao_usart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS\AT32UC3A3" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS\AT32UC3A3\256" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS\AT32UC3A3\256\GCC" />
+    <None Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS\AT32UC3A3\256\GCC\link_uc3a3256.lds">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\PREPROCESSOR" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\PREPROCESSOR\mrepeat.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\PREPROCESSOR\preprocessor.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\PREPROCESSOR\stringz.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\PREPROCESSOR\tpaste.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\STARTUP_FILES" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\STARTUP_FILES\GCC" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\STARTUP_FILES\GCC\crt0.x">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\Tools" />
+    <Compile Include="src\Tools\AD_Test.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\AD_Test.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\BUFFERED_SIO.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\BUFFERED_SIO.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\DFU_test.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\DFU_test.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\Inbetriebnahme.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\Inbetriebnahme.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\Interpreter.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\Interpreter.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\LED_test.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\LED_test.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\OTP_Test.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\OTP_Test.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\SD_Test.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\SD_Test.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\TIME_MEASURING.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Tools\TIME_MEASURING.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\USB_CCID" />
+    <Compile Include="src\USB_CCID\USB_CCID.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\USB_CCID\USB_CCID.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\USB_CCID\USB_CCID_task.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\USB_CCID\USB_CCID_task.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\USER_INTERFACE" />
+    <None Include="src\USER_INTERFACE\CryptoStickWebUserInterface.html">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\USER_INTERFACE\file_io.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\USER_INTERFACE\file_io.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\USER_INTERFACE\html_io.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\USER_INTERFACE\html_io.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\USHELL" />
+    <Compile Include="src\USHELL\ushell_task.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\USHELL\ushell_task.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\VIRTUAL_MEM" />
+    <Compile Include="src\VIRTUAL_MEM\virtual_mem.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\VIRTUAL_MEM\virtual_mem.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>

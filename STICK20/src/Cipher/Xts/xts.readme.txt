@@ -1,0 +1,76 @@
+
+XTS README
+==========
+
+This is an initial implementation of XTS. The files in this archive are
+as follows:
+
+1. AES implementation Files (C source)
+--------------------------------------
+
+aes.h           AES header file
+aesopt.h        AES optimisation options
+aestab.h        AES table header
+
+aescrypt.c      AES encrypt/decrypt
+aeskey.c        AES key schedule generation
+aestab.c        AES tables
+
+brg_endian.h    general purpose endian detection code
+brg_types.h     general purpose fixed width type definitions
+
+2. XTS Files (C source)
+-----------------------
+
+xts.h           XTS header file   
+xts.c           XTS
+
+mode_hdr.h      general purpose support code
+
+xts*.txt        test vector templates for GENTEST
+
+3. GENTEST
+----------
+
+GENTEST is a test vector generator which is described in gentest.txt. 
+For XTS it is compiled with the code above and then used with a test 
+vector template to generate test vectors.  The command:
+
+   gentest  template_file   test_vector_file
+   
+generates test vectors in 'test_vector_file' from the template in the 
+file 'template_file' (the xts*.txt files are examples of templates).
+
+4. MODETEST
+-----------
+ 
+MODETEST is compiled with AES and XTS source code and will then run 
+GENTEST test vector files and check if the implementation complies with 
+the test vectors provided.  The comamnd
+ 
+   modetest input_dir tv_name
+   
+will process multiple test vector files in the directory 'input_dir' 
+with the names tv_name.1, tv_name.2, .... and determine if the program 
+under test succeeds in duplicating the results.
+
+4. HELP NEEDED
+--------------
+
+I would greatly appreciate help and feedback on the following:
+
+1. Testing the code on big-endian machines with each of the 
+   following defines in mode_hdr.h:
+   
+   a. UNIT_BITS 64
+   a. UNIT_BITS 32
+   a. UNIT_BITS  8
+   
+2. The same on Sun systems AND to check that the 32 and 64 bit
+   compilers select the correct types in brg_types.h (for the
+   64-bit type in particular).
+
+My thanks to anyone who is able to help.
+
+       Brian Gladman, Worcester, UK
+       20th October 2006
