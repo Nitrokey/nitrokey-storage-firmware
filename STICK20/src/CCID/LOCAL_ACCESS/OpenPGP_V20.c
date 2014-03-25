@@ -761,14 +761,14 @@ int LA_OpenPGP_V20_Test_GetAID (void)
 {
   int nRet;
 
-//  CI_LocalPrintf ("Get AID  : ");
+  CI_LocalPrintf ("Get AID  : ");
   nRet = LA_OpenPGP_V20_GetData (&tSC_OpenPGP_V20,0x00,0x4F);
   if (FALSE == nRet)
   {
-//    CI_LocalPrintf ("fail\n\r");
+    CI_LocalPrintf ("fail\n\r");
     return (FALSE);
   }
-//  CI_LocalPrintf ("OK \n\r");
+  CI_LocalPrintf ("OK \n\r");
 
   return (TRUE);
 }
@@ -789,15 +789,15 @@ int LA_OpenPGP_V20_Test_SendAdminPW (unsigned char *pcPW)
   int n;
 
   n = strlen ((char *)pcPW);
-//  CI_LocalPrintf ("Send admin password : %s ",pcPW);
+  CI_LocalPrintf ("Send admin password : %s ",pcPW);
 
   nRet = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,3,n,pcPW);
   if (FALSE == nRet)
   {
-//    CI_LocalPrintf ("fail\n\r");
+    CI_LocalPrintf ("fail\n\r");
     return (FALSE);
   }
-//  CI_LocalPrintf ("OK\n\r");
+  CI_LocalPrintf ("OK\n\r");
   return (TRUE);
 }
 /*******************************************************************************

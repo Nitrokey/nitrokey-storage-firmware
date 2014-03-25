@@ -545,7 +545,6 @@ void HID_ExcuteCmd (void)
   {
     case HTML_CMD_ENABLE_AES_LUN :
     case HTML_CMD_ENABLE_FIRMWARE_UPDATE :
-    case HTML_CMD_FILL_SD_WITH_RANDOM_CHARS :
     case HTML_CMD_ENABLE_HIDDEN_AES_LUN :
     case HTML_CMD_DISABLE_HIDDEN_AES_LUN :
     case HTML_CMD_EXPORT_BINARY :
@@ -560,6 +559,23 @@ void HID_ExcuteCmd (void)
         case 'M' : //  matrix password
           // Convert matrix input to password
           if (FALSE == ConvertMatrixDataToPassword(&HID_String_au8[1]))
+          {
+            UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
+            return;
+          }
+          break;
+      }
+      break;
+
+    case HTML_CMD_FILL_SD_WITH_RANDOM_CHARS :
+      switch (HID_String_au8[1])
+      {
+        case 'P' : //  normal password
+          // Do nothing
+          break;
+        case 'M' : //  matrix password
+          // Convert matrix input to password
+          if (FALSE == ConvertMatrixDataToPassword(&HID_String_au8[2]))
           {
             UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
             return;
@@ -601,7 +617,6 @@ void HID_ExcuteCmd (void)
         SetSdEncryptedCardEnableState (FALSE);    // Disable crypted or hidden volume
         vTaskDelay (1000);
 
-
         GetStorageKey_u32 (&HID_String_au8[1],StorageKey_pu8);
         AES_SetNewStorageKey (StorageKey_pu8);
 
@@ -609,10 +624,10 @@ void HID_ExcuteCmd (void)
         SetSdEncryptedCardEnableState (TRUE);
 
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
-
+/*
         HID_NextPasswordIsHiddenPassword_u32 = TRUE;    // switch on redirection of aes volume password
         CI_TickLocalPrintf ("Next AES volume password is used for hidden volume\r\n");
-
+*/
         CI_TickLocalPrintf ("SD card AES LUN enabled\r\n");
       }
       else
@@ -649,7 +664,7 @@ void HID_ExcuteCmd (void)
       break;
 
     case HTML_CMD_FILL_SD_WITH_RANDOM_CHARS :
-      if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
+      if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[2]))
       {
         CI_TickLocalPrintf ("Fill SD card with random numbers - it runs very long, 1 GB ca. 4 minutes\r\n");
 
@@ -664,7 +679,14 @@ void HID_ExcuteCmd (void)
 
         vTaskDelay (500);
 
-        SD_SecureEraseHoleCard ();
+        if (STICK20_FILL_SD_CARD_WITH_RANDOM_CHARS_ALL_VOL == HID_String_au8[0])
+        {
+          SD_SecureEraseHoleCard ();
+        }
+        else
+        {
+          SD_SecureEraseCryptedVolume ();
+        }
 
         SetSdCardFilledWithRandomsToFlash ();
 

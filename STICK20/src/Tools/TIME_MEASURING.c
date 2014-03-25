@@ -487,7 +487,7 @@ u32 TIME_MEASURING_Stop_st (TIME_MEASURING_tst *Time_st,u32 SlotSize_u32)
 
     Time_st->LastStop_u64    = TIME_MEASURING_GetTime ();
     Time_st->LastRuntime_u64 = TIME_MEASURING_GetDiffTime (Time_st->LastStart_u64,Time_st->LastStop_u64);
-    Time_st->LastRuntime_u32 = Time_st->LastRuntime_u32;
+    Time_st->LastRuntime_u32 = Time_st->LastRuntime_u64;
 
     if (Time_st->LastRuntimeMin_u32 > Time_st->LastRuntime_u32)
     {

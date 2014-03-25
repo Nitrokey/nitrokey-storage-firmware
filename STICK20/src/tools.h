@@ -59,6 +59,7 @@ void CRC_CalcBlockCRC32_8 (u32 *Data_pu8, u32 Len_u32);
 u32 CRC_GetCRC32 (void);
 u32 generateCRC_len (u8 *data,u8 len);
 u32 generateCRC(u8 *data);
+u32 change_endian_u32 (u32 x);
 
 typedef struct {
   u32 MSD_ReadCalls_u32;

@@ -103,10 +103,21 @@ size	offset	description
 4		60		this report's CRC (with device status equal 0)
 */
 
-#define OUTPUT_CMD_TYPE_OFFSET                   1
+#define OUTPUT_DEVICE_STATUS_OFFSET              0
+
+// Quick hack for testing
+/*
+#define OUTPUT_LAST_CMD_TYPE_OFFSET              0
+#define OUTPUT_CMD_CRC_OFFSET                    1
+#define OUTPUT_CMD_STATUS_OFFSET                 5
+#define OUTPUT_CMD_RESULT_OFFSET                 6
+*/
+
+#define OUTPUT_LAST_CMD_TYPE_OFFSET              1
 #define OUTPUT_CMD_CRC_OFFSET                    2
 #define OUTPUT_CMD_STATUS_OFFSET                 6
 #define OUTPUT_CMD_RESULT_OFFSET                 7
+
 #define OUTPUT_CMD_RESULT_STICK20_STATUS_START  20
 #define OUTPUT_CMD_RESULT_STICK20_DATA_START    25
 #define OUTPUT_CRC_OFFSET                       60
@@ -115,21 +126,9 @@ size	offset	description
 #define CMD_TYPE_OFFSET            0
 
 
-/* For Stick 20 */
-/* Old version
-typedef struct {
-  u8  MatrixPasswordUserActiv_u8;
-  u8  MatrixPasswordAdminActiv_u8;
-  u8  ActivPasswordStatus_u8;
-  u8  VolumeStatus_u8;
-  u32 SD_BlockSize_u32;
-} HID_Stick20AccessStatus_est;
+#define STICK20_FILL_SD_CARD_WITH_RANDOM_CHARS_ALL_VOL              0
+#define STICK20_FILL_SD_CARD_WITH_RANDOM_CHARS_ENCRYPTED_VOL        1
 
-void SendStickStatusToHID (HID_Stick20AccessStatus_est *HID_Stick20AccessStatus_st);
-void GetStickStatusFromHID (HID_Stick20AccessStatus_est *HID_Stick20AccessStatus_st);
-*/
-
-// #define OUTPUT_CMD_STICK20_STATUS_OFFSET   7
 
 #define OUTPUT_CMD_STICK20_STATUS_IDLE                      0
 #define OUTPUT_CMD_STICK20_STATUS_OK                        1
@@ -240,8 +239,10 @@ output:
 	
 */
 
-#define CMD_GC_SLOT_NUMBER_OFFSET     1
-#define CMD_GC_CHALLENGE_OFFSET       2
+#define CMD_GC_SLOT_NUMBER_OFFSET      1
+#define CMD_GC_CHALLENGE_OFFSET        2
+#define CMD_GC_TIMESTAMP_OFFSET       10
+#define CMD_GC_INTERVAL_OFFSET        18
 
 /*
 CMD_WRITE_CONFIG	

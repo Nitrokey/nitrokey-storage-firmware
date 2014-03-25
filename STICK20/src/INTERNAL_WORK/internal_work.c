@@ -61,6 +61,15 @@
 
 
 
+#ifndef STICK_20_A_MUSTER_PROD
+  #define INTERPRETER_ENABLE     // Disable for PROD Version
+#endif
+
+#ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
+  #define INTERPRETER_ENABLE     // Enable also for PROD Version
+#endif
+
+
 /*******************************************************************************
 
  Local defines
@@ -157,8 +166,8 @@ void IW_task(void *pvParameters)
 
   xLastWakeTime = xTaskGetTickCount();
 
-#ifndef TIME_MEASURING_ENABLE
-  IDF_PrintStartupInfo ();
+#ifdef INTERPRETER_ENABLE
+//  IDF_PrintStartupInfo ();
 #endif
 
   while (TRUE)

@@ -477,9 +477,9 @@ u8 SD_SecureEraseCryptedVolume (void)
 
   sd_mmc_mci_read_capacity (SD_SLOT,(U32 *)&Blockcount_u32);
 
-  CI_LocalPrintf ("Erase SD: blocks from %d to %d\r\n",Blockcount_u32);
+  CI_LocalPrintf ("Erase SD: blocks from %d to %d\r\n",GetStartCryptedVolume_u32 (),Blockcount_u32);
 
-  SD_WriteBlocks (GetStartUncryptedVolume_u32 (),Blockcount_u32,1);
+  SD_WriteBlocks (GetStartCryptedVolume_u32 (),Blockcount_u32,1);
   return (TRUE);
 }
 

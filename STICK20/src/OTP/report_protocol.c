@@ -46,6 +46,8 @@
 #include "hotp.h"
 #include "report_protocol.h"
 #include "string.h"
+#include "time.h"
+
 
 #include "CCID/USART/ISO7816_ADPU.h"
 #include "CCID/USART/ISO7816_Prot_T1.h"
@@ -76,6 +78,7 @@
   #define CI_TickLocalPrintf(...)
   #define CI_StringOut(...)
   #define CI_Print8BitValue(...)
+  #define HexPrint(...)
 #endif
 
 //#define KEYBOARD_FEATURE_COUNT                64
@@ -272,25 +275,25 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
 
   if (0 != (Stick20Configuration_st.NewSDCardFound_u8 & 0x01))
   {
-    CI_StringOut ("*** New SD card found - Change Counter");
+    CI_StringOut ("*** New SD card found - Change Counter:");
   }
   else
   {
-    CI_StringOut ("SD card              - Change Counter");
+    CI_StringOut ("SD card              - Change Counter:");
   }
-  itoa (text_au8,(Stick20Configuration_st.SDFillWithRandomChars_u8 >> 1));
+  itoa ((Stick20Configuration_st.SDFillWithRandomChars_u8 >> 1),text_au8);
   CI_StringOut (text_au8);
   CI_StringOut ("\r\n");
 
   if (0 == (Stick20Configuration_st.SDFillWithRandomChars_u8 & 0x01))
   {
-    CI_StringOut("Not filled with random chars - Change Counter");
+    CI_StringOut("Not filled with random chars - Change Counter:");
   }
   else
   {
-    CI_StringOut("Filled with random    - Change Counter");
+    CI_StringOut("Filled with random    - Change Counter:");
   }
-  itoa (text_au8,(Stick20Configuration_st.SDFillWithRandomChars_u8 >> 1));
+  itoa ((Stick20Configuration_st.SDFillWithRandomChars_u8 >> 1),text_au8);
   CI_StringOut (text_au8);
   CI_StringOut ("\r\n");
 
@@ -466,7 +469,7 @@ u8 Stick20HIDSendMatrixData (u8 *output)
 
 u8 parse_report_stick_20 (u8 *report,u8 *output)
 {
-
+  return (TRUE);
 }
 
 /*******************************************************************************
@@ -505,21 +508,33 @@ u8 parse_report(u8 *report,u8 *output)
 // Init output block
 	memset(output,0,KEYBOARD_FEATURE_COUNT);
 
-	output[OUTPUT_CMD_TYPE_OFFSET]=cmd_type;
-
-	output[OUTPUT_CMD_CRC_OFFSET]  = calculated_crc32      & 0xFF;
-	output[OUTPUT_CMD_CRC_OFFSET+1]=(calculated_crc32>> 8) & 0xFF;
-	output[OUTPUT_CMD_CRC_OFFSET+2]=(calculated_crc32>>16) & 0xFF;
-	output[OUTPUT_CMD_CRC_OFFSET+3]=(calculated_crc32>>24) & 0xFF;
+// Set last command value
+	output[OUTPUT_LAST_CMD_TYPE_OFFSET]=cmd_type;
 
 // Get CRC from HID report block
-	received_crc32 = getu32(report+KEYBOARD_FEATURE_COUNT-4);
+  received_crc32 = getu32(report+KEYBOARD_FEATURE_COUNT-4);
 
 // Check data with CRC
   calculated_crc32 = generateCRC (report);
+
+// Store the CRC as the CMD_CRC
+	output[OUTPUT_CMD_CRC_OFFSET]  = received_crc32      & 0xFF;
+	output[OUTPUT_CMD_CRC_OFFSET+1]=(received_crc32>> 8) & 0xFF;
+	output[OUTPUT_CMD_CRC_OFFSET+2]=(received_crc32>>16) & 0xFF;
+	output[OUTPUT_CMD_CRC_OFFSET+3]=(received_crc32>>24) & 0xFF;
+
+
   if (calculated_crc32 != received_crc32)
   {
-    CI_StringOut ("Get CRC Wrong - ");
+    CI_StringOut ("CRC Wrong\r\n");
+    CI_StringOut ("Get     ");
+    for (i=0;i<4;i++)
+    {
+        CI_Print8BitValue (output[OUTPUT_CMD_CRC_OFFSET+3-i]);
+    }
+    CI_StringOut ("\r\n");
+
+    CI_StringOut ("Compute ");
     for (i=0;i<4;i++)
     {
         CI_Print8BitValue (output[OUTPUT_CMD_CRC_OFFSET+3-i]);
@@ -539,15 +554,31 @@ u8 parse_report(u8 *report,u8 *output)
         break;
 
       case CMD_WRITE_TO_SLOT:
-        CI_StringOut ("Get CMD_WRITE_TO_SLOT\r\n");
+        {
+          u8 text[10];
+          CI_StringOut ("Get CMD_WRITE_TO_SLOT - slot ");
+          itoa ((u8)report[1],text);
+          CI_StringOut (text);
+          CI_StringOut ("\r\n");
+        }
         if (calculated_crc32==authorized_crc)
-        cmd_write_to_slot(report,output);
+        {
+          cmd_write_to_slot(report,output);
+        }
         else
-        not_authorized=1;
+        {
+          not_authorized=1;
+        }
         break;
 
       case CMD_READ_SLOT_NAME:
-        CI_StringOut ("Get CMD_READ_SLOT_NAME\r\n");
+        {
+          u8 text[10];
+          CI_StringOut ("Get CMD_READ_SLOT_NAME - slot ");
+          itoa ((u8)report[1],text);
+          CI_StringOut (text);
+          CI_StringOut ("\r\n");
+        }
         cmd_read_slot_name(report,output);
         break;
 
@@ -575,15 +606,14 @@ u8 parse_report(u8 *report,u8 *output)
       case CMD_ERASE_SLOT:
         CI_StringOut ("Get CMD_ERASE_SLOT\r\n");
         if (calculated_crc32==authorized_crc)
-        cmd_erase_slot(report,output);
+          cmd_erase_slot(report,output);
         else
-        not_authorized=1;
+          not_authorized=1;
         break;
 
       case CMD_FIRST_AUTHENTICATE:
-        CI_StringOut ("Get CMD_FIRST_AUTHENTICATE - ");
+        CI_StringOut ("Get CMD_FIRST_AUTHENTICATE\r\n");
         cmd_first_authenticate(report,output);
-        CI_StringOut ("ok\r\n");
         break;
 
       case CMD_AUTHORIZE:
@@ -593,6 +623,7 @@ u8 parse_report(u8 *report,u8 *output)
     }
     if (not_authorized)
     {
+      CI_StringOut ("Get CMD_AUTHORIZE\r\n");
       output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_NOT_AUTHORIZED;
     }
 
@@ -607,242 +638,245 @@ u8 parse_report(u8 *report,u8 *output)
   }
 
   // Stick 2.0 commands
-  if (calculated_crc32==received_crc32)
+  if (STICK20_CMD_START_VALUE <=cmd_type)
   {
-    switch (cmd_type){
-      case STICK20_CMD_ENABLE_CRYPTED_PARI:
-        CI_StringOut ("Get STICK20_CMD_ENABLE_CRYPTED_PARI Password=-");
-        CI_StringOut ((char*)&report[1]);
-        CI_StringOut ("-\r\n");
+    if ((calculated_crc32==received_crc32))
+    {
+      switch (cmd_type){
+        case STICK20_CMD_ENABLE_CRYPTED_PARI:
+          CI_StringOut ("Get STICK20_CMD_ENABLE_CRYPTED_PARI Password=-");
+          CI_StringOut ((char*)&report[1]);
+          CI_StringOut ("-\r\n");
 
-        StartStick20Command (STICK20_CMD_ENABLE_CRYPTED_PARI);
+          StartStick20Command (STICK20_CMD_ENABLE_CRYPTED_PARI);
 
-        // Tranfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_ENABLE_AES_LUN;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Tranfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_ENABLE_AES_LUN;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_DISABLE_CRYPTED_PARI:
-        CI_StringOut ("Get STICK20_CMD_DISABLE_CRYPTED_PARI\r\n");
+        case STICK20_CMD_DISABLE_CRYPTED_PARI:
+          CI_StringOut ("Get STICK20_CMD_DISABLE_CRYPTED_PARI\r\n");
 
-        StartStick20Command (STICK20_CMD_DISABLE_CRYPTED_PARI);
+          StartStick20Command (STICK20_CMD_DISABLE_CRYPTED_PARI);
 
-        // Tranfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_DISABLE_AES_LUN;
-        memset (HID_String_au8,0,33);
-        break;
+          // Tranfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_DISABLE_AES_LUN;
+          memset (HID_String_au8,0,33);
+          break;
 
 
-      case STICK20_CMD_ENABLE_HIDDEN_CRYPTED_PARI:
-        CI_StringOut ("Get STICK20_CMD_ENABLE_HIDDEN_CRYPTED_PARI Password=-");
-        CI_StringOut ((char*)&report[1]);
-        CI_StringOut ("-\r\n");
+        case STICK20_CMD_ENABLE_HIDDEN_CRYPTED_PARI:
+          CI_StringOut ("Get STICK20_CMD_ENABLE_HIDDEN_CRYPTED_PARI Password=-");
+          CI_StringOut ((char*)&report[1]);
+          CI_StringOut ("-\r\n");
 
-        StartStick20Command (STICK20_CMD_ENABLE_HIDDEN_CRYPTED_PARI);
+          StartStick20Command (STICK20_CMD_ENABLE_HIDDEN_CRYPTED_PARI);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_ENABLE_HIDDEN_AES_LUN;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_ENABLE_HIDDEN_AES_LUN;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_DISABLE_HIDDEN_CRYPTED_PARI:
-        CI_StringOut ("Get STICK20_CMD_DISABLE_HIDDEN_CRYPTED_PARI\r\n");
+        case STICK20_CMD_DISABLE_HIDDEN_CRYPTED_PARI:
+          CI_StringOut ("Get STICK20_CMD_DISABLE_HIDDEN_CRYPTED_PARI\r\n");
 
-        StartStick20Command (STICK20_CMD_DISABLE_HIDDEN_CRYPTED_PARI);
+          StartStick20Command (STICK20_CMD_DISABLE_HIDDEN_CRYPTED_PARI);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_DISABLE_HIDDEN_AES_LUN;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_DISABLE_HIDDEN_AES_LUN;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_ENABLE_FIRMWARE_UPDATE:
-        CI_StringOut ("Get STICK20_CMD_ENABLE_FIRMWARE_UPDATE\r\n");
+        case STICK20_CMD_ENABLE_FIRMWARE_UPDATE:
+          CI_StringOut ("Get STICK20_CMD_ENABLE_FIRMWARE_UPDATE\r\n");
 
-        StartStick20Command (STICK20_CMD_ENABLE_FIRMWARE_UPDATE);
+          StartStick20Command (STICK20_CMD_ENABLE_FIRMWARE_UPDATE);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_ENABLE_FIRMWARE_UPDATE;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_ENABLE_FIRMWARE_UPDATE;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_EXPORT_FIRMWARE_TO_FILE:
-        CI_StringOut ("Get STICK20_CMD_EXPORT_FIRMWARE_TO_FILE\r\n");
+        case STICK20_CMD_EXPORT_FIRMWARE_TO_FILE:
+          CI_StringOut ("Get STICK20_CMD_EXPORT_FIRMWARE_TO_FILE\r\n");
 
-        StartStick20Command (STICK20_CMD_EXPORT_FIRMWARE_TO_FILE);
+          StartStick20Command (STICK20_CMD_EXPORT_FIRMWARE_TO_FILE);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_EXPORT_BINARY;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_EXPORT_BINARY;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_GENERATE_NEW_KEYS:
-        CI_StringOut ("Get STICK20_CMD_GENERATE_NEW_KEYS\r\n");
+        case STICK20_CMD_GENERATE_NEW_KEYS:
+          CI_StringOut ("Get STICK20_CMD_GENERATE_NEW_KEYS\r\n");
 
-        StartStick20Command (STICK20_CMD_GENERATE_NEW_KEYS);
+          StartStick20Command (STICK20_CMD_GENERATE_NEW_KEYS);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_GENERATE_NEW_KEYS;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_GENERATE_NEW_KEYS;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_FILL_SD_CARD_WITH_RANDOM_CHARS:
-        CI_StringOut ("Get STICK20_CMD_FILL_SD_CARD_WITH_RANDOM_CHARS\r\n");
+        case STICK20_CMD_FILL_SD_CARD_WITH_RANDOM_CHARS:
+          CI_StringOut ("Get STICK20_CMD_FILL_SD_CARD_WITH_RANDOM_CHARS\r\n");
 
-        StartStick20Command (STICK20_CMD_FILL_SD_CARD_WITH_RANDOM_CHARS);
+          StartStick20Command (STICK20_CMD_FILL_SD_CARD_WITH_RANDOM_CHARS);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_FILL_SD_WITH_RANDOM_CHARS;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_FILL_SD_WITH_RANDOM_CHARS;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_SEND_PASSWORD_MATRIX :
-        CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_MATRIX\r\n");
+        case STICK20_CMD_SEND_PASSWORD_MATRIX :
+          CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_MATRIX\r\n");
 
-        StartStick20Command (STICK20_CMD_SEND_PASSWORD_MATRIX);
+          StartStick20Command (STICK20_CMD_SEND_PASSWORD_MATRIX);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD_MATRIX;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD_MATRIX;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_SEND_PASSWORD_MATRIX_PINDATA :
-        CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_MATRIX_PINDATA\r\n");
+        case STICK20_CMD_SEND_PASSWORD_MATRIX_PINDATA :
+          CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_MATRIX_PINDATA\r\n");
 
-        StartStick20Command (STICK20_CMD_SEND_PASSWORD_MATRIX_PINDATA);
+          StartStick20Command (STICK20_CMD_SEND_PASSWORD_MATRIX_PINDATA);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD_MATRIX_PINDATA;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD_MATRIX_PINDATA;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_SEND_PASSWORD_MATRIX_SETUP :
-        CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_MATRIX_SETUP\r\n");
+        case STICK20_CMD_SEND_PASSWORD_MATRIX_SETUP :
+          CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_MATRIX_SETUP\r\n");
 
-        StartStick20Command (STICK20_CMD_SEND_PASSWORD_MATRIX_SETUP);
+          StartStick20Command (STICK20_CMD_SEND_PASSWORD_MATRIX_SETUP);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD_MATRIX_SETUP;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD_MATRIX_SETUP;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
 
-      case STICK20_CMD_GET_DEVICE_STATUS :
-        CI_StringOut ("Get STICK20_CMD_GET_DEVICE_STATUS\r\n");
+        case STICK20_CMD_GET_DEVICE_STATUS :
+          CI_StringOut ("Get STICK20_CMD_GET_DEVICE_STATUS\r\n");
 
-        StartStick20Command (STICK20_CMD_GET_DEVICE_STATUS);
+          StartStick20Command (STICK20_CMD_GET_DEVICE_STATUS);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_GET_DEVICE_STATUS;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_GET_DEVICE_STATUS;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_SEND_DEVICE_STATUS :
-        CI_StringOut ("Get STICK20_CMD_SEND_DEVICE_STATUS\r\n");
+        case STICK20_CMD_SEND_DEVICE_STATUS :
+          CI_StringOut ("Get STICK20_CMD_SEND_DEVICE_STATUS\r\n");
 
-        StartStick20Command (STICK20_CMD_SEND_DEVICE_STATUS);
+          StartStick20Command (STICK20_CMD_SEND_DEVICE_STATUS);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_WRITE_STATUS_DATA;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_WRITE_STATUS_DATA;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-/*
-      case STICK20_CMD_SEND_HIDDEN_VOLUME_PASSWORD :
-        CI_StringOut ("Get STICK20_CMD_SEND_HIDDEN_VOLUME_PASSWORD\r\n");
+  /*
+        case STICK20_CMD_SEND_HIDDEN_VOLUME_PASSWORD :
+          CI_StringOut ("Get STICK20_CMD_SEND_HIDDEN_VOLUME_PASSWORD\r\n");
 
-        StartStick20Command (STICK20_CMD_SEND_HIDDEN_VOLUME_PASSWORD);
+          StartStick20Command (STICK20_CMD_SEND_HIDDEN_VOLUME_PASSWORD);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_SEND_HIDDEN_VOLUME_PASSWORD;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
-*/
-      case STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP :
-        CI_StringOut ("Get STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP\r\n");
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_SEND_HIDDEN_VOLUME_PASSWORD;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
+  */
+        case STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP :
+          CI_StringOut ("Get STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP\r\n");
 
-        StartStick20Command (STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP);
+          StartStick20Command (STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_SEND_HIDDEN_VOLUME_SETUP;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_SEND_HIDDEN_VOLUME_SETUP;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_SEND_PASSWORD :
-        CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD\r\n");
+        case STICK20_CMD_SEND_PASSWORD :
+          CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD\r\n");
 
-        StartStick20Command (STICK20_CMD_SEND_PASSWORD);
+          StartStick20Command (STICK20_CMD_SEND_PASSWORD);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_SEND_NEW_PASSWORD :
-        CI_StringOut ("Get STICK20_CMD_SEND_NEW_PASSWORD\r\n");
+        case STICK20_CMD_SEND_NEW_PASSWORD :
+          CI_StringOut ("Get STICK20_CMD_SEND_NEW_PASSWORD\r\n");
 
-        StartStick20Command (STICK20_CMD_SEND_NEW_PASSWORD);
+          StartStick20Command (STICK20_CMD_SEND_NEW_PASSWORD);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_SEND_NEW_PASSWORD;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_SEND_NEW_PASSWORD;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN :
-        CI_StringOut ("Get STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN\r\n");
+        case STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN :
+          CI_StringOut ("Get STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN\r\n");
 
-        StartStick20Command (STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN);
+          StartStick20Command (STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_ENABLE_READONLY_UNCRYPTED_LUN;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_ENABLE_READONLY_UNCRYPTED_LUN;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN :
-        CI_StringOut ("Get STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN\r\n");
+        case STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN :
+          CI_StringOut ("Get STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN\r\n");
 
-        StartStick20Command (STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN);
+          StartStick20Command (STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_ENABLE_READWRITE_UNCRYPTED_LUN;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_ENABLE_READWRITE_UNCRYPTED_LUN;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
-      case STICK20_CMD_CLEAR_NEW_SD_CARD_FOUND :
-        CI_StringOut ("Get STICK20_CMD_CLEAR_NEW_SD_CARD_FOUND\r\n");
+        case STICK20_CMD_CLEAR_NEW_SD_CARD_FOUND :
+          CI_StringOut ("Get STICK20_CMD_CLEAR_NEW_SD_CARD_FOUND\r\n");
 
-        StartStick20Command (STICK20_CMD_CLEAR_NEW_SD_CARD_FOUND);
+          StartStick20Command (STICK20_CMD_CLEAR_NEW_SD_CARD_FOUND);
 
-        // Transfer data to other context
-        HID_CmdGet_u8  = HTML_CMD_CLEAR_NEW_SD_CARD_FOUND;
-        memcpy (HID_String_au8,&report[1],33);
-        break;
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_CLEAR_NEW_SD_CARD_FOUND;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 
 
-      default:
-        break;
+        default:
+          break;
 
-		}
-	}
-	else
-	{
-	  output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_WRONG_CRC;
-	}
+      }
+    }
+    else
+    {
+      output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_WRONG_CRC;
+    }
 
-// copy Stick 2.0 output status	to HID output
-	memcpy (&output[OUTPUT_CMD_RESULT_STICK20_STATUS_START],(void*)&HID_Stick20Status_st,sizeof (HID_Stick20Status_est));
+    // copy Stick 2.0 output status	to HID output
+    memcpy (&output[OUTPUT_CMD_RESULT_STICK20_STATUS_START],(void*)&HID_Stick20Status_st,sizeof (HID_Stick20Status_est));
 
-// Output section - only used when a command was called
+  }
 
-// Send password matrix ?
-	if (0 != Stick20HIDSendMatrixState_u8)
-	{
-	  Stick20HIDSendMatrixData (output);
-	}
+
+// Stick 20 Send password matrix ?
+  if (0 != Stick20HIDSendMatrixState_u8)
+  {
+    Stick20HIDSendMatrixData (output);
+  }
 #ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
-	else   // Send debug data
-	{
-	  Stick20HIDSendDebugData (output);
-	}
+  else   // Send debug data
+  {
+    Stick20HIDSendDebugData (output);
+  }
 #endif
 
   calculated_crc32 = generateCRC (output);
@@ -879,7 +913,14 @@ u8 parse_report(u8 *report,u8 *output)
           break;
     }
   }
-
+/* USB Debug
+  CI_StringOut ("\n\rSend ");
+  for (i=0;i<KEYBOARD_FEATURE_COUNT;i++)
+  {
+      CI_Print8BitValue (output[i]);
+  }
+  CI_StringOut ("\n\r");
+*/
   return 0;
 }
 /*******************************************************************************
@@ -911,6 +952,8 @@ u8 cmd_get_status(u8 *report,u8 *output)
 
   cmd_write_to_slot
 
+  Write data from pc into flash
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -924,10 +967,12 @@ u8 cmd_write_to_slot(u8 *report,u8 *output)
 	u8 slot_tmp[64];//this is will be the new slot contents
 
 	memset(slot_tmp,0,64);
+
 	slot_tmp[0]=0x01; //marks slot as programmed
+
 	memcpy(slot_tmp+1,report+CMD_WTS_SLOT_NAME_OFFSET,49);
 
-	if (slot_no>=0x10 && slot_no<=0x11)        // HOTP slot
+	if ((slot_no >= 0x10) && (slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS))        // HOTP slot
 	{
 		slot_no = slot_no & 0x0F;
 		
@@ -937,7 +982,7 @@ u8 cmd_write_to_slot(u8 *report,u8 *output)
 
 		write_to_slot(slot_tmp, hotp_slot_offsets[slot_no], 64);
 	}
-	else if (slot_no>=0x20 && slot_no<=0x23)   // TOTP slot
+	else if ((slot_no >= 0x20) && (slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS))   // TOTP slot
 	{
 		slot_no = slot_no & 0x0F;
 		
@@ -966,7 +1011,7 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
 	u8 slot_no=report[1];
 
 
-	if (slot_no>=0x10&&slot_no<=0x11)      //HOTP slot
+	if ((slot_no >= 0x10) && (slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS))      //HOTP slot
 	{
 		slot_no = slot_no & 0x0F;
 		u8 is_programmed =*((u8 *)(hotp_slots[slot_no]));
@@ -974,13 +1019,16 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
 		if (is_programmed==0x01)
 		{
 		  memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(hotp_slots[slot_no]+SLOT_NAME_OFFSET),15);
+      CI_StringOut ("Slot name -");
+      CI_StringOut (output+OUTPUT_CMD_RESULT_OFFSET);
+      CI_StringOut ("-\r\n");
 		}
 		else
 		{
 		  output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_SLOT_NOT_PROGRAMMED;
 		}
 	}
-	else if (slot_no>=0x20&&slot_no<=0x23)   //TOTP slot
+	else if ((slot_no >= 0x20) && (slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS))   //TOTP slot
 	{
 		slot_no=slot_no&0x0F;
 		u8 is_programmed=*((u8 *)(totp_slots[slot_no]));
@@ -988,6 +1036,9 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
 		if (is_programmed==0x01)
 		{
 		  memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(totp_slots[slot_no]+SLOT_NAME_OFFSET),15);
+      CI_StringOut ("Slot name -");
+      CI_StringOut (output+OUTPUT_CMD_RESULT_OFFSET);
+      CI_StringOut ("-\r\n");
 		}
 		else
 		{
@@ -1017,7 +1068,7 @@ u8 cmd_read_slot(u8 *report,u8 *output)
 	u8 slot_no=report[CMD_RS_SLOT_NUMBER_OFFSET];
 
 
-	if (slot_no>=0x10&&slot_no<=0x11)    //HOTP slot
+	if ((slot_no >= 0x10) && (slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS))    //HOTP slot
 	{
 		slot_no=slot_no&0x0F;
 		u8 is_programmed=*((u8 *)(hotp_slots[slot_no]));
@@ -1035,7 +1086,7 @@ u8 cmd_read_slot(u8 *report,u8 *output)
       output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_SLOT_NOT_PROGRAMMED;
 		}
 	}
-	else if (slot_no>=0x20&&slot_no<=0x23)     //TOTP slot
+	else if ((slot_no >= 0x20) && (slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS))     //TOTP slot
 	{
 		slot_no=slot_no&0x0F;
 		u8 is_programmed=*((u8 *)(totp_slots[slot_no]));
@@ -1057,6 +1108,87 @@ u8 cmd_read_slot(u8 *report,u8 *output)
 
 /*******************************************************************************
 
+  CheckSystemtime
+
+
+  Changes
+  Date      Author          Info
+  18.03.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+#define MAX_SYSTEMTIME_TIMEDIFF                           60        // Sec
+#define SYSTEMTIME_TIMEDIFF_FOR_WRITING_INTO_FLASH       (60*60)    // Sec = 1 hour
+
+
+u8 CheckSystemtime (u32 Newtimestamp_u32)
+{
+  struct tm      tm_st;
+  u8             Time_u8[30];
+  time_t         now;
+  u32            StoredTime_u32;
+  s64            Timediff_s64;
+  s32            Timediff_s32;
+
+// Get the local time
+  time (&now);
+
+  if (60*60*24*365 > now)     // If the local time is before 1971, set systemtime
+  {
+    CI_LocalPrintf ("Local time is not set - set to %ld = ",Newtimestamp_u32);
+    ctime_r (&Newtimestamp_u32,(char*)Time_u8);
+    CI_LocalPrintf ("%s\r\n",Time_u8);
+    set_time (Newtimestamp_u32);
+  }
+
+// Check timediff
+  time (&now);                // Get local time
+  Timediff_s64 = now - Newtimestamp_u32;
+  Timediff_s32 = Timediff_s64;
+  if ((Timediff_s32 > MAX_SYSTEMTIME_TIMEDIFF) || (Timediff_s32 < -MAX_SYSTEMTIME_TIMEDIFF))
+  {
+    CI_LocalPrintf ("New timestamp is not valid\r\n");
+    CI_LocalPrintf ("Systemtime:");
+    ctime_r (&now,(char*)Time_u8);
+    CI_LocalPrintf ("%s",Time_u8);
+
+    CI_LocalPrintf ("Timestamp :");
+    ctime_r (&Newtimestamp_u32,(char*)Time_u8);
+    CI_LocalPrintf ("%s",Time_u8);
+    return (FALSE);
+  }
+
+// Check for writing timestamp to flash
+  ReadDatetime (&StoredTime_u32);
+  Timediff_s64 = now - StoredTime_u32;
+  Timediff_s32 = Timediff_s64;
+
+  if (Timediff_s32 < -MAX_SYSTEMTIME_TIMEDIFF)
+  {
+    CI_LocalPrintf ("ERROR: Systemtime is time before stored time\r\n");
+    return (FALSE);     // Timestamp points to a time before the stored time > something is wrong
+  }
+
+  if (Timediff_s32 < SYSTEMTIME_TIMEDIFF_FOR_WRITING_INTO_FLASH)
+  {
+    return (TRUE);
+  }
+
+// Save the systemtime into flash
+  CI_LocalPrintf ("Write time into flash - ");
+  ctime_r (&now,(char*)Time_u8);
+  CI_LocalPrintf ("%s\r\n",Time_u8);
+
+  WriteDatetime (now);
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
   cmd_get_code
 
   Reviews
@@ -1068,19 +1200,29 @@ u8 cmd_read_slot(u8 *report,u8 *output)
 u8 cmd_get_code(u8 *report,u8 *output)
 {
 	
-	u64 challenge=getu64(report + CMD_GC_CHALLENGE_OFFSET);
+  u64 challenge = getu64(report + CMD_GC_CHALLENGE_OFFSET);
+  u64 timestamp = getu64(report + CMD_GC_TIMESTAMP_OFFSET);
+  u8  interval  = report[CMD_GC_INTERVAL_OFFSET];
 	u32 result=0;
-	
+/*
+	CI_LocalPrintf ("challenge:" );
+  HexPrint (8,(unsigned char*)report + CMD_GC_CHALLENGE_OFFSET);
+  CI_LocalPrintf ("\n\r");
+*/
 
 	u8 slot_no=report[CMD_GC_SLOT_NUMBER_OFFSET];
 	
-	if (slot_no>=0x10&&slot_no<=0x11)    //HOTP slot
+	if ((slot_no >= 0x10) && (slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS))    //HOTP slot
 	{
 		slot_no = slot_no & 0x0F;
 		u8 is_programmed = *((u8 *)(hotp_slots[slot_no]));
 		if (is_programmed == 0x01)
 		{
-			result=get_code_from_hotp_slot(slot_no);
+			result = get_code_from_hotp_slot(slot_no);
+
+// Change endian
+      result = change_endian_u32 (result);
+
 			memcpy(output+OUTPUT_CMD_RESULT_OFFSET,&result,4);
 			memcpy(output+OUTPUT_CMD_RESULT_OFFSET+4,(u8 *)hotp_slots[slot_no]+CONFIG_OFFSET,14);
 		}
@@ -1089,13 +1231,24 @@ u8 cmd_get_code(u8 *report,u8 *output)
 		  output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_SLOT_NOT_PROGRAMMED;
 		}
 	}
-	else if (slot_no>=0x20&&slot_no<=0x23)           //TOTP slot
+	else if ((slot_no >= 0x20) && (slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS))           //TOTP slot
 	{
-		slot_no = slot_no & 0x0F;
-		u8 is_programmed=*((u8 *)(totp_slots[slot_no]));
+		slot_no          = slot_no & 0x0F;
+		u8 is_programmed = *((u8 *)(totp_slots[slot_no]));
+
+		if (FALSE == CheckSystemtime ((u32)timestamp))
+		{
+
+		}
+
 		if (is_programmed==0x01)
 		{
-			result=get_code_from_totp_slot(slot_no,challenge);
+      result = get_code_from_totp_slot (slot_no,timestamp / (u64) interval);
+//      result = get_code_from_totp_slot (slot_no,challenge);
+
+// Change endian
+			result = change_endian_u32 (result);
+
 			memcpy(output+OUTPUT_CMD_RESULT_OFFSET,&result,4);
 			memcpy(output+OUTPUT_CMD_RESULT_OFFSET+4,(u8 *)totp_slots[slot_no]+CONFIG_OFFSET,14);
 		}
@@ -1190,12 +1343,14 @@ u8 cmd_first_authenticate(u8 *report,u8 *output)
 	memcpy (card_password,report+1,25);
 
 // Init smartcard
-  CCID_RestartSmartcard_u8 ();
-  ISO7816_T1_InitSendNr ();
+//  CCID_RestartSmartcard_u8 ();
+//  ISO7816_T1_InitSendNr ();
 
 
-// res = cardAuthenticate (card_password); // Check for user password
-	Ret_u32 = LA_OpenPGP_V20_Test_SendUserPW2 ((unsigned char *)card_password);
+// res = cardAuthenticate (card_password); // Check for admin password
+
+  Ret_u32 =  LA_SC_SendVerify (1,(unsigned char *)card_password); // 1 = user pw
+//	Ret_u32 = LA_OpenPGP_V20_Test_SendAdminPW ((unsigned char *)card_password);
   if (TRUE == Ret_u32)
   {
     res = 0;

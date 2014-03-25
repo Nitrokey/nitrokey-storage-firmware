@@ -617,10 +617,25 @@ Bool flashc_quick_page_read(int page_number)
   return flashc_is_page_erased();
 }
 
+#define DEBUG_FLASHC
 
 Bool flashc_erase_page(int page_number, Bool check)
 {
   Bool page_erased = TRUE;
+
+#ifdef DEBUG_FLASHC
+  {
+    unsigned char text[20];
+    CI_LocalPrintf ("Erase page :");
+    itoa ((unsigned int)page_number,text);
+    CI_LocalPrintf (text);
+    CI_LocalPrintf (" - ");
+    itoa ((unsigned int) flashc_get_page_number ());
+    CI_LocalPrintf (text);
+    CI_LocalPrintf ("\n\r");
+  }
+#endif
+
   flashc_issue_command(AVR32_FLASHC_FCMD_CMD_EP, page_number);
   if (check)
   {

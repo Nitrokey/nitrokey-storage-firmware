@@ -24,7 +24,7 @@
 //#include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 2
+#define VERSION_MINOR 3
 
 
 #define TRUE		1
@@ -50,7 +50,7 @@ typedef signed long  	s32;
 
 
 // Define to activate A_Muster specific handling
-//#define STICK_20_A_MUSTER           // Activate - to delete
+//to delete #define STICK_20_A_MUSTER           // Activate - to delete
 
 // Define to activate A_Muster specific handling
 // Achtung: Bootloader in trampoline.x aktivieren
@@ -58,7 +58,7 @@ typedef signed long  	s32;
 // *** Activate only for PROD version ***
 //#define STICK_20_A_MUSTER_PROD
 
-#define STICK_20_SEND_DEBUGINFOS_VIA_HID
+//#define STICK_20_SEND_DEBUGINFOS_VIA_HID
 
 // Enable the HTML interface via ram disc
 //#define HTML_ENABLE_HTML_INTERFACE
@@ -76,11 +76,19 @@ typedef signed long  	s32;
 // Printf only for Windows
 #define CCID_NO_PRINTF
 
-// Active time measuring
-// Disable for PROD Version
+// Active time measuring - always on for realtime handling
+#define TIME_MEASURING_ENABLE
+
+
 #ifndef STICK_20_A_MUSTER_PROD
-  #define TIME_MEASURING_ENABLE
+  #define INTERPRETER_ENABLE     // Disable for PROD Version
 #endif
+
+#ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
+  #define INTERPRETER_ENABLE     // Enable also for PROD Version
+#endif
+
+
 
 #define HID_PASSWORD_LEN      20
 

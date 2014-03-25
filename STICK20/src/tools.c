@@ -576,3 +576,21 @@ void reverse(char *s)
         s[j] = c;
     }
 }
+
+/*******************************************************************************
+
+  change_endian_u32
+
+  Changes
+  Date      Reviewer        Info
+  14.03.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u32 change_endian_u32 (u32 x)
+{
+    return (((x)<<24) | ((x)>>24) | (((x)& 0x0000ff00)<<8) | (((x)& 0x00ff0000)>>8));
+}

@@ -49,21 +49,29 @@ void hmac_sha1_init(hmac_sha1_ctx_t *s, const void* key, u16 keylength_b)
 	u8 i;
 	
 	memset(buffer, 0, SHA1_BLOCK_BYTES);
-	if (keylength_b > SHA1_BLOCK_BITS){
+
+	if (keylength_b > SHA1_BLOCK_BITS)
+	{
 		otp_sha1((void*)buffer, key, keylength_b);
-	} else {
+	}
+	else
+	{
 		memcpy(buffer, key, (keylength_b+7)/8);
 	}
 	
-	for (i=0; i<SHA1_BLOCK_BYTES; ++i){
+	for (i=0; i<SHA1_BLOCK_BYTES; ++i)
+	{
 		buffer[i] ^= IPAD;
 	}
+
 	sha1_init(&(s->a));
 	sha1_nextBlock(&(s->a), buffer);
 	
-	for (i=0; i<SHA1_BLOCK_BYTES; ++i){
-		buffer[i] ^= IPAD^OPAD;
+	for (i=0; i<SHA1_BLOCK_BYTES; ++i)
+	{
+		buffer[i] ^= IPAD ^ OPAD;
 	}
+
 	sha1_init(&(s->b));
 	sha1_nextBlock(&(s->b), buffer);
 	
@@ -73,10 +81,13 @@ void hmac_sha1_init(hmac_sha1_ctx_t *s, const void* key, u16 keylength_b)
 #endif
 }
 
-void hmac_sha1_nextBlock(hmac_sha1_ctx_t *s, const void* block){
+void hmac_sha1_nextBlock(hmac_sha1_ctx_t *s, const void* block)
+{
 	sha1_nextBlock(&(s->a), block);
 }
-void hmac_sha1_lastBlock(hmac_sha1_ctx_t *s, const void* block, u16 length_b){
+
+void hmac_sha1_lastBlock(hmac_sha1_ctx_t *s, const void* block, u16 length_b)
+{
 	while(length_b>=SHA1_BLOCK_BITS){
 		sha1_nextBlock(&(s->a), block);
 		block = (u8*)block + SHA1_BLOCK_BYTES;
@@ -85,7 +96,8 @@ void hmac_sha1_lastBlock(hmac_sha1_ctx_t *s, const void* block, u16 length_b){
 	sha1_lastBlock(&(s->a), block, length_b);
 }
 
-void hmac_sha1_final(void* dest, hmac_sha1_ctx_t *s){
+void hmac_sha1_final(void* dest, hmac_sha1_ctx_t *s)
+{
 	sha1_ctx2hash((sha1_hash_t*)dest, &(s->a));
 	sha1_lastBlock(&(s->b), dest, SHA1_HASH_BITS);
 	sha1_ctx2hash((sha1_hash_t*)dest, &(s->b));
@@ -97,7 +109,8 @@ void hmac_sha1_final(void* dest, hmac_sha1_ctx_t *s){
  * keylength in bits!
  * message length in bits!
  */
-void hmac_sha1(void* dest, const void* key, u16 keylength_b, const void* msg, u32 msglength_b){ /* a one-shot*/
+void hmac_sha1(void* dest, const void* key, u16 keylength_b, const void* msg, u32 msglength_b)
+{ /* a one-shot*/
 	sha1_ctx_t s;
 	u8 i;
 	u8 buffer[SHA1_BLOCK_BYTES];
@@ -105,27 +118,35 @@ void hmac_sha1(void* dest, const void* key, u16 keylength_b, const void* msg, u3
 	memset(buffer, 0, SHA1_BLOCK_BYTES);
 	
 	/* if key is larger than a block we have to hash it*/
-	if (keylength_b > SHA1_BLOCK_BITS){
+	if (keylength_b > SHA1_BLOCK_BITS)
+	{
 		otp_sha1((void*)buffer, key, keylength_b);
-	} else {
+	} else
+	{
 		memcpy(buffer, key, (keylength_b+7)/8);
 	}
 	
-	for (i=0; i<SHA1_BLOCK_BYTES; ++i){
+	for (i=0; i<SHA1_BLOCK_BYTES; ++i)
+	{
 		buffer[i] ^= IPAD;
 	}
+
 	sha1_init(&s);
 	sha1_nextBlock(&s, buffer);
+
 	while (msglength_b >= SHA1_BLOCK_BITS){
 		sha1_nextBlock(&s, msg);
 		msg = (u8*)msg + SHA1_BLOCK_BYTES;
 		msglength_b -=  SHA1_BLOCK_BITS;
 	}
+
 	sha1_lastBlock(&s, msg, msglength_b);
+
 	/* since buffer still contains key xor ipad we can do ... */
 	for (i=0; i<SHA1_BLOCK_BYTES; ++i){
 		buffer[i] ^= IPAD ^ OPAD;
 	}
+
 	sha1_ctx2hash(dest, &s); /* save inner hash temporary to dest */
 	sha1_init(&s);
 	sha1_nextBlock(&s, buffer);

@@ -529,7 +529,7 @@ u8 SetSdCardFilledWithRandomsToFlash (void)
 
   Changes
   Date      Author          Info
-  08.02.14  RB              Implementation of save new SD card found
+  08.02.14  RB              Implementation of clear new SD card found
 
   Reviews
   Date      Reviewer        Info
@@ -553,3 +553,41 @@ u8 ClearNewSdCardFoundToFlash (void)
   return (TRUE);
 }
 
+
+/*******************************************************************************
+
+  WriteDatetime
+
+  Changes
+  Date      Author          Info
+  08.02.14  RB              Implementation of save datetime in flash
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 WriteDatetime (u32 Datetime_u32)
+{
+  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 128,&Datetime_u32,4,TRUE);
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  ReadDatetime
+
+  Changes
+  Date      Author          Info
+  08.02.14  RB              Implementation of read datetime in flash
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 ReadDatetime (u32 *Datetime_u32)
+{
+  memcpy (Datetime_u32,(void*)(AVR32_FLASHC_USER_PAGE + 128),4);
+  return (TRUE);
+}

@@ -38,7 +38,9 @@
 #  undef DEBUG
 #endif
 
-#define LITTLE_ENDIAN
+//#define LITTLE_ENDIAN
+
+#define BIG_ENDIAN
 
 /********************************************************************************************************/
 
@@ -64,8 +66,14 @@ u32 rotl32(u32 n, u8 bits){
 }
 
 static const
-u32 change_endian32(u32 x){
-	return (((x)<<24) | ((x)>>24) | (((x)& 0x0000ff00)<<8) | (((x)& 0x00ff0000)>>8));
+u32 change_endian32(u32 x)
+{
+  #if defined BIG_ENDIAN
+    return (x);
+  #elif defined LITTLE_ENDIAN
+    return (((x)<<24) | ((x)>>24) | (((x)& 0x0000ff00)<<8) | (((x)& 0x00ff0000)>>8));
+  #endif
+
 }
 
 
@@ -155,9 +163,12 @@ void sha1_nextBlock (sha1_ctx_t *state, const void* block){
 
 /********************************************************************************************************/
 
-void sha1_lastBlock(sha1_ctx_t *state, const void* block, u16 length){
+void sha1_lastBlock(sha1_ctx_t *state, const void* block, u16 length)
+{
 	u8 lb[SHA1_BLOCK_BYTES]; /* local block */
-	while(length>=SHA1_BLOCK_BITS){
+
+	while(length>=SHA1_BLOCK_BITS)
+	{
 		sha1_nextBlock(state, block);
 		length -= SHA1_BLOCK_BITS;
 		block = (u8*)block + SHA1_BLOCK_BYTES;
@@ -169,11 +180,13 @@ void sha1_lastBlock(sha1_ctx_t *state, const void* block, u16 length){
 	/* set the final one bit */
 	lb[length>>3] |= 0x80>>(length & 0x07);
 
-	if (length>512-64-1){ /* not enouth space for 64bit length value */
+	if (length>512-64-1)
+	{ /* not enouth space for 64bit length value */
 		sha1_nextBlock(state, lb);
 		state->length -= 512;
 		memset(lb, 0, SHA1_BLOCK_BYTES);
 	}
+
 	/* store the 64bit length value */
 #if defined LITTLE_ENDIAN
 	 	/* this is now rolled up */
@@ -182,24 +195,30 @@ void sha1_lastBlock(sha1_ctx_t *state, const void* block, u16 length){
 		lb[56+i] = ((u8*)&(state->length))[7-i];
 	}
 #elif defined BIG_ENDIAN
-	*((u64)&(lb[56])) = state->length;
+  u8 i;
+  for (i=0; i<8; ++i){
+    lb[56+i] = ((u8*)&(state->length))[i];
+  }
+
+//	*((u64)&(lb[56])) = state->length;
 #endif
 	sha1_nextBlock(state, lb);
 }
 
 /********************************************************************************************************/
 
-void sha1_ctx2hash (void *dest, sha1_ctx_t *state){
+void sha1_ctx2hash (void *dest, sha1_ctx_t *state)
+{
 #if defined LITTLE_ENDIAN
 	u8 i;
 	for(i=0; i<5; ++i){
 		((u32*)dest)[i] = change_endian32(state->h[i]);
 	}
-#elif BIG_ENDIAN
+#elif defined BIG_ENDIAN
 	if (dest != state->h)
 		memcpy(dest, state->h, SHA1_HASH_BITS/8);
 #else
-# error unsupported endian type!
+  # error unsupported endian type!
 #endif
 }
 
@@ -212,7 +231,9 @@ void otp_sha1 (void *dest, const void* msg, u32 length)
 {
 	sha1_ctx_t s;
 	sha1_init(&s);
-	while(length & (~0x0001ff)){ /* length>=512 */
+
+	while(length & (~0x0001ff))
+	{ /* length>=512 */
 		sha1_nextBlock(&s, msg);
 		msg = (u8*)msg + SHA1_BLOCK_BITS/8; /* increment pointer to next block */
 		length -= SHA1_BLOCK_BITS;

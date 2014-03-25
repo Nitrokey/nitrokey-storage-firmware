@@ -60,14 +60,172 @@
 
 *******************************************************************************/
 
+//#define DEBUG_HOTP
+/*
+#ifdef DEBUG_HOTP
+#else
+  #define CI_LocalPrintf(...)
+  #define CI_TickLocalPrintf(...)
+  #define CI_StringOut(...)
+  #define CI_Print8BitValue(...)
+  #define HexPrint(...)
+#endif
+*/
+//#define LITTLE_ENDIAN
+
+#define BIG_ENDIAN        // AVR is BIG_ENDIAN
+
+/*
+
+  Flash storage description OTP
+
+  OTP parameter block
+
+    The OTP parameter block save the configuration data of each slot. The size of each slot is 64 byte
+
+         Slot        Start    End
+      GLOBAL_CONFIG     0       2
+      free              3      63
+      HOTP_SLOT1       64     127
+      HOTP_SLOT2      128     191
+      TOTP_SLOT1      192     255
+      TOTP_SLOT2      256     319
+      TOTP_SLOT3      320     383
+      TOTP_SLOT4      384     447
+
+
+  OTP configuration slot
+
+    Slot size 64 byte
+
+    Contain the parameter data - 50 data byte
+                       Start   Description
+    SLOT_TYPE_OFFSET     0       1 byte slot type TOTP, HOTP
+    SLOT_NAME_OFFSET     1      15 byte slot name
+    SECRET_OFFSET       16      20 byte secret key
+    CONFIG_OFFSET       36       1 byte config byte
+    TOKEN_ID_OFFSET     37      12 byte token ID
+
+
+  OTP counter storage slot
+
+    This field is used for storing the actual counter value. Because of the limitation of flash
+    erase accesses (1000 for a Stick 1.4 flash page (1024 byte), 100000 for a Stick 2.0 flash page (512 byte)).
+    it is necessary to reduce the erase access of the flash. This is done by using a greater area of the flash.
+    The limitation of flash accesses is only in the change of the bits to 1 in a flash page.
+    Only all bit in a hole flash page can set to 1 in a single process (this is the erase access).
+    The setting to 0 of a bit in the flash page is independent to other bits.
+
+    The implementation:
+    The first 8 byte of the slot contains the base counter of stored value as an unsigned 64 bit value. The
+    remaining page stored a token per flash byte for a used number. When all tokens in a slot are used, the
+    base counter is raised and the tokens are reseted to 0xff
+
+    Flash page layout
+
+    Entry                Position
+    Counter base         0 -    7     8 byte, unsigned 64 bit
+    Use flags            8 - 1023     1016 byte marked a used value (for Stick 1.4)
+    Use flags            8 -  511     504 byte marked a used value (for Stick 2.0)
+
+    Flash page byte order
+    0         1         2         3         4              End of flash page
+    01234567890123456789012345678901234567890123456789.... X
+    VVVVVVVVFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.... .
+
+    V = 64 bit counter base value
+    F = token for a used value, 0xFF = unused, 0x00 = used
+
+    The actual counter is the sum of the counter base value and the number of tokens with a 0 in the slot.
+
+    Example:
+
+          Flash page byte order
+          0         1         2         3         4              End of flash page
+          01234567890123456789012345678901234567890123456789.... X
+      xHi 0000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.... .
+      xLo 0000001000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.... .
+
+          V = 0x0100 = 256
+          Token 0-7 are marked as used = 8 tokens are marked
+
+          Counter value = 256 + 8 = 264
+
+
+    Slot size 1024 byte   Stick 1.4
+    Slot size  512 byte   Stick 2.0
+
+
+  OTP backup slot
+    Backup of the OTP parameter block
+
+
+*/
+
+/*
 u32 hotp_slots[NUMBER_OF_HOTP_SLOTS]         = {SLOTS_ADDRESS + HOTP_SLOT1_OFFSET, SLOTS_ADDRESS + HOTP_SLOT2_OFFSET};
 u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS] = {SLOT1_COUNTER_ADDRESS, SLOT2_COUNTER_ADDRESS};
 u32 hotp_slot_offsets[NUMBER_OF_HOTP_SLOTS]  = {HOTP_SLOT1_OFFSET, HOTP_SLOT2_OFFSET};
 
 u32 totp_slots[NUMBER_OF_TOTP_SLOTS]         = {SLOTS_ADDRESS + TOTP_SLOT1_OFFSET, SLOTS_ADDRESS + TOTP_SLOT2_OFFSET, SLOTS_ADDRESS + TOTP_SLOT3_OFFSET, SLOTS_ADDRESS + TOTP_SLOT4_OFFSET};
 u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS]  = {TOTP_SLOT1_OFFSET, TOTP_SLOT2_OFFSET, TOTP_SLOT3_OFFSET, TOTP_SLOT4_OFFSET};
+*/
 
-u8 page_buffer[SLOT_PAGE_SIZE];
+u32 hotp_slots[NUMBER_OF_HOTP_SLOTS]         = {
+                                                 SLOTS_ADDRESS + HOTP_SLOT1_OFFSET,
+                                                 SLOTS_ADDRESS + HOTP_SLOT2_OFFSET,
+                                                 SLOTS_ADDRESS + HOTP_SLOT3_OFFSET
+                                               };
+
+u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS] = {
+                                                  SLOT1_COUNTER_ADDRESS,
+                                                  SLOT2_COUNTER_ADDRESS,
+                                                  SLOT3_COUNTER_ADDRESS
+                                                };
+
+u32 hotp_slot_offsets[NUMBER_OF_HOTP_SLOTS]  = {
+                                                  HOTP_SLOT1_OFFSET,
+                                                  HOTP_SLOT2_OFFSET,
+                                                  HOTP_SLOT3_OFFSET,
+                                                };
+
+u32 totp_slots[NUMBER_OF_TOTP_SLOTS]         = {
+                                                  SLOTS_ADDRESS + TOTP_SLOT1_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT2_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT3_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT4_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT5_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT6_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT7_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT8_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT9_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT10_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT11_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT12_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT13_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT14_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT15_OFFSET
+                                               };
+
+u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS]  = {
+                                                  TOTP_SLOT1_OFFSET,
+                                                  TOTP_SLOT2_OFFSET,
+                                                  TOTP_SLOT3_OFFSET,
+                                                  TOTP_SLOT4_OFFSET,
+                                                  TOTP_SLOT5_OFFSET,
+                                                  TOTP_SLOT6_OFFSET,
+                                                  TOTP_SLOT7_OFFSET,
+                                                  TOTP_SLOT8_OFFSET,
+                                                  TOTP_SLOT9_OFFSET,
+                                                  TOTP_SLOT10_OFFSET,
+                                                  TOTP_SLOT11_OFFSET,
+                                                  TOTP_SLOT12_OFFSET,
+                                                  TOTP_SLOT13_OFFSET,
+                                                  TOTP_SLOT14_OFFSET,
+                                                  TOTP_SLOT15_OFFSET
+                                               };
+
+u8 page_buffer[FLASH_PAGE_SIZE*3];
 
 /*******************************************************************************
 
@@ -81,7 +239,9 @@ u8 page_buffer[SLOT_PAGE_SIZE];
 
 *******************************************************************************/
 
-extern u8 HID_GetReport_Value[32+1];
+#define KEYBOARD_FEATURE_COUNT 64
+
+extern u8 HID_GetReport_Value[KEYBOARD_FEATURE_COUNT];
 
 /*******************************************************************************
 
@@ -92,6 +252,10 @@ extern u8 HID_GetReport_Value[32+1];
 /*******************************************************************************
 
   getu16
+
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
 
   Reviews
   Date      Reviewer        Info
@@ -109,6 +273,10 @@ u16 getu16(u8 *array)
 /*******************************************************************************
 
   getu32
+
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
 
   Reviews
   Date      Reviewer        Info
@@ -136,6 +304,10 @@ u32 getu32(u8 *array)
 
   getu64
 
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -161,6 +333,12 @@ u64 getu64 (u8 *array)
 
   endian_swap
 
+  only for little endian systems
+
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -169,6 +347,7 @@ u64 getu64 (u8 *array)
 
 u64 endian_swap (u64 x)
 {
+#if defined LITTLE_ENDIAN
 	x = (x >> 56) |
 	((x << 40) & 0x00FF000000000000LL) |
 	((x << 24) & 0x0000FF0000000000LL) |
@@ -176,6 +355,7 @@ u64 endian_swap (u64 x)
 	((x >>  8) & 0x00000000FF000000LL) |
 	((x >> 24) & 0x0000000000FF0000LL) |
 	((x >> 40) & 0x000000000000FF00LL) | (x << 56);
+#endif
 	return x;
 }
 
@@ -185,6 +365,10 @@ u64 endian_swap (u64 x)
 
   dynamic_truncate
 
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -193,20 +377,23 @@ u64 endian_swap (u64 x)
 
 u32 dynamic_truncate (u8 * hmac_result)
 {
-
 	u8 offset = hmac_result[19] & 0xf;
-	u32 bin_code = (hmac_result[offset] & 0x7f) << 24
-	| (hmac_result[offset + 1] & 0xff) << 16
-	| (hmac_result[offset + 2] & 0xff) << 8
-	| (hmac_result[offset + 3] & 0xff);
+
+	u32 bin_code = (hmac_result[offset    ] & 0x7f) << 24
+	             | (hmac_result[offset + 1] & 0xff) << 16
+	             | (hmac_result[offset + 2] & 0xff) << 8
+	             | (hmac_result[offset + 3] & 0xff);
 
 	return bin_code;
 }
 
-
 /*******************************************************************************
 
   write_data_to_flash
+
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
 
   Reviews
   Date      Reviewer        Info
@@ -230,6 +417,10 @@ void write_data_to_flash (u8 *data,u16 len,u32 addr)
   secret_length - length of the secret
   len - length of the truncated result, 6 or 8
 
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -239,11 +430,65 @@ void write_data_to_flash (u8 *data,u16 len,u32 addr)
 u32 get_hotp_value(u64 counter,u8 * secret,u8 secret_length,u8 len)
 {
 	u8 hmac_result[20];
-	u64 c = endian_swap(counter);
+  u64 c = endian_swap(counter);
+
+
+#ifdef DEBUG_HOTP
+  {
+    u8 text[20];
+    CI_LocalPrintf ("output len  :");
+    itoa ((u32)len,text);
+    CI_LocalPrintf ((s8*)text);
+    CI_LocalPrintf ("\n\r");
+
+    CI_LocalPrintf ("secret len  :");
+    itoa ((u32)secret_length,text);
+    CI_LocalPrintf (text);
+    CI_LocalPrintf ("\n\r");
+
+    CI_LocalPrintf ("counter     :" );
+    itoa ((u32)counter,text);
+    CI_LocalPrintf (text);
+    CI_LocalPrintf (" - ");
+    HexPrint (8,(u8*)&counter);
+    CI_LocalPrintf ("\n\r");
+
+    CI_LocalPrintf ("secret      :" );
+    HexPrint (secret_length,secret);
+    CI_LocalPrintf ("\n\r");
+
+    CI_LocalPrintf ("c           :" );
+    HexPrint (8,(u8*)&c);
+    CI_LocalPrintf ("\n\r");
+  }
+#endif
 
 	hmac_sha1 (hmac_result, secret, secret_length*8, &c, 64);
 
+#ifdef DEBUG_HOTP
+  {
+    CI_LocalPrintf ("hmac_result :" );
+    HexPrint (20,hmac_result);
+    CI_LocalPrintf ("\n\r");
+  }
+#endif
+
 	u32 hotp_result = dynamic_truncate (hmac_result);
+
+#ifdef DEBUG_HOTP
+  {
+    u8 text[20];
+
+    CI_LocalPrintf ("hotp_result 1:" );
+    HexPrint (4,(u8*)&hotp_result);
+    CI_LocalPrintf (" - " );
+    itoa (hotp_result,text);
+    CI_LocalPrintf (text);
+
+
+    CI_LocalPrintf ("\n\r");
+  }
+#endif
 
 	if (len==6)
 	  hotp_result = hotp_result % 1000000;
@@ -251,6 +496,19 @@ u32 get_hotp_value(u64 counter,u8 * secret,u8 secret_length,u8 len)
 	  hotp_result = hotp_result % 100000000;
 	else
 	  return 0;
+
+
+#ifdef DEBUG_HOTP
+	{
+	  u8 text[20];
+    CI_LocalPrintf ("hotp_result 2:" );
+    HexPrint (4,(u8*)&hotp_result);
+    CI_LocalPrintf (" - " );
+    itoa (hotp_result,text);
+    CI_LocalPrintf (text);
+    CI_LocalPrintf ("\n\r");
+	}
+#endif
 
 	return hotp_result;
 }
@@ -263,6 +521,10 @@ u32 get_hotp_value(u64 counter,u8 * secret,u8 secret_length,u8 len)
   Get the HOTP counter stored in flash
   addr - counter page address
 
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -272,24 +534,25 @@ u32 get_hotp_value(u64 counter,u8 * secret,u8 secret_length,u8 len)
 u64 get_counter_value(u32 addr)
 {
 	u16 i;
-	u64 counter=0;
-	u8 *ptr=(u8 *)addr;
+	u64 counter;
+	u8 *ptr;
+  u64 *ptr_u64;
 
-	// for (i=0;i<4;i++){
-	// counter+=*ptr<<(8*i);
-	// ptr++;
-	// }
 
-	counter  = *((u64 *)addr);
-	ptr     +=8;
+	ptr_u64  = (u64*)addr;
+	counter  = *ptr_u64;   // Set the counter base value
+
+
+	ptr     =(u8 *)addr;        // Start of counter storage page
+	ptr     +=8;                 // Start of token area
 
 	i=0;
 
-	while(i<1016)
+	while(i < TOKEN_PER_FLASHPAGE)
 	{
 		if (*ptr==0xff)
 		{
-		  break;
+		  break;      // A free tocken entry found
 		}
 		ptr++;
 		counter++;
@@ -304,6 +567,10 @@ u64 get_counter_value(u32 addr)
 
   set_counter_value
 
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -312,25 +579,13 @@ u64 get_counter_value(u32 addr)
 
 u8 set_counter_value(u32 addr, u64 counter)
 {
-//	FLASH_Status err=FLASH_COMPLETE;
-/*
-	FLASH_Unlock();
+  s32 page_s32;
 
-	err=FLASH_ErasePage(addr);
-	if (err!=FLASH_COMPLETE) return err;
+  page_s32 = (addr - FLASH_START) / FLASH_PAGE_SIZE;
 
-	err=FLASH_ProgramWord(addr, counter&0xffffffff);
+  flashc_erase_page (page_s32,TRUE);                   // clear hole page
 
-	if (err!=FLASH_COMPLETE) return err;
-
-	err=FLASH_ProgramWord(addr+4,  (counter>>32)&0xffffffff);
-
-	if (err!=FLASH_COMPLETE) return err;
-
-	FLASH_Lock();
-*/
-
-  flashc_memcpy ((void*)addr,(void*)&counter,8,TRUE);
+  flashc_memcpy ((void*)addr,(void*)&counter,8,TRUE);   // set the counter base value
 
 	return 0;
 }
@@ -345,6 +600,10 @@ u8 set_counter_value(u32 addr, u64 counter)
 
   addr - counter page address
 
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -354,122 +613,107 @@ u8 set_counter_value(u32 addr, u64 counter)
 u8 increment_counter_page(u32 addr)
 {
 	u16 i;
+	u8  n;
+  u8  dummy_u8;
   u16 dummy_u16;
   u32 dummy_u32;
-	u8 *ptr=(u8 *)addr;
+	u8 *ptr;
 	u64 counter;
 	FLASH_Status err = FLASH_COMPLETE;
 
-	if (ptr[1023]==0x00)
+	ptr=(u8 *)addr;       // Set counter page slot
+
+	if (ptr[FLASH_PAGE_SIZE-1]==0x00)   // Are all token used ?
 	{
-		//Entire page is filled, erase cycle
-		counter=get_counter_value(addr)+1;
+		// Entire page is filled, erase cycle
+		counter = get_counter_value (addr);
 
-
-		/* 
-err=FLASH_ErasePage(BACKUP_PAGE_ADDRESS);
-if (err!=FLASH_COMPLETE) return err;
-
-//write address to backup page
-err=FLASH_ProgramHalfWord(BACKUP_PAGE_ADDRESS, addr);
-if (err!=FLASH_COMPLETE) return err;
-
-err=FLASH_ProgramWord(BACKUP_PAGE_ADDRESS+4, counter&0xffffffff);
-if (err!=FLASH_COMPLETE) return err;
-err=FLASH_ProgramWord(BACKUP_PAGE_ADDRESS+8, (counter>>32)&0xffffffff);
-if (err!=FLASH_COMPLETE) return err; */
-
-
-/*
-		FLASH_Unlock();
-		err=FLASH_ErasePage(BACKUP_PAGE_ADDRESS);
-		if (err!=FLASH_COMPLETE) return err;
-*/
-		// New erase by flash memset
+		// Clear the backup page
 		flashc_memset8 ((void*)BACKUP_PAGE_ADDRESS,0xFF,FLASH_PAGE_SIZE,TRUE);
 
 		//write address to backup page
-/*
-		err=FLASH_ProgramWord(BACKUP_PAGE_ADDRESS, counter&0xffffffff);
-		if (err!=FLASH_COMPLETE) return err;
-		err=FLASH_ProgramWord(BACKUP_PAGE_ADDRESS+4, (counter>>32)&0xffffffff);
-		if (err!=FLASH_COMPLETE) return err; 
-*/
-	  flashc_memcpy ((void*)BACKUP_PAGE_ADDRESS,(void*)&counter,8,TRUE);
+	  flashc_memcpy ((void*)BACKUP_PAGE_ADDRESS,(void*)&counter,8,FALSE);      // Area is erased
 
-/*
-		err=FLASH_ProgramWord(BACKUP_PAGE_ADDRESS+BACKUP_ADDRESS_OFFSET, addr);
-		if (err!=FLASH_COMPLETE) return err;
-*/
-    flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_ADDRESS_OFFSET),(void*)&addr,4,TRUE);
+	  // Write page addr to backup page
+    flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_ADDRESS_OFFSET),(void*)&addr,4,FALSE);  // Area is erased
 
-/*
-		err=FLASH_ProgramWord(BACKUP_PAGE_ADDRESS+BACKUP_LENGTH_OFFSET, 8);
-		if (err!=FLASH_COMPLETE) return err;
-*/
+
     dummy_u32 = 8;
-    flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_LENGTH_OFFSET),(void*)&dummy_u32,4,TRUE);
+    flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_LENGTH_OFFSET),(void*)&dummy_u32,4,FALSE); // Area is erased
 
-/*
-		err=FLASH_ErasePage(addr);
-		if (err!=FLASH_COMPLETE) return err;
-*/
     // New erase by flash memset
-    flashc_memset8 ((void*)addr,0xFF,FLASH_PAGE_SIZE,TRUE);
+    flashc_memset8 ((void*)addr,0xFF,FLASH_PAGE_SIZE,TRUE);     // Erase counter page
 
-/*
-		err=FLASH_ProgramWord(addr, counter&0xffffffff);
-		if (err!=FLASH_COMPLETE) return err;
-		err=FLASH_ProgramWord(addr+4,  (counter>>32)&0xffffffff);
-		if (err!=FLASH_COMPLETE) return err;
-*/
-    flashc_memcpy ((void*)BACKUP_PAGE_ADDRESS,(void*)&counter,8,TRUE);
+    // Write counter page value
+    flashc_memcpy ((void*)addr,(void*)&counter,8,FALSE);        // Area is erased
 
-/*
-		err=FLASH_ProgramHalfWord(BACKUP_PAGE_ADDRESS+BACKUP_OK_OFFSET, 0x4F4B);
-		if (err!=FLASH_COMPLETE) return err;
-*/
+    // Write valid token to backup page
     dummy_u16 = 0x4F4B;
-    flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_OK_OFFSET),(void*)&dummy_u16,2,TRUE);
+    flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_OK_OFFSET),(void*)&dummy_u16,2,FALSE); // Area is erased
 
-/*
-		FLASH_Lock();
-*/
 	}
-	else{
+	else
+	{
+		ptr +=8;      // Start of token area
+		i    =0;
 
-		ptr+=8;
-		i=0;
-		while(i<1016){
-			if (*ptr==0xff)
-			  break;
+		while (i < TOKEN_PER_FLASHPAGE)
+		{
+		  n = *ptr;
+			if (n==0xff)
+			{
+			  break;         // Token is free
+			}
 			ptr++;
 			i++;
 		}
+
+#ifdef DEBUG_HOTP
+{
+  u8 text[20];
+
+  CI_TickLocalPrintf ("Mark token:" );
+  itoa ((u32)i,text);
+  CI_LocalPrintf (text);
+  CI_LocalPrintf (" - Counter:");
+  itoa ((u32)get_counter_value (addr),text);
+  CI_LocalPrintf (text);
+  CI_LocalPrintf ("\n\r");
+
+}
+#endif
+
+		// Mark token as used
+    flashc_memset8 ((void*)ptr,0x00,1,FALSE);     // Area is erased
+    n = *ptr;
 /*
-		FLASH_Unlock();
+    {
+      u8 text[20];
+
+      CI_LocalPrintf ("After change0:" );
+      itoa ((u32)n,text);
+      CI_LocalPrintf (text);
+      CI_LocalPrintf ("\n\r");
+    }
 */
-		if ((u32)ptr%2){ //odd byte
-/*
-			err=FLASH_ProgramHalfWord((u32)ptr-1, 0x0000);
-*/
-	    dummy_u16 = 0x0000;
-	    flashc_memcpy ((void*)(ptr-1),(void*)&dummy_u16,2,TRUE);
+    if (0 != n)   // If token is not erased
+    {
+      // Mark token as used with erasing page
+      flashc_memset8 ((void*)ptr,0x00,1,TRUE);
+#ifdef DEBUG_HOTP
+{
+  u8 text[20];
+  n = *ptr;
+  CI_LocalPrintf ("Token after erase: (0 = ok)" );
+  itoa ((u32)n,text);
+  CI_LocalPrintf (text);
+  CI_LocalPrintf ("\n\r");
+}
+#endif
+    }
 
 
-		}
-		else{ //even byte
-/*
-			err=FLASH_ProgramHalfWord((u32)ptr, 0xff00);
-*/
-      dummy_u16 = 0xFF00;
-      flashc_memcpy ((void*)ptr,(void*)&dummy_u16,2,TRUE);
 
-
-		}
-/*
-		FLASH_Lock();
-*/
 	}
 
 	return err; //no error
@@ -479,6 +723,10 @@ if (err!=FLASH_COMPLETE) return err; */
 /*******************************************************************************
 
   get_code_from_hotp_slot
+
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
 
   Reviews
   Date      Reviewer        Info
@@ -496,21 +744,62 @@ u32 get_code_from_hotp_slot(u8 slot)
 
 	if (slot>=NUMBER_OF_HOTP_SLOTS) return 0;
 
-	config=get_hotp_slot_config(slot);
+	config = get_hotp_slot_config(slot);
 
-	if (config&(1<<SLOT_CONFIG_DIGITS))
+	if (config & (1<<SLOT_CONFIG_DIGITS))
 	  len=8;
 
-	result=*((u8 *)hotp_slots[slot]);
+	result = *((u8 *)hotp_slots[slot]);
 
 	if (result==0xFF)//unprogrammed slot
 	  return 0;
 
-	counter = get_counter_value(hotp_slot_counters[slot]);
+	counter = get_counter_value (hotp_slot_counters[slot]);
+/*
+ 	For a counter test without flash
+	{
+    static u32 co = 0;
+    counter = co;
+    co++;
+	}
+*/
+#ifdef DEBUG_HOTP
+  {
+    u8 text[20];
+    u32 c;
+/*
+    DelayMs (10);
+    CI_LocalPrintf ("HOTP counter:" );
+    itoa ((u32)counter,text);
+    CI_LocalPrintf (text);
+    CI_LocalPrintf ("\n\r");
+
+    CI_LocalPrintf ("secret addr :" );
+    c = hotp_slots[slot]+SECRET_OFFSET;
+    HexPrint (4,&c);
+    CI_LocalPrintf ("\n\r");
+*/
+  }
+#endif
 
 	result = get_hotp_value(counter,(u8 *)(hotp_slots[slot]+SECRET_OFFSET),20,len);
 
-	err=increment_counter_page(hotp_slot_counters[slot]);
+
+	err = increment_counter_page (hotp_slot_counters[slot]);
+
+#ifdef DEBUG_HOTP
+  {
+    u8 text[20];
+
+    counter = get_counter_value (hotp_slot_counters[slot]);
+/*
+    CI_LocalPrintf ("HOTP counter after inc:" );
+    itoa ((u32)counter,text);
+    CI_LocalPrintf (text);
+    CI_LocalPrintf ("\n\r");
+*/
+  }
+#endif
 
 	if (err!=FLASH_COMPLETE) return 0;
 
@@ -523,9 +812,13 @@ u32 get_code_from_hotp_slot(u8 slot)
   backup_data
 
   backup data to the backup page
-  data -data to be backed up
-  len - length of the data
+  data - data to be backed up
+  len  - length of the data
   addr - original address of the data
+
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
 
   Reviews
   Date      Reviewer        Info
@@ -538,35 +831,28 @@ void backup_data(u8 *data,u16 len, u32 addr)
   u16 dummy_u16;
   u32 dummy_u32;
 
-/*
-	FLASH_Unlock();
-	FLASH_ErasePage(BACKUP_PAGE_ADDRESS);
-*/
   // New erase by flash memset
   flashc_memset8 ((void*)BACKUP_PAGE_ADDRESS,0xFF,FLASH_PAGE_SIZE,TRUE);
 
 	write_data_to_flash(data,len,BACKUP_PAGE_ADDRESS);
-/*
-	FLASH_ProgramHalfWord(BACKUP_PAGE_ADDRESS+BACKUP_LENGTH_OFFSET, len);
-*/
+
   dummy_u16 = len;
-  flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_LENGTH_OFFSET),(void*)&dummy_u16,2,TRUE);
+  flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_LENGTH_OFFSET),(void*)&dummy_u16,2,FALSE);  // Area is erased
 
-/*
-	FLASH_ProgramWord(BACKUP_PAGE_ADDRESS+BACKUP_ADDRESS_OFFSET, addr);
-*/
   dummy_u32 = addr;
-  flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_ADDRESS_OFFSET),(void*)&dummy_u32,4,TRUE);
+  flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_ADDRESS_OFFSET),(void*)&dummy_u32,4,FALSE);  // Area is erased
 
-/*
-	FLASH_Lock();
-*/
 }
-
 
 /*******************************************************************************
 
   write_to_slot
+
+  Write a paramter slot to the parameter page
+
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
 
   Reviews
   Date      Reviewer        Info
@@ -578,37 +864,24 @@ void write_to_slot(u8 *data, u16 offset, u16 len)
 {
   u16 dummy_u16;
 
-	//copy entire page to ram
+//copy entire page to ram
 	u8 *page=(u8 *)SLOTS_ADDRESS;
-	memcpy(page_buffer,page,SLOT_PAGE_SIZE);
+	memcpy(page_buffer,page,FLASH_PAGE_SIZE*3);
 
-	//make changes to page
+//make changes to page
 	memcpy(page_buffer+offset,data,len);
 
+//write page to backup location
+	backup_data(page_buffer,FLASH_PAGE_SIZE*3,SLOTS_ADDRESS);
 
-	//write page to backup location
-	backup_data(page_buffer,SLOT_PAGE_SIZE,SLOTS_ADDRESS);
+//write page to regular location
+  flashc_memset8 ((void*)SLOTS_ADDRESS,0xFF,FLASH_PAGE_SIZE*3,TRUE);
 
-	//write page to regular location
-/*
-	FLASH_Unlock();
-	FLASH_ErasePage(SLOTS_ADDRESS);
-*/
-  // New erase by flash memset
-  flashc_memset8 ((void*)SLOTS_ADDRESS,0xFF,FLASH_PAGE_SIZE,TRUE);
+	write_data_to_flash (page_buffer,FLASH_PAGE_SIZE*3,SLOTS_ADDRESS);
 
-	write_data_to_flash(page_buffer,SLOT_PAGE_SIZE,SLOTS_ADDRESS);
-
-/*
-	FLASH_ProgramHalfWord(BACKUP_PAGE_ADDRESS+BACKUP_OK_OFFSET, 0x4F4B);
-*/
+// Init backup block
   dummy_u16 = 0x4F4B;
   flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_OK_OFFSET),(void*)&dummy_u16,2,TRUE);
-
-
-/*
-	FLASH_Lock();
-*/
 }
 
 
@@ -617,6 +890,10 @@ void write_to_slot(u8 *data, u16 offset, u16 len)
   check_backups
 
   check for any data on the backup page
+
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
 
   Reviews
   Date      Reviewer        Info
@@ -637,26 +914,16 @@ u8 check_backups()
 	else
 	{
 
-		if ((address != 0xffffffff) && (length <= 1000))
+		if ((address != 0xffffffff) && (length <= 1000)) // todo 1000 > define
 		{
-/*
-		  FLASH_Unlock();
-			FLASH_ErasePage(address);
-*/
-
 		  // New erase by flash memset
 		  flashc_memset8 ((void*)address,0xFF,FLASH_PAGE_SIZE,TRUE);
 
 			write_data_to_flash((u8 *)BACKUP_PAGE_ADDRESS,length,address);
-/*
-			FLASH_ErasePage(BACKUP_PAGE_ADDRESS);
-*/
-      // New erase by flash memset
+
+			// New erase by flash memset
       flashc_memset8 ((void*)BACKUP_PAGE_ADDRESS,0xFF,FLASH_PAGE_SIZE,TRUE);
 
-/*
-			FLASH_Lock();
-*/
 			return 1; //backed up page restored
 		}
 		else
@@ -672,6 +939,10 @@ u8 check_backups()
 
   get_hotp_slot_config
 
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -681,15 +952,28 @@ u8 check_backups()
 u8 get_hotp_slot_config(u8 slot_number)
 {
 	u8 result=0;
-	if (slot_number>=NUMBER_OF_HOTP_SLOTS)
+	if (slot_number >= NUMBER_OF_HOTP_SLOTS)
 	  return 0;
 	else
 	{
-		result=((u8 *)hotp_slots[slot_number])[CONFIG_OFFSET];
+		result= ((u8 *)hotp_slots[slot_number])[CONFIG_OFFSET];
 	}
 
 	return result;
 }
+
+/*******************************************************************************
+
+  get_totp_slot_config
+
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
 
 u8 get_totp_slot_config(u8 slot_number)
 {
@@ -709,6 +993,10 @@ u8 get_totp_slot_config(u8 slot_number)
 
   get_code_from_totp_slot
 
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -721,7 +1009,7 @@ u32 get_code_from_totp_slot(u8 slot, u64 challenge)
 	u8 config=0;
 	u8 len=6;
 
-	if (slot>=NUMBER_OF_TOTP_SLOTS) return 0;
+	if (slot >= NUMBER_OF_TOTP_SLOTS) return 0;
 
 
 	result=*((u8 *)totp_slots[slot]);
@@ -744,6 +1032,10 @@ u32 get_code_from_totp_slot(u8 slot, u64 challenge)
 /*******************************************************************************
 
   get_hotp_slot_addr
+
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
 
   Reviews
   Date      Reviewer        Info
@@ -772,6 +1064,10 @@ u8 *get_hotp_slot_addr(u8 slot_number)
 
   get_totp_slot_addr
 
+  Changes
+  Date      Reviewer        Info
+  24.03.14  RB              Integration from Stick 1.4
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -782,7 +1078,7 @@ u8 *get_totp_slot_addr (u8 slot_number)
 {
   u8 *result = NULL;
 
-  if (slot_number>=NUMBER_OF_TOTP_SLOTS)
+  if (slot_number >= NUMBER_OF_TOTP_SLOTS)
   {
     return NULL;
   }
@@ -794,10 +1090,6 @@ u8 *get_totp_slot_addr (u8 slot_number)
   return result;
 }
 
-
-#ifdef NOT_USED
-
-#endif // NOT_USED
 
 
 

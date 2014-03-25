@@ -239,7 +239,7 @@ u8 *Keyboard_GetReport_Feature(u16 Length)
 //    u32 i;
 
     memcpy((void*)HID_GetReport_Value,HID_GetReport_Value_tmp,KEYBOARD_FEATURE_COUNT);
-    HID_GetReport_Value[0] = OTP_device_status;                         // Todo RB usage of OTP_device_status
+//    HID_GetReport_Value[0] = OTP_device_status;                         // Todo RB usage of OTP_device_status
 
 
 // Send password matrix ?
@@ -314,14 +314,14 @@ u8 *Keyboard_SetReport_Feature(u16 Length)
 
   memcpy(HID_SetReport_Value_tmp,HID_SetReport_Value,KEYBOARD_FEATURE_COUNT);
   OTP_device_status=STATUS_RECEIVED_REPORT;
-//  CI_StringOut ("-G-");
-  CI_StringOut ("\n\r");
+/* USB Debug
+  CI_StringOut ("\n\r Get ");
   for (i=0;i<BytesIn_u32;i++)
   {
       CI_Print8BitValue (HID_SetReport_Value[i]);
   }
   CI_StringOut ("\n\r");
-
+*/
   Usb_ack_control_out_received_free();
   Usb_ack_control_in_ready_send();
   while (!Is_usb_control_in_ready());

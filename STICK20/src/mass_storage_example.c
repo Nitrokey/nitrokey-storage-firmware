@@ -1046,7 +1046,7 @@ int main(void)
 // IDF
   BUFFERED_SIO_Init ();
 
-#ifdef TIME_MEASURING_ENABLE
+#ifdef INTERPRETER_ENABLE
   IDF_task_init();
 #endif
 

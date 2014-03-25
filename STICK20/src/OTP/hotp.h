@@ -47,9 +47,15 @@ typedef enum
   FLASH_TIMEOUT
 }FLASH_Status;
 
-
+/*
 #define NUMBER_OF_HOTP_SLOTS 2
 #define NUMBER_OF_TOTP_SLOTS 4
+*/
+
+#define NUMBER_OF_HOTP_SLOTS 3
+#define NUMBER_OF_TOTP_SLOTS 15
+
+
 
 //Flash memory pages:
 //0x801E800
@@ -85,36 +91,55 @@ global config slot:
 
 */
 
-#define FLASH_PAGE_SIZE 1024 // RB
+#define FLASH_PAGE_SIZE 512 // AVR
 
-#define SLOT_PAGE_SIZE 1000 //less than actual page, so we can copy it to backup page with additional info
+#define SLOT_PAGE_SIZE  500 //less than actual page, so we can copy it to backup page with additional info
 
-#define SLOTS_ADDRESS         (0x80000000 + 245 * FLASH_PAGE_SIZE +    0) // 0x803EC00
-#define SLOT1_COUNTER_ADDRESS (0x80000000 + 245 * FLASH_PAGE_SIZE + 1024) // 0x803F000
-#define SLOT2_COUNTER_ADDRESS (0x80000000 + 245 * FLASH_PAGE_SIZE + 2048) // 0x803F400
-#define BACKUP_PAGE_ADDRESS   (0x80000000 + 245 * FLASH_PAGE_SIZE + 4096) // 0x803FC00
-
-#define BACKUP_ADDRESS_OFFSET 1000
-#define BACKUP_LENGTH_OFFSET  1004
-#define BACKUP_OK_OFFSET      1006
-
-#define GLOBAL_CONFIG_OFFSET 0
-
-#define HOTP_SLOT1_OFFSET 64
-#define HOTP_SLOT2_OFFSET 128
-
-#define TOTP_SLOT1_OFFSET 192
-#define TOTP_SLOT2_OFFSET 256
-#define TOTP_SLOT3_OFFSET 320
-#define TOTP_SLOT4_OFFSET 384
-
-#define SLOT_TYPE_OFFSET 0
-#define SLOT_NAME_OFFSET 1
-#define SECRET_OFFSET 16
-#define CONFIG_OFFSET 36
-#define TOKEN_ID_OFFSET 37
+#define FLASH_START            0x80000000
+#define OTP_FLASH_START_PAGE   500
+#define SLOTS_ADDRESS         (0x80000000 + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (512*0)) // 0x8003e800
+#define SLOT1_COUNTER_ADDRESS (0x80000000 + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (512*3)) // 0x8003
+#define SLOT2_COUNTER_ADDRESS (0x80000000 + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (512*4)) // 0x8003
+#define SLOT3_COUNTER_ADDRESS (0x80000000 + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (512*5)) // 0x8003
+#define BACKUP_PAGE_ADDRESS   (0x80000000 + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (512*6)) // (3 Pages) 0x8003
 
 
+#define BACKUP_ADDRESS_OFFSET ((512 * 3) - 12)          //500
+#define BACKUP_LENGTH_OFFSET  ((512 * 3) -  8)          //504
+#define BACKUP_OK_OFFSET      ((512 * 3) -  6)          //506
+
+#define GLOBAL_CONFIG_OFFSET  (64 * 0)
+
+#define HOTP_SLOT1_OFFSET     (64 * 1)
+#define HOTP_SLOT2_OFFSET     (64 * 2)
+#define HOTP_SLOT3_OFFSET     (64 * 3)
+
+#define TOTP_SLOT1_OFFSET     ((64 * 4) + (64 *  0))
+#define TOTP_SLOT2_OFFSET     ((64 * 4) + (64 *  1))
+#define TOTP_SLOT3_OFFSET     ((64 * 4) + (64 *  2))
+#define TOTP_SLOT4_OFFSET     ((64 * 4) + (64 *  3))
+#define TOTP_SLOT5_OFFSET     ((64 * 4) + (64 *  4))
+#define TOTP_SLOT6_OFFSET     ((64 * 4) + (64 *  5))
+#define TOTP_SLOT7_OFFSET     ((64 * 4) + (64 *  6))
+#define TOTP_SLOT8_OFFSET     ((64 * 4) + (64 *  7))
+#define TOTP_SLOT9_OFFSET     ((64 * 4) + (64 *  8))
+#define TOTP_SLOT10_OFFSET    ((64 * 4) + (64 *  9))
+#define TOTP_SLOT11_OFFSET    ((64 * 4) + (64 * 10))
+#define TOTP_SLOT12_OFFSET    ((64 * 4) + (64 * 11))
+#define TOTP_SLOT13_OFFSET    ((64 * 4) + (64 * 12))
+#define TOTP_SLOT14_OFFSET    ((64 * 4) + (64 * 14))
+#define TOTP_SLOT15_OFFSET    ((64 * 4) + (64 * 15))
+
+// End of data = ((64 * 4) + (64 * 16)) = 1280 >= 3 flash page
+
+
+#define SLOT_TYPE_OFFSET     0
+#define SLOT_NAME_OFFSET     1
+#define SECRET_OFFSET       16
+#define CONFIG_OFFSET       36
+#define TOKEN_ID_OFFSET     37
+
+#define TOKEN_PER_FLASHPAGE        (FLASH_PAGE_SIZE-8)
 
 
 extern u32 hotp_slots[NUMBER_OF_HOTP_SLOTS];
@@ -123,7 +148,7 @@ extern u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];
 extern u32 hotp_slot_offsets[NUMBER_OF_HOTP_SLOTS];
 extern u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS];
 
-extern u8 page_buffer[SLOT_PAGE_SIZE];
+extern u8 page_buffer[FLASH_PAGE_SIZE*3];
 
 u32 getu32(u8 *array);
 u64 getu64(u8 *array);

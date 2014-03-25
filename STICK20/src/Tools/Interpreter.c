@@ -40,13 +40,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifndef STICK_20_A_MUSTER_PROD
-  #define INTERPRETER_ENABLE     // Disable for PROD Version
-#endif
-
-#ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
-  #define INTERPRETER_ENABLE     // Enable also for PROD Version
-#endif
 
 #ifdef INTERPRETER_ENABLE
 

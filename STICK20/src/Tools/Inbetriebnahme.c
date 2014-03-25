@@ -684,8 +684,11 @@ void IBN_TimeAccess (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u8 *String_pu8)
 		CI_LocalPrintf ("Time functions\r\n");
 		CI_LocalPrintf ("\r\n");
 		CI_LocalPrintf ("0   Show time\r\n");
-		CI_LocalPrintf ("1   Set  time - HH:MM:SS\r\n");
-		CI_LocalPrintf ("2   Set  date - DD:MM:YY\r\n");
+		CI_LocalPrintf ("1   Set time - HH:MM:SS\r\n");
+    CI_LocalPrintf ("2   Set date - DD:MM:YY\r\n");
+    CI_LocalPrintf ("3   Set time in sec\r\n");
+    CI_LocalPrintf ("4   Write time to flash\r\n");
+    CI_LocalPrintf ("5   Read time from flash\r\n");
 		CI_LocalPrintf ("\r\n");
 		return;
 	}
@@ -730,6 +733,28 @@ void IBN_TimeAccess (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u8 *String_pu8)
 			now = mktime (&tm_st);
 			set_time (now);
 			break;
+    case 3 :
+      CI_LocalPrintf ("Set Time %ld\r\n",Param_u32);
+      set_time (Param_u32);
+      time (&now);
+      CI_LocalPrintf ("Time %ld\r\n",now);
+      ctime_r (&now,(char*)Time_u8);
+      CI_LocalPrintf ("Time %s\r\n",Time_u8);
+      break;
+    case 4 :
+      time (&now);
+      CI_LocalPrintf ("Write time %ld -",now);
+      ctime_r (&now,(char*)Time_u8);
+      CI_LocalPrintf ("%s\r\n",Time_u8);
+      WriteDatetime (now);
+      break;
+    case 5 :
+      ReadDatetime (&now);
+      CI_LocalPrintf ("Stored time %ld - ",now);
+      ctime_r (&now,(char*)Time_u8);
+      CI_LocalPrintf ("Time %s\r\n",Time_u8);
+      break;
+
 	}
 }
 
