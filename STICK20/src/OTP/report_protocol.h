@@ -47,7 +47,8 @@
 #define CMD_ERASE_SLOT                    0x06
 #define CMD_FIRST_AUTHENTICATE            0x07
 #define CMD_AUTHORIZE                     0x08
-
+#define CMD_GET_PASSWORD_RETRY_COUNT      0x09
+#define CMD_CLEAR_WARNING                 0x0A
 
 #define STICK20_CMD_START_VALUE                         0x10
 #define STICK20_CMD_ENABLE_CRYPTED_PARI                 (STICK20_CMD_START_VALUE +  0)
@@ -77,6 +78,15 @@
 #define STICK20_CMD_SEND_NEW_PASSWORD                   (STICK20_CMD_START_VALUE + 19)
 
 #define STICK20_CMD_CLEAR_NEW_SD_CARD_FOUND             (STICK20_CMD_START_VALUE + 20)
+#define STICK20_CMD_SEND_STARTUP                        (STICK20_CMD_START_VALUE + 21)
+
+#define STICK20_CMD_SEND_PASSWORD_RETRY_COUNT           (STICK20_CMD_START_VALUE + 22)
+
+
+
+#define STICK20_SEND_STATUS_IDLE     0
+#define STICK20_SEND_STATUS_PIN      1
+#define STICK20_SEND_STARTUP   2
 
 
 #define STATUS_READY                      0x00
@@ -164,7 +174,7 @@ typedef struct  {
 #define OUTPUT_CMD_STICK20_SEND_DATA_TYPE_STATUS      3
 
 
-u8 Stick20HIDInitSendConfoguration (void);
+u8 Stick20HIDInitSendConfoguration (u8 state_u8);
 u8 Stick20HIDSendAccessStatusData (u8 *output);
 extern u8 Stick20HIDSendConfigurationState_u8;
 
@@ -298,6 +308,7 @@ u8 cmd_write_config(u8 *report,u8 *output);
 u8 cmd_erase_slot(u8 *report,u8 *output);
 u8 cmd_first_authenticate(u8 *report,u8 *output);
 u8 cmd_authorize(u8 *report,u8 *output);
+u8 cmd_getPasswordCount (u8 *report,u8 *output);
 
 void OTP_main (void);
 
@@ -312,4 +323,5 @@ extern u8 HID_GetReport_Value_tmp[KEYBOARD_FEATURE_COUNT];
 
 u8 Stick20HIDInitSendMatrixData (u8 *PasswordMatrixData_au8);
 
+u8 CheckSystemtime (u32 Newtimestamp_u32);
 

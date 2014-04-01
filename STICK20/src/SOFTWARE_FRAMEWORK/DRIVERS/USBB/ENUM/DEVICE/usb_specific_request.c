@@ -123,6 +123,11 @@ static void hid_get_descriptor(U8 size_of_report, const U8* p_usb_hid_report);
 #endif
 
 u8 Stick20HIDSendMatrixData (u8 *output);
+extern u8 Stick20HIDSendConfigurationState_u8;
+
+#define STICK20_SEND_STATUS_IDLE     0
+#define STICK20_SEND_STATUS_PIN      1
+#define STICK20_SEND_STARTUP   2
 
 /*******************************************************************************
 * Function Name  : CCID_Status_In
@@ -241,16 +246,20 @@ u8 *Keyboard_GetReport_Feature(u16 Length)
     memcpy((void*)HID_GetReport_Value,HID_GetReport_Value_tmp,KEYBOARD_FEATURE_COUNT);
 //    HID_GetReport_Value[0] = OTP_device_status;                         // Todo RB usage of OTP_device_status
 
-
 // Send password matrix ?
     if (0 != Stick20HIDSendMatrixState_u8)
     {
       Stick20HIDSendMatrixData (HID_GetReport_Value);
     }
-    else if (0 != Stick20HIDSendConfigurationState_u8)
+    else if (STICK20_SEND_STATUS_PIN == Stick20HIDSendConfigurationState_u8)
     {
       Stick20HIDSendAccessStatusData (HID_GetReport_Value);
     }
+    else if (STICK20_SEND_STARTUP == Stick20HIDSendConfigurationState_u8)
+    {
+      Stick20HIDSendAccessStatusData (HID_GetReport_Value);
+    }
+
 #ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
     else   // Send debug data
     {

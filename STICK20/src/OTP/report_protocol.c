@@ -202,13 +202,13 @@ void Stick20HIDSendDebugData (u8 *output)
 
 *******************************************************************************/
 
-u8 Stick20HIDSendConfigurationState_u8      = 0;
+u8 Stick20HIDSendConfigurationState_u8      = STICK20_SEND_STATUS_IDLE;
 
-u8 Stick20HIDInitSendConfoguration (void)
+u8 Stick20HIDInitSendConfoguration (u8 state_u8)
 {
   CI_StringOut ("Init status data\r\n");
 
-  Stick20HIDSendConfigurationState_u8      = 1;
+  Stick20HIDSendConfigurationState_u8      = state_u8;
 
   return (TRUE);
 }
@@ -257,20 +257,22 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
     CI_StringOut ("Uncyrpted Volume  READ ONLY active\r\n");
   }
 
-  if (0 != (Stick20Configuration_st.VolumeActiceFlag_u8 & (1 << SD_CRYPTED_VOLUME_BIT_PLACE)))
+  if (STICK20_SEND_STATUS_PIN == Stick20HIDInitSendConfoguration)    // This information only with pin
   {
-    CI_StringOut ("Crypted volume    active\r\n");
-  }
-  else
-  {
-    CI_StringOut ("Crypted volume    not active\r\n");
-  }
+    if (0 != (Stick20Configuration_st.VolumeActiceFlag_u8 & (1 << SD_CRYPTED_VOLUME_BIT_PLACE)))
+    {
+      CI_StringOut ("Crypted volume    active\r\n");
+    }
+    else
+    {
+      CI_StringOut ("Crypted volume    not active\r\n");
+    }
 
-  if (0 != (Stick20Configuration_st.VolumeActiceFlag_u8 & (1 << SD_HIDDEN_VOLUME_BIT_PLACE)))
-  {
-    CI_StringOut ("Hidden volume     active\r\n");
+    if (0 != (Stick20Configuration_st.VolumeActiceFlag_u8 & (1 << SD_HIDDEN_VOLUME_BIT_PLACE)))
+    {
+      CI_StringOut ("Hidden volume     active\r\n");
+    }
   }
-
 
 
   if (0 != (Stick20Configuration_st.NewSDCardFound_u8 & 0x01))
@@ -281,7 +283,7 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   {
     CI_StringOut ("SD card              - Change Counter:");
   }
-  itoa ((Stick20Configuration_st.SDFillWithRandomChars_u8 >> 1),text_au8);
+  itoa ((Stick20Configuration_st.NewSDCardFound_u8 >> 1),text_au8);
   CI_StringOut (text_au8);
   CI_StringOut ("\r\n");
 
@@ -298,7 +300,7 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   CI_StringOut ("\r\n");
 
 
-  HID_Stick20SendData_st.FollowBytesFlag_u8 = 0;     // No
+  HID_Stick20SendData_st.FollowBytesFlag_u8 = 0;     // No next data
   HID_Stick20SendData_st.SendSize_u8        = sizeof (typeStick20Configuration_st);
 
   // Copy send data to transfer struct
@@ -620,6 +622,14 @@ u8 parse_report(u8 *report,u8 *output)
         CI_StringOut ("Get CMD_AUTHORIZE\r\n");
         cmd_authorize(report,output);
         break;
+
+      case CMD_GET_PASSWORD_RETRY_COUNT:
+        CI_StringOut ("Get CMD_GET_PASSWORD_RETRY_COUNT\r\n");
+        cmd_getPasswordCount(report,output);
+
+        output[OUTPUT_CMD_RESULT_STICK20_STATUS_START] = 0xaa;
+        break;
+
     }
     if (not_authorized)
     {
@@ -850,6 +860,26 @@ u8 parse_report(u8 *report,u8 *output)
           memcpy (HID_String_au8,&report[1],33);
           break;
 
+        case STICK20_CMD_SEND_STARTUP :
+          CI_StringOut ("Get STICK20_CMD_SEND_STARTUP\r\n");
+
+          StartStick20Command (STICK20_CMD_SEND_STARTUP);
+
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_SEND_STARTUP;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
+
+        case STICK20_CMD_SEND_PASSWORD_RETRY_COUNT :
+          CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_RETRY_COUNT\r\n");
+
+          StartStick20Command (STICK20_CMD_SEND_PASSWORD_RETRY_COUNT);
+
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD_RETRY_COUNT;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
+
 
         default:
           break;
@@ -914,13 +944,14 @@ u8 parse_report(u8 *report,u8 *output)
     }
   }
 /* USB Debug
+*/
   CI_StringOut ("\n\rSend ");
   for (i=0;i<KEYBOARD_FEATURE_COUNT;i++)
   {
       CI_Print8BitValue (output[i]);
   }
   CI_StringOut ("\n\r");
-*/
+
   return 0;
 }
 /*******************************************************************************
@@ -1399,6 +1430,35 @@ u8 cmd_authorize(u8 *report,u8 *output)
 
 	return (0);
 }
+
+/*******************************************************************************
+
+  cmd_getPasswordCount
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getPasswordCount (u8 *report,u8 *output)
+{
+  u8  Data_u8[20];
+  u32 Ret_u32;
+
+  Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus (Data_u8);
+  if (TRUE == Ret_u32)
+  {
+    output[OUTPUT_CMD_RESULT_OFFSET] = Data_u8[4];
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+  }
+  else
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_PASSWORD;
+  }
+
+  return (0);
+}
+
 /*******************************************************************************
 
   CopyUpdateToHIDData

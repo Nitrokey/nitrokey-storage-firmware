@@ -51,6 +51,9 @@
 #define HTML_CMD_GET_DEVICE_STATUS                  14
 #define HTML_CMD_CLEAR_NEW_SD_CARD_FOUND            15
 
+#define HTML_CMD_SEND_STARTUP                       16
+#define HTML_CMD_SEND_PASSWORD_RETRY_COUNT          17
+
 #define HTML_CMD_EXPORT_BINARY                      20
 
 

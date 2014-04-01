@@ -41,6 +41,7 @@ int LA_OpenPGP_V20_Put_AES_key (typeAPDU *tSC,unsigned char cKeyLen,unsigned cha
 int LA_OpenPGP_V20_Test (void);
 
 u32 LA_SC_SendVerify (u8 PasswordFlag_u8,u8 *String_pu8);
+int LA_OpenPGP_V20_GetPasswordstatus (char *PasswordStatus);
 
 int LA_OpenPGP_V20_Test_GetAID (void);
 int LA_OpenPGP_V20_Test_SendAdminPW (unsigned char *pcPW);

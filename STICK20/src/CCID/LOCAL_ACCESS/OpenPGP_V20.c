@@ -775,6 +775,56 @@ int LA_OpenPGP_V20_Test_GetAID (void)
 
 /*******************************************************************************
 
+  LA_OpenPGP_V20_GetPasswordstatus
+
+  Changes
+  Date      Author          Info
+  31.03.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+
+*******************************************************************************/
+
+int LA_OpenPGP_V20_GetPasswordstatus (char *PasswordStatus)
+{
+  int nRet;
+
+  LA_RestartSmartcard_u8 ();
+// Check for smartcard on
+  if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
+  {
+    CI_TickLocalPrintf ("LA_OpenPGP_V20_GetPasswordstatus: Restart smartcard\r\n");
+
+    LA_RestartSmartcard_u8 ();
+    if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
+    {
+      CI_TickLocalPrintf ("LA_OpenPGP_V20_GetPasswordstatus: Can't start smartcard\r\n");
+      return (FALSE);
+    }
+  }
+
+  memset (PasswordStatus,0,7);
+
+  CI_LocalPrintf ("Get password status  : ");
+  nRet = LA_OpenPGP_V20_GetData (&tSC_OpenPGP_V20,0x00,0xC4);
+  if (FALSE == nRet)
+  {
+    CI_LocalPrintf ("fail\n\r");
+    return (FALSE);
+  }
+  CI_LocalPrintf ("OK \n\r");
+
+  // Copy password status
+  memcpy (PasswordStatus,tSC_OpenPGP_V20.cReceiveData,7);
+
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
   LA_OpenPGP_V20_Test_SendAdminPW
 
   Reviews
@@ -1327,6 +1377,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
     CI_LocalPrintf ("12         Change user pin old pin+new pin  -> 123456abcdef\r\n");
     CI_LocalPrintf ("13         Change admin pin old pin+new pin -> 12345678abcdefgh\r\n");
     CI_LocalPrintf ("14         SC startup test\r\n");
+    CI_LocalPrintf ("15         Get password status\r\n");
 
     CI_LocalPrintf ("\r\n");
     return;
@@ -1474,7 +1525,18 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
     case 14 :
           ISO7816_SC_StartupTest (Param_u32);
           break;
+    case 15 :
+          Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus (LocalString_au8);
+          if (TRUE == Ret_u32)
+          {
+            CI_LocalPrintf ("Password status -");
+            HexPrint (7,LocalString_au8);
+            CI_LocalPrintf ("\n\r");
 
+            CI_LocalPrintf ("User   %d\n\r",LocalString_au8[4]);
+            CI_LocalPrintf ("Admin  %d\n\r",LocalString_au8[6]);
+          }
+          break;
     default :
           break;
   }

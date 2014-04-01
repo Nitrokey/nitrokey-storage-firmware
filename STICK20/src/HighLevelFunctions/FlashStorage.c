@@ -57,7 +57,7 @@ typeStick20Configuration_st StickConfiguration_st;
    0 -  31    AES Storage key
   32 -  51    Matrix columns for user password
   52 -  71    Matrix columns for admin password
-  72 -  91    Stick Configuration
+  72 - 101    Stick Configuration
   92 - 123    Base for AES key hidden volume (32 byte)
  124 - 128    ID of sd card (4 byte)
 
@@ -200,7 +200,7 @@ u8 WriteStickConfigurationToUserPage (void)
   StickConfiguration_st.VersionInfo_au8[2]              = 0;               // Build number not used
   StickConfiguration_st.VersionInfo_au8[3]              = 0;               // Build number not used
 
-  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 72,&StickConfiguration_st,20,TRUE);
+  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 72,&StickConfiguration_st,30,TRUE);
   return (TRUE);
 }
 
@@ -257,6 +257,9 @@ u8 InitStickConfigurationToUserPage_u8 (void)
   StickConfiguration_st.NewSDCardFound_u8               = 0;
   StickConfiguration_st.SDFillWithRandomChars_u8        = FALSE;
   StickConfiguration_st.VolumeActiceFlag_u8             = 0;
+  StickConfiguration_st.NewSmartCardFound_u8            = 0;
+  StickConfiguration_st.ActiveSmartCardID_u32           = 0;
+
 
   WriteStickConfigurationToUserPage ();
   return (TRUE);
@@ -277,7 +280,7 @@ u8 InitStickConfigurationToUserPage_u8 (void)
 
 u8 WriteBaseForHiddenVolumeKey (u8 *data)
 {
-  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 92,data,32,TRUE);
+  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 102,data,32,TRUE);
   return (TRUE);
 }
 
@@ -293,7 +296,7 @@ u8 WriteBaseForHiddenVolumeKey (u8 *data)
 
 u8 ReadBaseForHiddenVolumeKey (u8 *data)
 {
-  memcpy (data,(void*)(AVR32_FLASHC_USER_PAGE + 92),32);
+  memcpy (data,(void*)(AVR32_FLASHC_USER_PAGE + 102),32);
   return (TRUE);
 }
 
@@ -434,7 +437,7 @@ u8 Write_ReadWriteStatusUncryptedVolume_u8 (u8 NewStatus_u8)
 
 u8 WriteSdId (u32 *SdId_u32)
 {
-  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 124,SdId_u32,4,TRUE);
+  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 134,SdId_u32,4,TRUE);
   return (TRUE);
 }
 
@@ -453,7 +456,7 @@ u8 WriteSdId (u32 *SdId_u32)
 
 u8 ReadSdId (u32 *SdId_u32)
 {
-  memcpy (SdId_u32,(void*)(AVR32_FLASHC_USER_PAGE + 124),4);
+  memcpy (SdId_u32,(void*)(AVR32_FLASHC_USER_PAGE + 134),4);
   return (TRUE);
 }
 
@@ -569,7 +572,7 @@ u8 ClearNewSdCardFoundToFlash (void)
 
 u8 WriteDatetime (u32 Datetime_u32)
 {
-  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 128,&Datetime_u32,4,TRUE);
+  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 138,&Datetime_u32,4,TRUE);
   return (TRUE);
 }
 
@@ -588,6 +591,6 @@ u8 WriteDatetime (u32 Datetime_u32)
 
 u8 ReadDatetime (u32 *Datetime_u32)
 {
-  memcpy (Datetime_u32,(void*)(AVR32_FLASHC_USER_PAGE + 128),4);
+  memcpy (Datetime_u32,(void*)(AVR32_FLASHC_USER_PAGE + 138),4);
   return (TRUE);
 }

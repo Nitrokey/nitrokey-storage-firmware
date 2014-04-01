@@ -107,6 +107,8 @@
 
 *******************************************************************************/
 
+u64 getu64 (u8 *array);
+
 /*******************************************************************************
 
  External declarations
@@ -532,11 +534,13 @@ void HTML_CheckRamDisk (void)
 
 void HID_ExcuteCmd (void)
 {
-//  u8  Text_u8[HTML_INPUTBUFFER_SIZE];
+  u8  Text_u8[HTML_INPUTBUFFER_SIZE];
   u8  StorageKey_pu8[32];
   u8  Cmd_u8;
   u8 *PasswordMatrix_pu8;
   u8  ret_u8;
+  u64 timestamp;
+  u32 Ret_u32;
 
   Cmd_u8 = HID_CmdGet_u8;
 
@@ -843,7 +847,7 @@ void HID_ExcuteCmd (void)
 
     case HTML_CMD_GET_DEVICE_STATUS :
       CI_TickLocalPrintf ("Get HTML_CMD_GET_DEVICE_STATUS\r\n");
-      Stick20HIDInitSendConfoguration ();
+      Stick20HIDInitSendConfoguration (STICK20_SEND_STATUS_PIN);
       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
       break;
 
@@ -950,6 +954,34 @@ void HID_ExcuteCmd (void)
          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
          CI_TickLocalPrintf ("*** wrong password ***\r\n");
        }
+       break;
+
+     case HTML_CMD_SEND_STARTUP :
+       CI_TickLocalPrintf ("Get HTML_CMD_SEND_STARTUP\r\n");
+       timestamp = getu64(&HID_String_au8[0]);
+       if (FALSE == CheckSystemtime ((u32)timestamp))
+       {
+
+       }
+       Stick20HIDInitSendConfoguration (STICK20_SEND_STARTUP);
+       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
+       break;
+
+     case STICK20_CMD_SEND_PASSWORD_RETRY_COUNT :
+       CI_TickLocalPrintf ("Get STICK20_CMD_SEND_PASSWORD_RETRY_COUNT\r\n");
+/*
+       Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus (Text_u8);
+
+       if (TRUE == Ret_u32)
+       {
+         HID_Stick20SendData_st.SendData_u8[0]     = Text_u8[4];      // Set state in sendblock
+         HID_Stick20SendData_st.FollowBytesFlag_u8 = 0;               // No
+         HID_Stick20SendData_st.SendSize_u8        = 1;
+       }
+*/
+
+//       Stick20HIDInitSendConfoguration (STICK20_SEND_STARTUP);
+       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
        break;
 
     default:
