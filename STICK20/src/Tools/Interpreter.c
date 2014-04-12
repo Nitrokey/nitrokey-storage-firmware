@@ -72,6 +72,7 @@
 #include "..\HighLevelFunctions\MatrixPassword.h"
 #include "..\HighLevelFunctions\HandleAesStorageKey.h"
 #include "SD_Test.h"
+#include "..\HighLevelFunctions\HiddenVolume.h"
 
 /*******************************************************************************
 
@@ -148,7 +149,7 @@ typeCommand tCommandData[CI_MAX_COMMANDS] =
     {   "file",     "",                                          CI_CMD_FILE,            "File io test",},
     {   "otp",      "",                                          CI_CMD_OTP,             "OPT tests",},
     {   "pwm",      "",                                          CI_CMD_PWM,             "Password matrix",},
-    {   "",         "",                                          0,                      "",},
+    {   "hv",       "",                                          CI_CMD_HIDDEN_VOULME,   "Hidden volumes",},
     { NULL,NULL,0,NULL}
 };
 
@@ -644,7 +645,7 @@ void CI_Help (void)
    CI_StringOut ("Description Command Parameter\n\r");
    for (i=0;i<CI_MAX_COMMANDS;i++)
    {
-      if (0 == strlen (tCommandData[i].szCommand))
+      if (0 == tCommandData[i].nCommandID)
       {
          break;
       }
@@ -652,6 +653,7 @@ void CI_Help (void)
                                           tCommandData[i].szCommand,                                          
                                           tCommandData[i].szParameter
                                           );
+//      DelayMs (100);
    }
 }
 
@@ -952,7 +954,12 @@ int CI_ExecCmd (char *szCommandLine)
          break;
 
       case CI_CMD_FILE_ACCESS :
-     	 IBN_FileAccess (nParamsGet_u8,(u8)nValue[0],nValue[1]);
+#ifdef ENABLE_IBN_FILE_ACCESS_TESTS
+          IBN_FileAccess (nParamsGet_u8,(u8)nValue[0],nValue[1]);
+#else
+          CI_LocalPrintf ("Test not enabled - activate ENABLE_IBN_FILE_ACCESS_TESTS\n\r");
+#endif
+
          break;
 
       case CI_CMD_MOUNT:
@@ -1062,7 +1069,11 @@ int CI_ExecCmd (char *szCommandLine)
 		  break;
 
 	  case CI_CMD_TIME_TEST :
-		  IBN_TimeAccess (nParamsGet_u8,(u8)nValue[0],nValue[1],String_pu8[0]);
+#ifdef ENABLE_IBN_TIME_ACCESS_TESTS
+      IBN_TimeAccess (nParamsGet_u8,(u8)nValue[0],nValue[1],String_pu8[0]);
+#else
+      CI_LocalPrintf ("Test not enabled - activate ENABLE_IBN_TIME_ACCESS_TESTS\n\r");
+#endif
 		  break;
 
     case CI_CMD_USB :
@@ -1096,7 +1107,18 @@ int CI_ExecCmd (char *szCommandLine)
       IBN_OTP_Tests (nParamsGet_u8,(u8)nValue[0],nValue[1],String_pu8[0]);
       break;
     case CI_CMD_PWM :
+#ifdef ENABLE_IBN_PWM_TESTS
       IBN_PWM_Tests (nParamsGet_u8,(u8)nValue[0],nValue[1],String_pu8[0]);
+#else
+      CI_LocalPrintf ("Test not enabled - activate ENABLE_IBN_PWM_TESTS\n\r");
+#endif
+      break;
+    case CI_CMD_HIDDEN_VOULME :
+#ifdef ENABLE_IBN_HV_TESTS
+      IBN_HV_Tests (nParamsGet_u8,(u8)nValue[0],nValue[1],String_pu8[0]);
+#else
+      CI_LocalPrintf ("Test not enabled - activate ENABLE_IBN_HV_TESTS\n\r");
+#endif
       break;
    }
 

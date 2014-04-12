@@ -75,9 +75,14 @@ typedef struct {
   u8  NewSDCardFound_u8;                    // Bit 0 new card found, bit 1-7 change counter       1 byte
   u8  SDFillWithRandomChars_u8;             // Bit 0 = 1 = filled, bit 1-7 change counter         1 byte
   u8  VolumeActiceFlag_u8;                  //                                                    1 byte
-  u8  NewSmartCardFound_u8;                 // Bit 0 new card found, bit 1-7 change counter       1 byte
+  u8  NewSmartCardFound_u8;                 // Bit 0 new card found, bit 1-7 change counter       1 byte  // 20 Byte not packed
   u32 ActiveSmartCardID_u32;                // Not used                                           4 byte
-} typeStick20Configuration_st;                                                          // Sum   22 byte
+  u8  UserPwRetryCount;                     // User password retry count                          1 byte
+  u8  AdminPwRetryCount;                    // Admin password retry count                         1 byte
+} typeStick20Configuration_st;                                                          // Sum   24+2 byte  // not packed
+
+
+extern typeStick20Configuration_st StickConfiguration_st;
 
 u8 ReadStickConfigurationFromUserPage (void);
 void SendStickStatusToHID (typeStick20Configuration_st *Status_st);

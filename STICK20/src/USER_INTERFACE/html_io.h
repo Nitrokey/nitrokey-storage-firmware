@@ -45,7 +45,7 @@
 #define HTML_CMD_ENABLE_HIDDEN_AES_LUN              10
 #define HTML_CMD_DISABLE_HIDDEN_AES_LUN             11
 
-#define HTML_CMD_SETUP_HIDDEN_AES_LUN               12      // Todo
+#define HTML_CMD_INIT_HIDDEN_VOLUME_SLOT            12
 
 #define HTML_CMD_WRITE_STATUS_DATA                  13
 #define HTML_CMD_GET_DEVICE_STATUS                  14
@@ -53,6 +53,9 @@
 
 #define HTML_CMD_SEND_STARTUP                       16
 #define HTML_CMD_SEND_PASSWORD_RETRY_COUNT          17
+
+#define HTML_CMD_SAVE_HIDDEN_VOLUME_SLOT            18
+#define HTML_CMD_READ_HIDDEN_VOLUME_SLOT            19
 
 #define HTML_CMD_EXPORT_BINARY                      20
 
@@ -64,7 +67,7 @@
 
 
 
-#define HTML_SEND_HIDDEN_VOLUME_SETUP                24
+#define HTML_SEND_HIDDEN_VOLUME_SETUP                24     // Old version
 #define HTML_CMD_SEND_PASSWORD                       25
 #define HTML_CMD_SEND_NEW_PASSWORD                   26
 

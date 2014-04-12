@@ -45,13 +45,26 @@
 
 #include "polarssl/config.h"
 
-#if defined(POLARSSL_TIMING_C)
-
 #include "polarssl/timing.h"
 
 #include "global.h"
 #include "tools.h"
 #include "TIME_MEASURING.h"
+
+//#include <unistd.h>
+//#include <sys/types.h>
+//#include <sys/time.h>
+//#include <signal.h>
+#include <time.h>
+
+#if defined(__AVR32__) || defined(__ICCAVR32__)
+#include <avr32/io.h>
+#include "cycle_counter.h"
+#endif
+
+#if defined(POLARSSL_TIMING_C)
+
+
 
 
 #if defined(WIN32)
@@ -66,11 +79,7 @@ struct _hr_time
 
 #else
 
-//#include <unistd.h>
-//#include <sys/types.h>
-//#include <sys/time.h>
-//#include <signal.h>
-#include <time.h>
+
 
 //struct _hr_time
 //{
@@ -79,10 +88,7 @@ struct _hr_time
 
 #endif
 
-#if defined(__AVR32__) || defined(__ICCAVR32__)
-#include <avr32/io.h>
-#include "cycle_counter.h"
-#endif 
+
 #if defined(POLARSSL_HAVE_ASM) && 					\
 	(defined(_MSC_VER) && defined(_M_IX86)) || defined(__WATCOMC__)
 
@@ -286,15 +292,7 @@ time_t time(time_t* timer) {
 	return 1;
 }
 
-void set_time (time_t TimeInSec)
-{
-	time_t time;
 
-// Get local cpu time
-	time  = (time_t) (TIME_MEASURING_GetTime () / (u64)TIME_MEASURING_TICKS_IN_USEC / 1000000LL);
-
-	RealTimeOffsetInSec_u32 = TimeInSec - time;		// Get offset to real time
-}
 
 void set_alarm( int seconds )
 {
@@ -334,3 +332,13 @@ void m_sleep( int milliseconds )
 
 #endif
 #endif
+
+void set_time (time_t TimeInSec)
+{
+  time_t time;
+
+// Get local cpu time
+  time  = (time_t) (TIME_MEASURING_GetTime () / (u64)TIME_MEASURING_TICKS_IN_USEC / 1000000LL);
+
+  RealTimeOffsetInSec_u32 = TimeInSec - time;   // Get offset to real time
+}

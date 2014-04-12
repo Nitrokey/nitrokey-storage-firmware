@@ -275,7 +275,6 @@ unsigned int flashc_get_page_number(void)
   return (AVR32_FLASHC.fcmd & AVR32_FLASHC_FCMD_PAGEN_MASK) >> AVR32_FLASHC_FCMD_PAGEN_OFFSET;
 }
 
-
 void flashc_issue_command(unsigned int command, int page_number)
 {
   u_avr32_flashc_fcmd_t u_avr32_flashc_fcmd;
@@ -287,6 +286,16 @@ void flashc_issue_command(unsigned int command, int page_number)
   AVR32_FLASHC.fcmd = u_avr32_flashc_fcmd.fcmd;
   flashc_error_status = flashc_get_error_status();
   flashc_wait_until_ready();
+#ifdef DEBUG_FLASHC
+  {
+    unsigned char text[20];
+    CI_LocalPrintf ("Flash page :");
+    itoa ((unsigned int) u_avr32_flashc_fcmd.FCMD.pagen,text);
+    CI_LocalPrintf (text);
+    CI_LocalPrintf ("\n\r");
+  }
+#endif
+
 }
 
 
@@ -629,8 +638,8 @@ Bool flashc_erase_page(int page_number, Bool check)
     CI_LocalPrintf ("Erase page :");
     itoa ((unsigned int)page_number,text);
     CI_LocalPrintf (text);
-    CI_LocalPrintf (" - ");
-    itoa ((unsigned int) flashc_get_page_number ());
+    CI_LocalPrintf (" - Pagebuffer = ");
+    itoa ((unsigned int) flashc_get_page_number (),text);
     CI_LocalPrintf (text);
     CI_LocalPrintf ("\n\r");
   }

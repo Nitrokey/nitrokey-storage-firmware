@@ -28,6 +28,7 @@
 #define CCID_OPENPGP_V20_H_
 
 extern typeAPDU   tSC_OpenPGP_V20;
+extern unsigned int SmartCardSerialNumber;
 
 void IBN_SC_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u8 *String_pu8);
 
@@ -42,6 +43,7 @@ int LA_OpenPGP_V20_Test (void);
 
 u32 LA_SC_SendVerify (u8 PasswordFlag_u8,u8 *String_pu8);
 int LA_OpenPGP_V20_GetPasswordstatus (char *PasswordStatus);
+int LA_OpenPGP_V20_GetAID (char *AID);
 
 int LA_OpenPGP_V20_Test_GetAID (void);
 int LA_OpenPGP_V20_Test_SendAdminPW (unsigned char *pcPW);

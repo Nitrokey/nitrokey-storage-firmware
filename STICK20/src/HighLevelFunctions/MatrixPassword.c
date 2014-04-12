@@ -58,6 +58,9 @@
 #else
   #define CI_LocalPrintf(...)
   #define CI_TickLocalPrintf(...)
+  #define CI_StringOut(...)
+  #define CI_Print8BitValue(...)
+  #define HexPrint(...)
 #endif
 
 #define PWM_RAMDOMCHAR_BUFFERSIZE   97     //
@@ -888,6 +891,7 @@ u8 ConvertMatrixDataToPassword(u8 *MatrixData_au8)
 #endif
   return (TRUE);
 }
+
 /*******************************************************************************
 
   IBN_PWM_Tests
@@ -897,6 +901,8 @@ u8 ConvertMatrixDataToPassword(u8 *MatrixData_au8)
   16.08.13  RB              First review
 
 *******************************************************************************/
+
+#ifdef ENABLE_IBN_PWM_TESTS
 
 void IBN_PWM_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int Param_u32,unsigned char *String_pu8)
 {
@@ -956,4 +962,4 @@ void IBN_PWM_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned in
       break;
   }
 }
-
+#endif

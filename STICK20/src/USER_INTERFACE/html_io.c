@@ -76,6 +76,9 @@
 #include "..\HighLevelFunctions\FlashStorage.h"
 #include "..\HighLevelFunctions\HiddenVolume.h"
 
+extern typeStick20Configuration_st StickConfiguration_st;
+void GetSmartCardStatus (typeStick20Configuration_st *Status_st);
+
 /*******************************************************************************
 
  Local defines
@@ -88,6 +91,9 @@
 #else
   #define CI_LocalPrintf(...)
   #define CI_TickLocalPrintf(...)
+  #define CI_StringOut(...)
+  #define CI_Print8BitValue(...)
+  #define HexPrint(...)
 #endif
 
 //#define HTML_ENABLE_HTML_INTERFACE
@@ -99,7 +105,6 @@
 #endif // HTML_ENABLE_HTML_INTERFACE
 
 #define HTML_FILEIO_LUN           0    // RAM Disk
-
 
 /*******************************************************************************
 
@@ -963,6 +968,10 @@ void HID_ExcuteCmd (void)
        {
 
        }
+
+       GetSmartCardStatus (&StickConfiguration_st);
+
+
        Stick20HIDInitSendConfoguration (STICK20_SEND_STARTUP);
        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
        break;
@@ -984,6 +993,19 @@ void HID_ExcuteCmd (void)
        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
        break;
 
+     case HTML_CMD_INIT_HIDDEN_VOLUME_SLOT:
+        CI_TickLocalPrintf ("Get HTML_CMD_INIT_HIDDEN_VOLUME_SLOT\r\n");
+        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
+        break;
+     case HTML_CMD_SAVE_HIDDEN_VOLUME_SLOT:
+        CI_TickLocalPrintf ("Get HTML_CMD_SAVE_HIDDEN_VOLUME_SLOT\r\n");
+        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
+        break;
+     case HTML_CMD_READ_HIDDEN_VOLUME_SLOT:
+        CI_TickLocalPrintf ("Get HTML_CMD_READ_HIDDEN_VOLUME_SLOT\r\n");
+        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
+        break;
+
     default:
       CI_TickLocalPrintf ("HID_ExcuteCmd: Get unknown command: %d \r\n",Cmd_u8);
       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_IDLE,0);
@@ -994,4 +1016,55 @@ void HID_ExcuteCmd (void)
   memset (HID_String_au8,0,50);
 
 }
+
+
+/*******************************************************************************
+
+  GetSmartCardStatus
+
+  Changes
+  Date      Author          Info
+  02.04.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void GetSmartCardStatus (typeStick20Configuration_st *Status_st)
+{
+  u8  Text_u8[20];
+  u32 Ret_u32 = FALSE;
+  u32 *p_u32;
+
+//  DelayMs (2000);
+
+/* Get password retry counts*/
+
+  Status_st->UserPwRetryCount  = 0;
+  Status_st->AdminPwRetryCount = 0;
+  Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus (Text_u8);
+  if (TRUE == Ret_u32)
+  {
+    Status_st->UserPwRetryCount  = Text_u8[4];
+    Status_st->AdminPwRetryCount = Text_u8[6];
+  }
+
+/* Get smartcard ID from AID */
+  Status_st->ActiveSmartCardID_u32 = 0;
+  Ret_u32 = LA_OpenPGP_V20_GetAID (Text_u8);
+  if (TRUE == Ret_u32)
+  {
+    Status_st->ActiveSmartCardID_u32 =  (u32)Text_u8[10];
+    Status_st->ActiveSmartCardID_u32 = Status_st->ActiveSmartCardID_u32 << 8;
+    Status_st->ActiveSmartCardID_u32 +=  (u32)Text_u8[11];
+    Status_st->ActiveSmartCardID_u32 = Status_st->ActiveSmartCardID_u32 << 8;
+    Status_st->ActiveSmartCardID_u32 +=  (u32)Text_u8[12];
+    Status_st->ActiveSmartCardID_u32 = Status_st->ActiveSmartCardID_u32 << 8;
+    Status_st->ActiveSmartCardID_u32 +=  (u32)Text_u8[13];
+  }
+
+}
+
+
 

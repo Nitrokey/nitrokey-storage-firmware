@@ -441,6 +441,8 @@ char *IBN_FileSystemErrorText (u8 FS_Error_u8)
 
 extern Ctrl_status sd_mmc_mci_unit_state_e;
 
+
+#ifdef ENABLE_IBN_FILE_ACCESS_TESTS
 void IBN_FileAccess (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32)
 {
 	s32 FileID_s32;
@@ -609,6 +611,7 @@ void IBN_FileAccess (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32)
 
 	}
 }
+#endif
 
 /*******************************************************************************
 
@@ -670,6 +673,7 @@ void IBN_LogADInput (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32)
   16.08.13  RB              First review
 
 *******************************************************************************/
+#ifdef ENABLE_IBN_TIME_ACCESS_TESTS
 
 void IBN_TimeAccess (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u8 *String_pu8)
 {
@@ -757,7 +761,7 @@ void IBN_TimeAccess (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u8 *String_pu8)
 
 	}
 }
-
+#endif
 /*******************************************************************************
 
   IBN_USB_Stats

@@ -29,4 +29,52 @@
 u8 *BuildAESKeyFromUserpassword_u8 (u8 *Userpassword_pu8,u8 *AESKey_au8);
 u8 InitRamdomBaseForHiddenKey_u8 (void);
 
+/* Storage description */
+
+#define FLASH_PAGE_SIZE       512                   // AVR
+#define FLASH_START           0x80000000            // AVR
+
+#define HV_FLASH_START_PAGE   498
+#define HV_SLOT_START_ADDRESS (FLASH_START + HV_FLASH_START_PAGE * FLASH_PAGE_SIZE) // 0x8003e400
+#define HV_SLOT_SIZE          64                    // Byte
+#define HV_SLOT_COUNT         8                     // 8 Slots a 64 byte = 512 byte
+
+
+#define HV_MAGIC_NUMBER_SLOT_ENTRY        0x26f29c02
+
+typedef struct {
+  u32 MagicNumber_u32;          //
+  u32 StartBlock_u32;           //
+  u32 EndBlock_u32;             //
+  u8  AesKey_au8[32];           //
+  u32 Crc_u32;                  // This had to be the last entry in struct
+} HiddenVolumeKeySlot_tst;      // 48 byte = 4+4+4+32+4 - must multiple from 4 for CRC32
+
+/* Interface description */
+
+#define STICK_20_HV_COMAND_GET_SLOT_DATA       0
+#define STICK_20_HV_COMAND_INIT_SLOT           1
+#define STICK_20_HV_COMAND_SEND_SLOT_DATA      2
+
+#define STICK_20_HV_STATUS_ERROR               0
+#define STICK_20_HV_STATUS_OK                  1
+#define STICK_20_HV_SLOT_NOT_USED              2
+
+#define STICK_20_HV_COMAND_DATA_LENGTH        30
+
+typedef struct {
+  u8  Comand_u8;                                  //
+  u8  Status_u8;                                  //
+  u8  Slot_u8;                                    //
+  u8  dummy_u8;                                   // for 4 byte alignment
+  u32 StartBlock_u32;                             //
+  u32 EndBlock_u32;                               //
+  u8  Data_au8[STICK_20_HV_COMAND_DATA_LENGTH];   //
+} HiddenVolumeTransferData_tst;                   // 42 byte = 1+1+1+1+4+4+30
+
+
+
+void IBN_HV_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int Param_u32,unsigned char *String_pu8);
+
+
 #endif /* HIDDENVOLUME_H_ */

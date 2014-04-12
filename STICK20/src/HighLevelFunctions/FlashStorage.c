@@ -220,7 +220,7 @@ u8 WriteStickConfigurationToUserPage (void)
 
 u8 ReadStickConfigurationFromUserPage (void)
 {
-  memcpy (&StickConfiguration_st,(void*)(AVR32_FLASHC_USER_PAGE + 72),sizeof (typeStick20Configuration_st));
+  memcpy (&StickConfiguration_st,(void*)(AVR32_FLASHC_USER_PAGE + 72),sizeof (typeStick20Configuration_st)-8); // Not the retry counter and sc serial no
 
   if (MAGIC_NUMBER_STICK20_CONFIG != StickConfiguration_st.MagicNumber_StickConfig_u16)
   {
@@ -325,7 +325,7 @@ void SendStickStatusToHID (typeStick20Configuration_st *Status_st)
     InitStickConfigurationToUserPage_u8 ();
   }
 
-  memcpy (Status_st,&StickConfiguration_st,sizeof (typeStick20Configuration_st));
+  memcpy (Status_st,&StickConfiguration_st,sizeof (typeStick20Configuration_st)); // Not the retry counter and sc serial no
 
 // Set the actual volume status
   Status_st->VolumeActiceFlag_u8 = 0;

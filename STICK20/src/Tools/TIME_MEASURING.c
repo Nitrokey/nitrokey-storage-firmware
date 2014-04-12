@@ -691,6 +691,7 @@ void TIME_MEASURING_INT_show_interrupt_table (void)
         CI_LocalPrintf ("%3d %3d %4d %-15s : %9d 0x%08x\n\r",IntNamePointer,int_grp,int_req,INT_NameTable[IntNamePointer],TIME_MEASURING_INT_IntCount[IntNamePointer],_int_handler_table[int_grp]._int_line_handler_table[int_req]);
       }
       IntNamePointer++;
+      DelayMs(50);
     }
   }
   CI_LocalPrintf ("             %-15s : %9d\n\r",INT_NameTable[IntNamePointer],TIME_MEASURING_INT_IntCount[IntNamePointer]);

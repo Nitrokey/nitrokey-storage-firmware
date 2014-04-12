@@ -61,8 +61,6 @@
 #include "User_Interface/html_io.h"
 
 
-
-
 /*******************************************************************************
 
  Local defines
@@ -206,7 +204,7 @@ u8 Stick20HIDSendConfigurationState_u8      = STICK20_SEND_STATUS_IDLE;
 
 u8 Stick20HIDInitSendConfoguration (u8 state_u8)
 {
-  CI_StringOut ("Init status data\r\n");
+  CI_StringOut ("Init HID config data\r\n");
 
   Stick20HIDSendConfigurationState_u8      = state_u8;
 
@@ -226,10 +224,10 @@ u8 Stick20HIDInitSendConfoguration (u8 state_u8)
 u8 Stick20HIDSendAccessStatusData (u8 *output)
 {
   u32 calculated_crc32;
-  typeStick20Configuration_st Stick20Configuration_st;
+  typeStick20Configuration_st Configuration_st;
   u8  text_au8[10];
 
-  SendStickStatusToHID (&Stick20Configuration_st);
+  SendStickStatusToHID (&Configuration_st);
 
   HID_Stick20SendData_st.SendDataType_u8 = OUTPUT_CMD_STICK20_SEND_DATA_TYPE_STATUS;
 
@@ -237,18 +235,18 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   HID_Stick20SendData_st.FollowBytesFlag_u8  = 0;     // No
   HID_Stick20SendData_st.SendSize_u8         = 1;
 
-  memcpy (&HID_Stick20SendData_st.SendData_u8[0],&Stick20Configuration_st,sizeof (typeStick20Configuration_st));
+  memcpy (&HID_Stick20SendData_st.SendData_u8[0],&Configuration_st,sizeof (typeStick20Configuration_st));
 
   CI_StringOut ("Firmware version  ");
 
-  itoa (Stick20Configuration_st.VersionInfo_au8[0],text_au8);
+  itoa (Configuration_st.VersionInfo_au8[0],text_au8);
   CI_StringOut (text_au8);
   CI_StringOut (".");
-  itoa (Stick20Configuration_st.VersionInfo_au8[1],text_au8);
+  itoa (Configuration_st.VersionInfo_au8[1],text_au8);
   CI_StringOut (text_au8);
   CI_StringOut ("\r\n");
 
-  if (READ_WRITE_ACTIVE == Stick20Configuration_st.ReadWriteFlagUncryptedVolume_u8)
+  if (READ_WRITE_ACTIVE == Configuration_st.ReadWriteFlagUncryptedVolume_u8)
   {
     CI_StringOut ("Uncyrpted Volume  READ/WRITE active\r\n");
   }
@@ -259,7 +257,7 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
 
   if (STICK20_SEND_STATUS_PIN == Stick20HIDInitSendConfoguration)    // This information only with pin
   {
-    if (0 != (Stick20Configuration_st.VolumeActiceFlag_u8 & (1 << SD_CRYPTED_VOLUME_BIT_PLACE)))
+    if (0 != (Configuration_st.VolumeActiceFlag_u8 & (1 << SD_CRYPTED_VOLUME_BIT_PLACE)))
     {
       CI_StringOut ("Crypted volume    active\r\n");
     }
@@ -268,14 +266,14 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
       CI_StringOut ("Crypted volume    not active\r\n");
     }
 
-    if (0 != (Stick20Configuration_st.VolumeActiceFlag_u8 & (1 << SD_HIDDEN_VOLUME_BIT_PLACE)))
+    if (0 != (Configuration_st.VolumeActiceFlag_u8 & (1 << SD_HIDDEN_VOLUME_BIT_PLACE)))
     {
       CI_StringOut ("Hidden volume     active\r\n");
     }
   }
 
 
-  if (0 != (Stick20Configuration_st.NewSDCardFound_u8 & 0x01))
+  if (0 != (Configuration_st.NewSDCardFound_u8 & 0x01))
   {
     CI_StringOut ("*** New SD card found - Change Counter:");
   }
@@ -283,11 +281,11 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   {
     CI_StringOut ("SD card              - Change Counter:");
   }
-  itoa ((Stick20Configuration_st.NewSDCardFound_u8 >> 1),text_au8);
+  itoa ((Configuration_st.NewSDCardFound_u8 >> 1),text_au8);
   CI_StringOut (text_au8);
   CI_StringOut ("\r\n");
 
-  if (0 == (Stick20Configuration_st.SDFillWithRandomChars_u8 & 0x01))
+  if (0 == (Configuration_st.SDFillWithRandomChars_u8 & 0x01))
   {
     CI_StringOut("Not filled with random chars - Change Counter:");
   }
@@ -295,9 +293,24 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   {
     CI_StringOut("Filled with random    - Change Counter:");
   }
-  itoa ((Stick20Configuration_st.SDFillWithRandomChars_u8 >> 1),text_au8);
+  itoa ((Configuration_st.SDFillWithRandomChars_u8 >> 1),text_au8);
   CI_StringOut (text_au8);
   CI_StringOut ("\r\n");
+
+
+  CI_StringOut ("Password retry count - User ");
+  itoa (Configuration_st.UserPwRetryCount,text_au8);
+  CI_StringOut (text_au8);
+  CI_StringOut (" - Admin ");
+  itoa (Configuration_st.AdminPwRetryCount,text_au8);
+  CI_StringOut (text_au8);
+  CI_StringOut ("\r\n");
+
+  CI_StringOut ("Smartcard serial nr: ");
+  itoa (Configuration_st.ActiveSmartCardID_u32,text_au8);
+  CI_StringOut (text_au8);
+  CI_StringOut ("\r\n");
+
 
 
   HID_Stick20SendData_st.FollowBytesFlag_u8 = 0;     // No next data
@@ -314,7 +327,7 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   output[OUTPUT_CRC_OFFSET+2] = (calculated_crc32>>16) & 0xFF;
   output[OUTPUT_CRC_OFFSET+3] = (calculated_crc32>>24) & 0xFF;
 
-  Stick20HIDSendConfigurationState_u8              = 0;     // Send status done
+  Stick20HIDSendConfigurationState_u8              = STICK20_SEND_STATUS_IDLE;     // Send status done
 
   return (TRUE);
 }
@@ -877,6 +890,35 @@ u8 parse_report(u8 *report,u8 *output)
 
           // Transfer data to other context
           HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD_RETRY_COUNT;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
+
+
+        case STICK20_CMD_INIT_HIDDEN_VOLUME_SLOT :
+          CI_StringOut ("Get STICK20_CMD_INIT_HIDDEN_VOLUME_SLOT\r\n");
+
+          StartStick20Command (STICK20_CMD_INIT_HIDDEN_VOLUME_SLOT);
+
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_INIT_HIDDEN_VOLUME_SLOT;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
+        case STICK20_CMD_SAVE_HIDDEN_VOLUME_SLOT :
+          CI_StringOut ("Get STICK20_CMD_SAVE_HIDDEN_VOLUME_SLOT\r\n");
+
+          StartStick20Command (STICK20_CMD_SAVE_HIDDEN_VOLUME_SLOT);
+
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_SAVE_HIDDEN_VOLUME_SLOT;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
+        case STICK20_CMD_READ_HIDDEN_VOLUME_SLOT :
+          CI_StringOut ("Get STICK20_CMD_READ_HIDDEN_VOLUME_SLOT\r\n");
+
+          StartStick20Command (STICK20_CMD_READ_HIDDEN_VOLUME_SLOT);
+
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_READ_HIDDEN_VOLUME_SLOT;
           memcpy (HID_String_au8,&report[1],33);
           break;
 

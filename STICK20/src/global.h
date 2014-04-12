@@ -58,7 +58,7 @@ typedef signed long  	s32;
 // *** Activate only for PROD version ***
 //#define STICK_20_A_MUSTER_PROD
 
-//#define STICK_20_SEND_DEBUGINFOS_VIA_HID
+//#define STICK_20_SEND_DEBUGINFOS_VIA_HID      // Need ca. 2k flash
 
 // Enable the HTML interface via ram disc
 //#define HTML_ENABLE_HTML_INTERFACE
@@ -88,6 +88,44 @@ typedef signed long  	s32;
   #define INTERPRETER_ENABLE     // Enable also for PROD Version
 #endif
 
+
+/*******************************************************************************
+
+  Defines for enabling interpreter test
+
+*******************************************************************************/
+
+// #define ENABLE_IBN_PWM_TESTS          // ca. 1k - Password matix - Enable the interpreter tests
+#define ENABLE_IBN_HV_TESTS           // ca. 1k - Hidden volume - Enable the interpreter tests
+// #define ENABLE_IBN_TIME_ACCESS_TESTS  // ca. 2k - Time access - Enable the interpreter tests
+// #define ENABLE_IBN_FILE_ACCESS_TESTS  // ca. 7k - file access - Enable the interpreter tests
+
+/*******************************************************************************
+
+  Defines for enabling special debug informations
+
+*******************************************************************************/
+
+// #define DEBUG_SCSI_IO           // ca. 3 k - Enable SCSI command output
+
+
+/*******************************************************************************
+
+   Defines for saving flash memory
+   *** Only for debugging ***
+
+   Some defines lower the secure of the stick 2.0
+
+*******************************************************************************/
+
+//#define SAVE_FLASH_MEMORY
+
+#ifdef SAVE_FLASH_MEMORY
+  #define SAVE_FLASH_MEMORY_NO_PBKDF2           // ca. 12k - Disable the PBKDF2 function: Warning stored data is not secure
+#endif
+
+
+/*********************************************************************************/
 
 
 #define HID_PASSWORD_LEN      20

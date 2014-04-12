@@ -58,6 +58,7 @@
 #include "usb_drv.h"
 #include "ctrl_access.h"
 
+#include "sd_mmc_mci.h"
 
 //_____ D E C L A R A T I O N S ____________________________________________
 
@@ -146,13 +147,16 @@ static const sbc_st_std_inquiry_data sbc_std_inquiry_data =
 
 extern int sd_mmc_mci_test_unit_only_local_access ;
 
-//#define DEBUG_SCSI_IO
+
+#include "global.h"
+
+// #define DEBUG_SCSI_IO
 
 #ifdef DEBUG_SCSI_IO
 #else
-//  #define CI_LocalPrintf(...)
-//  #define CI_TickLocalPrintf(...)
-//  #define CI_StringOut(...)
+  #define CI_LocalPrintf(...)
+  #define CI_TickLocalPrintf(...)
+  #define CI_StringOut(...)
 #endif
 
 
@@ -174,177 +178,196 @@ extern int sd_mmc_mci_test_unit_only_local_access ;
 
 void DebugScsiCommand (U8 *ScsiCommand_pu8)
 {
-  switch (ScsiCommand_pu8[0])  // Check received command.
+  static U8 LastScsiCommand_u8 = 255;
+
+  if (ScsiCommand_pu8[0] != LastScsiCommand_u8)
   {
-    case SBC_CMD_TEST_UNIT_READY:               // 0x00 - Mandatory.
-      CI_StringOut ("SCSI: TEST_UNIT_READY\r\n");
-      break;
-    case SBC_CMD_REQUEST_SENSE:                 // 0x03 - Mandatory.
-      CI_StringOut ("SCSI: REQUEST_SENSE\r\n");
-      break;
-    case SBC_CMD_INQUIRY:                       // 0x12 - Mandatory.
-      CI_StringOut ("SCSI: INQUIRY\r\n");
-      break;
-    case SBC_CMD_MODE_SENSE_6:                  // 0x1A - Optional.
-      CI_StringOut ("SCSI: MODE_SENSE_6\r\n");
-      break;
-    case SBC_CMD_PREVENT_ALLOW_MEDIUM_REMOVAL:  // 0x1E - Optional.
-      CI_StringOut ("SCSI: PREVENT_ALLOW_MEDIUM_REMOVAL\r\n");
-      break;
-    case SBC_CMD_READ_CAPACITY_10:              // 0x25 - Mandatory.
-      CI_StringOut ("SCSI: READ_CAPACITY_10\r\n");
-      break;
-    case SBC_CMD_READ_10:                       // 0x28 - Mandatory.
-      CI_StringOut ("SCSI: READ_10\r\n");
-      break;
-    case SBC_CMD_WRITE_10:                      // 0x2A - Optional.
-      CI_StringOut ("SCSI: WRITE_10\r\n");
-      break;
-    case SBC_CMD_VERIFY_10:                     // 0x2F - Optional.
-      CI_StringOut ("SCSI: VERIFY_10\r\n");
-      break;
-    case SBC_CMD_MODE_SENSE_10:                 // 0x5A - Optional.
-      CI_StringOut ("SCSI: MODE_SENSE_10\r\n");
-      break;
-    case SBC_CMD_START_STOP_UNIT:               // 0x1B - Ignored. This command is used by the Linux 2.4 kernel,
-      CI_StringOut ("SCSI: START_STOP_UNIT\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_FORMAT_UNIT:                   // 0x04 - Mandatory.
-      CI_StringOut ("SCSI: FORMAT_UNIT\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_REASSIGN_BLOCKS:               // 0x07 - Optional.
-      CI_StringOut ("SCSI: REASSIGN_BLOCKS\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_READ_6:                        // 0x08 - Mandatory.
-      CI_StringOut ("SCSI: READ_6\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_WRITE_6:                       // 0x0A - Optional.
-      CI_StringOut ("SCSI: WRITE_6\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_MODE_SELECT_6:                 // 0x15 - Optional.
-      CI_StringOut ("SCSI: MODE_SELECT_6\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_RECEIVE_DIAGNOSTIC_RESULTS:    // 0x1C - Optional.
-      CI_StringOut ("SCSI: RECEIVE_DIAGNOSTIC_RESULTS\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_SEND_DIAGNOSTIC:               // 0x1D - Mandatory.
-      CI_StringOut ("SCSI: SEND_DIAGNOSTIC\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_WRITE_AND_VERIFY_10:           // 0x2E - Optional.
-      CI_StringOut ("SCSI: WRITE_AND_VERIFY_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_PREFETCH_10:                   // 0x34 - Optional.
-      CI_StringOut ("SCSI: PREFETCH_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_SYNCHRONIZE_CACHE_10:          // 0x35 - Optional.
-      CI_StringOut ("SCSI: SYNCHRONIZE_CACHE_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_READ_DEFECT_DATA_10:           // 0x37 - Optional.
-      CI_StringOut ("SCSI: READ_DEFECT_DATA_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_WRITE_BUFFER:                  // 0x3B - Optional.
-      CI_StringOut ("SCSI: WRITE_BUFFER\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_READ_BUFFER:                   // 0x3C - Optional.
-      CI_StringOut ("SCSI: READ_BUFFER\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_READ_LONG_10:                  // 0x3E - Optional.
-      CI_StringOut ("SCSI: READ_LONG_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_WRITE_LONG_10:                 // 0x3F - Optional.
-      CI_StringOut ("SCSI: WRITE_LONG_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_WRITE_SAME_10:                 // 0x41 - Optional.
-      CI_StringOut ("SCSI: WRITE_SAME_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_LOG_SELECT:                    // 0x4C - Optional.
-      CI_StringOut ("SCSI: LOG_SELECT\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_LOG_SENSE:                     // 0x4D - Optional.
-      CI_StringOut ("SCSI: LOG_SENSE\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_XDWRITE_10:                    // 0x50 - Optional.
-      CI_StringOut ("SCSI: XDWRITE_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_XPWRITE_10:                    // 0x51 - Optional.
-      CI_StringOut ("SCSI: XPWRITE_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_XDREAD_10:                     // 0x52 - Optional.
-      CI_StringOut ("SCSI: XDREAD_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_XDWRITEREAD_10:                // 0x53 - Optional.
-      CI_StringOut ("SCSI: XDWRITEREAD_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_MODE_SELECT_10:                // 0x55 - Optional.
-      CI_StringOut ("SCSI: MODE_SELECT_10\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_PERSISTENT_RESERVE_IN:         // 0x5E - Optional.
-      CI_StringOut ("SCSI: PERSISTENT_RESERVE_IN\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_PERSISTENT_RESERVE_OUT:        // 0x5F - Optional.
-      CI_StringOut ("SCSI: PERSISTENT_RESERVE_OUT\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_EXTENDED_COPY:                 // 0x83 - Optional.
-      CI_StringOut ("SCSI: EXTENDED_COPY\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_RECEIVE_COPY_RESULTS:          // 0x84 - Optional.
-      CI_StringOut ("SCSI: RECEIVE_COPY_RESULTS\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_ACCESS_CONTROL_IN:             // 0x86 - Optional.
-      CI_StringOut ("SCSI: ACCESS_CONTROL_IN\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_ACCESS_CONTROL_OUT:            // 0x87 - Optional.
-      CI_StringOut ("SCSI: ACCESS_CONTROL_OUT\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_READ_16:                       // 0x88 - Optional.
-      CI_StringOut ("SCSI: READ_16\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_WRITE_16:                      // 0x8A - Optional.
-      CI_StringOut ("SCSI: WRITE_16\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_READ_ATTRIBUTE:                // 0x8C - Optional.
-      CI_StringOut ("SCSI: READ_ATTRIBUTE\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_WRITE_ATTRIBUTE:               // 0x8D - Optional.
-      CI_StringOut ("SCSI: WRITE_ATTRIBUTE\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_WRITE_AND_VERIFY_16:           // 0x8E - Optional.
-      CI_StringOut ("SCSI: WRITE_AND_VERIFY_16\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_VERIFY_16:                     // 0x8F - Optional.
-      CI_StringOut ("SCSI: VERIFY_16\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_PREFETCH_16:                   // 0x90 - Optional.
-      CI_StringOut ("SCSI: PREFETCH_16\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_SYNCHRONIZE_CACHE_16:          // 0x91 - Optional.
-      CI_StringOut ("SCSI: SYNCHRONIZE_CACHE_16\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_WRITE_SAME_16:                 // 0x93 - Optional.
-      CI_StringOut ("SCSI: WRITE_SAME_16\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_REPORT_LUNS:                   // 0xA0 - Mandator.
-      CI_StringOut ("SCSI: REPORT_LUNS\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_READ_12:                       // 0xA8 - Optional.
-      CI_StringOut ("SCSI: READ_12\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_WRITE_12:                      // 0xAA - Optional.
-      CI_StringOut ("SCSI: WRITE_12\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_WRITE_AND_VERIFY_12:           // 0xAE - Optional.
-      CI_StringOut ("SCSI: WRITE_AND_VERIFY_12\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_VERIFY_12:                     // 0xAF - Optional.
-      CI_StringOut ("SCSI: VERIFY_12\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    case SBC_CMD_READ_DEFECT_DATA_12:           // 0xB7 - Optional.
-      CI_StringOut ("SCSI: READ_DEFECT_DATA_12\r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
-    default:
-      CI_StringOut ("SCSI: *** UNKOWN *** \r\n");
-      break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+    switch (ScsiCommand_pu8[0])  // Check received command.
+    {
+      case SBC_CMD_TEST_UNIT_READY:               // 0x00 - Mandatory.
+        CI_StringOut ("SCSI: TEST_UNIT_READY\r\n");
+/*
+       {
+          U8 text_au8[10];
+           itoa (ScsiCommand_pu8[1] >> 5,text_au8);
+          CI_StringOut (text_au8);
+          CI_StringOut ("\r\n");
+        }
+*/
+        break;
+      case SBC_CMD_REQUEST_SENSE:                 // 0x03 - Mandatory.
+        CI_StringOut ("SCSI: REQUEST_SENSE\r\n");
+        break;
+      case SBC_CMD_INQUIRY:                       // 0x12 - Mandatory.
+        CI_StringOut ("SCSI: INQUIRY\r\n");
+        break;
+      case SBC_CMD_MODE_SENSE_6:                  // 0x1A - Optional.
+        CI_StringOut ("SCSI: MODE_SENSE_6\r\n");
+        break;
+      case SBC_CMD_PREVENT_ALLOW_MEDIUM_REMOVAL:  // 0x1E - Optional.
+        CI_StringOut ("SCSI: PREVENT_ALLOW_MEDIUM_REMOVAL\r\n");
+        break;
+      case SBC_CMD_READ_CAPACITY_10:              // 0x25 - Mandatory.
+        CI_StringOut ("SCSI: READ_CAPACITY_10\r\n");
+        break;
+      case SBC_CMD_READ_10:                       // 0x28 - Mandatory.
+        CI_StringOut ("SCSI: READ_10\r\n");
+        break;
+      case SBC_CMD_WRITE_10:                      // 0x2A - Optional.
+        CI_StringOut ("SCSI: WRITE_10\r\n");
+        break;
+      case SBC_CMD_VERIFY_10:                     // 0x2F - Optional.
+        CI_StringOut ("SCSI: VERIFY_10\r\n");
+        break;
+      case SBC_CMD_MODE_SENSE_10:                 // 0x5A - Optional.
+        CI_StringOut ("SCSI: MODE_SENSE_10\r\n");
+        break;
+      case SBC_CMD_START_STOP_UNIT:               // 0x1B - Ignored. This command is used by the Linux 2.4 kernel,
+        CI_StringOut ("SCSI: START_STOP_UNIT\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_FORMAT_UNIT:                   // 0x04 - Mandatory.
+        CI_StringOut ("SCSI: FORMAT_UNIT\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_REASSIGN_BLOCKS:               // 0x07 - Optional.
+        CI_StringOut ("SCSI: REASSIGN_BLOCKS\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_READ_6:                        // 0x08 - Mandatory.
+        CI_StringOut ("SCSI: READ_6\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_WRITE_6:                       // 0x0A - Optional.
+        CI_StringOut ("SCSI: WRITE_6\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_MODE_SELECT_6:                 // 0x15 - Optional.
+        CI_StringOut ("SCSI: MODE_SELECT_6\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_RECEIVE_DIAGNOSTIC_RESULTS:    // 0x1C - Optional.
+        CI_StringOut ("SCSI: RECEIVE_DIAGNOSTIC_RESULTS\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_SEND_DIAGNOSTIC:               // 0x1D - Mandatory.
+        CI_StringOut ("SCSI: SEND_DIAGNOSTIC\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_WRITE_AND_VERIFY_10:           // 0x2E - Optional.
+        CI_StringOut ("SCSI: WRITE_AND_VERIFY_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_PREFETCH_10:                   // 0x34 - Optional.
+        CI_StringOut ("SCSI: PREFETCH_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_SYNCHRONIZE_CACHE_10:          // 0x35 - Optional.
+        CI_StringOut ("SCSI: SYNCHRONIZE_CACHE_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_READ_DEFECT_DATA_10:           // 0x37 - Optional.
+        CI_StringOut ("SCSI: READ_DEFECT_DATA_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_WRITE_BUFFER:                  // 0x3B - Optional.
+        CI_StringOut ("SCSI: WRITE_BUFFER\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_READ_BUFFER:                   // 0x3C - Optional.
+        CI_StringOut ("SCSI: READ_BUFFER\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_READ_LONG_10:                  // 0x3E - Optional.
+        CI_StringOut ("SCSI: READ_LONG_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_WRITE_LONG_10:                 // 0x3F - Optional.
+        CI_StringOut ("SCSI: WRITE_LONG_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_WRITE_SAME_10:                 // 0x41 - Optional.
+        CI_StringOut ("SCSI: WRITE_SAME_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_LOG_SELECT:                    // 0x4C - Optional.
+        CI_StringOut ("SCSI: LOG_SELECT\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_LOG_SENSE:                     // 0x4D - Optional.
+        CI_StringOut ("SCSI: LOG_SENSE\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_XDWRITE_10:                    // 0x50 - Optional.
+        CI_StringOut ("SCSI: XDWRITE_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_XPWRITE_10:                    // 0x51 - Optional.
+        CI_StringOut ("SCSI: XPWRITE_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_XDREAD_10:                     // 0x52 - Optional.
+        CI_StringOut ("SCSI: XDREAD_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_XDWRITEREAD_10:                // 0x53 - Optional.
+        CI_StringOut ("SCSI: XDWRITEREAD_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_MODE_SELECT_10:                // 0x55 - Optional.
+        CI_StringOut ("SCSI: MODE_SELECT_10\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_PERSISTENT_RESERVE_IN:         // 0x5E - Optional.
+        CI_StringOut ("SCSI: PERSISTENT_RESERVE_IN\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_PERSISTENT_RESERVE_OUT:        // 0x5F - Optional.
+        CI_StringOut ("SCSI: PERSISTENT_RESERVE_OUT\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_EXTENDED_COPY:                 // 0x83 - Optional.
+        CI_StringOut ("SCSI: EXTENDED_COPY\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_RECEIVE_COPY_RESULTS:          // 0x84 - Optional.
+        CI_StringOut ("SCSI: RECEIVE_COPY_RESULTS\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_ACCESS_CONTROL_IN:             // 0x86 - Optional.
+        CI_StringOut ("SCSI: ACCESS_CONTROL_IN\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_ACCESS_CONTROL_OUT:            // 0x87 - Optional.
+        CI_StringOut ("SCSI: ACCESS_CONTROL_OUT\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_READ_16:                       // 0x88 - Optional.
+        CI_StringOut ("SCSI: READ_16\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_WRITE_16:                      // 0x8A - Optional.
+        CI_StringOut ("SCSI: WRITE_16\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_READ_ATTRIBUTE:                // 0x8C - Optional.
+        CI_StringOut ("SCSI: READ_ATTRIBUTE\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_WRITE_ATTRIBUTE:               // 0x8D - Optional.
+        CI_StringOut ("SCSI: WRITE_ATTRIBUTE\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_WRITE_AND_VERIFY_16:           // 0x8E - Optional.
+        CI_StringOut ("SCSI: WRITE_AND_VERIFY_16\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_VERIFY_16:                     // 0x8F - Optional.
+        CI_StringOut ("SCSI: VERIFY_16\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_PREFETCH_16:                   // 0x90 - Optional.
+        CI_StringOut ("SCSI: PREFETCH_16\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_SYNCHRONIZE_CACHE_16:          // 0x91 - Optional.
+        CI_StringOut ("SCSI: SYNCHRONIZE_CACHE_16\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_WRITE_SAME_16:                 // 0x93 - Optional.
+        CI_StringOut ("SCSI: WRITE_SAME_16\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_REPORT_LUNS:                   // 0xA0 - Mandator.
+        CI_StringOut ("SCSI: REPORT_LUNS\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_READ_12:                       // 0xA8 - Optional.
+        CI_StringOut ("SCSI: READ_12\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_WRITE_12:                      // 0xAA - Optional.
+        CI_StringOut ("SCSI: WRITE_12\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_WRITE_AND_VERIFY_12:           // 0xAE - Optional.
+        CI_StringOut ("SCSI: WRITE_AND_VERIFY_12\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_VERIFY_12:                     // 0xAF - Optional.
+        CI_StringOut ("SCSI: VERIFY_12\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      case SBC_CMD_READ_DEFECT_DATA_12:           // 0xB7 - Optional.
+        CI_StringOut ("SCSI: READ_DEFECT_DATA_12\r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+      default:
+        CI_StringOut ("SCSI: *** UNKOWN *** \r\n");
+        break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+    }
   }
+  else
+  {
+    CI_StringOut ("*");
+  }
+
+  LastScsiCommand_u8 = ScsiCommand_pu8[0];
 }
 #else
   #define DebugScsiCommand(...)
@@ -414,6 +437,7 @@ Bool scsi_decode_command(void)
 
   case SBC_CMD_START_STOP_UNIT:               // 0x1B - Ignored. This command is used by the Linux 2.4 kernel,
     status = TRUE;
+
     sbc_lun_status_is_good();
     {
       U8 Text[10];
@@ -426,6 +450,9 @@ Bool scsi_decode_command(void)
       CI_StringOut (Text);
       CI_StringOut ("\r\n");
     }
+    SetSdUncryptedCardEnableState (FALSE);
+    SetSdEncryptedCardEnableState (FALSE);
+    SetSdEncryptedHiddenState (FALSE);
     break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
 
   case SBC_CMD_FORMAT_UNIT:                   // 0x04 - Mandatory.

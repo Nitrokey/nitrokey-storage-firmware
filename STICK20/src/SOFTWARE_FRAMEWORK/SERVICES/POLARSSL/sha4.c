@@ -37,6 +37,22 @@
 #include <string.h>
 #include <stdio.h>
 
+//#define DEBUG_SHA4
+
+#ifdef DEBUG_SHA4
+  int CI_LocalPrintf (char *szFormat,...);
+  int CI_LocalPrintfNoDelay (char *szFormat,...);
+  int CI_TickLocalPrintf (char *szFormat,...);
+#else
+  #define CI_LocalPrintf(...)
+  #define CI_TickLocalPrintf(...)
+  #define CI_StringOut(...)
+  #define CI_Print8BitValue(...)
+  #define HexPrint(...)
+#endif
+
+
+
 /*
  * 64-bit integer manipulation macros (big endian)
  */
@@ -669,7 +685,7 @@ int sha4_self_test( int verbose )
         k = i < 3;
 
         if( verbose != 0 )
-            printf( "  SHA-%d test #%d: ", 512 - k * 128, j + 1 );
+          CI_LocalPrintf( "  SHA-%d test #%d: ", 512 - k * 128, j + 1 );
 
         sha4_starts( &ctx, k );
 
@@ -689,17 +705,17 @@ int sha4_self_test( int verbose )
         if( memcmp( sha4sum, sha4_test_sum[i], 64 - k * 16 ) != 0 )
         {
             if( verbose != 0 )
-                printf( "failed\n" );
+              CI_LocalPrintf( "failed\n" );
 
             return( 1 );
         }
 
         if( verbose != 0 )
-            printf( "passed\n" );
+          CI_LocalPrintf( "passed\n" );
     }
 
     if( verbose != 0 )
-        printf( "\n" );
+      CI_LocalPrintf( "\n" );
 
     for( i = 0; i < 14; i++ )
     {
@@ -707,7 +723,7 @@ int sha4_self_test( int verbose )
         k = i < 7;
 
         if( verbose != 0 )
-            printf( "  HMAC-SHA-%d test #%d: ", 512 - k * 128, j + 1 );
+          CI_LocalPrintf( "  HMAC-SHA-%d test #%d: ", 512 - k * 128, j + 1 );
 
         if( j == 5 || j == 6 )
         {
@@ -728,17 +744,17 @@ int sha4_self_test( int verbose )
         if( memcmp( sha4sum, sha4_hmac_test_sum[i], buflen ) != 0 )
         {
             if( verbose != 0 )
-                printf( "failed\n" );
+              CI_LocalPrintf( "failed\n" );
 
             return( 1 );
         }
 
         if( verbose != 0 )
-            printf( "passed\n" );
+          CI_LocalPrintf( "passed\n" );
     }
 
     if( verbose != 0 )
-        printf( "\n" );
+      CI_LocalPrintf( "\n" );
 
     return( 0 );
 }

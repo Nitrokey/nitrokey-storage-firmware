@@ -62,8 +62,11 @@
 // Set debuglevel
 // 0 = print nothing
 // 3 = print all
-
-int     CCID_T1_DebugLevel = 0;
+#ifdef DEBUG_LOG_CCID_DETAIL
+  int     CCID_T1_DebugLevel = 3;
+#else
+  int     CCID_T1_DebugLevel = 0;
+#endif
 
 int    nStartT1BlockLenght;
 char   acStartT1Block[CCID_MAX_XFER_LENGTH];

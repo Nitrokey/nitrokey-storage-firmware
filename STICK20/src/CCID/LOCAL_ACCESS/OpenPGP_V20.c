@@ -805,7 +805,7 @@ int LA_OpenPGP_V20_GetPasswordstatus (char *PasswordStatus)
     }
   }
 
-  memset (PasswordStatus,0,7);
+//  memset (PasswordStatus,0,7);
 
   CI_LocalPrintf ("Get password status  : ");
   nRet = LA_OpenPGP_V20_GetData (&tSC_OpenPGP_V20,0x00,0xC4);
@@ -818,6 +818,54 @@ int LA_OpenPGP_V20_GetPasswordstatus (char *PasswordStatus)
 
   // Copy password status
   memcpy (PasswordStatus,tSC_OpenPGP_V20.cReceiveData,7);
+
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
+  LA_OpenPGP_V20_GetAID
+
+  Changes
+  Date      Author          Info
+  02.04.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+
+*******************************************************************************/
+
+int LA_OpenPGP_V20_GetAID (char *AID)
+{
+  int Ret_u32;
+
+//  LA_RestartSmartcard_u8 ();
+// Check for smartcard on
+  if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
+  {
+    CI_TickLocalPrintf ("LA_OpenPGP_V20_GetPasswordstatus: Restart smartcard\r\n");
+
+    LA_RestartSmartcard_u8 ();
+    if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
+    {
+      CI_TickLocalPrintf ("LA_OpenPGP_V20_GetPasswordstatus: Can't start smartcard\r\n");
+      return (FALSE);
+    }
+  }
+
+  CI_LocalPrintf ("Get AID  : ");
+  Ret_u32 = LA_OpenPGP_V20_SelectFile (&tSC_OpenPGP_V20);
+  if (FALSE == Ret_u32)
+  {
+    CI_LocalPrintf ("fail\n\r");
+    return (FALSE);
+  }
+  CI_LocalPrintf ("OK \n\r");
+
+  // Copy password status
+  memcpy (AID,&tSC_OpenPGP_V20.cReceiveData[4],16);
 
   return (TRUE);
 }

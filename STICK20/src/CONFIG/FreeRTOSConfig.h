@@ -277,13 +277,13 @@ to exclude the API function. */
 
 /* USB device CCID definitions. */
 #define configTSK_CCID_TEST_NAME        ((const signed portCHAR *)"CCID Test task")
-#define configTSK_CCID_TEST_STACK_SIZE  (1024*3)
+#define configTSK_CCID_TEST_STACK_SIZE  (1024*2)
 #define configTSK_CCID_TEST_PRIORITY    (tskIDLE_PRIORITY + 2)
 #define configTSK_CCID_TEST_PERIOD      20
 
 /* IDF definitions. */
 #define configTSK_IDF_TEST_NAME        ((const signed portCHAR *)"IDF task")
-#define configTSK_IDF_TEST_STACK_SIZE  (1024)
+#define configTSK_IDF_TEST_STACK_SIZE  (1024+512)
 #define configTSK_IDF_TEST_PRIORITY    (tskIDLE_PRIORITY + 2)
 #define configTSK_IDF_TEST_PERIOD      1 // 10
 
