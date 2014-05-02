@@ -267,10 +267,16 @@ u8 InitStickConfigurationToUserPage_u8 (void)
 
 /*******************************************************************************
 
-  WriteBaseForHiddenVolumeKey
+  WriteHiddenVolumeSlotKey
+
+  Stores the encrypted hidden volume slot key
 
   Byte
   Len = 32 Byte
+
+  Changes
+  Date      Author          Info
+  14.04.14  RB              Renaming
 
   Reviews
   Date      Reviewer        Info
@@ -278,15 +284,22 @@ u8 InitStickConfigurationToUserPage_u8 (void)
 
 *******************************************************************************/
 
-u8 WriteBaseForHiddenVolumeKey (u8 *data)
+u8 WriteHiddenVolumeSlotKey (u8 *data)
 {
-  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 102,data,32,TRUE);
+  flashc_memcpy((void*)(AVR32_FLASHC_USER_PAGE + 102),data,32,TRUE);
   return (TRUE);
 }
 
 /*******************************************************************************
 
-  ReadBaseForHiddenVolumeKey
+  ReadHiddenVolumeSlotsKey
+
+  Read the encrypted hidden volume slot key
+
+  Changes
+  Date      Author          Info
+  14.04.14  RB              Renaming
+
 
   Reviews
   Date      Reviewer        Info
@@ -294,7 +307,7 @@ u8 WriteBaseForHiddenVolumeKey (u8 *data)
 
 *******************************************************************************/
 
-u8 ReadBaseForHiddenVolumeKey (u8 *data)
+u8 ReadHiddenVolumeSlotsKey (u8 *data)
 {
   memcpy (data,(void*)(AVR32_FLASHC_USER_PAGE + 102),32);
   return (TRUE);
@@ -347,6 +360,8 @@ void SendStickStatusToHID (typeStick20Configuration_st *Status_st)
       Status_st->VolumeActiceFlag_u8 |= (1 << SD_CRYPTED_VOLUME_BIT_PLACE);
     }
   }
+
+  ReadSdId (&Status_st->ActiveSD_CardID_u32);
 }
 
 /*******************************************************************************
@@ -438,6 +453,8 @@ u8 Write_ReadWriteStatusUncryptedVolume_u8 (u8 NewStatus_u8)
 u8 WriteSdId (u32 *SdId_u32)
 {
   flashc_memcpy(AVR32_FLASHC_USER_PAGE + 134,SdId_u32,4,TRUE);
+
+  StickConfiguration_st.ActiveSD_CardID_u32 = *SdId_u32;
   return (TRUE);
 }
 
@@ -457,6 +474,8 @@ u8 WriteSdId (u32 *SdId_u32)
 u8 ReadSdId (u32 *SdId_u32)
 {
   memcpy (SdId_u32,(void*)(AVR32_FLASHC_USER_PAGE + 134),4);
+
+  StickConfiguration_st.ActiveSD_CardID_u32 = *SdId_u32;
   return (TRUE);
 }
 

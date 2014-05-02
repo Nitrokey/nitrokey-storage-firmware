@@ -1110,7 +1110,7 @@ void AES_Encryption (unsigned short int u16BufferSize, unsigned int *pSrcBuf, un
 
   AES_StorageKeyEncryption
 
-  Only 256 bit Keys
+  Only 256 bit Keys // Max 256 byte
 
 *******************************************************************************/
 

@@ -280,7 +280,7 @@ U32 GetStartHiddenVolume_u32(void);
 U32 GetEndHiddenVolume_u32 (void);
 
 U32 InitSDVolumeSizes_u32 (void);
-
+void SetHiddenVolumeSizes_u32 (U32 StartBlock_u32, U32 EndBlock_u32);
 #endif
 
 

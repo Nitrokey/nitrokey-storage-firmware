@@ -115,6 +115,9 @@ U32 gSdEndCryptedVolume_u32     = (2*1024*2048) - 1;
 U32 gSdStartHiddenVolume_u32    = SD_SIZE_UNCRYPTED_PARITION + (2*1024*2048);
 U32 gSdEndHiddenVolume_u32      = (2*1024*2048) + (2*1024*2048) - 1;
 
+U32 gSdEndOfCard_u32            = 0;    // 0 = SD size is not present
+
+
 U32 sd_FlagHiddenLun_u32    = 0;
 U32 sd_MaxAccessedBlock_u32 = 0;
 
@@ -1111,6 +1114,8 @@ U32 InitSDVolumeSizes_u32 (void)
   sd_mmc_mci_read_capacity (SD_SLOT,(U32 *)&EndBlockOfSdCard_u32);
   EndBlockOfSdCard_u32 -= 1;                                    // Last block nr
 
+  gSdEndOfCard_u32            = EndBlockOfSdCard_u32;
+
   gSdStartUncryptedVolume_u32 = 0;
   gSdEndUncryptedVolume_u32   = SD_SIZE_UNCRYPTED_PARITION - 1;
 
@@ -1122,6 +1127,13 @@ U32 InitSDVolumeSizes_u32 (void)
 
   return (TRUE);
 }
+
+void SetHiddenVolumeSizes_u32 (U32 StartBlock_u32, U32 EndBlock_u32)
+{
+  gSdStartHiddenVolume_u32    = StartBlock_u32;
+  gSdEndHiddenVolume_u32      = EndBlock_u32;
+}
+
 
 //! @}
 

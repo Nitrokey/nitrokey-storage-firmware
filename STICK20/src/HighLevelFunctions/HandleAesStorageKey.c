@@ -291,9 +291,55 @@ u32 BuildStorageKeys_u32 (u8 *AdminPW_pu8)
   return (TRUE);
 }
 
+
+/*******************************************************************************
+
+  DecryptKeyViaSmartcard_u32
+
+  Changes
+  Date      Reviewer        Info
+  13.04.14  RB              Modification for multiple hidden volumes
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u32 DecryptKeyViaSmartcard_u32 (u8 *StorageKey_pu8)
+{
+#ifdef LOCAL_DEBUG
+  CI_LocalPrintf ("DecryptKeyViaSmartcard\r\n");
+//  HexPrint (AES_KEYSIZE_256_BIT,StorageKey_pu8);
+//  CI_LocalPrintf ("\r\n");
+#endif
+
+/* SC AES key decryption */
+  if (FALSE == LA_OpenPGP_V20_Test_ScAESKey (AES_KEYSIZE_256_BIT,StorageKey_pu8))
+  {
+#ifdef LOCAL_DEBUG
+    CI_LocalPrintf ("Smartcard access failed\r\n");
+#endif
+    return (FALSE);
+  }
+
+#ifdef LOCAL_DEBUG
+//  CI_LocalPrintf ("DecryptKeyViaSmartcard_u32: Decrypted key : ");
+//  HexPrint (AES_KEYSIZE_256_BIT,StorageKey_pu8);
+//  CI_LocalPrintf ("\r\n");
+#endif
+
+  return (TRUE);
+}
+
 /*******************************************************************************
 
   GetStorageKey_u32
+
+  Key for the normal crypted volume (not the hidden volumes)
+
+  Changes
+  Date      Reviewer        Info
+  13.04.14  RB              Modification for multiple hidden volumes
 
   Reviews
   Date      Reviewer        Info
@@ -303,17 +349,6 @@ u32 BuildStorageKeys_u32 (u8 *AdminPW_pu8)
 
 u32 GetStorageKey_u32 (u8 *UserPW_pu8, u8 *StorageKey_pu8)
 {
-
-//  memcpy (StorageKey_pu8,(void*)(AVR32_FLASHC_USER_PAGE),AES_KEYSIZE_256_BIT);
-  ReadAESStorageKeyToUserPage (StorageKey_pu8);
-
-#ifdef LOCAL_DEBUG
-  CI_LocalPrintf ("GetStorageKey_u32: Encrypted storage key : ");
-  HexPrint (AES_KEYSIZE_256_BIT,StorageKey_pu8);
-  CI_LocalPrintf ("\r\n");
-#endif
-
-
 /* Enable smartcard */
   if (FALSE == LA_OpenPGP_V20_Test_SendUserPW2 (UserPW_pu8))
   {
@@ -323,21 +358,16 @@ u32 GetStorageKey_u32 (u8 *UserPW_pu8, u8 *StorageKey_pu8)
 // Wait for next smartcard cmd
   DelayMs (10);
 
-/* SC AES key decryption */
-  if (FALSE == LA_OpenPGP_V20_Test_ScAESKey (AES_KEYSIZE_256_BIT,StorageKey_pu8))
+// Get encrypted key for the crypted volume
+  ReadAESStorageKeyToUserPage (StorageKey_pu8);
+
+  if (FALSE == DecryptKeyViaSmartcard_u32 (StorageKey_pu8))
   {
     return (FALSE);
   }
 
-#ifdef LOCAL_DEBUG
-  CI_LocalPrintf ("GetStorageKey_u32: Decrypted storage key : ");
-  HexPrint (AES_KEYSIZE_256_BIT,StorageKey_pu8);
-  CI_LocalPrintf ("\r\n");
-#endif
-
   return (TRUE);
 }
-
 
 /*******************************************************************************
 
@@ -359,7 +389,7 @@ void HighLevelTests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned i
     CI_LocalPrintf ("0          Build storage keys\r\n");
     CI_LocalPrintf ("1          Print 32 byte of USER PAGE\r\n");
     CI_LocalPrintf ("2          Write 12345678 to USER PAGE\r\n");
-    CI_LocalPrintf ("2          Write 987654321 to USER PAGE\r\n");
+    CI_LocalPrintf ("3          Write 987654321 to USER PAGE\r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }

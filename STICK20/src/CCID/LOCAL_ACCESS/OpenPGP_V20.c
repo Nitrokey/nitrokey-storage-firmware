@@ -42,7 +42,7 @@
 
 *******************************************************************************/
 
-#define LOCAL_DEBUG
+//#define LOCAL_DEBUG
 
 #ifndef LOCAL_DEBUG
   #define CI_LocalPrintfDebug(...)
@@ -624,6 +624,12 @@ int LA_OpenPGP_V20_AES_Dec (typeAPDU *tSC, int nSendLength,unsigned char *cSendD
   if (16 == nSendLength)
   {
     nRet = LA_OpenPGP_V20_AES_Dec_SUB (tSC,nSendLength,cSendData,nReceiveLength,cReceiveData);
+
+    if ((0x90 != tSC->tState.cSW1) || (0x00 != tSC->tState.cSW2))   // Sc send no ok
+    {
+      return (FALSE);
+    }
+
     return (nRet);
   }
 
@@ -633,6 +639,12 @@ int LA_OpenPGP_V20_AES_Dec (typeAPDU *tSC, int nSendLength,unsigned char *cSendD
   {
     // Decrypt first 16 Byte
     nRet = LA_OpenPGP_V20_AES_Dec_SUB (tSC,16,cSendData,16,cReceiveData);
+
+    if ((0x90 != tSC->tState.cSW1) || (0x00 != tSC->tState.cSW2)) // Sc send no ok
+    {
+      return (FALSE);
+    }
+
     if (FALSE == nRet)
     {
       return (FALSE);
@@ -640,6 +652,11 @@ int LA_OpenPGP_V20_AES_Dec (typeAPDU *tSC, int nSendLength,unsigned char *cSendD
 
     // Decrypt second 16 Byte
     nRet = LA_OpenPGP_V20_AES_Dec_SUB (tSC,16,&cSendData[16],16,&cReceiveData[16]);
+
+    if ((0x90 != tSC->tState.cSW1) || (0x00 != tSC->tState.cSW2)) // Sc send no ok
+    {
+      return (FALSE);
+    }
     return (nRet);
   }
 
@@ -791,6 +808,7 @@ int LA_OpenPGP_V20_GetPasswordstatus (char *PasswordStatus)
 {
   int nRet;
 
+
   LA_RestartSmartcard_u8 ();
 // Check for smartcard on
   if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
@@ -814,7 +832,7 @@ int LA_OpenPGP_V20_GetPasswordstatus (char *PasswordStatus)
     CI_LocalPrintf ("fail\n\r");
     return (FALSE);
   }
-  CI_LocalPrintf ("OK \n\r");
+  CI_LocalPrintf ("OK  P %d - A %d\n\r",tSC_OpenPGP_V20.cReceiveData[4],tSC_OpenPGP_V20.cReceiveData[6]);
 
   // Copy password status
   memcpy (PasswordStatus,tSC_OpenPGP_V20.cReceiveData,7);
@@ -862,7 +880,7 @@ int LA_OpenPGP_V20_GetAID (char *AID)
     CI_LocalPrintf ("fail\n\r");
     return (FALSE);
   }
-  CI_LocalPrintf ("OK \n\r");
+  CI_LocalPrintf ("OK\n\r");
 
   // Copy password status
   memcpy (AID,&tSC_OpenPGP_V20.cReceiveData[4],16);
@@ -1007,16 +1025,22 @@ int LA_OpenPGP_V20_Test_ScAESKey (int nLen,unsigned char *pcKey)
 {
   int nRet;
 
-  CI_LocalPrintf ("Dec AES storage key         : ");
+  CI_LocalPrintf ("Encrypted AES key  : ");
   HexPrint (nLen,pcKey);
   CI_LocalPrintf ("\r\n");
+
+  if (32 < nLen)
+  {
+    CI_LocalPrintf ("len fail\n\r");
+    return (FALSE);
+  }
 
   memset (acBufferOut,0,nLen);
 
   nRet = LA_OpenPGP_V20_AES_Dec (&tSC_OpenPGP_V20,nLen,pcKey,nLen,acBufferOut);
   if (TRUE == nRet)
   {
-    CI_LocalPrintf ("SC Entschlüsselter Key      : ");
+    CI_LocalPrintf ("Decrypted AES key  : ");
     HexPrint (nLen,acBufferOut);
     CI_LocalPrintf ("\r\n");
   }
@@ -1294,6 +1318,48 @@ int LA_OpenPGP_V20_Test (void)
 
 }
 
+/*******************************************************************************
+
+  LA_SC_StartSmartcard
+
+  Changes
+  Date      Reviewer        Info
+  14.04.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u32 LA_SC_StartSmartcard (void)
+{
+  u32 Ret_u32;
+
+//  LA_RestartSmartcard_u8 ();
+
+// Check for smartcard on
+  if (CCID_SLOT_STATUS_PRESENT_ACTIVE == CCID_GetSlotStatus_u8 ())
+  {
+    return (TRUE);    // Smartcard is on
+  }
+
+  CI_TickLocalPrintf ("LA_SC_StartSmartcard: Start smartcard\r\n");
+  LA_RestartSmartcard_u8 ();
+  if (CCID_SLOT_STATUS_PRESENT_ACTIVE == CCID_GetSlotStatus_u8 ())
+  {
+    return (TRUE);
+  }
+
+  CI_TickLocalPrintf ("LA_SC_StartSmartcard: Restart smartcard\r\n");
+  LA_RestartSmartcard_u8 ();
+  if (CCID_SLOT_STATUS_PRESENT_ACTIVE == CCID_GetSlotStatus_u8 ())
+  {
+    return (TRUE);
+  }
+
+  CI_TickLocalPrintf ("LA_SC_StartSmartcard: Can't start smartcard\r\n");
+  return (FALSE);
+}
 
 /*******************************************************************************
 
@@ -1301,7 +1367,6 @@ int LA_OpenPGP_V20_Test (void)
 
   Reviews
   Date      Reviewer        Info
-  14.08.13  RB              First review
 
 *******************************************************************************/
 
@@ -1309,20 +1374,11 @@ u32 LA_SC_SendVerify (u8 PasswordFlag_u8,u8 *String_pu8)
 {
   u32 Ret_u32;
 
-  LA_RestartSmartcard_u8 ();
 // Check for smartcard on
-  if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
+  if (FALSE == LA_SC_StartSmartcard ())
   {
-    CI_TickLocalPrintf ("LA_SC_SendVerify: Restart smartcard\r\n");
-
-    LA_RestartSmartcard_u8 ();
-    if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
-    {
-      CI_TickLocalPrintf ("LA_SC_SendVerify: Can't start smartcard\r\n");
-      return (FALSE);
-    }
+    return (FALSE);
   }
-
 
   CI_TickLocalPrintf ("LA_SC_SendVerify: %d -%s-\r\n",PasswordFlag_u8,String_pu8);
 
@@ -1465,8 +1521,11 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
           }
           break;
     case 1 :
-//          sprintf (cBuffer,"%d",Param_u32);
-          Ret_u32 = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,1,strlen ((char *)String_pu8),String_pu8); //6, (unsigned char*)"123456");
+          sprintf (LocalString_au8,"%d",Param_u32);
+//          strcpy (LocalString_au8,String_pu8);
+          CI_LocalPrintf ("Send password -%s-\r\n",LocalString_au8);
+
+          Ret_u32 = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,1,strlen ((char *)LocalString_au8),LocalString_au8); //6, (unsigned char*)"123456");
 //          Ret_u32 = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,1,6,(unsigned char*)"123456");
           if (FALSE == Ret_u32)
           {
@@ -1474,8 +1533,11 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
           }
           break;
     case 2 :
-//          sprintf (cBuffer,"%d",Param_u32);
-          Ret_u32 = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,2,strlen ((char*)String_pu8),String_pu8);
+          sprintf (LocalString_au8,"%d",Param_u32);
+//          strcpy (LocalString_au8,String_pu8);
+          CI_LocalPrintf ("Send password -%s-\r\n",LocalString_au8);
+          Ret_u32 = LA_OpenPGP_V20_Test_SendUserPW2 (LocalString_au8);
+//          Ret_u32 = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,2,strlen ((char*)LocalString_au8),LocalString_au8);
 //          Ret_u32 = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,2,6,(unsigned char*)"123456");
           if (FALSE == Ret_u32)
           {
@@ -1484,8 +1546,9 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
           break;
 
     case 3 :
+          sprintf (LocalString_au8,"%d",Param_u32);
 //          sprintf (cBuffer,"%d",Param_u32);
-          Ret_u32 = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,3,strlen ((char*)String_pu8),String_pu8);
+          Ret_u32 = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,3,strlen ((char*)LocalString_au8),LocalString_au8);
 //          Ret_u32 = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,3,8,(unsigned char*)"12345678");
           if (FALSE == Ret_u32)
           {

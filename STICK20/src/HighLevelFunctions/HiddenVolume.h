@@ -26,32 +26,53 @@
 #ifndef HIDDENVOLUME_H_
 #define HIDDENVOLUME_H_
 
-u8 *BuildAESKeyFromUserpassword_u8 (u8 *Userpassword_pu8,u8 *AESKey_au8);
-u8 InitRamdomBaseForHiddenKey_u8 (void);
 
 /* Storage description */
 
 #define FLASH_PAGE_SIZE       512                   // AVR
 #define FLASH_START           0x80000000            // AVR
 
-#define HV_FLASH_START_PAGE   498
-#define HV_SLOT_START_ADDRESS (FLASH_START + HV_FLASH_START_PAGE * FLASH_PAGE_SIZE) // 0x8003e400
-#define HV_SLOT_SIZE          64                    // Byte
-#define HV_SLOT_COUNT         8                     // 8 Slots a 64 byte = 512 byte
 
 
-#define HV_MAGIC_NUMBER_SLOT_ENTRY        0x26f29c02
+#define HV_FLASH_START_PAGE     498
+#define HV_MAGIC_NUMBER_SIZE    4
+#define HV_SALT_SIZE            32
+#define HV_MAGIC_NUMBER_ADDRESS (FLASH_START             + HV_FLASH_START_PAGE * FLASH_PAGE_SIZE) // 0x8003e400
+#define HV_SALT_START_ADDRESS   (HV_MAGIC_NUMBER_ADDRESS + HV_MAGIC_NUMBER_SIZE)                  // 0x8003e404
+#define HV_SLOT_START_ADDRESS   (HV_SALT_START_ADDRESS   + HV_SALT_SIZE)                          // 0x8003e424
+#define HV_SLOT_SIZE            64                    // Byte
+#define HV_SLOT_COUNT           4                     // 4 Slots a 128 byte = 512 byte
+
+#define HV_MAGIC_NUMBER_INIT              0x42bc8f13
+//#define HV_MAGIC_NUMBER_SLOT_ENTRY        0x26f29c02  // Removed, because it is fix number, it could make it easier to attack the encrypted slot
+
+
+#define HIDDEN_VOLUME_OUTPUT_STATUS_FAIL                      0
+#define HIDDEN_VOLUME_OUTPUT_STATUS_OK                        1
+#define HIDDEN_VOLUME_OUTPUT_STATUS_WRONG_PASSWORD            2
+#define HIDDEN_VOLUME_OUTPUT_STATUS_NO_USER_PASSWORD_UNLOCK   3
+#define HIDDEN_VOLUME_OUTPUT_STATUS_SMARTCARD_ERROR           4
+
+
+
 
 typedef struct {
-  u32 MagicNumber_u32;          //
+//  u32 MagicNumber_u32;          // Entry removed, because it is fix number, it could make it easier to attack the encrypted slot
   u32 StartBlock_u32;           //
   u32 EndBlock_u32;             //
   u8  AesKey_au8[32];           //
   u32 Crc_u32;                  // This had to be the last entry in struct
-} HiddenVolumeKeySlot_tst;      // 48 byte = 4+4+4+32+4 - must multiple from 4 for CRC32
+} HiddenVolumeKeySlot_tst;      // 44 byte = 4+4+32+4 - must multiple from 4 for CRC32
+
+/*
+typedef struct {
+  u8  Salt_au8[HV_SALT_SIZE];           //  32 byte
+  u8  SlotParameter_au8[HV_SLOT_SIZE];  //  64 byte
+} HiddenVolumeKeyPage_tst;              // 288 byte = 32 + 4 * 64
+*/
 
 /* Interface description */
-
+/*
 #define STICK_20_HV_COMAND_GET_SLOT_DATA       0
 #define STICK_20_HV_COMAND_INIT_SLOT           1
 #define STICK_20_HV_COMAND_SEND_SLOT_DATA      2
@@ -59,9 +80,22 @@ typedef struct {
 #define STICK_20_HV_STATUS_ERROR               0
 #define STICK_20_HV_STATUS_OK                  1
 #define STICK_20_HV_SLOT_NOT_USED              2
-
+*/
 #define STICK_20_HV_COMAND_DATA_LENGTH        30
 
+#define MAX_HIDDEN_VOLUME_PASSOWORD_SIZE  20
+
+typedef struct {
+    u8 SlotNr_u8;
+    u8 StartBlockPercent_u8;
+    u8 EndBlockPercent_u8;
+    u8 HiddenVolumePassword_au8[MAX_HIDDEN_VOLUME_PASSOWORD_SIZE+1];
+} HiddenVolumeSetup_tst;
+
+
+u8 SetupUpHiddenVolumeSlot (HiddenVolumeSetup_tst *HV_Setup_st);
+
+/* not used
 typedef struct {
   u8  Comand_u8;                                  //
   u8  Status_u8;                                  //
@@ -72,8 +106,13 @@ typedef struct {
   u8  Data_au8[STICK_20_HV_COMAND_DATA_LENGTH];   //
 } HiddenVolumeTransferData_tst;                   // 42 byte = 1+1+1+1+4+4+30
 
+*/
 
-
+u8 InitRamdomBaseForHiddenKey (void);
+u8 DecryptedHiddenVolumeSlotsData (void);
+u8 GetHiddenVolumeSlotKey (u8 *HiddenVolumeKey_pu8,u8 *Password_pu8,u32 PasswordLen_u32,u8 *Salt_pu8,u32 SaltLen_u32);
+u8 SetupUpHiddenVolumeSlot (HiddenVolumeSetup_tst *HV_Setup_st);
+u8 GetHiddenVolumeKeyFromUserpassword (u8 *Userpassword_pu8,u8 *DecryptedHiddenVolumeKey_au8);
 void IBN_HV_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int Param_u32,unsigned char *String_pu8);
 
 

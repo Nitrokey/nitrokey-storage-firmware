@@ -69,6 +69,7 @@
 
 
 #define DEBUG_REPORT_PROTOCOL
+//#define DEBUG_HID_USB_DATA
 
 #ifdef DEBUG_REPORT_PROTOCOL
 #else
@@ -235,7 +236,6 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   HID_Stick20SendData_st.FollowBytesFlag_u8  = 0;     // No
   HID_Stick20SendData_st.SendSize_u8         = 1;
 
-  memcpy (&HID_Stick20SendData_st.SendData_u8[0],&Configuration_st,sizeof (typeStick20Configuration_st));
 
   CI_StringOut ("Firmware version  ");
 
@@ -291,7 +291,7 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   }
   else
   {
-    CI_StringOut("Filled with random    - Change Counter:");
+    CI_StringOut("Filled with random   - Change Counter:");
   }
   itoa ((Configuration_st.SDFillWithRandomChars_u8 >> 1),text_au8);
   CI_StringOut (text_au8);
@@ -311,6 +311,16 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   CI_StringOut (text_au8);
   CI_StringOut ("\r\n");
 
+  CI_StringOut ("SD card serial nr: ");
+  itoa (Configuration_st.ActiveSD_CardID_u32,text_au8);
+  CI_StringOut (text_au8);
+  CI_StringOut ("\r\n");
+
+// Set endian
+  Configuration_st.ActiveSmartCardID_u32 = change_endian_u32 (Configuration_st.ActiveSmartCardID_u32);
+  Configuration_st.ActiveSD_CardID_u32   = change_endian_u32 (Configuration_st.ActiveSD_CardID_u32);
+
+  memcpy (&HID_Stick20SendData_st.SendData_u8[0],&Configuration_st,sizeof (typeStick20Configuration_st));
 
 
   HID_Stick20SendData_st.FollowBytesFlag_u8 = 0;     // No next data
@@ -813,6 +823,7 @@ u8 parse_report(u8 *report,u8 *output)
           memcpy (HID_String_au8,&report[1],33);
           break;
   */
+/*
         case STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP :
           CI_StringOut ("Get STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP\r\n");
 
@@ -822,7 +833,7 @@ u8 parse_report(u8 *report,u8 *output)
           HID_CmdGet_u8  = HTML_SEND_HIDDEN_VOLUME_SETUP;
           memcpy (HID_String_au8,&report[1],33);
           break;
-
+*/
         case STICK20_CMD_SEND_PASSWORD :
           CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD\r\n");
 
@@ -883,6 +894,17 @@ u8 parse_report(u8 *report,u8 *output)
           memcpy (HID_String_au8,&report[1],33);
           break;
 
+        case STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP :
+          CI_StringOut ("Get STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP\r\n");
+
+          StartStick20Command (STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP);
+
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_HIDDEN_VOLUME_SETUP;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
+
+/*
         case STICK20_CMD_SEND_PASSWORD_RETRY_COUNT :
           CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_RETRY_COUNT\r\n");
 
@@ -903,6 +925,7 @@ u8 parse_report(u8 *report,u8 *output)
           HID_CmdGet_u8  = HTML_CMD_INIT_HIDDEN_VOLUME_SLOT;
           memcpy (HID_String_au8,&report[1],33);
           break;
+
         case STICK20_CMD_SAVE_HIDDEN_VOLUME_SLOT :
           CI_StringOut ("Get STICK20_CMD_SAVE_HIDDEN_VOLUME_SLOT\r\n");
 
@@ -912,6 +935,7 @@ u8 parse_report(u8 *report,u8 *output)
           HID_CmdGet_u8  = HTML_CMD_SAVE_HIDDEN_VOLUME_SLOT;
           memcpy (HID_String_au8,&report[1],33);
           break;
+
         case STICK20_CMD_READ_HIDDEN_VOLUME_SLOT :
           CI_StringOut ("Get STICK20_CMD_READ_HIDDEN_VOLUME_SLOT\r\n");
 
@@ -921,7 +945,7 @@ u8 parse_report(u8 *report,u8 *output)
           HID_CmdGet_u8  = HTML_CMD_READ_HIDDEN_VOLUME_SLOT;
           memcpy (HID_String_au8,&report[1],33);
           break;
-
+*/
 
         default:
           break;
@@ -987,12 +1011,14 @@ u8 parse_report(u8 *report,u8 *output)
   }
 /* USB Debug
 */
+#ifdef DEBUG_HID_USB_DATA
   CI_StringOut ("\n\rSend ");
   for (i=0;i<KEYBOARD_FEATURE_COUNT;i++)
   {
       CI_Print8BitValue (output[i]);
   }
   CI_StringOut ("\n\r");
+#endif
 
   return 0;
 }

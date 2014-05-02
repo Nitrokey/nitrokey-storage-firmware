@@ -626,11 +626,15 @@ void HID_ExcuteCmd (void)
         SetSdEncryptedCardEnableState (FALSE);    // Disable crypted or hidden volume
         vTaskDelay (1000);
 
+        CI_TickLocalPrintf ("Get key for crypted volume\r\n");
+
         GetStorageKey_u32 (&HID_String_au8[1],StorageKey_pu8);
         AES_SetNewStorageKey (StorageKey_pu8);
 
         SetSdEncryptedHiddenState (FALSE);
         SetSdEncryptedCardEnableState (TRUE);
+
+        DecryptedHiddenVolumeSlotsData ();
 
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
 /*
@@ -715,26 +719,44 @@ void HID_ExcuteCmd (void)
       break;
 
     case HTML_CMD_ENABLE_HIDDEN_AES_LUN :
-
+//      SetSdUncryptedCardEnableState (FALSE);    // look for >> sd_mmc_mci_test_unit_only_local_access = hard disabel
       SetSdEncryptedCardEnableState (FALSE);
       SetSdEncryptedHiddenState (FALSE);
-      AES_SetNewStorageKey ((u8*)"0000");      // Set dummy key
 
-      vTaskDelay (1000);
-
-      // Get w AES key for hidden volume - we use always the password that was send
-      BuildAESKeyFromUserpassword_u8 ((u8*)&HID_String_au8[1],StorageKey_pu8);
+      memset (StorageKey_pu8,0,32);             // Set dummy key
       AES_SetNewStorageKey (StorageKey_pu8);
 
-      SetSdEncryptedHiddenState (TRUE);
-      SetSdEncryptedCardEnableState (TRUE);
+      vTaskDelay (2000);    // Wait 2 sec to send LUN not active
 
+      // Get w AES key for hidden volume - we use always the password that was send
+      ret_u8 = GetHiddenVolumeKeyFromUserpassword ((u8*)&HID_String_au8[1],StorageKey_pu8);
+      switch (ret_u8)
+      {
+        case HIDDEN_VOLUME_OUTPUT_STATUS_OK :
+          AES_SetNewStorageKey (StorageKey_pu8);
+          SetSdEncryptedHiddenState (TRUE);
+          SetSdEncryptedCardEnableState (TRUE);
+          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
+          CI_TickLocalPrintf ("Hidden volume - SD card hidden AES LUN enabled\r\n");
+          break;
+        case HIDDEN_VOLUME_OUTPUT_STATUS_WRONG_PASSWORD :
+          CI_TickLocalPrintf ("Hidden volume - wrong password\r\n");
+          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
+          break;
+        case HIDDEN_VOLUME_OUTPUT_STATUS_NO_USER_PASSWORD_UNLOCK :
+          CI_TickLocalPrintf ("Hidden volume - no user password\r\n");
+          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_NO_USER_PASSWORD_UNLOCK,0);
+          break;
+        case HIDDEN_VOLUME_OUTPUT_STATUS_SMARTCARD_ERROR :
+          CI_TickLocalPrintf ("Hidden volume - smartcard error\r\n");
+          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_SMARTCARD_ERROR,0);
+          break;
+        default :
+          break;
+      }
 
-      HID_NextPasswordIsHiddenPassword_u32 = FALSE;       // switch off redirection of aes volume password
-
-      UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
-      CI_TickLocalPrintf ("SD card hidden AES LUN enabled\r\n");
-      break;
+       HID_NextPasswordIsHiddenPassword_u32 = FALSE;       // switch off redirection of aes volume password
+       break;
 
     case HTML_CMD_DISABLE_HIDDEN_AES_LUN :
       SetSdEncryptedCardEnableState (FALSE);
@@ -865,7 +887,7 @@ void HID_ExcuteCmd (void)
 
     case HTML_SEND_HIDDEN_VOLUME_SETUP:
        CI_TickLocalPrintf ("Get HTML_SEND_HIDDEN_VOLUME_SETUP\r\n");
-       InitRamdomBaseForHiddenKey_u8 ();
+       InitRamdomBaseForHiddenKey ();
        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
        break;
 
@@ -975,35 +997,34 @@ void HID_ExcuteCmd (void)
        Stick20HIDInitSendConfoguration (STICK20_SEND_STARTUP);
        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
        break;
-
+/*
      case STICK20_CMD_SEND_PASSWORD_RETRY_COUNT :
        CI_TickLocalPrintf ("Get STICK20_CMD_SEND_PASSWORD_RETRY_COUNT\r\n");
-/*
-       Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus (Text_u8);
-
-       if (TRUE == Ret_u32)
-       {
-         HID_Stick20SendData_st.SendData_u8[0]     = Text_u8[4];      // Set state in sendblock
-         HID_Stick20SendData_st.FollowBytesFlag_u8 = 0;               // No
-         HID_Stick20SendData_st.SendSize_u8        = 1;
-       }
-*/
 
 //       Stick20HIDInitSendConfoguration (STICK20_SEND_STARTUP);
        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
        break;
-
-     case HTML_CMD_INIT_HIDDEN_VOLUME_SLOT:
-        CI_TickLocalPrintf ("Get HTML_CMD_INIT_HIDDEN_VOLUME_SLOT\r\n");
-        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
-        break;
-     case HTML_CMD_SAVE_HIDDEN_VOLUME_SLOT:
-        CI_TickLocalPrintf ("Get HTML_CMD_SAVE_HIDDEN_VOLUME_SLOT\r\n");
-        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
-        break;
-     case HTML_CMD_READ_HIDDEN_VOLUME_SLOT:
-        CI_TickLocalPrintf ("Get HTML_CMD_READ_HIDDEN_VOLUME_SLOT\r\n");
-        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
+*/
+     case HTML_CMD_HIDDEN_VOLUME_SETUP:
+        CI_TickLocalPrintf ("Get HTML_CMD_HIDDEN_VOLUME_SETUP\r\n");
+        ret_u8 = SetupUpHiddenVolumeSlot ((HiddenVolumeSetup_tst *)&HID_String_au8[0]);
+        switch (ret_u8)
+        {
+          case HIDDEN_VOLUME_OUTPUT_STATUS_OK :
+            UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
+            break;
+          case HIDDEN_VOLUME_OUTPUT_STATUS_WRONG_PASSWORD :
+            UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
+            break;
+          case HIDDEN_VOLUME_OUTPUT_STATUS_NO_USER_PASSWORD_UNLOCK :
+            UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_NO_USER_PASSWORD_UNLOCK,0);
+            break;
+          case HIDDEN_VOLUME_OUTPUT_STATUS_SMARTCARD_ERROR :
+            UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_SMARTCARD_ERROR,0);
+            break;
+          default :
+            break;
+        }
         break;
 
     default:
