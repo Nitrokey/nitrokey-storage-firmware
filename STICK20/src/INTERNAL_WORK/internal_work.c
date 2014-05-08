@@ -57,6 +57,7 @@
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 
 #include "OTP\report_protocol.h"
+#include "HighLevelFunctions\HandleAesStorageKey.h"
 #include "internal_work.h"
 
 
@@ -163,6 +164,9 @@ void IW_task(void *pvParameters)
 #ifdef HTML_ENABLE_HTML_INTERFACE
   HTML_FileIO_Init_u8 ();
 #endif
+
+// Check system configuration
+  StartupCheck_u8 ();
 
   xLastWakeTime = xTaskGetTickCount();
 

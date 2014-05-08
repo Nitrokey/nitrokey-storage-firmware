@@ -1008,12 +1008,10 @@ int main(void)
   }
 #endif  // FREERTOS_USED
 
-  // Init Hmatrix bus
+// Init Hmatrix bus
   init_hmatrix();
-/*
-	TestUart0 ();
-*/
-  // Initialize USB clock.
+
+// Initialize USB clock.
   pcl_configure_usb_clock();
 
 
@@ -1029,6 +1027,7 @@ int main(void)
 
 	Test_LEDs_Pins ();
 
+	TestUart0 ();
 
   while (1);
   return (0);
@@ -1040,10 +1039,9 @@ int main(void)
 #ifdef TIME_MEASURING_ENABLE
   TIME_MEASURING_Init ();
 #endif
-/*
-*/
 
-// IDF
+
+// For debugging
   BUFFERED_SIO_Init ();
 
 #ifdef INTERPRETER_ENABLE
@@ -1052,7 +1050,7 @@ int main(void)
 
 // Internal work task - FAT Access
   IW_task_init();
-// RB todo
+
 // Initialize USB tasks.
   usb_task_init();
 
@@ -1074,9 +1072,14 @@ int main(void)
 // Protect bootloader
 #ifdef STICK_20_A_MUSTER_PROD     //
   flashc_set_bootloader_protected_size (0x2000);
+  flashc_lock_external_privileged_fetch (TRUE); // Disable external instruction fetch
+  // todo: Disable debugging
+//  flashc_activate_security_bit ();    // Debugging disabled, only chip erase works (bootloader is save) , AES storage keys and setup are erased
+
 #endif
 
-  DFU_DisableFirmwareUpdate ();
+  DFU_DisableFirmwareUpdate ();     // Stick always starts in application mode
+
 
 //  ushell_task_init(pcl_freq_param.pba_f);
 

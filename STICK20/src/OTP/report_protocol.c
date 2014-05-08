@@ -193,7 +193,7 @@ void Stick20HIDSendDebugData (u8 *output)
 
 /*******************************************************************************
 
-  Stick20HIDInitSendConfoguration
+  Stick20HIDInitSendConfiguration
 
   Reviews
   Date      Reviewer        Info
@@ -203,7 +203,7 @@ void Stick20HIDSendDebugData (u8 *output)
 
 u8 Stick20HIDSendConfigurationState_u8      = STICK20_SEND_STATUS_IDLE;
 
-u8 Stick20HIDInitSendConfoguration (u8 state_u8)
+u8 Stick20HIDInitSendConfiguration (u8 state_u8)
 {
   CI_StringOut ("Init HID config data\r\n");
 
@@ -255,7 +255,7 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
     CI_StringOut ("Uncyrpted Volume  READ ONLY active\r\n");
   }
 
-  if (STICK20_SEND_STATUS_PIN == Stick20HIDInitSendConfoguration)    // This information only with pin
+  if (STICK20_SEND_STATUS_PIN == Stick20HIDInitSendConfiguration)    // This information only with pin
   {
     if (0 != (Configuration_st.VolumeActiceFlag_u8 & (1 << SD_CRYPTED_VOLUME_BIT_PLACE)))
     {
@@ -297,6 +297,14 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   CI_StringOut (text_au8);
   CI_StringOut ("\r\n");
 
+  if (TRUE == Configuration_st.StickKeysNotInitiated_u8)
+  {
+    CI_StringOut("*** Stick not initiated ***\r\n");
+  }
+  else
+  {
+    CI_StringOut("Stick initiated\r\n");
+  }
 
   CI_StringOut ("Password retry count - User ");
   itoa (Configuration_st.UserPwRetryCount,text_au8);
@@ -904,6 +912,15 @@ u8 parse_report(u8 *report,u8 *output)
           memcpy (HID_String_au8,&report[1],33);
           break;
 
+        case STICK20_CMD_SEND_CLEAR_STICK_KEYS_NOT_INITIATED :
+          CI_StringOut ("Get STICK20_CMD_SEND_CLEAR_STICK_KEYS_NOT_INITIATED\r\n");
+
+          StartStick20Command (STICK20_CMD_SEND_CLEAR_STICK_KEYS_NOT_INITIATED);
+
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_CLEAR_STICK_KEYS_NOT_INITIATED;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
 /*
         case STICK20_CMD_SEND_PASSWORD_RETRY_COUNT :
           CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_RETRY_COUNT\r\n");
@@ -1106,7 +1123,7 @@ u8 cmd_write_to_slot(u8 *report,u8 *output)
 
 u8 cmd_read_slot_name(u8 *report,u8 *output)
 {
-
+  u8 text[10];
 	u8 slot_no=report[1];
 
 
@@ -1118,7 +1135,10 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
 		if (is_programmed==0x01)
 		{
 		  memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(hotp_slots[slot_no]+SLOT_NAME_OFFSET),15);
-      CI_StringOut ("Slot name -");
+      CI_StringOut ("HOTP Slot ");
+      itoa (slot_no,text);
+      CI_StringOut (text);
+      CI_StringOut (" name -");
       CI_StringOut (output+OUTPUT_CMD_RESULT_OFFSET);
       CI_StringOut ("-\r\n");
 		}
@@ -1135,7 +1155,10 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
 		if (is_programmed==0x01)
 		{
 		  memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(totp_slots[slot_no]+SLOT_NAME_OFFSET),15);
-      CI_StringOut ("Slot name -");
+      CI_StringOut ("TOTP Slot ");
+      itoa (slot_no,text);
+      CI_StringOut (text);
+      CI_StringOut (" name -");
       CI_StringOut (output+OUTPUT_CMD_RESULT_OFFSET);
       CI_StringOut ("-\r\n");
 		}
@@ -1400,19 +1423,33 @@ u8 cmd_write_config(u8 *report,u8 *output)
 u8 cmd_erase_slot(u8 *report,u8 *output)
 {
 	u8 slot_no=report[CMD_WTS_SLOT_NUMBER_OFFSET];
-	u8 slot_tmp[64];
+  u8 slot_tmp[64];
+  u8 text_au8[10];
 
 	memset(slot_tmp,0xFF,64);
 
-	if (slot_no>=0x10&&slot_no<=0x11)          //HOTP slot
+	if ((slot_no >= 0x10) && (slot_no <= 0x10 + NUMBER_OF_HOTP_SLOTS))          //HOTP slot
 	{
-		slot_no=slot_no&0x0F;
-		write_to_slot(slot_tmp, hotp_slot_offsets[slot_no], 64);
+		slot_no = slot_no & 0x0F;
+
+	  CI_StringOut ("Erase slot HOTP ");
+	  itoa (slot_no,text_au8);
+	  CI_StringOut (text_au8);
+	  CI_StringOut ("\r\n");
+
+	  write_to_slot(slot_tmp, hotp_slot_offsets[slot_no], 64);
 	}
-	else if (slot_no>=0x20&&slot_no<=0x23)     //TOTP slot
+	else if ((slot_no >= 0x20) && (slot_no <= 0x20 + NUMBER_OF_TOTP_SLOTS))     //TOTP slot
 	{
-		slot_no=slot_no&0x0F;	
-		write_to_slot(slot_tmp, totp_slot_offsets[slot_no], 64);
+		slot_no = slot_no & 0x0F;
+
+    CI_StringOut ("Erase slot TOTP ");
+    itoa (slot_no,text_au8);
+    CI_StringOut (text_au8);
+    CI_StringOut ("\r\n");
+
+
+    write_to_slot(slot_tmp, totp_slot_offsets[slot_no], 64);
 	}
 	else
 	{
@@ -1448,8 +1485,8 @@ u8 cmd_first_authenticate(u8 *report,u8 *output)
 
 // res = cardAuthenticate (card_password); // Check for admin password
 
-  Ret_u32 =  LA_SC_SendVerify (1,(unsigned char *)card_password); // 1 = user pw
-//	Ret_u32 = LA_OpenPGP_V20_Test_SendAdminPW ((unsigned char *)card_password);
+//  Ret_u32 =  LA_SC_SendVerify (1,(unsigned char *)card_password); // 1 = user pw
+	Ret_u32 = LA_OpenPGP_V20_Test_SendAdminPW ((unsigned char *)card_password);
   if (TRUE == Ret_u32)
   {
     res = 0;

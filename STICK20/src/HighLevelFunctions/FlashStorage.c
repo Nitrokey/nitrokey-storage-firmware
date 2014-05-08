@@ -220,7 +220,21 @@ u8 WriteStickConfigurationToUserPage (void)
 
 u8 ReadStickConfigurationFromUserPage (void)
 {
-  memcpy (&StickConfiguration_st,(void*)(AVR32_FLASHC_USER_PAGE + 72),sizeof (typeStick20Configuration_st)-8); // Not the retry counter and sc serial no
+  u8  UserPwRetryCount;
+  u8  AdminPwRetryCount;
+  u32 ActiveSmartCardID_u32;
+
+// Save dynamic data
+  UserPwRetryCount      = StickConfiguration_st.UserPwRetryCount;
+  AdminPwRetryCount     = StickConfiguration_st.AdminPwRetryCount;
+  ActiveSmartCardID_u32 = StickConfiguration_st.ActiveSmartCardID_u32;
+
+  memcpy (&StickConfiguration_st,(void*)(AVR32_FLASHC_USER_PAGE + 72),sizeof (typeStick20Configuration_st));
+
+// Restore dynamic data
+  StickConfiguration_st.UserPwRetryCount      = UserPwRetryCount      ;
+  StickConfiguration_st.AdminPwRetryCount     = AdminPwRetryCount     ;
+  StickConfiguration_st.ActiveSmartCardID_u32 = ActiveSmartCardID_u32 ;
 
   if (MAGIC_NUMBER_STICK20_CONFIG != StickConfiguration_st.MagicNumber_StickConfig_u16)
   {
@@ -259,7 +273,7 @@ u8 InitStickConfigurationToUserPage_u8 (void)
   StickConfiguration_st.VolumeActiceFlag_u8             = 0;
   StickConfiguration_st.NewSmartCardFound_u8            = 0;
   StickConfiguration_st.ActiveSmartCardID_u32           = 0;
-
+  StickConfiguration_st.StickKeysNotInitiated_u8        = 0;
 
   WriteStickConfigurationToUserPage ();
   return (TRUE);
@@ -569,6 +583,125 @@ u8 ClearNewSdCardFoundToFlash (void)
   CI_LocalPrintf ("Clear new SD card found\r\n");
 
   StickConfiguration_st.NewSDCardFound_u8 &= 0xFE;     // Clear the "new SD card found"  bit
+
+  WriteStickConfigurationToUserPage ();
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  SetSdCardFilledWithRandomCharsToFlash
+
+  Changes
+  Date      Author          Info
+  06.05.14  RB              Implementation of clear new SD card found
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 SetSdCardFilledWithRandomCharsToFlash (void)
+{
+  // If configuration not found then init it
+  if (FALSE == ReadStickConfigurationFromUserPage ())
+  {
+    InitStickConfigurationToUserPage_u8 ();
+  }
+
+  CI_LocalPrintf ("Set new SD card filled with random chars\r\n");
+
+  StickConfiguration_st.SDFillWithRandomChars_u8 |= 0x01;     // Set the "SD card filled with randoms"  bit
+
+  WriteStickConfigurationToUserPage ();
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  SetSdCardNotFilledWithRandomCharsToFlash
+
+  Changes
+  Date      Author          Info
+  06.05.14  RB              Implementation of clear new SD card found
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 SetSdCardNotFilledWithRandomCharsToFlash (void)
+{
+  // If configuration not found then init it
+  if (FALSE == ReadStickConfigurationFromUserPage ())
+  {
+    InitStickConfigurationToUserPage_u8 ();
+  }
+
+  CI_LocalPrintf ("Set new SD card *** not *** filled with random chars\r\n");
+
+  StickConfiguration_st.SDFillWithRandomChars_u8 &= 0xFE;     // Clear the "card with random chars filled"  bit
+
+  WriteStickConfigurationToUserPage ();
+
+  return (TRUE);
+}
+/*******************************************************************************
+
+  SetStickKeysNotInitatedToFlash
+
+  Changes
+  Date      Author          Info
+  05.05.14  RB              Implementation of clear new SD card found
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 SetStickKeysNotInitatedToFlash (void)
+{
+  // If configuration not found then init it
+  if (FALSE == ReadStickConfigurationFromUserPage ())
+  {
+    InitStickConfigurationToUserPage_u8 ();
+  }
+
+  CI_LocalPrintf ("Set stick keys not initiated\r\n");
+
+  StickConfiguration_st.StickKeysNotInitiated_u8 = TRUE;
+
+  WriteStickConfigurationToUserPage ();
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  ClearStickKeysNotInitatedToFlash
+
+  Changes
+  Date      Author          Info
+  05.05.14  RB              Implementation of clear new SD card found
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 ClearStickKeysNotInitatedToFlash (void)
+{
+  // If configuration not found then init it
+  if (FALSE == ReadStickConfigurationFromUserPage ())
+  {
+    InitStickConfigurationToUserPage_u8 ();
+  }
+
+  CI_LocalPrintf ("Clear stick keys not initiated\r\n");
+
+  StickConfiguration_st.StickKeysNotInitiated_u8 = FALSE;
 
   WriteStickConfigurationToUserPage ();
 

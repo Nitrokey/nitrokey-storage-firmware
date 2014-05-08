@@ -133,8 +133,6 @@ u32 BuildNewAesStorageKey_u32 (u8 *MasterKey_pu8)
 
 // Store the encrypted storage key in USER PAGE
   WriteAESStorageKeyToUserPage (Buffer_au8);
-//  flashc_memcpy(AVR32_FLASHC_USER_PAGE,Buffer_au8,AES_KEYSIZE_256_BIT,TRUE);
-
 
 #ifdef LOCAL_DEBUG
 // Test the storage key
@@ -195,9 +193,10 @@ u32 BuildNewAesMasterKey_u32 (u8 *AdminPW_pu8,u8 *MasterKey_pu8)
 #ifdef LOCAL_DEBUG
   CI_TickLocalPrintf ("BuildNewAesMasterKey_u32\r\n");
 #endif
+  LA_RestartSmartcard_u8 ();
 
 // Wait for next smartcard cmd
-  DelayMs (10);
+//  DelayMs (10);
 
 #ifdef LOCAL_DEBUG
     CI_LocalPrintf ("GetRandomNumber\n\r");
@@ -254,6 +253,8 @@ u32 BuildNewAesMasterKey_u32 (u8 *AdminPW_pu8,u8 *MasterKey_pu8)
 #endif
     return (FALSE);
   }
+
+  ClearStickKeysNotInitatedToFlash ();
 
   return (TRUE);
 }
@@ -371,6 +372,74 @@ u32 GetStorageKey_u32 (u8 *UserPW_pu8, u8 *StorageKey_pu8)
 
 /*******************************************************************************
 
+  CheckStorageKey_u8
+
+  Check Key for the normal encrypted volume (not the hidden volumes)
+
+  Changes
+  Date      Reviewer        Info
+  05.05.14  RB              Creation
+
+  Reviews
+  Date      Reviewer        Info
+
+
+*******************************************************************************/
+
+u8 CheckStorageKey_u8 (void)
+{
+  u8 StorageKey_au8[AES_KEYSIZE_256_BIT];
+  u32 *p_pu32;
+
+// Get encrypted key for the crypted volume
+  ReadAESStorageKeyToUserPage (StorageKey_au8);
+
+  p_pu32 = (u32*)&StorageKey_au8[0];
+  if ((u32)0xFFFFFFFF == *p_pu32)
+  {
+    return (FALSE);   // No key generated - this is a security leak
+  }
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  StartupCheck_u8
+
+  Changes
+  Date      Reviewer        Info
+  05.05.14  RB              Creation
+
+  Reviews
+  Date      Reviewer        Info
+
+
+*******************************************************************************/
+
+u8 StartupCheck_u8 (void)
+{
+
+  if (TRUE == CheckStorageKey_u8 ())
+  {
+    return (TRUE);        // Keys ok
+  }
+
+  CI_LocalPrintf ("*** AES keys unsecure ***\r\n");
+
+  ReadStickConfigurationFromUserPage ();
+
+  if (FALSE == StickConfiguration_st.StickKeysNotInitiated_u8)
+  {
+    CI_LocalPrintf ("*** Set flash bit NotInitated ***\r\n");
+    SetStickKeysNotInitatedToFlash ();
+  }
+
+  return (FALSE);
+}
+
+/*******************************************************************************
+
   HighLevelTests
 
   Reviews
@@ -381,6 +450,7 @@ u32 GetStorageKey_u32 (u8 *UserPW_pu8, u8 *StorageKey_pu8)
 
 void HighLevelTests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int Param_u32,unsigned char *String_pu8)
 {
+  u8 Buffer_au8[32];
 
   if (0 == nParamsGet_u8)
   {
@@ -390,6 +460,9 @@ void HighLevelTests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned i
     CI_LocalPrintf ("1          Print 32 byte of USER PAGE\r\n");
     CI_LocalPrintf ("2          Write 12345678 to USER PAGE\r\n");
     CI_LocalPrintf ("3          Write 987654321 to USER PAGE\r\n");
+    CI_LocalPrintf ("4          Clear AES storage key\r\n");
+    CI_LocalPrintf ("5          Print AES storage key\r\n");
+    CI_LocalPrintf ("6          Set new SD card found\r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }
@@ -414,6 +487,23 @@ void HighLevelTests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned i
           CI_LocalPrintf ("Write 987654321 to USER PAGE\r\n");
           flashc_memcpy(AVR32_FLASHC_USER_PAGE,"987654321",9,TRUE);
           break;
+    case 4 :
+          CI_LocalPrintf ("Clear AES storage key in flash\r\n");
+          memset (Buffer_au8,255,32);
+          // Store the encrypted storage key in USER PAGE
+          WriteAESStorageKeyToUserPage (Buffer_au8);
+          break;
+    case 5 :
+          ReadAESStorageKeyToUserPage (Buffer_au8);
+          CI_LocalPrintf ("Print AES storage key : ");
+          HexPrint (32,(u8*)Buffer_au8);
+          CI_LocalPrintf ("\r\n");
+          break;
+    case 6 :
+          CI_LocalPrintf ("Set new SD card found\r\n");
+          SetSdCardNotFilledWithRandomCharsToFlash ();
+          break;
+
     default :
           break;
   }

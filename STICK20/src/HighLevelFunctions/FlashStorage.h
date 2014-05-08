@@ -86,7 +86,8 @@ typedef struct {
   u8  UserPwRetryCount;                     // User password retry count                          1 byte  // 19
   u8  AdminPwRetryCount;                    // Admin password retry count                         1 byte  // 20 Byte not packed
   u32 ActiveSmartCardID_u32;                //                                                    4 byte
-} typeStick20Configuration_st;                                                          // Sum   24 byte (Max 25 Byte) // not packed
+  u8  StickKeysNotInitiated_u8;                // No AES keys computed (1 = AES are builded)         1 byte  // 25 Byte not packed
+} typeStick20Configuration_st;                                                          // Sum   25 byte (Max 25 Byte) // not packed
 
 
 extern typeStick20Configuration_st StickConfiguration_st;
@@ -100,5 +101,9 @@ u8 ReadSdId (u32 *SdId_u32);
 u8 WriteNewSdCardFoundToFlash (u32 *SdId_u32);
 u8 SetSdCardFilledWithRandomsToFlash (void);
 u8 ClearNewSdCardFoundToFlash (void);
+u8 SetSdCardNotFilledWithRandomCharsToFlash (void);
+u8 SetSdCardFilledWithRandomCharsToFlash (void);
 
+u8 SetStickKeysNotInitatedToFlash (void);
+u8 ClearStickKeysNotInitatedToFlash (void);
 #endif /* FLASHSTORAGE_H_ */

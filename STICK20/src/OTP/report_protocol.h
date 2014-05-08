@@ -80,7 +80,7 @@
 #define STICK20_CMD_CLEAR_NEW_SD_CARD_FOUND             (STICK20_CMD_START_VALUE + 20)
 #define STICK20_CMD_SEND_STARTUP                        (STICK20_CMD_START_VALUE + 21)
 
-#define STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP            (STICK20_CMD_START_VALUE + 22)
+#define STICK20_CMD_SEND_CLEAR_STICK_KEYS_NOT_INITIATED (STICK20_CMD_START_VALUE + 22)
 
 
 /*
@@ -184,7 +184,7 @@ typedef struct  {
 #define OUTPUT_CMD_STICK20_SEND_DATA_TYPE_STATUS      3
 
 
-u8 Stick20HIDInitSendConfoguration (u8 state_u8);
+u8 Stick20HIDInitSendConfiguration (u8 state_u8);
 u8 Stick20HIDSendAccessStatusData (u8 *output);
 extern u8 Stick20HIDSendConfigurationState_u8;
 

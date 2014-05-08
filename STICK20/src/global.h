@@ -46,11 +46,8 @@ typedef signed long  	s32;
 ******************************************************************************/
 //#define DEBUG_LOG_CCID_DETAIL       // Shows details of smartcard io + set CCID_T1_DebugLevel = 3;
 
-//#define MMC_DEBUG_PRINT            // Shows details of SD card actions
+//#define MMC_DEBUG_PRINT             // Shows details of SD card actions
 
-
-// Define to activate A_Muster specific handling
-//to delete #define STICK_20_A_MUSTER           // Activate - to delete
 
 // Define to activate A_Muster specific handling
 // Achtung: Bootloader in trampoline.x aktivieren
@@ -58,20 +55,11 @@ typedef signed long  	s32;
 // *** Activate only for PROD version ***
 //#define STICK_20_A_MUSTER_PROD
 
-//#define STICK_20_SEND_DEBUGINFOS_VIA_HID      // Need ca. 2k flash
 
-// Enable the HTML interface via ram disc
-//#define HTML_ENABLE_HTML_INTERFACE
+//#define STICK_20_SEND_DEBUGINFOS_VIA_HID      // Use ca. 2k flash
 
 
 #define STICK_20_AES_ENABLE
-
-// Simulate
-//#define SIMULATE_USB_CCID_DISPATCH
-
-
-// Activated AD logging
-//#define AD_LOGGING_ACTIV
 
 // Printf only for Windows
 #define CCID_NO_PRINTF
@@ -145,6 +133,22 @@ int CI_TickLocalPrintf (char *szFormat,...);
 // Led ports
 #define TOOL_LED_RED_PIN       AVR32_PIN_PX41
 #define TOOL_LED_GREEN_PIN     AVR32_PIN_PX45
+
+
+/*********************************************************************************
+
+ Special functions
+
+*********************************************************************************/
+
+// Enable the HTML interface via ram disc
+//#define HTML_ENABLE_HTML_INTERFACE
+
+// Simulate
+//#define SIMULATE_USB_CCID_DISPATCH
+
+// Activated AD logging
+//#define AD_LOGGING_ACTIV
 
 
 #endif // GLOBAL_H

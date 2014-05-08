@@ -127,8 +127,9 @@ global config slot:
 #define TOTP_SLOT11_OFFSET    ((64 * 4) + (64 * 10))
 #define TOTP_SLOT12_OFFSET    ((64 * 4) + (64 * 11))
 #define TOTP_SLOT13_OFFSET    ((64 * 4) + (64 * 12))
-#define TOTP_SLOT14_OFFSET    ((64 * 4) + (64 * 14))
-#define TOTP_SLOT15_OFFSET    ((64 * 4) + (64 * 15))
+#define TOTP_SLOT14_OFFSET    ((64 * 4) + (64 * 13))
+#define TOTP_SLOT15_OFFSET    ((64 * 4) + (64 * 14))
+#define TOTP_SLOT16_OFFSET    ((64 * 4) + (64 * 15))
 
 // End of data = ((64 * 4) + (64 * 16)) = 1280 >= 3 flash page
 

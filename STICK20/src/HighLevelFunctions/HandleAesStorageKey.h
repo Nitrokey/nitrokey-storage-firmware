@@ -30,6 +30,8 @@
 u32 BuildStorageKeys_u32 (u8 *AdminPW_pu8);
 u32 GetStorageKey_u32 (u8 *UserPW_pu8, u8 *StorageKey_pu8);
 u32 DecryptKeyViaSmartcard_u32 (u8 *StorageKey_pu8);
+u8 CheckStorageKey_u8 (void);
+u8 StartupCheck_u8 (void);
 
 void HighLevelTests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int Param_u32,unsigned char *String_pu8);
 

@@ -72,7 +72,7 @@
 #define HTML_CMD_SEND_NEW_PASSWORD                   26
 
 #define HTML_CMD_HIDDEN_VOLUME_SETUP                 27
-
+#define HTML_CMD_CLEAR_STICK_KEYS_NOT_INITIATED      28
 
 #define HTML_INPUTBUFFER_SIZE   64
 

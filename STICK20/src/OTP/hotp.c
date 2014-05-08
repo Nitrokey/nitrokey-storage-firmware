@@ -204,7 +204,8 @@ u32 totp_slots[NUMBER_OF_TOTP_SLOTS]         = {
                                                   SLOTS_ADDRESS + TOTP_SLOT12_OFFSET,
                                                   SLOTS_ADDRESS + TOTP_SLOT13_OFFSET,
                                                   SLOTS_ADDRESS + TOTP_SLOT14_OFFSET,
-                                                  SLOTS_ADDRESS + TOTP_SLOT15_OFFSET
+                                                  SLOTS_ADDRESS + TOTP_SLOT15_OFFSET,
+                                                  SLOTS_ADDRESS + TOTP_SLOT16_OFFSET
                                                };
 
 u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS]  = {
@@ -222,7 +223,8 @@ u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS]  = {
                                                   TOTP_SLOT12_OFFSET,
                                                   TOTP_SLOT13_OFFSET,
                                                   TOTP_SLOT14_OFFSET,
-                                                  TOTP_SLOT15_OFFSET
+                                                  TOTP_SLOT15_OFFSET,
+                                                  TOTP_SLOT16_OFFSET
                                                };
 
 u8 page_buffer[FLASH_PAGE_SIZE*3];

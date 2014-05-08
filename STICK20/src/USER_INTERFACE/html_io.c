@@ -874,7 +874,8 @@ void HID_ExcuteCmd (void)
 
     case HTML_CMD_GET_DEVICE_STATUS :
       CI_TickLocalPrintf ("Get HTML_CMD_GET_DEVICE_STATUS\r\n");
-      Stick20HIDInitSendConfoguration (STICK20_SEND_STATUS_PIN);
+      GetSmartCardStatus (&StickConfiguration_st);
+      Stick20HIDInitSendConfiguration (STICK20_SEND_STATUS_PIN);
       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
       break;
 
@@ -972,7 +973,8 @@ void HID_ExcuteCmd (void)
        CI_TickLocalPrintf ("Get HTML_CMD_CLEAR_NEW_SD_CARD_FOUND\r\n");
        if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
        {
-         ClearNewSdCardFoundToFlash ();
+//         ClearNewSdCardFoundToFlash ();
+         SetSdCardFilledWithRandomCharsToFlash ();
          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
          CI_TickLocalPrintf ("password ok\r\n");
        }
@@ -988,20 +990,19 @@ void HID_ExcuteCmd (void)
        timestamp = getu64(&HID_String_au8[0]);
        if (FALSE == CheckSystemtime ((u32)timestamp))
        {
-
+          // todo
        }
 
        GetSmartCardStatus (&StickConfiguration_st);
 
-
-       Stick20HIDInitSendConfoguration (STICK20_SEND_STARTUP);
+       Stick20HIDInitSendConfiguration (STICK20_SEND_STARTUP);
        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
        break;
 /*
      case STICK20_CMD_SEND_PASSWORD_RETRY_COUNT :
        CI_TickLocalPrintf ("Get STICK20_CMD_SEND_PASSWORD_RETRY_COUNT\r\n");
 
-//       Stick20HIDInitSendConfoguration (STICK20_SEND_STARTUP);
+//       Stick20HIDInitSendConfiguration (STICK20_SEND_STARTUP);
        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
        break;
 */
@@ -1025,6 +1026,12 @@ void HID_ExcuteCmd (void)
           default :
             break;
         }
+        break;
+
+      case HTML_CMD_CLEAR_STICK_KEYS_NOT_INITIATED :
+        CI_TickLocalPrintf ("Get HTML_CMD_CLEAR_STICK_KEYS_NOT_INITIATED\r\n");
+        ClearStickKeysNotInitatedToFlash ();
+        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
         break;
 
     default:
