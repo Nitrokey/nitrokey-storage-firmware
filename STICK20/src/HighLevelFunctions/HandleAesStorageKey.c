@@ -27,6 +27,7 @@
 #include "string.h"
 #include "aes.h"
 #include "flashc.h"
+#include "time.h"
 
 #include "global.h"
 #include "tools.h"
@@ -259,6 +260,109 @@ u32 BuildNewAesMasterKey_u32 (u8 *AdminPW_pu8,u8 *MasterKey_pu8)
   return (TRUE);
 }
 
+
+/*******************************************************************************
+
+  BuildNewXorPattern_u32
+
+  Build a xor pattern, with this pattern every key received from the smartcard is xored
+
+  Changes
+  Date      Author          Info
+  20.05.14  RB              Implementation of build xor pattern
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u32 BuildNewXorPattern_u32 (void)
+{
+  u8      XorPattern_au8[AES_KEYSIZE_256_BIT];
+  time_t  now;
+  u32     i;
+
+#ifdef LOCAL_DEBUG
+  CI_TickLocalPrintf ("BuildNewXorPattern_u32\r\n");
+#endif
+  LA_RestartSmartcard_u8 ();
+
+
+#ifdef LOCAL_DEBUG
+    CI_LocalPrintf ("GetRandomNumber\n\r");
+#endif
+
+// Get a random number for the master key
+  if (FALSE == GetRandomNumber_u32 (AES_KEYSIZE_256_BIT/2,XorPattern_au8))
+  {
+#ifdef LOCAL_DEBUG
+    CI_LocalPrintf ("GetRandomNumber fails\n\r");
+#endif
+    return (FALSE);
+  }
+
+// Get a random number for the master key
+  if (FALSE == GetRandomNumber_u32 (AES_KEYSIZE_256_BIT/2,&XorPattern_au8[AES_KEYSIZE_256_BIT/2]))
+  {
+#ifdef LOCAL_DEBUG
+    CI_LocalPrintf ("GetRandomNumber fails\n\r");
+#endif
+    return (FALSE);
+  }
+
+// Paranoia: if the random key is not really random, xor it with another random key from a second source
+  time (&now);        // Get the local time
+  srand (now);        // Init the local random generator
+  for (i=0;i<AES_KEYSIZE_256_BIT;i++)
+  {
+    XorPattern_au8[i] = XorPattern_au8[i] ^ (u8)(rand () % 256);
+  }
+
+
+  WriteXorPatternToFlash (XorPattern_au8);
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  XorAesKey_u32
+
+  Changes
+  Date      Author          Info
+  20.05.14  RB              Implementation of xor a aes key
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u32 XorAesKey_u32 (u8 *AesKey_au8)
+{
+  u8  XorKey_au8[AES_KEYSIZE_256_BIT];
+  u32 i;
+
+  ReadXorPatternFromFlash (XorKey_au8);
+
+#ifdef LOCAL_DEBUG
+  CI_LocalPrintf ("XorAesKey with     : ");
+  HexPrint (AES_KEYSIZE_256_BIT,XorKey_au8);
+  CI_LocalPrintf ("\r\n");
+#endif
+
+  for (i=0;i<AES_KEYSIZE_256_BIT;i++)
+  {
+    AesKey_au8[i] = AesKey_au8[i] ^ XorKey_au8[i];
+  }
+
+#ifdef LOCAL_DEBUG
+  CI_LocalPrintf ("New AesKey         : ");
+  HexPrint (AES_KEYSIZE_256_BIT,AesKey_au8);
+  CI_LocalPrintf ("\r\n");
+#endif
+  return (TRUE);
+}
+
 /*******************************************************************************
 
   BuildStorageKeys_u32
@@ -273,6 +377,13 @@ u32 BuildStorageKeys_u32 (u8 *AdminPW_pu8)
 {
   u32 Ret_u32;
   u8  MasterKey_au8[AES_KEYSIZE_256_BIT];
+
+
+  Ret_u32 = BuildNewXorPattern_u32 ();
+  if (FALSE == Ret_u32)
+  {
+    return (FALSE);
+  }
 
   Ret_u32 = BuildNewAesMasterKey_u32 (AdminPW_pu8,MasterKey_au8);
   if (FALSE == Ret_u32)
@@ -322,6 +433,8 @@ u32 DecryptKeyViaSmartcard_u32 (u8 *StorageKey_pu8)
 #endif
     return (FALSE);
   }
+
+  XorAesKey_u32 (StorageKey_pu8);
 
 #ifdef LOCAL_DEBUG
 //  CI_LocalPrintf ("DecryptKeyViaSmartcard_u32: Decrypted key : ");

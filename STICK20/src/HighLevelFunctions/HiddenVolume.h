@@ -56,18 +56,17 @@
 
 typedef struct {
 //  u32 MagicNumber_u32;          // Entry removed, because it is fix number, it could make it easier to attack the encrypted slot
+  u8  AesKey_au8[32];           // Move random chars in front, to harden struct against attacks
   u32 StartBlock_u32;           //
   u32 EndBlock_u32;             //
-  u8  AesKey_au8[32];           //
   u32 Crc_u32;                  // This had to be the last entry in struct
 } HiddenVolumeKeySlot_tst;      // 44 byte = 4+4+32+4 - must multiple from 4 for CRC32
 
 
-/* Interface description */
+/* GUI interface description */
 
 #define STICK_20_HV_COMAND_DATA_LENGTH        30
-
-#define MAX_HIDDEN_VOLUME_PASSOWORD_SIZE  20
+#define MAX_HIDDEN_VOLUME_PASSOWORD_SIZE      20
 
 typedef struct {
     u8 SlotNr_u8;
@@ -78,7 +77,6 @@ typedef struct {
 
 
 u8 SetupUpHiddenVolumeSlot (HiddenVolumeSetup_tst *HV_Setup_st);
-
 
 u8 InitRamdomBaseForHiddenKey (void);
 u8 DecryptedHiddenVolumeSlotsData (void);

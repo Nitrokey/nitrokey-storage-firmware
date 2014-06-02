@@ -919,14 +919,14 @@ void IBN_HV_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
       if (FALSE == GetRandomNumber_u32 (AES_KEYSIZE_256_BIT/2,SlotData_st.AesKey_au8))
       {
         CI_LocalPrintf ("GetRandomNumber fails\n\r");
-        return (FALSE);
+        return;
       }
 
 // Get a random number for the data key
       if (FALSE == GetRandomNumber_u32 (AES_KEYSIZE_256_BIT/2,&SlotData_st.AesKey_au8[AES_KEYSIZE_256_BIT/2]))
       {
         CI_LocalPrintf ("GetRandomNumber fails\n\r");
-        return (FALSE);
+        return;
       }
 
       HV_WriteSlot_u8 (Param_u32,&SlotData_st,HiddenVolumeSlotKey_u8);

@@ -246,6 +246,15 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   CI_StringOut (text_au8);
   CI_StringOut ("\r\n");
 
+  if (FALSE == Configuration_st.FirmwareLocked_u8)
+  {
+    CI_StringOut ("Firmware not locked\r\n");
+  }
+  else
+  {
+    CI_StringOut ("*** Firmware locked ***\r\n");
+  }
+
   if (READ_WRITE_ACTIVE == Configuration_st.ReadWriteFlagUncryptedVolume_u8)
   {
     CI_StringOut ("Uncyrpted Volume  READ/WRITE active\r\n");
@@ -255,7 +264,7 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
     CI_StringOut ("Uncyrpted Volume  READ ONLY active\r\n");
   }
 
-  if (STICK20_SEND_STATUS_PIN == Stick20HIDInitSendConfiguration)    // This information only with pin
+  if (STICK20_SEND_STATUS_PIN == Stick20HIDSendConfigurationState_u8)    // This information only with pin
   {
     if (0 != (Configuration_st.VolumeActiceFlag_u8 & (1 << SD_CRYPTED_VOLUME_BIT_PLACE)))
     {
@@ -921,48 +930,16 @@ u8 parse_report(u8 *report,u8 *output)
           HID_CmdGet_u8  = HTML_CMD_CLEAR_STICK_KEYS_NOT_INITIATED;
           memcpy (HID_String_au8,&report[1],33);
           break;
-/*
-        case STICK20_CMD_SEND_PASSWORD_RETRY_COUNT :
-          CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_RETRY_COUNT\r\n");
 
-          StartStick20Command (STICK20_CMD_SEND_PASSWORD_RETRY_COUNT);
+        case STICK20_CMD_SEND_LOCK_STICK_HARDWARE :
+          CI_StringOut ("Get STICK20_CMD_SEND_LOCK_STICK_HARDWARE\r\n");
 
-          // Transfer data to other context
-          HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD_RETRY_COUNT;
-          memcpy (HID_String_au8,&report[1],33);
-          break;
-
-
-        case STICK20_CMD_INIT_HIDDEN_VOLUME_SLOT :
-          CI_StringOut ("Get STICK20_CMD_INIT_HIDDEN_VOLUME_SLOT\r\n");
-
-          StartStick20Command (STICK20_CMD_INIT_HIDDEN_VOLUME_SLOT);
+          StartStick20Command (STICK20_CMD_SEND_LOCK_STICK_HARDWARE);
 
           // Transfer data to other context
-          HID_CmdGet_u8  = HTML_CMD_INIT_HIDDEN_VOLUME_SLOT;
+          HID_CmdGet_u8  = HTML_CMD_CLEAR_LOCK_STICK_HARDWARE;
           memcpy (HID_String_au8,&report[1],33);
           break;
-
-        case STICK20_CMD_SAVE_HIDDEN_VOLUME_SLOT :
-          CI_StringOut ("Get STICK20_CMD_SAVE_HIDDEN_VOLUME_SLOT\r\n");
-
-          StartStick20Command (STICK20_CMD_SAVE_HIDDEN_VOLUME_SLOT);
-
-          // Transfer data to other context
-          HID_CmdGet_u8  = HTML_CMD_SAVE_HIDDEN_VOLUME_SLOT;
-          memcpy (HID_String_au8,&report[1],33);
-          break;
-
-        case STICK20_CMD_READ_HIDDEN_VOLUME_SLOT :
-          CI_StringOut ("Get STICK20_CMD_READ_HIDDEN_VOLUME_SLOT\r\n");
-
-          StartStick20Command (STICK20_CMD_READ_HIDDEN_VOLUME_SLOT);
-
-          // Transfer data to other context
-          HID_CmdGet_u8  = HTML_CMD_READ_HIDDEN_VOLUME_SLOT;
-          memcpy (HID_String_au8,&report[1],33);
-          break;
-*/
 
         default:
           break;
@@ -1035,6 +1012,7 @@ u8 parse_report(u8 *report,u8 *output)
       CI_Print8BitValue (output[i]);
   }
   CI_StringOut ("\n\r");
+
 #endif
 
   return 0;

@@ -58,8 +58,12 @@ typeStick20Configuration_st StickConfiguration_st;
   32 -  51    Matrix columns for user password
   52 -  71    Matrix columns for admin password
   72 - 101    Stick Configuration
-  92 - 123    Base for AES key hidden volume (32 byte)
- 124 - 128    ID of sd card (4 byte)
+ 102 - 133    Base for AES key hidden volume (32 byte)
+ 134 - 137    ID of sd card (4 byte)
+ 138 - 141    Last stored real timestamp (4 byte)
+ 142 - 145    ID of sc card (4 byte)
+ 146 - 177    XOR mask for sc tranfered keys (32 byte)
+
 
 */
 
@@ -262,7 +266,7 @@ u8 InitStickConfigurationToUserPage_u8 (void)
   StickConfiguration_st.ReadWriteFlagUncryptedVolume_u8 = READ_WRITE_ACTIVE;
   StickConfiguration_st.ReadWriteFlagCryptedVolume_u8   = READ_WRITE_ACTIVE;
   StickConfiguration_st.ReadWriteFlagHiddenVolume_u8    = READ_WRITE_ACTIVE;
-  StickConfiguration_st.StoredMatrixLength_u8           = 0;
+  StickConfiguration_st.FirmwareLocked_u8               = 0;
   StickConfiguration_st.ActiveSD_CardID_u32             = 0;               // todo: check endian
   StickConfiguration_st.VersionInfo_au8[0]              = VERSION_MAJOR;
   StickConfiguration_st.VersionInfo_au8[1]              = VERSION_MINOR;
@@ -376,6 +380,12 @@ void SendStickStatusToHID (typeStick20Configuration_st *Status_st)
   }
 
   ReadSdId (&Status_st->ActiveSD_CardID_u32);
+
+  Status_st->FirmwareLocked_u8 = FALSE;
+  if (TRUE ==  flashc_is_security_bit_active())
+  {
+    Status_st->FirmwareLocked_u8 = TRUE;
+  }
 }
 
 /*******************************************************************************
@@ -492,6 +502,8 @@ u8 ReadSdId (u32 *SdId_u32)
   StickConfiguration_st.ActiveSD_CardID_u32 = *SdId_u32;
   return (TRUE);
 }
+
+
 
 /*******************************************************************************
 
@@ -648,6 +660,8 @@ u8 SetSdCardNotFilledWithRandomCharsToFlash (void)
 
   return (TRUE);
 }
+
+
 /*******************************************************************************
 
   SetStickKeysNotInitatedToFlash
@@ -699,7 +713,7 @@ u8 ClearStickKeysNotInitatedToFlash (void)
     InitStickConfigurationToUserPage_u8 ();
   }
 
-  CI_LocalPrintf ("Clear stick keys not initiated\r\n");
+  CI_LocalPrintf ("Clear: Stick keys not initiated\r\n");
 
   StickConfiguration_st.StickKeysNotInitiated_u8 = FALSE;
 
@@ -746,3 +760,88 @@ u8 ReadDatetime (u32 *Datetime_u32)
   memcpy (Datetime_u32,(void*)(AVR32_FLASHC_USER_PAGE + 138),4);
   return (TRUE);
 }
+
+
+/*******************************************************************************
+
+  WriteScId
+
+  Changes
+  Date      Author          Info
+  20.05.14  RB              Implementation of save SC id in CPU flash
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 WriteScId (u32 *ScId_u32)
+{
+  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 142,ScId_u32,4,TRUE);
+
+  StickConfiguration_st.ActiveSmartCardID_u32 = *ScId_u32;
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  ReadSdId
+
+  Changes
+  Date      Author          Info
+  20.05.14  RB              Implementation of save SC id in CPU flash
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 ReadScId (u32 *ScId_u32)
+{
+  memcpy (ScId_u32,(void*)(AVR32_FLASHC_USER_PAGE + 142),4);
+
+  StickConfiguration_st.ActiveSmartCardID_u32 = *ScId_u32;
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
+  WriteXorPatternToFlash
+
+  Changes
+  Date      Author          Info
+  20.05.14  RB              Implementation of save xor pattern to flash
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 WriteXorPatternToFlash (u8 *XorPattern_pu8)
+{
+  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 146,XorPattern_pu8,32,TRUE);
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  ReadXorPatternFromFlash
+
+  Changes
+  Date      Author          Info
+  20.05.14  RB              Implementation of read xor pattern from flash
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 ReadXorPatternFromFlash (u8 *XorPattern_pu8)
+{
+  memcpy (XorPattern_pu8,(void*)(AVR32_FLASHC_USER_PAGE + 146),32);
+
+  return (TRUE);
+}
+

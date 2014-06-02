@@ -189,7 +189,7 @@ u32 hotp_slot_offsets[NUMBER_OF_HOTP_SLOTS]  = {
                                                   HOTP_SLOT3_OFFSET,
                                                 };
 
-u32 totp_slots[NUMBER_OF_TOTP_SLOTS]         = {
+u32 totp_slots[NUMBER_OF_TOTP_SLOTS+1]         = {
                                                   SLOTS_ADDRESS + TOTP_SLOT1_OFFSET,
                                                   SLOTS_ADDRESS + TOTP_SLOT2_OFFSET,
                                                   SLOTS_ADDRESS + TOTP_SLOT3_OFFSET,
@@ -208,7 +208,7 @@ u32 totp_slots[NUMBER_OF_TOTP_SLOTS]         = {
                                                   SLOTS_ADDRESS + TOTP_SLOT16_OFFSET
                                                };
 
-u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS]  = {
+u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS+1]  = {
                                                   TOTP_SLOT1_OFFSET,
                                                   TOTP_SLOT2_OFFSET,
                                                   TOTP_SLOT3_OFFSET,

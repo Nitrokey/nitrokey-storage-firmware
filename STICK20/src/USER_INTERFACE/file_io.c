@@ -263,7 +263,7 @@ u8 FileIO_AppendBin_u8 (u8 *Filename_pu8,u8 *Bin_pu8,u16 Count_u16)
 #define FILEIO_STATUS_DIR        "status"
 #define FILEIO_IMAGE_FILE        "status\\app.bin"
 #define FILEIO_IMAGE_START       0x80000000
-#define FILEIO_IMAGE_SIZE        0x3EC00 // Don't save the OTP area below - 0x40000 -        // 256 k
+#define FILEIO_IMAGE_SIZE        (498*512) // 0x3E400 // Don't save the hidden volume and OTP data area below - 0x40000 -        // 256 k
 #define FILEIO_IMAGE_BLOCKSIZE   4096
 
 u8 FileIO_SaveAppImage_u8 (void)

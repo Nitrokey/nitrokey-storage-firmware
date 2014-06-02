@@ -77,7 +77,7 @@ typedef struct {
   u8  ReadWriteFlagCryptedVolume_u8;        // Flag stores the read/write flag in the CPU flash   1 byte  //  4
   u8  VersionInfo_au8[4];                   //                                                    4 byte  //  8
   u8  ReadWriteFlagHiddenVolume_u8;         // Flag stores the read/write flag in the CPU flash   1 byte  //  9
-  u8  StoredMatrixLength_u8;                // Not used                                           1 byte  // 10
+  u8  FirmwareLocked_u8;                    //                                                    1 byte  // 10
   u8  NewSDCardFound_u8;                    // Bit 0 new card found, bit 1-7 change counter       1 byte  // 11
   u8  SDFillWithRandomChars_u8;             // Bit 0 = 1 = filled, bit 1-7 change counter         1 byte  // 12
   u32 ActiveSD_CardID_u32;                  //                                                    4 byte  // 16
@@ -86,7 +86,7 @@ typedef struct {
   u8  UserPwRetryCount;                     // User password retry count                          1 byte  // 19
   u8  AdminPwRetryCount;                    // Admin password retry count                         1 byte  // 20 Byte not packed
   u32 ActiveSmartCardID_u32;                //                                                    4 byte
-  u8  StickKeysNotInitiated_u8;                // No AES keys computed (1 = AES are builded)         1 byte  // 25 Byte not packed
+  u8  StickKeysNotInitiated_u8;             // No AES keys computed (1 = AES are builded)         1 byte  // 25 Byte not packed
 } typeStick20Configuration_st;                                                          // Sum   25 byte (Max 25 Byte) // not packed
 
 
@@ -97,6 +97,12 @@ void SendStickStatusToHID (typeStick20Configuration_st *Status_st);
 
 u8 WriteSdId (u32 *SdId_u32);
 u8 ReadSdId (u32 *SdId_u32);
+
+u8 WriteScId (u32 *ScId_u32);
+u8 ReadScId (u32 *ScId_u32);
+
+u8 WriteXorPatternToFlash (u8 *XorPattern_pu8);
+u8 ReadXorPatternFromFlash (u8 *XorPattern_pu8);
 
 u8 WriteNewSdCardFoundToFlash (u32 *SdId_u32);
 u8 SetSdCardFilledWithRandomsToFlash (void);

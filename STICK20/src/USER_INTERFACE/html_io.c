@@ -723,8 +723,8 @@ void HID_ExcuteCmd (void)
       SetSdEncryptedCardEnableState (FALSE);
       SetSdEncryptedHiddenState (FALSE);
 
-      memset (StorageKey_pu8,0,32);             // Set dummy key
-      AES_SetNewStorageKey (StorageKey_pu8);
+      memset (StorageKey_pu8,0,32);
+      AES_SetNewStorageKey ((u8*)"0000");       // Set dummy key
 
       vTaskDelay (2000);    // Wait 2 sec to send LUN not active
 
@@ -761,10 +761,11 @@ void HID_ExcuteCmd (void)
     case HTML_CMD_DISABLE_HIDDEN_AES_LUN :
       SetSdEncryptedCardEnableState (FALSE);
       SetSdEncryptedHiddenState (FALSE);
+      memset (StorageKey_pu8,0,32);             // Set dummy key
+      AES_SetNewStorageKey ((u8*)"0000");       // Set dummy key
+      HID_NextPasswordIsHiddenPassword_u32 = FALSE;
 
-      memset (StorageKey_pu8,0,32);
-      AES_SetNewStorageKey (StorageKey_pu8);
-
+      vTaskDelay (2000);    // Wait 2 sec to send LUN not active
       CI_TickLocalPrintf ("SD card hidden AES LUN disabled\r\n");
       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
       break;
@@ -1034,6 +1035,21 @@ void HID_ExcuteCmd (void)
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
         break;
 
+      case HTML_CMD_CLEAR_LOCK_STICK_HARDWARE :
+        CI_TickLocalPrintf ("Get HTML_CMD_CLEAR_LOCK_STICK_HARDWARE\r\n");
+        if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
+        {
+          CI_TickLocalPrintf ("Lock firmware\r\n");
+          flashc_activate_security_bit ();            // Debugging disabled, only chip erase works (bootloader is save) , AES storage keys and setup are erased
+          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
+        }
+        else
+        {
+          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
+          CI_TickLocalPrintf ("*** worng password ***\r\n");
+        }
+        break;
+
     default:
       CI_TickLocalPrintf ("HID_ExcuteCmd: Get unknown command: %d \r\n",Cmd_u8);
       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_IDLE,0);
@@ -1090,6 +1106,12 @@ void GetSmartCardStatus (typeStick20Configuration_st *Status_st)
     Status_st->ActiveSmartCardID_u32 +=  (u32)Text_u8[12];
     Status_st->ActiveSmartCardID_u32 = Status_st->ActiveSmartCardID_u32 << 8;
     Status_st->ActiveSmartCardID_u32 +=  (u32)Text_u8[13];
+  }
+
+  Status_st->FirmwareLocked_u8 = FALSE;
+  if (TRUE ==  flashc_is_security_bit_active())
+  {
+    Status_st->FirmwareLocked_u8 = TRUE;
   }
 
 }

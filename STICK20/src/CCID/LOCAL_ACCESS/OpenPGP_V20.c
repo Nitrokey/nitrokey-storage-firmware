@@ -1457,7 +1457,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
 {
 //  u32   Runtime_u32;
   u32   Ret_u32;
-//  u32   i;
+  u32   i;
   u32   nSize;
   u8   *BufferPointer_pu8 = cBuffer;
 //  static u8    FlagSCOpen_u8 = FALSE;
@@ -1482,7 +1482,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
     CI_LocalPrintf ("13         Change admin pin old pin+new pin -> 12345678abcdefgh\r\n");
     CI_LocalPrintf ("14         SC startup test\r\n");
     CI_LocalPrintf ("15         Get password status\r\n");
-
+    CI_LocalPrintf ("16 count   Generate [count] random numbers a 10 byte\r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }
@@ -1648,6 +1648,26 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
             CI_LocalPrintf ("Admin  %d\n\r",LocalString_au8[6]);
           }
           break;
+    case 16 : // Zufallszahl Dauertest
+          CI_LocalPrintf ("Generate %d times a 10 char random\n",Param_u32);
+
+          for (i=0;i<Param_u32;i++)
+          {
+            Ret_u32 = LA_OpenPGP_V20_GetChallenge (&tSC_OpenPGP_V20,10,BufferPointer_pu8);
+            if (TRUE == Ret_u32)
+            {
+              CI_LocalPrintf ("Zufallszahl %6d :",i);
+              HexPrint (10,BufferPointer_pu8);
+              CI_LocalPrintf ("\r\n");
+            }
+            else
+            {
+              CI_LocalPrintf ("Error\r\n");
+            }
+            DelayMs (50);
+          }
+          break;
+
     default :
           break;
   }

@@ -59,13 +59,9 @@
 
 #define HTML_CMD_EXPORT_BINARY                      20
 
-
-
 #define HTML_CMD_SEND_PASSWORD_MATRIX                21
 #define HTML_CMD_SEND_PASSWORD_MATRIX_PINDATA        22
 #define HTML_CMD_SEND_PASSWORD_MATRIX_SETUP          23
-
-
 
 #define HTML_SEND_HIDDEN_VOLUME_SETUP                24     // Old version
 #define HTML_CMD_SEND_PASSWORD                       25
@@ -73,6 +69,7 @@
 
 #define HTML_CMD_HIDDEN_VOLUME_SETUP                 27
 #define HTML_CMD_CLEAR_STICK_KEYS_NOT_INITIATED      28
+#define HTML_CMD_CLEAR_LOCK_STICK_HARDWARE           29
 
 #define HTML_INPUTBUFFER_SIZE   64
 

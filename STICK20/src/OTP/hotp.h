@@ -144,10 +144,10 @@ global config slot:
 
 
 extern u32 hotp_slots[NUMBER_OF_HOTP_SLOTS];
-extern u32 totp_slots[NUMBER_OF_TOTP_SLOTS];
+extern u32 totp_slots[NUMBER_OF_TOTP_SLOTS+1];
 extern u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];
 extern u32 hotp_slot_offsets[NUMBER_OF_HOTP_SLOTS];
-extern u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS];
+extern u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS+1];
 
 extern u8 page_buffer[FLASH_PAGE_SIZE*3];
 
