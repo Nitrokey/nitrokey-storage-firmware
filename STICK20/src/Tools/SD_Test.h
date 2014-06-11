@@ -29,6 +29,7 @@
 
 u8 SD_SecureEraseHoleCard (void);
 u8 SD_SecureEraseCryptedVolume (void);
+u8 SD_GetRandomBlock (u8 *RandomData_u8);
 
 void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 Param_2_u32);
 

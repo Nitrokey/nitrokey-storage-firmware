@@ -41,7 +41,7 @@
 
 *******************************************************************************/
 
-//#define DEBUG_USB_CCID_IO
+#define DEBUG_USB_CCID_IO
 
 #ifdef DEBUG_USB_CCID_IO
   int CI_LocalPrintf (char *szFormat,...);
@@ -51,7 +51,7 @@
   #define CI_TickLocalPrintf(...)
 #endif
 
-#define DEBUG_LOG_CCID_DETAIL
+//#define DEBUG_LOG_CCID_DETAIL
 
 
 /*******************************************************************************

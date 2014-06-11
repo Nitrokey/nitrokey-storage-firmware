@@ -26,6 +26,7 @@
 #include "gpio.h"
 #include "usart.h"
 #include "aes.h"
+#include "time.h"
 
 #include "tools.h"
 #include "Interpreter.h"
@@ -1110,6 +1111,10 @@ int LA_OpenPGP_V20_Test_AES_Key (void)
 
   GetRandomNumber_u32
 
+  Changes
+  Date      Author          Info
+  03.06.14  RB              XOR random number with random number from second source
+
   Reviews
   Date      Reviewer        Info
   14.08.13  RB              First review
@@ -1119,6 +1124,8 @@ int LA_OpenPGP_V20_Test_AES_Key (void)
 u32 GetRandomNumber_u32 (u32 Size_u32,u8 *Data_pu8)
 {
   u32 Ret_u32;
+  u32 i;
+  time_t  now;
 
   // Size ok ?
   if (ISO7816_APDU_MAX_RESPONSE_LEN <= Size_u32)
@@ -1126,9 +1133,19 @@ u32 GetRandomNumber_u32 (u32 Size_u32,u8 *Data_pu8)
     return (FALSE);
   }
 
-  // Get the number
+  // Get a random number from smartcard
   Ret_u32 = LA_OpenPGP_V20_GetChallenge (&tSC_OpenPGP_V20,Size_u32,Data_pu8);
 
+
+#ifdef GENERATE_RANDOM_NUMBER_WITH_2ND_SOURCE
+  // Paranoia: if the random number is not really random, xor it with another random number from a second source
+  time (&now);                      // Get the local time
+  srand (now + Data_pu8[0]);        // Init the local random generator
+  for (i=0;i<Size_u32;i++)
+  {
+    Data_pu8[i] = Data_pu8[i] ^ (u8)(rand () % 256);
+  }
+#endif
   return (Ret_u32);
 }
 
@@ -1483,6 +1500,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
     CI_LocalPrintf ("14         SC startup test\r\n");
     CI_LocalPrintf ("15         Get password status\r\n");
     CI_LocalPrintf ("16 count   Generate [count] random numbers a 10 byte\r\n");
+    CI_LocalPrintf ("17 count   Generate [count] *10 random numbers [output as 0,1 stream]\r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }
@@ -1568,7 +1586,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
             nSize = IBN_BUFFER_SIZE;
           }
 
-          Ret_u32 = LA_OpenPGP_V20_GetChallenge (&tSC_OpenPGP_V20,nSize,BufferPointer_pu8);
+          Ret_u32 = GetRandomNumber_u32 (nSize,BufferPointer_pu8);
           if (TRUE == Ret_u32)
           {
             CI_LocalPrintf ("Zufallszahl : \r\n");
@@ -1653,7 +1671,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
 
           for (i=0;i<Param_u32;i++)
           {
-            Ret_u32 = LA_OpenPGP_V20_GetChallenge (&tSC_OpenPGP_V20,10,BufferPointer_pu8);
+            Ret_u32 = GetRandomNumber_u32 (10,BufferPointer_pu8);
             if (TRUE == Ret_u32)
             {
               CI_LocalPrintf ("Zufallszahl %6d :",i);
@@ -1667,7 +1685,41 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
             DelayMs (50);
           }
           break;
+    case 17 : // Zufallszahl Dauertest
+          CI_LocalPrintf ("Generate %d times 10 random chars  [Output as 0,1 stream]\n",Param_u32);
 
+          for (i=0;i<Param_u32;i++)
+          {
+            Ret_u32 = GetRandomNumber_u32 (10,BufferPointer_pu8);
+            if (TRUE == Ret_u32)
+            {
+              u32 i,i1;
+
+//              HexPrint (10,BufferPointer_pu8);
+              for (i=0;i<10;i++)
+              {
+                for (i1=0;i1<8;i1++)
+                {
+                  if (((BufferPointer_pu8[i]>>i1) & 1) == 1)
+                  {
+                    CI_LocalPrintf ("1");
+                  }
+                  else
+                  {
+                    CI_LocalPrintf ("0");
+                  }
+                }
+              }
+            }
+            else
+            {
+              CI_LocalPrintf ("Error\r\n");
+            }
+
+            DelayMs (50);
+          }
+          CI_LocalPrintf ("\r\n");
+          break;
     default :
           break;
   }

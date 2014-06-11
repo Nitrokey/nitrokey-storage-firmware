@@ -236,11 +236,12 @@ void SD_WriteMultipleBlocksWithRandoms (u8 *Addr_u8,u32 Block_u32,u32 Count_u32,
 
     if (i % 1000 == 0)
     {
-      // Change the key very 1000 block
+      // Change the key every 1000 blocks
       if (TRUE == CryptionFlag_u8)
       {
         AES_SetNewStorageKey ((u8*)&Addr_u8[i%(256-16)]);   // Get key from input data
       }
+
       SD_ProgressInPercent = i / (Count_u32 / 100);
       if (100 < SD_ProgressInPercent)
       {
@@ -252,6 +253,12 @@ void SD_WriteMultipleBlocksWithRandoms (u8 *Addr_u8,u32 Block_u32,u32 Count_u32,
     if (0 == i % (Count_u32/100))
     {
       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_BUSY_PROGRESSBAR,(u8)(i / (Count_u32 /100)));
+    }
+
+// Generate new random chars
+    if (0 == i % (Count_u32/127))
+    {
+      SD_GetRandomBlock (Addr_u8);
     }
 
 #ifdef TIME_MEASURING_ENABLE
@@ -380,9 +387,52 @@ void SD_WriteBlock (u32 Block_u32)
 
 /*******************************************************************************
 
+  SD_GetRandomBlock
+
+  Changes
+  Date      Author          Info
+  03.06.14  RB              Creation of function
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 RandomBuffer_u8[SD_BLOCK_SIZE];
+
+u8 SD_GetRandomBlock (u8 *RandomData_u8)
+{
+  u32 i;
+
+  for (i=0;i<SD_BLOCK_SIZE/SC_RANDOM_SIZE;i++)
+  {
+  //    CI_TickLocalPrintf ("GetRandomNumber %d\n\r",i);
+    if (FALSE == GetRandomNumber_u32 (SC_RANDOM_SIZE,&RandomData_u8[i*SC_RANDOM_SIZE]))
+    {
+      CI_TickLocalPrintf ("SD_GetRandomBlock: fails\n\r");
+      return (FALSE);
+    }
+  }
+/*
+  CI_TickLocalPrintf ("\r\nRandom Block = \r\n");
+  for (i=0;i<SD_BLOCK_SIZE/SC_RANDOM_SIZE;i++)
+  {
+    CI_LocalPrintf ("0x%03x : ",i*SC_RANDOM_SIZE);
+    HexPrint (SC_RANDOM_SIZE,&RandomData_u8[i*SC_RANDOM_SIZE]);
+    CI_LocalPrintf ("\r\n");
+  }
+*/
+  return (TRUE);
+}
+
+/*******************************************************************************
+
   SD_WriteBlocks
 
-  Used the usb buffers
+  Changes
+  Date      Author          Info
+  03.06.14  RB              Own buffer for random chars
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -397,37 +447,20 @@ void SD_WriteBlocks (u32 Block_u32,u32 Count_u32,u8 CryptionFlag_u8)
   u16 i;
 
   CI_TickLocalPrintf ("Build SD start block -");
-  for (i=0;i<SD_BLOCK_SIZE/SC_RANDOM_SIZE;i++)
-  {
-//    CI_TickLocalPrintf ("GetRandomNumber %d\n\r",i);
-    if (FALSE == GetRandomNumber_u32 (SC_RANDOM_SIZE,&sector_buf_0[i*SC_RANDOM_SIZE]))
-    {
-      CI_TickLocalPrintf ("fails\n\r");
-      return;
-    }
-  }
+
+  SD_GetRandomBlock (RandomBuffer_u8);
 
   CI_TickLocalPrintf (" ok\n\r");
 
-  /*
-  CI_TickLocalPrintf ("\r\nSD Block = \r\n");
-  for (i=0;i<SD_BLOCK_SIZE/SC_RANDOM_SIZE;i++)
-  {
-    CI_LocalPrintf ("0x%03x : ",i*SC_RANDOM_SIZE);
-    HexPrint (SC_RANDOM_SIZE,&sector_buf_0[i*SC_RANDOM_SIZE]);
-    CI_LocalPrintf ("\r\n");
-  }
-*/
-// Write Data
-
+// Lock SD card for local access
   sd_mmc_mci_test_unit_only_local_access = TRUE;
 
   // Wait until no access
   while (TRUE == Check_Sd_mmc_mci_access_signal_on ())
   {
   }
-
-  SD_WriteMultipleBlocksWithRandoms (sector_buf_0,Block_u32,Count_u32,CryptionFlag_u8);
+ // Write Data
+  SD_WriteMultipleBlocksWithRandoms (RandomBuffer_u8,Block_u32,Count_u32,CryptionFlag_u8);
 
   sd_mmc_mci_test_unit_only_local_access = FALSE;
 }
@@ -460,7 +493,7 @@ u8 SD_SecureEraseHoleCard (void)
 
   SD_SecureEraseCryptedVolume
 
-  Write random chars in volume 1, the uncrypted volume is untouched
+  Write random chars in volume 1, the unencrypted volume is untouched
 
   Changes
   Date      Author          Info
@@ -514,7 +547,7 @@ void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 
     CI_LocalPrintf ("6 X Write SD start = 0[X=Blockcount]\r\n");
     CI_LocalPrintf ("7 X fill SD start = 0[X=fill char]\r\n");
     CI_LocalPrintf ("8   Show SD block count\r\n");
-    CI_LocalPrintf ("9   Erase SD card with random numbers via AES\r\n");
+    CI_LocalPrintf ("9   Erase encrypted volume with random numbers via AES\r\n");
     CI_LocalPrintf ("10  Lock USB access\r\n");
     CI_LocalPrintf ("11  Unlock USB access\r\n");
     CI_LocalPrintf ("14  Get CID from sd card\r\n");
@@ -612,7 +645,7 @@ void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 
         CI_LocalPrintf ("SD - %d blocks a 512 byte = %d MB\r\n",Blockcount_u32,Blockcount_u32/2000);
         break;
       case 9 :
-        SD_SecureEraseHoleCard ();
+        SD_SecureEraseCryptedVolume ();
         break;
       case 10 :
         SetSdUncryptedCardEnableState (FALSE);      // Disable access

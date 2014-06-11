@@ -45,6 +45,7 @@
 *******************************************************************************/
 
 #define LOCAL_DEBUG
+// #define LOCAL_DEBUG_CHECK_KEY_GENERATION
 
 #define AES_KEYSIZE_256_BIT     32        // 32 * 8 = 256
 
@@ -135,7 +136,7 @@ u32 BuildNewAesStorageKey_u32 (u8 *MasterKey_pu8)
 // Store the encrypted storage key in USER PAGE
   WriteAESStorageKeyToUserPage (Buffer_au8);
 
-#ifdef LOCAL_DEBUG
+#ifdef LOCAL_DEBUG_CHECK_KEY_GENERATION
 // Test the storage key
 
 // Wait for next smartcard cmd
@@ -310,6 +311,7 @@ u32 BuildNewXorPattern_u32 (void)
     return (FALSE);
   }
 
+/* Now integrated in GetRandomNumber_u32
 // Paranoia: if the random key is not really random, xor it with another random key from a second source
   time (&now);        // Get the local time
   srand (now);        // Init the local random generator
@@ -317,7 +319,7 @@ u32 BuildNewXorPattern_u32 (void)
   {
     XorPattern_au8[i] = XorPattern_au8[i] ^ (u8)(rand () % 256);
   }
-
+*/
 
   WriteXorPatternToFlash (XorPattern_au8);
 

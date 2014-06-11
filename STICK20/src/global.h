@@ -24,7 +24,7 @@
 //#include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 4
+#define VERSION_MINOR 5
 
 
 #define TRUE		1
@@ -53,7 +53,7 @@ typedef signed long  	s32;
 // Achtung: Bootloader in trampoline.x aktivieren
 
 // *** Activate only for PROD version ***
-//#define STICK_20_A_MUSTER_PROD
+#define STICK_20_A_MUSTER_PROD
 
 
 //#define STICK_20_SEND_DEBUGINFOS_VIA_HID      // Use ca. 2k flash
@@ -75,6 +75,15 @@ typedef signed long  	s32;
 #ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
   #define INTERPRETER_ENABLE     // Enable also for PROD Version
 #endif
+
+
+/*******************************************************************************
+
+  Security defines
+
+*******************************************************************************/
+
+#define GENERATE_RANDOM_NUMBER_WITH_2ND_SOURCE
 
 
 /*******************************************************************************
