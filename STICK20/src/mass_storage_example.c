@@ -1073,9 +1073,8 @@ int main(void)
 #ifdef STICK_20_A_MUSTER_PROD     //
   flashc_set_bootloader_protected_size (0x2000);
   flashc_lock_external_privileged_fetch (TRUE); // Disable external instruction fetch
-  // todo: Disable debugging
-//  flashc_activate_security_bit ();    // Debugging disabled, only chip erase works (bootloader is save) , AES storage keys and setup are erased
-
+  flashc_write_gp_fuse_bit (30,0);              // Set SP_IO_COND_EN  = 0 for DUF 1.0.3
+  flashc_write_gp_fuse_bit (31,0);              // Set to 0 to start application for DUF 1.0.3
 #endif
 
   DFU_DisableFirmwareUpdate ();     // Stick always starts in application mode
