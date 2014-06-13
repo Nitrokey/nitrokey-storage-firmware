@@ -219,6 +219,10 @@ void DFU_DisableFirmwareUpdate (void)
   DFU_String_au8[3] = TOOL_DFU_ISP_CONFIG_WORD_START_APPL_3;
 
   flashc_memcpy(TOOL_DFU_ISP_CONFIG_ADDR_1,DFU_String_au8,4,TRUE);
+
+  flashc_write_gp_fuse_bit (30,0);              // Set SP_IO_COND_EN  = 0 for DUF 1.0.3
+  flashc_write_gp_fuse_bit (31,0);              // Set to 0 to start application for DUF 1.0.3
+
 }
 
 /*******************************************************************************
@@ -241,6 +245,12 @@ void DFU_EnableFirmwareUpdate (void)
   DFU_String_au8[3] = TOOL_DFU_ISP_CONFIG_WORD_START_DFU_3;
 
   flashc_memcpy(TOOL_DFU_ISP_CONFIG_ADDR_1,DFU_String_au8,4,TRUE);
+
+  flashc_erase_gp_fuse_bit (30,0);              // Set SP_IO_COND_EN  = 1 for DUF 1.0.3
+  flashc_erase_gp_fuse_bit (31,0);              // Set to 1 to start bootloader for DUF 1.0.3
+
+  flashc_write_gp_fuse_bit (30,1);              // Set SP_IO_COND_EN  = 1 for DUF 1.0.3
+  flashc_write_gp_fuse_bit (31,1);              // Set to 1 to start application for DUF 1.0.3
 }
 
 /*******************************************************************************
