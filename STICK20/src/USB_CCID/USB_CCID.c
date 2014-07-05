@@ -75,7 +75,7 @@
 t_USB_CCID_data_st g_USB_CCID_data_st;
 
 
-static u8 CCID_SlotStatus_u8  = CCID_SLOT_STATUS_NOT_PRESENT; 
+static u8 CCID_SlotStatus_u8  = CCID_SLOT_STATUS_PRESENT_INACTIVE;    // Todo present check at startup
 static u8 CCID_ClockStatus_u8 = CCID_SLOT_STATUS_CLOCK_UNKNOWN;
 
 /*******************************************************************************
@@ -101,7 +101,7 @@ u8 CCID_RestartSmartcard_u8 (void)
 	else
 	{
 	  CI_TickLocalPrintf ("*** ERROR Smartcard is not ON ***\n");
-		CCID_SlotStatus_u8 = CCID_SLOT_STATUS_NOT_PRESENT;
+		CCID_SlotStatus_u8 = CCID_SLOT_STATUS_PRESENT_INACTIVE;
 	}
 
 	return (nRet);
@@ -121,7 +121,7 @@ u8 CCID_SmartcardOff_u8 (void)
 {
   CI_TickLocalPrintf ("*** Smartcard off ***\n");
 	Smartcard_Reset_off ();		// Disable SC
-  CCID_SlotStatus_u8 = CCID_SLOT_STATUS_NOT_PRESENT;
+  CCID_SlotStatus_u8 = CCID_SLOT_STATUS_PRESENT_INACTIVE;
 	return (TRUE);
 }
 

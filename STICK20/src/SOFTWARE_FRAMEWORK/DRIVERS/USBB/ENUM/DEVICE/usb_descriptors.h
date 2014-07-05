@@ -129,7 +129,7 @@
     #define PRODUCT_ID            MSD_CCID_HID_HS_PID     // Production id
   #elif !defined USB_MSD && defined USB_CCID && defined USB_KB
     #define VENDOR_ID             STICK_V20_VID           // STICK_V20 vendor ID
-    #define PRODUCT_ID            MSD_CCID_HID_HS_PID     // Production id
+    #define PRODUCT_ID            CCID_KB_HS_PID         // CCID + HID (KB)
   #else
     #error "Wrong USB config"
   #endif
