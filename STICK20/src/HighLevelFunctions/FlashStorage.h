@@ -92,6 +92,7 @@ typedef struct {
 
 extern typeStick20Configuration_st StickConfiguration_st;
 
+
 u8 ReadStickConfigurationFromUserPage (void);
 void SendStickStatusToHID (typeStick20Configuration_st *Status_st);
 
@@ -109,6 +110,7 @@ u8 SetSdCardFilledWithRandomsToFlash (void);
 u8 ClearNewSdCardFoundToFlash (void);
 u8 SetSdCardNotFilledWithRandomCharsToFlash (void);
 u8 SetSdCardFilledWithRandomCharsToFlash (void);
+u8 CheckForNewFirmwareVersion (void);
 
 u8 SetStickKeysNotInitatedToFlash (void);
 u8 ClearStickKeysNotInitatedToFlash (void);

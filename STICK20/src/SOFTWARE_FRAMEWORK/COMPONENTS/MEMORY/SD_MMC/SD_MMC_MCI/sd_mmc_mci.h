@@ -846,6 +846,8 @@ void SetSdEncryptedHiddenState (unsigned char cState);
 void dma_mci_2_ram(void *ram, size_t size, unsigned int BlockNr_u32);
 void dma_ram_2_mci(const void *ram, size_t size, unsigned int BlockNr_u32);
 void dma_ram_2_mci_crypted (const void *ram, size_t size, unsigned int BlockNr_u32);
+void dma_ram_2_mci_uncrypted (const void *ram, size_t size, unsigned int BlockNr_u32);
+Bool is_dma_ram_2_mci_complete( void );
 
 const cid_t *GetSdCidInfo (void);
 unsigned char CheckForNewSdCard (void);

@@ -43,6 +43,7 @@
 
 typeStick20Configuration_st StickConfiguration_st;
 
+
 /*******************************************************************************
 
  Local defines
@@ -234,6 +235,12 @@ u8 ReadStickConfigurationFromUserPage (void)
   ActiveSmartCardID_u32 = StickConfiguration_st.ActiveSmartCardID_u32;
 
   memcpy (&StickConfiguration_st,(void*)(AVR32_FLASHC_USER_PAGE + 72),sizeof (typeStick20Configuration_st));
+
+// Write actual version info
+  StickConfiguration_st.VersionInfo_au8[0]              = VERSION_MAJOR;
+  StickConfiguration_st.VersionInfo_au8[1]              = VERSION_MINOR;
+  StickConfiguration_st.VersionInfo_au8[2]              = 0;               // Build number not used
+  StickConfiguration_st.VersionInfo_au8[3]              = 0;               // Build number not used
 
 // Restore dynamic data
   StickConfiguration_st.UserPwRetryCount      = UserPwRetryCount      ;
@@ -722,6 +729,60 @@ u8 ClearStickKeysNotInitatedToFlash (void)
   return (TRUE);
 }
 
+/*******************************************************************************
+
+  CheckForNewFirmwareVersion
+
+  Changes
+  Date      Author          Info
+  05.07.14  RB              Implementation
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 CheckForNewFirmwareVersion (void)
+{
+  static u8 UpdateFlag_u8 = FALSE;
+  u8 update_u8;
+
+  if (TRUE == UpdateFlag_u8)
+  {
+    return (TRUE);
+  }
+
+  UpdateFlag_u8 = TRUE;   // Run only once
+
+  // If configuration not found then init it
+  if (FALSE == ReadStickConfigurationFromUserPage ())
+  {
+    InitStickConfigurationToUserPage_u8 ();
+  }
+
+  update_u8 = FALSE;
+  if (VERSION_MAJOR != StickConfiguration_st.VersionInfo_au8[0])
+  {
+    update_u8 = TRUE;
+  }
+
+  if (VERSION_MINOR != StickConfiguration_st.VersionInfo_au8[1])
+  {
+    update_u8 = TRUE;
+  }
+
+/*
+  StickConfiguration_st.VersionInfo_au8[2]              = 0;               // Build number not used
+  StickConfiguration_st.VersionInfo_au8[3]              = 0;               // Build number not used
+*/
+
+  if (TRUE == update_u8)
+  {
+    WriteStickConfigurationToUserPage ();
+  }
+
+  return (TRUE);
+}
 
 /*******************************************************************************
 

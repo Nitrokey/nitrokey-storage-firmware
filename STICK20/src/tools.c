@@ -595,3 +595,22 @@ u32 change_endian_u32 (u32 x)
 {
     return (((x)<<24) | ((x)>>24) | (((x)& 0x0000ff00)<<8) | (((x)& 0x00ff0000)>>8));
 }
+
+/*******************************************************************************
+
+  change_endian_u16
+
+  Changes
+  Date      Reviewer        Info
+  07.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u16 change_endian_u16 (u16 x)
+{
+    return ( (((x)& 0x00ff)<<8) | (((x)& 0xff00)>>8) );
+}
+

@@ -534,7 +534,6 @@ u8 CheckStorageKey_u8 (void)
 
 u8 StartupCheck_u8 (void)
 {
-
   if (TRUE == CheckStorageKey_u8 ())
   {
     return (TRUE);        // Keys ok

@@ -205,7 +205,7 @@ u8 Stick20HIDSendConfigurationState_u8      = STICK20_SEND_STATUS_IDLE;
 
 u8 Stick20HIDInitSendConfiguration (u8 state_u8)
 {
-  CI_StringOut ("Init HID config data\r\n");
+  CI_StringOut ("Send HID data\r\n");
 
   Stick20HIDSendConfigurationState_u8      = state_u8;
 
@@ -358,6 +358,66 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
 
   return (TRUE);
 }
+
+
+/*******************************************************************************
+
+  Stick20HIDSendProductionInfos
+
+  Changes
+  Date      Author          Info
+  07.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 Stick20HIDSendProductionInfos (u8 *output)
+{
+  u32 calculated_crc32;
+  typeStick20ProductionInfos_st Infos_st;
+  u8  text_au8[10];
+
+  HID_Stick20SendData_st.SendDataType_u8 = OUTPUT_CMD_STICK20_SEND_DATA_TYPE_PROD_INFO;
+
+  CI_StringOut ("Send production infos\r\n");
+  HID_Stick20SendData_st.FollowBytesFlag_u8  = 0;     // No
+  HID_Stick20SendData_st.SendSize_u8         = 1;
+
+  Infos_st = Stick20ProductionInfos_st;
+
+// Set endian
+  Infos_st.CPU_CardID_u32  = change_endian_u32 (Infos_st.CPU_CardID_u32);
+  Infos_st.SmartCardID_u32 = change_endian_u32 (Infos_st.SmartCardID_u32);
+  Infos_st.SD_CardID_u32   = change_endian_u32 (Infos_st.SD_CardID_u32);
+
+  Infos_st.SD_Card_OEM_u16   = change_endian_u16 (Infos_st.SD_Card_OEM_u16);
+  Infos_st.SD_WriteSpeed_u16 = change_endian_u16 (Infos_st.SD_WriteSpeed_u16);
+
+
+  memcpy (&HID_Stick20SendData_st.SendData_u8[0],&Infos_st,sizeof (typeStick20ProductionInfos_st));
+
+
+  HID_Stick20SendData_st.FollowBytesFlag_u8 = 0;     // No next data
+  HID_Stick20SendData_st.SendSize_u8        = sizeof (typeStick20ProductionInfos_st);
+
+  // Copy send data to transfer struct
+  memcpy (&output[OUTPUT_CMD_RESULT_STICK20_DATA_START],(void*)&HID_Stick20SendData_st,sizeof (HID_Stick20SendData_est));
+
+  // Build CRC, can overwritten by new CRC computation
+  calculated_crc32 = generateCRC (output);
+
+  output[OUTPUT_CRC_OFFSET]   =  calculated_crc32      & 0xFF;
+  output[OUTPUT_CRC_OFFSET+1] = (calculated_crc32>>8)  & 0xFF;
+  output[OUTPUT_CRC_OFFSET+2] = (calculated_crc32>>16) & 0xFF;
+  output[OUTPUT_CRC_OFFSET+3] = (calculated_crc32>>24) & 0xFF;
+
+  Stick20HIDSendConfigurationState_u8              = STICK20_SEND_STATUS_IDLE;     // Send status done
+
+  return (TRUE);
+}
+
 /*******************************************************************************
 
   Stick20HIDInitSendMatrixData
@@ -940,6 +1000,17 @@ u8 parse_report(u8 *report,u8 *output)
           HID_CmdGet_u8  = HTML_CMD_CLEAR_LOCK_STICK_HARDWARE;
           memcpy (HID_String_au8,&report[1],33);
           break;
+
+        case STICK20_CMD_PRODUCTION_TEST :
+          CI_StringOut ("Get STICK20_CMD_PRODUCTION_TEST\r\n");
+
+          StartStick20Command (STICK20_CMD_PRODUCTION_TEST);
+
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_PRODUCTION_TEST;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
+
 
         default:
           break;

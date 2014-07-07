@@ -127,7 +127,8 @@ extern u8 Stick20HIDSendConfigurationState_u8;
 
 #define STICK20_SEND_STATUS_IDLE     0
 #define STICK20_SEND_STATUS_PIN      1
-#define STICK20_SEND_STARTUP   2
+#define STICK20_SEND_STARTUP         2
+#define STICK20_SEND_PRODUCTION_TEST 3
 
 /*******************************************************************************
 * Function Name  : CCID_Status_In
@@ -258,6 +259,10 @@ u8 *Keyboard_GetReport_Feature(u16 Length)
     else if (STICK20_SEND_STARTUP == Stick20HIDSendConfigurationState_u8)
     {
       Stick20HIDSendAccessStatusData (HID_GetReport_Value);
+    }
+    else if (STICK20_SEND_PRODUCTION_TEST == Stick20HIDSendConfigurationState_u8)
+    {
+      Stick20HIDSendProductionInfos (HID_GetReport_Value);
     }
 
 #ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID

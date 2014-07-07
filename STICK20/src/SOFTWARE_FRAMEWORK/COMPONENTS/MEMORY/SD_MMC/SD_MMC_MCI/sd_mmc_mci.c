@@ -144,7 +144,7 @@ volatile avr32_mci_t *mci = &AVR32_MCI;
 #if ACCESS_USB == ENABLED
 
 static Bool is_dma_usb_2_ram_complete( void );
-static Bool is_dma_ram_2_mci_complete( void );
+//static Bool is_dma_ram_2_mci_complete( void );
 static void dma_usb_2_ram(void *ram, size_t size);
 //static void dma_ram_2_mci(const void *ram, size_t size, unsigned int BlockNr_u32);
 
@@ -1204,7 +1204,7 @@ sd_mmc_mci_dma_write_init ();
 ******************************************************************************/
 
 
-static void dma_ram_2_mci_uncrypted (const void *ram, size_t size, unsigned int BlockNr_u32)
+void dma_ram_2_mci_uncrypted (const void *ram, size_t size, unsigned int BlockNr_u32)
 {
   const unsigned int *pRam = ram;
 
@@ -1226,7 +1226,7 @@ sd_mmc_mci_dma_write_init ();
 }
 
 
-static Bool is_dma_ram_2_mci_complete( void )
+Bool is_dma_ram_2_mci_complete( void )
 {
   // Wait for the end of the AES->RAM transfer (channel 1).
   if (AVR32_DMACA.chenreg & (2<<AVR32_DMACA_CHENREG_CH_EN_OFFSET))

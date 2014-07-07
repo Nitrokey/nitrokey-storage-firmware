@@ -77,7 +77,7 @@
 #include "..\HighLevelFunctions\HiddenVolume.h"
 
 extern typeStick20Configuration_st StickConfiguration_st;
-void GetSmartCardStatus (typeStick20Configuration_st *Status_st);
+u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st);
 
 /*******************************************************************************
 
@@ -130,6 +130,7 @@ void AES_SetNewStorageKey (unsigned char *pcKey);
 extern u8 HID_CmdGet_u8;   // Todo: make function
 extern u8 HID_String_au8[50];
 
+typeStick20ProductionInfos_st Stick20ProductionInfos_st;
 
 u8 HID_AdminPassword_au8[HID_PASSWORD_LEN+1];
 u8 HID_UserPassword_au8[HID_PASSWORD_LEN+1];
@@ -1050,6 +1051,14 @@ void HID_ExcuteCmd (void)
         }
         break;
 
+      case HTML_CMD_PRODUCTION_TEST :
+        CI_TickLocalPrintf ("Get HTML_CMD_PRODUCTION_TEST\r\n");
+        GetProductionInfos (&Stick20ProductionInfos_st);
+        Stick20HIDInitSendConfiguration (STICK20_SEND_PRODUCTION_TEST);
+        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
+        break;
+
+
     default:
       CI_TickLocalPrintf ("HID_ExcuteCmd: Get unknown command: %d \r\n",Cmd_u8);
       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_IDLE,0);
@@ -1075,7 +1084,7 @@ void HID_ExcuteCmd (void)
 
 *******************************************************************************/
 
-void GetSmartCardStatus (typeStick20Configuration_st *Status_st)
+u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st)
 {
   u8  Text_u8[20];
   u32 Ret_u32 = FALSE;
@@ -1084,7 +1093,6 @@ void GetSmartCardStatus (typeStick20Configuration_st *Status_st)
 //  DelayMs (2000);
 
 /* Get password retry counts*/
-
   Status_st->UserPwRetryCount  = 0;
   Status_st->AdminPwRetryCount = 0;
   Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus (Text_u8);
@@ -1093,6 +1101,7 @@ void GetSmartCardStatus (typeStick20Configuration_st *Status_st)
     Status_st->UserPwRetryCount  = Text_u8[4];
     Status_st->AdminPwRetryCount = Text_u8[6];
   }
+
 
 /* Get smartcard ID from AID */
   Status_st->ActiveSmartCardID_u32 = 0;
@@ -1116,5 +1125,80 @@ void GetSmartCardStatus (typeStick20Configuration_st *Status_st)
 
 }
 
+/*******************************************************************************
 
+  GetProductionInfos
+
+  Changes
+  Date      Author          Info
+  06.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void GetProductionInfos (typeStick20ProductionInfos_st *Infos_st)
+{
+  typeStick20Configuration_st SC_Status_st;
+  volatile u32* id_data = 0x80800204;       // Place of 120 bit CPU ID
+  u32           i;
+  u32           CPU_ID_u32;
+  cid_t        *cid;
+
+// Clear data field
+  memset ((void*)Infos_st,0,sizeof (Infos_st));
+
+  Infos_st->FirmwareVersion_au8[0]              = VERSION_MAJOR;
+  Infos_st->FirmwareVersion_au8[1]              = VERSION_MINOR;
+  Infos_st->FirmwareVersion_au8[2]              = 0;               // Build number not used
+  Infos_st->FirmwareVersion_au8[3]              = 0;               // Build number not used
+
+// Get smartcard infos
+  GetSmartCardStatus (&SC_Status_st);
+
+// Run the check only if the initial pw is aktive
+  if (3 == SC_Status_st.UserPwRetryCount)
+  {
+    if (FALSE == LA_OpenPGP_V20_Test_SendUserPW2 ("123456"))
+    {
+      CI_TickLocalPrintf ("GetProductionInfos: Intial password is not activ\r\n");
+      Infos_st->SC_AdminPwRetryCount = 99;    // Marker for wrong pw
+      return;
+    }
+  }
+  else
+  {
+    CI_TickLocalPrintf ("GetProductionInfos: Password retry count is not 3 : %d\r\n",SC_Status_st.UserPwRetryCount);
+    Infos_st->SC_AdminPwRetryCount = 88;    // Marker for wrong pw retry count
+    return;
+  }
+
+
+// Get XORed CPU ID
+  CPU_ID_u32 = 0;
+  for (i=0;i<4;i++)
+  {
+     CPU_ID_u32 ^= id_data[i];
+  }
+  Infos_st->CPU_CardID_u32 = CPU_ID_u32;
+
+
+// Save smartcard infos
+  Infos_st->SC_UserPwRetryCount  = SC_Status_st.UserPwRetryCount;
+  Infos_st->SC_AdminPwRetryCount = SC_Status_st.AdminPwRetryCount;
+  Infos_st->SmartCardID_u32      = SC_Status_st.ActiveSmartCardID_u32;
+
+// Get SD card infos
+  cid = GetSdCidInfo ();
+
+  Infos_st->SD_CardID_u32                 = (cid->psnh << 8) + cid->psnl;
+  Infos_st->SD_Card_ManufacturingYear_u8  = cid->mdt/16;
+  Infos_st->SD_Card_ManufacturingMonth_u8 = cid->mdt % 0x0f;
+  Infos_st->SD_Card_OEM_u16               = cid->oid;
+  Infos_st->SD_Card_Manufacturer_u8       = cid->mid;
+
+// Get SD card speed
+  Infos_st->SD_WriteSpeed_u16 = SD_SpeedTest ();
+}
 
