@@ -24,7 +24,7 @@
 //#include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 6
+#define VERSION_MINOR 0   // 0 = development // last Version 6
 
 
 #define TRUE		1
@@ -44,7 +44,8 @@ typedef signed long  	s32;
   Defines for debugging
 
 ******************************************************************************/
-//#define DEBUG_LOG_CCID_DETAIL       // Shows details of smartcard io + set CCID_T1_DebugLevel = 3;
+//#define DEBUG_LOG_CCID_DETAIL          // Shows details of smartcard io + set CCID_T1_DebugLevel = 3;
+//#define DEBUG_USB_CCID_IO_DETAIL        // Shows details of CCID USB transfers
 
 //#define MMC_DEBUG_PRINT             // Shows details of SD card actions
 
@@ -53,7 +54,7 @@ typedef signed long  	s32;
 // Achtung: Bootloader in trampoline.x aktivieren
 
 // *** Activate only for PROD version ***
-#define STICK_20_A_MUSTER_PROD
+//#define STICK_20_A_MUSTER_PROD
 
 
 //#define STICK_20_SEND_DEBUGINFOS_VIA_HID      // Use ca. 2k flash

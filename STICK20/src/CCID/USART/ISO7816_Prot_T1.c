@@ -68,9 +68,9 @@
 
 *******************************************************************************/
 
-unsigned char ISO7816_T1_SendNr     = FALSE;
-unsigned char ISO7816_T1_R_BlockNr  = FALSE;
-unsigned char ISO7816_T1_LastSendNr = FALSE;
+unsigned char ISO7816_T1_SendNr     = 0;
+unsigned char ISO7816_T1_R_BlockNr  = 0;
+unsigned char ISO7816_T1_LastSendNr = 0;
 
 /*******************************************************************************
 

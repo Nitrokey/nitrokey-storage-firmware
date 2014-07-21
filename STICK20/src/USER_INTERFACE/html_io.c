@@ -550,6 +550,18 @@ void HID_ExcuteCmd (void)
 
   Cmd_u8 = HID_CmdGet_u8;
 
+// Check for active CCID command
+
+
+// If cmd is active, disable CCID smart card access
+
+/*
+  if (HTML_CMD_NOTHING == cmd)
+  {
+    HID_SmartcardAccess_u8 = TRUE;
+  }
+*/
+
   // Check for matrix password > if yes convert the matrix to password
   switch (Cmd_u8)
   {
@@ -975,7 +987,7 @@ void HID_ExcuteCmd (void)
        CI_TickLocalPrintf ("Get HTML_CMD_CLEAR_NEW_SD_CARD_FOUND\r\n");
        if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
        {
-//         ClearNewSdCardFoundToFlash ();
+         ClearNewSdCardFoundToFlash ();
          SetSdCardFilledWithRandomCharsToFlash ();
          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
          CI_TickLocalPrintf ("password ok\r\n");
@@ -1067,6 +1079,11 @@ void HID_ExcuteCmd (void)
 
   HID_CmdGet_u8 = HTML_CMD_NOTHING;
   memset (HID_String_au8,0,50);
+
+/*
+    HID_SmartcardAccess_u8 = FALSE;
+*/
+
 
 }
 

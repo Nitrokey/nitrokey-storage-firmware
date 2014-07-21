@@ -101,6 +101,10 @@ typedef struct
 } t_USB_CCID_data_st;
 
 
+void USB_CCID_SetLockCounter (u32 Value_u32);
+void USB_CCID_DecLockCounter (void);
+u32 USB_CCID_GetLockCounter (void);
+
 void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst);
 u8 CCID_GetSlotStatus_u8 (void);
 u8 CCID_RestartSmartcard_u8 (void);

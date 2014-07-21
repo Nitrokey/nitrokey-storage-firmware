@@ -92,7 +92,7 @@ static const usart_options_t ISO7816_USART_OPTIONS =
 *******************************************************************************/
 
 //! Input parameters when initializing ISO7816 mode.
-static const usart_iso7816_options_t ISO7816_USART_ISO7816 =
+const usart_iso7816_options_t ISO7816_USART_ISO7816 =
 {
   .iso7816_hz     = 4000000,
 //  .iso7816_hz     = 3000000,
@@ -667,7 +667,8 @@ int ISO7816_SendString (int nCount,unsigned char *cString)
 	int i;
 	int nRet;
 	int nPos;
-	int nTimeOutMs;
+  int nTimeOutMs;
+  int nTimeOutCounter;
 
 	nTimeOutMs = ISO7816_CHAR_DELAY_TIME_FIRST_MS;
 	nPos = 0;
@@ -703,11 +704,17 @@ int ISO7816_SendString (int nCount,unsigned char *cString)
 	}
 
 // Wait until last byte had leaved the transmitter buffer
-
+	nTimeOutCounter = 10000;
 	while (TRUE != usart_txTransmitter_ready(ISO7816_USART))
 	{
+	  nTimeOutCounter--;
+	  if (0 == nTimeOutCounter)
+	  {
+	    break;
+	  }
 	}
 
+//  CI_LocalPrintf ("C %5d\n\r",10000-nTimeOutCounter);
 
 	return (nRet);
 }

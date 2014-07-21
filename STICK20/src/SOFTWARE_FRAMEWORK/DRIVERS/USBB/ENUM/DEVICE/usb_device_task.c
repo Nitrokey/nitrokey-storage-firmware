@@ -84,6 +84,10 @@ volatile Bool usb_connected;
 #ifdef FREERTOS_USED
 //! Handle to the USB Device task
 xTaskHandle usb_device_tsk = NULL;
+
+void USB_CCID_DecLockCounter (void);
+void ISO7816_DecLockCounter (void);
+
 #endif
 
 
@@ -169,11 +173,25 @@ void usb_device_task(void)
 {
 #ifdef FREERTOS_USED
   portTickType xLastWakeTime;
+  unsigned int  TaskTimerForClockCounter_u32;
+
+  USB_CCID_SetLockCounter (0);        // Init smartcard lock counter
+  TaskTimerForClockCounter_u32 = 0;
 
   xLastWakeTime = xTaskGetTickCount();
   while (TRUE)
   {
     vTaskDelayUntil(&xLastWakeTime, configTSK_USB_DEV_PERIOD);
+
+// Handle smartcard lock counter - here because it's an independent clock
+    TaskTimerForClockCounter_u32 += configTSK_USB_CCID_PERIOD;    // Tick = 2000 Hz
+    while (20 <= TaskTimerForClockCounter_u32)                    // Counter count 10 ms ticks
+    {
+      USB_CCID_DecLockCounter ();                     // USB smartcard access
+      ISO7816_DecLockCounter ();                      // Internal smartcard access
+      TaskTimerForClockCounter_u32 -= 20;
+    }
+
 
 #endif  // FREERTOS_USED
     if (!usb_connected && Is_usb_vbus_high())

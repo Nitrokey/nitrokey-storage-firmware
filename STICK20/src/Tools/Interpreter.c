@@ -231,7 +231,7 @@ int CI_TickLocalPrintf (char *szFormat,...)
    char szBuffer[MAX_TEXT_LENGTH+10];       // on task stack
    va_list args;
 
-   sprintf (szBuffer,"%7d ",(int)xTickCount);
+   sprintf (szBuffer,"%7d ",(int)xTickCount / 2);   // To get msec
 
    va_start(args,szFormat);
 
@@ -1143,6 +1143,8 @@ int CI_ExecCmd (char *szCommandLine)
 void IDF_PrintStartupInfo (void)
 {
   CI_PrintIntro ();
+
+//  OTP_FLASH_START_PAGE
 
 #ifdef STICK_20_A_MUSTER_PROD
   CI_StringOut ("*** PROD version active ***\r\n");

@@ -29,6 +29,7 @@
 #include "time.h"
 
 #include "tools.h"
+#include "TIME_MEASURING.h"
 #include "Interpreter.h"
 #include "CCID/USART/ISO7816_USART.h"
 #include "CCID/USART/ISO7816_ADPU.h"
@@ -43,9 +44,10 @@
 
 *******************************************************************************/
 
-//#define LOCAL_DEBUG
+//#define DEBUG_OPENPGP
+//#define DEBUG_OPENPGP_SHOW_CALLS
 
-#ifndef LOCAL_DEBUG
+#ifndef DEBUG_OPENPGP
   #define CI_LocalPrintfDebug(...)
 #else
   #define CI_LocalPrintfDebug(...)    CI_LocalPrintf(...)
@@ -70,6 +72,86 @@
 
 typeAPDU 	tSC_OpenPGP_V20;
 
+
+
+/*******************************************************************************
+
+  LA_OpenPGP_V20_ChangeReset1
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+int LA_OpenPGP_V20_ChangeReset1 (typeAPDU *tSC)
+{
+  int     nRet;
+
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call Reset1\r\n");
+#endif
+
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
+
+// Command
+  tSC->tAPDU.cCLA     = 0x00;
+  tSC->tAPDU.cINS     = 0x44;
+  tSC->tAPDU.cP1      = 0x00;
+  tSC->tAPDU.cP2      = 0x00;
+  tSC->tAPDU.nLc      = 0;
+
+  nRet = ISO7816_SendAPDU_NoLe_NoLc (tSC);
+
+  // Check for error
+  if ((0x90 != tSC->tState.cSW1) && (0x90 != tSC->tState.cSW2))
+  {
+    nRet = FALSE;
+  }
+
+  return (nRet);
+}
+
+/*******************************************************************************
+
+  LA_OpenPGP_V20_ChangeReset2
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+int LA_OpenPGP_V20_ChangeReset2 (typeAPDU *tSC)
+{
+  int     nRet;
+
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call Reset2\r\n");
+#endif
+
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
+// Command
+  tSC->tAPDU.cCLA     = 0x00;
+  tSC->tAPDU.cINS     = 0xe6;
+  tSC->tAPDU.cP1      = 0x00;
+  tSC->tAPDU.cP2      = 0x00;
+  tSC->tAPDU.nLc      = 0;
+
+  nRet = ISO7816_SendAPDU_NoLe_NoLc (tSC);
+
+  // Check for error
+  if ((0x90 != tSC->tState.cSW1) && (0x90 != tSC->tState.cSW2))
+  {
+    nRet = FALSE;
+  }
+
+  return (nRet);
+}
 /*******************************************************************************
 
   LA_OpenPGP_V20_SelectFile
@@ -83,6 +165,15 @@ typeAPDU 	tSC_OpenPGP_V20;
 int LA_OpenPGP_V20_SelectFile (typeAPDU *tSC)
 {
 	int 		nRet;
+
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+	CI_TickLocalPrintf ("ISO7816: Call SelectFile\r\n");
+#endif
+
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
 
 /*
 	SELECT FILE - so übernehmen
@@ -132,6 +223,14 @@ int LA_OpenPGP_V20_GetData (typeAPDU *tSC, unsigned char cP1, unsigned char cP2)
 {
 	int 		nRet;
 
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+	CI_TickLocalPrintf ("ISO7816: Call GetData\r\n");
+#endif
+
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
 /*
 	SELECT FILE - so übernehmen
 	00 00 0B
@@ -172,6 +271,10 @@ int LA_OpenPGP_V20_Verify (typeAPDU *tSC, unsigned char cPW,unsigned char cPassw
 {
 	int 		nRet;
 
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+	CI_TickLocalPrintf ("ISO7816: Call Verify %d\r\n",cPW);
+#endif
+
 // 	Correct PW level ?
 	if ((0 != cPW) && (3 < cPW))
 	{
@@ -188,6 +291,10 @@ int LA_OpenPGP_V20_Verify (typeAPDU *tSC, unsigned char cPW,unsigned char cPassw
 		return (FALSE);
 	}
 
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
 // Command
 	tSC->tAPDU.cCLA     = 0x00;
 	tSC->tAPDU.cINS     = 0x20;
@@ -227,6 +334,14 @@ int LA_OpenPGP_V20_GetChallenge (typeAPDU *tSC, int nReceiveLength, unsigned cha
   int     nRet;
   int     n;
 
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call GetChallenge\r\n");
+#endif
+
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
 // Command
   tSC->tAPDU.cCLA     = 0x00;
   tSC->tAPDU.cINS     = 0x84;
@@ -268,6 +383,14 @@ int LA_OpenPGP_V20_GetPublicKey (typeAPDU *tSC,int nKind, int nReceiveLength, un
   int     nRet;
   int     n;
 
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call GetPublicKey\r\n");
+#endif
+
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
 // Command
   tSC->tAPDU.cCLA     = 0x00;
   tSC->tAPDU.cINS     = 0x47;
@@ -336,6 +459,14 @@ int LA_OpenPGP_V20_ComputeSignature (typeAPDU *tSC,int nSendLength,unsigned char
   int     nRet;
   int     n;
 
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call ComputeSignature\r\n");
+#endif
+
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
 // Command
   tSC->tAPDU.cCLA     = 0x00;
   tSC->tAPDU.cINS     = 0x2A;
@@ -384,6 +515,14 @@ int LA_OpenPGP_V20_Decipher (typeAPDU *tSC, int nSendLength,unsigned char *cSend
 {
   int     nRet;
 
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call Decipher\r\n");
+#endif
+
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
 // Command
   tSC->tAPDU.cCLA     = 0x00;
   tSC->tAPDU.cINS     = 0x2A;
@@ -417,6 +556,10 @@ int LA_OpenPGP_V20_Put_AES_key (typeAPDU *tSC,unsigned char cKeyLen,unsigned cha
 {
   int     nRet;
 
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call Put_AES_key\r\n");
+#endif
+
 //  Correct key len ?
   if ((16 != cKeyLen) && (32 != cKeyLen))
   {
@@ -429,6 +572,10 @@ int LA_OpenPGP_V20_Put_AES_key (typeAPDU *tSC,unsigned char cKeyLen,unsigned cha
     return (FALSE);
   }
 
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
 // Command
   tSC->tAPDU.cCLA     = 0x00;
   tSC->tAPDU.cINS     = 0xDA;
@@ -461,11 +608,20 @@ int LA_OpenPGP_V20_AES_Enc (typeAPDU *tSC, int nSendLength,unsigned char *cSendD
 {
   int     nRet;
 
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call AES_Enc\r\n");
+#endif
+
 //  Correct key len ?
-    if ((16 != nSendLength) && (32 != nSendLength))
-    {
-      return (FALSE);
-    }
+  if ((16 != nSendLength) && (32 != nSendLength))
+  {
+    return (FALSE);
+  }
+
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
 
 // Command
   tSC->tAPDU.cCLA     = 0x00;
@@ -501,8 +657,17 @@ int LA_OpenPGP_V20_AES_Dec_SUB (typeAPDU *tSC, int nSendLength,unsigned char *cS
   int     nRet;
   int     n;
 
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call AES_Dec_SUB\r\n");
+#endif
+
 //  Correct key len ?
   if ((16 != nSendLength) && (32 != nSendLength))
+  {
+    return (FALSE);
+  }
+
+  if (FALSE == LA_SC_StartSmartcard ())
   {
     return (FALSE);
   }
@@ -550,6 +715,14 @@ int LA_OpenPGP_V20_ChangeUserPin (typeAPDU *tSC, int nSendLength,unsigned char *
 {
   int     nRet;
 
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call ChangeUserPin\r\n");
+#endif
+
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
 // Command
   tSC->tAPDU.cCLA     = 0x00;
   tSC->tAPDU.cINS     = 0x24;
@@ -585,6 +758,14 @@ int LA_OpenPGP_V20_ChangeAdminPin (typeAPDU *tSC, int nSendLength,unsigned char 
 {
   int     nRet;
 
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call ChangeAdminPin\r\n");
+#endif
+
+  if (FALSE == LA_SC_StartSmartcard ())
+  {
+    return (FALSE);
+  }
 // Command
   tSC->tAPDU.cCLA     = 0x00;
   tSC->tAPDU.cINS     = 0x24;
@@ -619,7 +800,6 @@ int LA_OpenPGP_V20_ChangeAdminPin (typeAPDU *tSC, int nSendLength,unsigned char 
 int LA_OpenPGP_V20_AES_Dec (typeAPDU *tSC, int nSendLength,unsigned char *cSendData,int nReceiveLength, unsigned char *cReceiveData)
 {
   int     nRet;
-
 
 //  128 bit key ?
   if (16 == nSendLength)
@@ -809,24 +989,10 @@ int LA_OpenPGP_V20_GetPasswordstatus (char *PasswordStatus)
 {
   int nRet;
 
-
-  LA_RestartSmartcard_u8 ();
-// Check for smartcard on
-  if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
-  {
-    CI_TickLocalPrintf ("LA_OpenPGP_V20_GetPasswordstatus: Restart smartcard\r\n");
-
-    LA_RestartSmartcard_u8 ();
-    if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
-    {
-      CI_TickLocalPrintf ("LA_OpenPGP_V20_GetPasswordstatus: Can't start smartcard\r\n");
-      return (FALSE);
-    }
-  }
-
 //  memset (PasswordStatus,0,7);
 
   CI_LocalPrintf ("Get password status  : ");
+
   nRet = LA_OpenPGP_V20_GetData (&tSC_OpenPGP_V20,0x00,0xC4);
   if (FALSE == nRet)
   {
@@ -859,20 +1025,6 @@ int LA_OpenPGP_V20_GetPasswordstatus (char *PasswordStatus)
 int LA_OpenPGP_V20_GetAID (char *AID)
 {
   int Ret_u32;
-
-//  LA_RestartSmartcard_u8 ();
-// Check for smartcard on
-  if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
-  {
-    CI_TickLocalPrintf ("LA_OpenPGP_V20_GetPasswordstatus: Restart smartcard\r\n");
-
-    LA_RestartSmartcard_u8 ();
-    if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
-    {
-      CI_TickLocalPrintf ("LA_OpenPGP_V20_GetPasswordstatus: Can't start smartcard\r\n");
-      return (FALSE);
-    }
-  }
 
   CI_LocalPrintf ("Get AID  : ");
   Ret_u32 = LA_OpenPGP_V20_SelectFile (&tSC_OpenPGP_V20);
@@ -1100,6 +1252,55 @@ int LA_OpenPGP_V20_Test_AES_Key (void)
   return (TRUE);
 
 }
+
+/*******************************************************************************
+
+  LA_OpenPGP_V20_ResetCard
+
+  Changes
+  Date      Author          Info
+  15.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+int LA_OpenPGP_V20_ResetCard (void)
+{
+  int i;
+  int nRet;
+
+// Disable user password
+  for (i=0;i<4;i++)
+  {
+    nRet = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,1,8,(unsigned char*)"@@@@@@@@");
+    if (FALSE == nRet)
+    {
+    }
+  }
+
+// Disable admin password
+  for (i=0;i<4;i++)
+  {
+    nRet = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,3,8,(unsigned char*)"@@@@@@@@");
+    if (FALSE == nRet)
+    {
+    }
+  }
+
+  nRet = LA_OpenPGP_V20_ChangeReset1 (&tSC_OpenPGP_V20);
+  if (FALSE == nRet)
+  {
+  }
+
+  nRet = LA_OpenPGP_V20_ChangeReset2 (&tSC_OpenPGP_V20);
+  if (FALSE == nRet)
+  {
+  }
+
+}
+
 
 /*******************************************************************************
 
@@ -1423,8 +1624,6 @@ u8 LA_RestartSmartcard_u8 (void)
   u32 Ret_u32;
 
   CCID_RestartSmartcard_u8 ();
-  //          ISO7816_InitSC ();
-  ISO7816_T1_InitSendNr ();
 
   Ret_u32 = LA_OpenPGP_V20_SelectFile (&tSC_OpenPGP_V20);
   if (FALSE == Ret_u32)
@@ -1479,6 +1678,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
   u8   *BufferPointer_pu8 = cBuffer;
 //  static u8    FlagSCOpen_u8 = FALSE;
   u8    LocalString_au8[50];
+  u64   Runtime_u64;
 
 
   if (0 == nParamsGet_u8)
@@ -1501,6 +1701,8 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
     CI_LocalPrintf ("15         Get password status\r\n");
     CI_LocalPrintf ("16 count   Generate [count] random numbers a 10 byte\r\n");
     CI_LocalPrintf ("17 count   Generate [count] *10 random numbers [output as 0,1 stream]\r\n");
+    CI_LocalPrintf ("18 FiDi    FiDi Test\r\n");
+    CI_LocalPrintf ("99         Factory reset smartcard \r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }
@@ -1720,6 +1922,34 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
           }
           CI_LocalPrintf ("\r\n");
           break;
+    case 18 :
+          CI_LocalPrintf ("Set FiDi to 0x%02x\r\n",Param_u32);
+
+          ISO7816_SetFiDI (Param_u32);
+
+          LA_RestartSmartcard_u8 ();
+
+#ifdef TIME_MEASURING_ENABLE
+          Runtime_u64 = TIME_MEASURING_GetTime ();
+#endif
+          // GETDATA 00 4F - Application identifier (AID), 16 (dec.) bytes (ISO 7816-4)
+          Ret_u32 = LA_OpenPGP_V20_GetData (&tSC_OpenPGP_V20,0x00,0x4F);
+          if (FALSE == Ret_u32)
+          {
+            CI_LocalPrintf ("ERROR: GETDATA 00 4F - Application identifier (AID) \r\n");
+            return;
+          }
+
+#ifdef TIME_MEASURING_ENABLE
+          Runtime_u64 = TIME_MEASURING_GetTime () - Runtime_u64;
+          CI_LocalPrintf ("SC runtime %ld msec\n\r",(u32)(Runtime_u64/(u64)TIME_MEASURING_TICKS_IN_USEC/(u64)1000L));
+#endif
+
+          break;
+    case 99 :
+        LA_OpenPGP_V20_ResetCard();
+        break;
+
     default :
           break;
   }

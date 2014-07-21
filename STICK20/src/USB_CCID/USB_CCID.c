@@ -25,7 +25,21 @@
  *      Author: RB
  */
 
+#ifdef FREERTOS_USED
+  #include "FreeRTOS.h"
+  #include "task.h"
+#endif
+
+#include <avr32/io.h>
+#include "stdio.h"
+#include "string.h"
+#include "compiler.h"
+#include "board.h"
+#include "power_clocks_lib.h"
+
+
 #include "global.h"
+
 #include "tools.h"
 #include "usart.h"
 #include "CCID\\USART\\ISO7816_USART.h"
@@ -42,13 +56,22 @@
 *******************************************************************************/
 
 #define DEBUG_USB_CCID_IO
+//#define DEBUG_USB_CCID_IO_DETAIL
+#define DEBUG_USB_CCID_LOCK
+
+
+#ifdef DEBUG_USB_CCID_IO_DETAIL
+  #define DEBUG_USB_CCID_IO
+#endif
 
 #ifdef DEBUG_USB_CCID_IO
   int CI_LocalPrintf (char *szFormat,...);
   int CI_TickLocalPrintf (char *szFormat,...);
+  int CI_StringOut (char *szText);
 #else
   #define CI_LocalPrintf(...)
   #define CI_TickLocalPrintf(...)
+  #define CI_StringOut(...)
 #endif
 
 //#define DEBUG_LOG_CCID_DETAIL
@@ -65,6 +88,7 @@
  External declarations
 
 *******************************************************************************/
+extern  volatile portTickType xTickCount            ;
 
 /*******************************************************************************
 
@@ -72,12 +96,286 @@
 
 *******************************************************************************/
 
+u32 USB_CCID_LockCounter_u32 = 0;       // 1 Tick = 10 ms
+u32 USB_CCID_PowerOffDelay_u32 = 0;     // 1 Tick = 10 ms
+
+
 t_USB_CCID_data_st g_USB_CCID_data_st;
 
 
 static u8 CCID_SlotStatus_u8  = CCID_SLOT_STATUS_PRESENT_INACTIVE;    // Todo present check at startup
 static u8 CCID_ClockStatus_u8 = CCID_SLOT_STATUS_CLOCK_UNKNOWN;
 
+#define USB_CCID_LOCK_COUNT_NORMAL    50    // =   500 ms
+#define USB_CCID_LOCK_COUNT_POWERON 1000    // = 10000 ms
+#define USB_CCID_LOCK_COUNT_LONG    3000    // = 30000 ms
+#define USB_CCID_LOCK_COUNT_CLEAR     10    // =   100 ms
+
+/*******************************************************************************
+
+  USB_CCID_SetPowerOffDelayCounter
+
+  Changes
+  Date      Author          Info
+  17.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void USB_CCID_SetPowerOffDelayCounter (u32 Value_u32)
+{
+#ifdef DEBUG_USB_CCID_LOCK
+  {
+    u8 Text[20];
+    itoa (xTickCount/2,Text);   // in msec
+    CI_StringOut (Text);
+    CI_StringOut (" USB_CCID - Set power off counter = ");
+    itoa (Value_u32*10,Text);
+    CI_StringOut (Text);
+    CI_StringOut (" msec\r\n");
+  }
+#endif
+
+  USB_CCID_PowerOffDelay_u32 = Value_u32;
+}
+
+/*******************************************************************************
+
+  USB_CCID_DecPowerOffDelayCounter
+
+  Changes
+  Date      Author          Info
+  17.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void USB_CCID_DecPowerOffDelayCounter (void)
+{
+  if (0 != USB_CCID_PowerOffDelay_u32)
+  {
+    USB_CCID_LockCounter_u32--;
+#ifdef DEBUG_USB_CCID_LOCK
+    if (0 == USB_CCID_PowerOffDelay_u32)
+    {
+      u8 Text[20];
+      itoa (xTickCount/2,Text);
+      CI_StringOut (Text);
+      CI_StringOut (" USB_CCID - Poweroff counter = 0\r\n");
+    }
+#endif
+  }
+}
+
+/*******************************************************************************
+
+  USB_CCID_GetPowerOffDelayCounter
+
+  Changes
+  Date      Author          Info
+  17.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u32 USB_CCID_GetPowerOffDelayCounter (void)
+{
+  return (USB_CCID_PowerOffDelay_u32);
+}
+
+
+
+/*******************************************************************************
+
+  USB_CCID_LockCounter_u32
+
+  Changes
+  Date      Author          Info
+  16.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void USB_CCID_SetLockCounter (u32 Value_u32)
+{
+  int LockActive_u32;
+
+#ifdef DEBUG_USB_CCID_LOCK
+  {
+    u8 Text[20];
+    itoa (xTickCount/2,Text);   // in msec
+    CI_StringOut (Text);
+    CI_StringOut (" USB_CCID - Set lock counter = ");
+    itoa (Value_u32*10,Text);
+    CI_StringOut (Text);
+    CI_StringOut (" msec\r\n");
+  }
+#endif
+
+  LockActive_u32 = FALSE;
+
+// Check lock
+  portENTER_CRITICAL();
+  while (0 != ISO7816_GetLockCounter ())
+  {
+    portEXIT_CRITICAL();
+    CI_TickLocalPrintf ("USB_CCID - *** WAIT for unlock ISO7816 counter  - %3d msec***\r\n", ISO7816_GetLockCounter ()*10);
+    LockActive_u32 = TRUE;
+    DelayMs (50);       // Wait for unlock
+    portENTER_CRITICAL();
+  }
+
+// Set lock counter
+  USB_CCID_LockCounter_u32 = Value_u32;
+  portEXIT_CRITICAL();
+
+  if (TRUE == LockActive_u32)     // Clear the IO line when switching the access route
+  {
+//    ISO7816_InitSC ();
+    ISO7816_ClearRx ();
+  }
+}
+
+/*******************************************************************************
+
+  USB_CCID_DecLockCounter
+
+  Changes
+  Date      Author          Info
+  16.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void USB_CCID_DecLockCounter (void)
+{
+  if (0 != USB_CCID_LockCounter_u32)
+  {
+    USB_CCID_LockCounter_u32--;
+#ifdef DEBUG_USB_CCID_LOCK
+    if (0 == USB_CCID_LockCounter_u32)
+    {
+      u8 Text[20];
+      itoa (xTickCount/2,Text);
+      CI_StringOut (Text);
+      CI_StringOut (" USB_CCID - Lock counter = 0\r\n");
+    }
+#endif
+  }
+}
+
+/*******************************************************************************
+
+  USB_CCID_GetLockCounter
+
+  Changes
+  Date      Author          Info
+  16.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u32 USB_CCID_GetLockCounter (void)
+{
+  return (USB_CCID_LockCounter_u32);
+}
+
+
+/*******************************************************************************
+
+  USB_CCID_DebugCmdStart
+
+  Changes
+  Date      Author          Info
+  16.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+#ifdef DEBUG_USB_CCID_IO_DETAIL
+void USB_CCID_DebugCmdStart (t_USB_CCID_data_st *USB_CCID_data_pst)
+{
+  switch(USB_CCID_data_pst->USB_data[CCID_OFFSET_MESSAGE_TYPE])
+  {
+    case PC_TO_RDR_ICCPOWERON:
+      CI_TickLocalPrintf ("USB_CCID - ICCPOWERON\r\n");
+      break;
+    case PC_TO_RDR_ICCPOWEROFF:
+      CI_TickLocalPrintf ("USB_CCID - ICCPOWEROFF\r\n");
+      break;
+    case PC_TO_RDR_GETSLOTSTATUS:
+      CI_TickLocalPrintf ("USB_CCID - GETSLOTSTATUS\r\n");
+      break;
+    case PC_TO_RDR_XFRBLOCK:
+      CI_TickLocalPrintf ("USB_CCID - XFRBLOCK\r\n");
+      break;
+    case PC_TO_RDR_GETPARAMETERS:
+      CI_TickLocalPrintf ("USB_CCID - GETPARAMETERS\r\n");
+      break;
+    case PC_TO_RDR_RESETPARAMETERS:
+      CI_TickLocalPrintf ("USB_CCID - RESETPARAMETERS\r\n");
+      break;
+    case PC_TO_RDR_SETPARAMETERS:
+      CI_TickLocalPrintf ("USB_CCID - SETPARAMETERS\r\n");
+      break;
+    case PC_TO_RDR_ESCAPE:
+      CI_TickLocalPrintf ("USB_CCID - ESCAPE\r\n");
+      break;
+    case PC_TO_RDR_ICCCLOCK:
+      CI_TickLocalPrintf ("USB_CCID - ICCCLOCK\r\n");
+      break;
+    case PC_TO_RDR_ABORT:
+      CI_TickLocalPrintf ("USB_CCID - ABORT\r\n");
+      break;
+    case PC_TO_RDR_T0APDU:
+      CI_TickLocalPrintf ("USB_CCID - T0APDU\r\n");
+      break;
+    case PC_TO_RDR_SECURE:
+      CI_TickLocalPrintf ("USB_CCID - SECURE\r\n");
+      break;
+    case PC_TO_RDR_MECHANICAL:
+      CI_TickLocalPrintf ("USB_CCID - MECHANICAL\r\n");
+      break;
+    case PC_TO_RDR_SET_DATA_RATE_AND_CLOCK_FREQUENCY:
+      CI_TickLocalPrintf ("USB_CCID - SET_DATA_RATE_AND_CLOCK_FREQUENCY\r\n");
+      break;
+    default:
+      CI_TickLocalPrintf ("USB_CCID - *** UNKNOWN ***\r\n");
+      break;
+  }
+}
+#endif
+/*******************************************************************************
+
+  USB_CCID_DebugCmdEnd
+
+  Changes
+  Date      Author          Info
+  16.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+#ifdef DEBUG_USB_CCID_IO_DETAIL
+void USB_CCID_DebugCmdEnd (t_USB_CCID_data_st *USB_CCID_data_pst)
+{
+  CI_TickLocalPrintf ("USB_CCID - End of call\r\n");
+}
+#endif
 /*******************************************************************************
 
   CCID_RestartSmartcard_u8
@@ -119,9 +417,18 @@ u8 CCID_RestartSmartcard_u8 (void)
 
 u8 CCID_SmartcardOff_u8 (void)
 {
-  CI_TickLocalPrintf ("*** Smartcard off ***\n");
-	Smartcard_Reset_off ();		// Disable SC
-  CCID_SlotStatus_u8 = CCID_SLOT_STATUS_PRESENT_INACTIVE;
+
+  if (0 == ISO7816_GetLockCounter ())
+  {
+    CI_TickLocalPrintf ("*** Smartcard off ***\n");
+    Smartcard_Reset_off ();		// Disable SC
+    CCID_SlotStatus_u8 = CCID_SLOT_STATUS_PRESENT_INACTIVE;
+  }
+  else
+  {
+    CI_TickLocalPrintf ("*** Smartcard NOT switched off (because internal access) ***\n");
+  }
+
 	return (TRUE);
 }
 
@@ -370,6 +677,11 @@ u8 PC_to_RDR_IccPowerOn_u8 (t_USB_CCID_data_st *USB_CCID_data_pst)
 	{
 		return (CCID_ERROR_CMD_ABORTED);
 	}
+
+	if (CCID_SLOT_STATUS_PRESENT_ACTIVE == CCID_SlotStatus_u8) // If smartcard is on, don't start
+  {
+    return (CCID_NO_ERROR);
+  }
 
 // We used only one voltage
 	if (FALSE == CCID_RestartSmartcard_u8 ())
@@ -992,15 +1304,22 @@ void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst)
 									   USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH];
 
 	n = USB_CCID_data_pst->USB_data[CCID_OFFSET_MESSAGE_TYPE];
-	  if (mci != &AVR32_MCI)
-	  {
-		  mci = &AVR32_MCI;
 
-	  }
+  if (mci != &AVR32_MCI)      // To get sure that mci has the correct value
+  {
+    mci = &AVR32_MCI;
+  }
+
+#ifdef DEBUG_USB_CCID_IO_DETAIL
+  USB_CCID_DebugCmdStart (USB_CCID_data_pst);
+#endif
+
+  USB_CCID_SetLockCounter (USB_CCID_LOCK_COUNT_LONG);
+
 	switch(USB_CCID_data_pst->USB_data[CCID_OFFSET_MESSAGE_TYPE])
 	{
 		case PC_TO_RDR_ICCPOWERON:
-//			portDBG_TRACE("ICCPOWERON Start %d",xTaskGetTickCount());
+		  USB_CCID_SetLockCounter (USB_CCID_LOCK_COUNT_POWERON);
 
 			ErrorCode_u8	= PC_to_RDR_IccPowerOn_u8 (USB_CCID_data_pst);
 			if (CCID_NO_ERROR == ErrorCode_u8)
@@ -1016,13 +1335,13 @@ void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst)
 
 			RDR_to_PC_DataBlock_u8 (USB_CCID_data_pst);
 //			portDBG_TRACE("ICCPOWERON End   %d",xTaskGetTickCount());
-
 			break;
 
 		case PC_TO_RDR_ICCPOWEROFF:
 			ErrorCode_u8 = PC_to_RDR_IccPowerOff_u8 (USB_CCID_data_pst);
 //				RDR_to_PC_SlotStatus(ErrorCode_u8);
 			RDR_to_PC_SlotStatus_CardStopped_v (USB_CCID_data_pst);		 	// simulate power off
+      USB_CCID_SetLockCounter (USB_CCID_LOCK_COUNT_CLEAR);
 			break;
 
 		case PC_TO_RDR_GETSLOTSTATUS:
@@ -1034,13 +1353,11 @@ void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst)
 if (mci != &AVR32_MCI)
 {
   mci = &AVR32_MCI;
-
 }
 			ErrorCode_u8 = PC_to_RDR_XfrBlock_u8 (USB_CCID_data_pst);
 if (mci != &AVR32_MCI)
 {
   mci = &AVR32_MCI;
-
 }
 			RDR_to_PC_DataBlock_v (USB_CCID_data_pst,ErrorCode_u8);
 #ifdef SIMULATE_USB_CCID_DISPATCH
@@ -1087,11 +1404,18 @@ if (mci != &AVR32_MCI)
 			RDR_to_PC_CmdNotSupported_v (USB_CCID_data_pst);
 			break;
 	}
-	  if (mci != &AVR32_MCI)
-	  {
-		  mci = &AVR32_MCI;
 
-	  }
+#ifdef DEBUG_USB_CCID_IO_DETAIL
+  USB_CCID_DebugCmdEnd (USB_CCID_data_pst);
+#endif
+
+  USB_CCID_SetLockCounter (USB_CCID_LOCK_COUNT_NORMAL);     // Set delay to lock the smartcard for the next command
+
+  if (mci != &AVR32_MCI)
+  {
+    mci = &AVR32_MCI;
+
+  }
 }
 
 /*******************************************************************************

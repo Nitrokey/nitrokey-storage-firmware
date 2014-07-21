@@ -45,6 +45,8 @@
 #include "ISO7816_Prot_T1.h"
 
 
+
+
 /*******************************************************************************
 
  Local defines
@@ -53,6 +55,17 @@
 
 #define ISO7816_MAX_ATR_CHARS 		40
 
+#define DEBUG_ISO7816_IO
+
+#ifdef DEBUG_ISO7816_IO
+  int CI_LocalPrintf (char *szFormat,...);
+  int CI_TickLocalPrintf (char *szFormat,...);
+  int CI_StringOut (char *szText);
+#else
+  #define CI_LocalPrintf(...)
+  #define CI_TickLocalPrintf(...)
+  #define CI_StringOut(...)
+#endif
 /*******************************************************************************
 
  Global declarations
@@ -65,11 +78,15 @@
 
 *******************************************************************************/
 
+extern  volatile portTickType xTickCount            ;
+
 /*******************************************************************************
 
  Local declarations
 
 *******************************************************************************/
+
+extern const usart_iso7816_options_t ISO7816_USART_ISO7816;
 
 typedef struct  {
   int       nLen;
@@ -80,6 +97,173 @@ int nISO7816_Error;
 
 typedef_ISO7816_ATR tISO7816_ATR;
 
+static u16 FI_List_au8[16] = {
+    372,   // 0
+    372,   // 1
+    558,   // 2
+    744,   // 3
+   1116,   // 4
+   1488,   // 5
+   1860,   // 6
+      0,   // 7, reserved
+      0,   // 8, reserved
+    512,   // 9
+    768,   // 10
+   1024,   // 11
+   1536,   // 12
+   2048,   // 13
+      0,   // 14, reserved
+      0,   // 15, reserved
+};
+
+
+static u8 DI_List_au8[16] = {
+      0,   // 0, reserved
+      1,   // 1
+      2,   // 2
+      4,   // 3
+      8,   // 4
+     16,   // 5
+     32,   // 6
+      0,   // 7, reserved
+     12,   // 8
+     20,   // 9
+      0,   // 10, reserved
+      0,   // 11, reserved
+      0,   // 12, reserved
+      0,   // 13, reserved
+      0,   // 14, reserved
+      0,   // 15, reserved
+};
+
+static u8 ISO7816_FiDi_u8 = 0x13;       // 0x11 = ca 10kbaud, 0x13 = ca. 40kbaud
+
+static u32 ISO7816_LockCounter_u32 = 0;
+
+#define ISO7816_LOCK_COUNT_NORMAL    50    // =   500 ms
+#define ISO7816_LOCK_COUNT_POWERON 1000    // = 10000 ms
+#define ISO7816_LOCK_COUNT_LONG    3000    // = 30000 ms
+#define ISO7816_LOCK_COUNT_CLEAR     10    // =   100 ms
+
+/*******************************************************************************
+
+  ISO7816_SetLockCounter
+
+  Changes
+  Date      Author          Info
+  16.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void ISO7816_SetLockCounter (u32 Value_u32)
+{
+  int LockActive_u32;
+
+#ifdef DEBUG_ISO7816_IO
+  {
+    u8 Text[20];
+    itoa (xTickCount/2,Text);   // in msec
+    CI_StringOut (Text);
+    CI_StringOut (" ISO7816 - Set lock counter = ");
+    itoa (Value_u32*10,Text);
+    CI_StringOut (Text);
+    CI_StringOut (" msec\r\n");
+  }
+#endif
+
+  LockActive_u32 = FALSE;
+
+// Check lock
+  portENTER_CRITICAL();
+  while (0 != USB_CCID_GetLockCounter ())
+  {
+    portEXIT_CRITICAL();
+    LockActive_u32 = TRUE;
+    CI_TickLocalPrintf ("ISO7816 - *** WAIT for unlock CCID counter - %3d msec***\r\n", USB_CCID_GetLockCounter ()*10);
+    DelayMs (50);       // Wait for unlock
+    portENTER_CRITICAL();
+  }
+
+// Set lock counter
+  ISO7816_LockCounter_u32 = Value_u32;
+  portEXIT_CRITICAL();
+
+  if (TRUE == LockActive_u32)     // Clear the IO line when switching the access route
+  {
+//    ISO7816_InitSC ();
+    ISO7816_ClearRx ();
+  }
+
+}
+
+/*******************************************************************************
+
+  USB_CCID_DecLockCounter
+
+  Changes
+  Date      Author          Info
+  16.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void ISO7816_DecLockCounter (void)
+{
+  if (0 != ISO7816_LockCounter_u32)
+  {
+    ISO7816_LockCounter_u32--;
+#ifdef DEBUG_ISO7816_IO
+    if (0 == ISO7816_LockCounter_u32)
+    {
+      u8 Text[20];
+      itoa (xTickCount/2,Text);   // in msec
+      CI_StringOut (Text);
+      CI_StringOut (" ISO7816 - Lock counter = 0\r\n");
+    }
+#endif
+  }
+}
+
+/*******************************************************************************
+
+  ISO7816_GetLockCounter
+
+  Changes
+  Date      Author          Info
+  16.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u32 ISO7816_GetLockCounter (void)
+{
+  return (ISO7816_LockCounter_u32);
+}
+
+/*******************************************************************************
+
+  ISO7816_SetFiDI
+
+  Changes
+  Date      Author          Info
+  15.07.14  RB              Creation of function
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void ISO7816_SetFiDI (u8 FiDi_u8)
+{
+  ISO7816_FiDi_u8 = FiDi_u8;
+}
 
 /*******************************************************************************
 
@@ -92,7 +276,6 @@ typedef_ISO7816_ATR tISO7816_ATR;
   14.08.13  RB              First review
 
 *******************************************************************************/
-
 
 int ISO7816_GetATP (typedef_ISO7816_ATR *tATR)
 {
@@ -166,8 +349,10 @@ int ISO7816_GetATP (typedef_ISO7816_ATR *tATR)
 
   Send PTS to change baud rate
 
-  didn't work correct > send FIDI = 0x11 and change nothing
-  (Problem with the local CPU clock, divider, ... ???)
+  Changes
+  Date      Author          Info
+  14.07.14  RB              Change FIDI for faster communication
+
   Reviews
   Date      Reviewer        Info
   14.08.13  RB              First review
@@ -188,19 +373,28 @@ int ISO7816_SendPTS (typedef_ISO7816_ATR *tATR)
 	int 			      nDelaytime;
 	int   			    szPTS_Answer[ISO7816_PTS_MAX_CHARS];
 	unsigned char 	szPTS[ISO7816_PTS_MAX_CHARS];
+	int             baud;
+	unsigned int    cd;
+  unsigned int    FiDi;
+  unsigned int    FiDiRatio;
 
 // Is TA1 transmitted ?
-	if (0 == tATR->szATR[ISO7816_ATR_T0]&& 0x10)
+	if (0 == (tATR->szATR[ISO7816_ATR_T0] & 0x10))
 	{
 		return (TRUE);	// No, send no PTS
 	}
 
-	tATR->szATR[ISO7816_ATR_A1_OPENPGP] = 0x11;			// as a workaround
+	FiDi = ISO7816_FiDi_u8;
+
+/*	*/
+  cd = (CCID_TARGET_PBACLK_FREQ_HZ + ISO7816_USART_ISO7816.iso7816_hz / 2) / ISO7816_USART_ISO7816.iso7816_hz; // = frequency divisor
+  baud = CCID_TARGET_PBACLK_FREQ_HZ / cd / 372 * DI_List_au8[FiDi & 0x0f];
+  CI_TickLocalPrintf ("ISO7816_SendPTS : Set FIDI to 0x%04x = %d baud\n",FiDi,baud);
 
 // Generate PTS String
-	szPTS[0] = 0xFF;									// PTSS
-	szPTS[1] = 0x11;									// PTS0 > Send PTS1 + protocol type T = 1
-	szPTS[2] = tATR->szATR[ISO7816_ATR_A1_OPENPGP];	 	// PTS1 = FIDI	// 0x13
+	szPTS[0] = 0xFF;									        // PTSS
+	szPTS[1] = 0x11;									        // PTS0 > Send PTS1 + protocol type T = 1
+	szPTS[2] = FiDi;	 	                      // PTS1 = FIDI	// 0x13
 	szPTS[3] = ISO7816_XOR_String (3,szPTS);
 
 // Send PTS
@@ -213,7 +407,7 @@ int ISO7816_SendPTS (typedef_ISO7816_ATR *tATR)
 
 // Receive SC answer
 	ISO7816_ClearRx ();
-	nDelaytime = ISO7816_CHAR_DELAY_TIME_FIRST_MS;
+	nDelaytime = ISO7816_CHAR_DELAY_TIME_FIRST_CHAR_PTS;
 	for (i=0;i<4;i++)
 	{
 		szPTS_Answer[i] = 0;
@@ -225,7 +419,7 @@ int ISO7816_SendPTS (typedef_ISO7816_ATR *tATR)
 	for (i=0;i<4;i++)
 	{
 		if ((szPTS[i]      != szPTS_Answer[i]) ||
-			(USART_SUCCESS != nPTS_Status[i]))
+			  (USART_SUCCESS != nPTS_Status[i]))
 		{
       CI_TickLocalPrintf ("ISO7816_SendPTS : FAIL char %d Status=%d - %02x != %02x\n",i,nPTS_Status[i],szPTS[i],szPTS_Answer[i]);
       CI_LocalPrintf ("Status- %02x %02x %02x %02x\n",nPTS_Status[0],nPTS_Status[1],nPTS_Status[2],nPTS_Status[3]);
@@ -235,8 +429,9 @@ int ISO7816_SendPTS (typedef_ISO7816_ATR *tATR)
 		}
 	}
 
-// Set new Fi/Di ratio
-//	ISO7816_SetFiDiRatio (tATR->szATR[ISO7816_ATR_A1_OPENPGP]);
+// Set new FiDi ratio
+	FiDiRatio = FI_List_au8[FiDi >> 4] / DI_List_au8[FiDi & 0x0f];
+	ISO7816_SetFiDiRatio (FiDiRatio);
 
 	return (TRUE);
 }
@@ -262,10 +457,13 @@ int ISO7816_InitSC (void)
 
 	nRetryCount = 10;
 
+  CI_TickLocalPrintf ("ISO7816_InitSC : SC power off\n");
+
 	for (i=0;i<nRetryCount;i++)
 	{
     SmartcardPowerOff ();
     Smartcard_Reset_off ();
+    ISO7816_T1_InitSendNr ();
     DelayMs (100);
 
     if (TRUE == ISO7816_GetATP (&tISO7816_ATR))
@@ -295,7 +493,7 @@ int ISO7816_InitSC (void)
 
   CI_TickLocalPrintf ("ISO7816_InitSC : Init FAIL\n");
 
-  CI_TickLocalPrintf ("ISO7816_InitSC : Reset_CPU\n");
+//  CI_TickLocalPrintf ("ISO7816_InitSC : Reset_CPU\n");
 
 //  DelayMs (50);
 //  Reset_CPU ();
@@ -387,6 +585,42 @@ int ISO7816_CopyATR (unsigned char *szATR,int nMaxLength)
 	return (n);
 }
 
+
+/*******************************************************************************
+
+  ISO7816_SendAPDU_NoLe_NoLc
+
+  Reviews
+  Date      Reviewer        Info
+  14.08.13  RB              First review
+
+*******************************************************************************/
+
+int ISO7816_SendAPDU_NoLe_NoLc (typeAPDU *tSC)
+{
+  int           nRet;
+//  int       nPointer;
+
+  ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_NORMAL);
+
+// Build the send string
+  tSC->cSendData[0] = tSC->tAPDU.cCLA;
+  tSC->cSendData[1] = tSC->tAPDU.cINS;
+  tSC->cSendData[2] = tSC->tAPDU.cP1;
+  tSC->cSendData[3] = tSC->tAPDU.cP2;
+
+  tSC->nSendDataLen    = 4;
+  tSC->nReceiveDataLen = ISO7816_APDU_MAX_RESPONSE_LEN;
+
+// go
+  nRet = ISO7816_T1_SendAPDU (tSC);
+
+  ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_CLEAR);
+
+  return (nRet);
+}
+
+
 /*******************************************************************************
 
   ISO7816_SendAPDU_Le_NoLc
@@ -401,6 +635,8 @@ int ISO7816_SendAPDU_Le_NoLc (typeAPDU *tSC)
 {
 	int           nRet;
 //	int 		  nPointer;
+
+	ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_NORMAL);
 
 // Build the send string
 	tSC->cSendData[0] = tSC->tAPDU.cCLA;
@@ -428,6 +664,8 @@ int ISO7816_SendAPDU_Le_NoLc (typeAPDU *tSC)
 // go
 	nRet = ISO7816_T1_SendAPDU (tSC);
 
+  ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_CLEAR);
+
 	return (nRet);
 }
 
@@ -437,13 +675,15 @@ int ISO7816_SendAPDU_Le_NoLc (typeAPDU *tSC)
 
   Reviews
   Date      Reviewer        Info
-  14.08.13  RB              First review
+  16.07.14  RB              First review
 
 *******************************************************************************/
 
 int ISO7816_SendAPDU_NoLe_Lc (typeAPDU *tSC)
 {
 	int           nRet;
+
+  ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_NORMAL);
 
 // Build the send string
 	tSC->cSendData[0] = tSC->tAPDU.cCLA;
@@ -476,6 +716,8 @@ int ISO7816_SendAPDU_NoLe_Lc (typeAPDU *tSC)
 // go
 	nRet = ISO7816_T1_SendAPDU (tSC);
 
+  ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_CLEAR);
+
 	return (nRet);
 }
 
@@ -492,6 +734,8 @@ int ISO7816_SendAPDU_NoLe_Lc (typeAPDU *tSC)
 int ISO7816_SendAPDU_Le_Lc (typeAPDU *tSC)
 {
 	int           nRet;
+
+	ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_NORMAL);
 
 // Build the header
 	tSC->cSendData[0] = tSC->tAPDU.cCLA;
@@ -544,6 +788,9 @@ int ISO7816_SendAPDU_Le_Lc (typeAPDU *tSC)
 
 // go
 	nRet = ISO7816_T1_SendAPDU (tSC);
+
+  ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_CLEAR);
+
 	return (nRet);
 }
 
