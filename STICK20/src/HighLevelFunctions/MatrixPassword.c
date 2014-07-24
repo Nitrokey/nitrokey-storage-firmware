@@ -156,7 +156,7 @@ u8 PWM_InitRandomChar (void)
   }
   InitCalls_u8 = 0;
 
-  LA_RestartSmartcard_u8 ();    // Todo lock transcation
+//  LA_RestartSmartcard_u8 ();    // Todo lock transcation
 
   if (FALSE == GetRandomNumber_u32 (PWM_RAMDOMCHAR_BUFFERSIZE,PWM_Randomchars_au8))
   {
@@ -177,6 +177,10 @@ u8 PWM_InitRandomChar (void)
   }
 
   PWM_RandomcharsPointer_u8 = 0;
+
+//  LA_RestartSmartcard_u8 ();
+  ISO7816_SetLockCounter (0);
+  CCID_SmartcardOff_u8 ();          // To avoid smartcard error - after GetRandomNumber_u32
 
   return (TRUE);
 }

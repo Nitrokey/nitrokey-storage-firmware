@@ -30,15 +30,6 @@
 #define TRUE		1
 #define FALSE   0
 
-/*
-typedef unsigned char  	u8;
-typedef unsigned short 	u16;
-typedef unsigned long  	u32;
-typedef signed char  	s8;
-typedef signed short 	s16;
-typedef signed long  	s32;
-*/
-
 /******************************************************************************
 
   Defines for debugging
@@ -128,9 +119,17 @@ typedef signed long  	s32;
 
 #define HID_PASSWORD_LEN      20
 
-int CI_LocalPrintf (char *szFormat,...);
-int CI_LocalPrintfNoDelay (char *szFormat,...);
-int CI_TickLocalPrintf (char *szFormat,...);
+// Remove all printf in production version
+#ifdef INTERPRETER_ENABLE
+  int CI_LocalPrintf (char *szFormat,...);
+  int CI_LocalPrintfNoDelay (char *szFormat,...);
+  int CI_TickLocalPrintf (char *szFormat,...);
+#else
+  #define CI_LocalPrintf(...)
+  #define CI_TickLocalPrintf(...)
+  #define CI_StringOut(...)
+#endif
+
 
 
 #define FMCK_HZ                       60000000

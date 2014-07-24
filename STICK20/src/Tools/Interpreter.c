@@ -1309,6 +1309,10 @@ void IDF_task_init(void)
 
 *******************************************************************************/
 
+#undef CI_LocalPrintf
+#undef CI_TickLocalPrintf
+#undef CI_StringOut
+
 int CI_TickLocalPrintf (char *szFormat,...)
 {
     return (0);

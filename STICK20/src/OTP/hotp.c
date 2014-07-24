@@ -62,6 +62,8 @@
 
 //#define DEBUG_HOTP
 /*
+*/
+
 #ifdef DEBUG_HOTP
 #else
   #define CI_LocalPrintf(...)
@@ -70,7 +72,7 @@
   #define CI_Print8BitValue(...)
   #define HexPrint(...)
 #endif
-*/
+
 //#define LITTLE_ENDIAN
 
 #define BIG_ENDIAN        // AVR is BIG_ENDIAN

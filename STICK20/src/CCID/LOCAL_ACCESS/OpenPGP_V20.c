@@ -44,7 +44,7 @@
 
 *******************************************************************************/
 
-//#define DEBUG_OPENPGP
+#define DEBUG_OPENPGP
 //#define DEBUG_OPENPGP_SHOW_CALLS
 
 #ifndef DEBUG_OPENPGP
@@ -257,6 +257,70 @@ int LA_OpenPGP_V20_GetData (typeAPDU *tSC, unsigned char cP1, unsigned char cP2)
 	return (nRet);
 }
 
+
+
+/*******************************************************************************
+
+  LA_OpenPGP_V20_ResetRetryCounter
+
+  Admin access had to be enabled (PW3)
+
+  Changes
+  Date      Author          Info
+  22.08.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+
+*******************************************************************************/
+
+int LA_OpenPGP_V20_ResetRetryCounter (typeAPDU *tSC, unsigned char cPasswordLen, unsigned char *pcPassword)
+{
+  int     nRet;
+
+#ifdef DEBUG_OPENPGP_SHOW_CALLS
+  CI_TickLocalPrintf ("ISO7816: Call ResetRetryCounter\r\n");
+#endif
+
+//  Correct length ?
+  if (6 > cPasswordLen)
+  {
+    return (FALSE);
+  }
+
+  if (ISO7816_MAX_APDU_DATA+ISO7816_APDU_SEND_HEADER_LEN+ISO7816_APDU_OFERHEAD <= cPasswordLen)
+  {
+    return (FALSE);
+  }
+
+// Command
+  tSC->tAPDU.cCLA     = 0x00;
+  tSC->tAPDU.cINS     = 0x2C;
+  tSC->tAPDU.cP1      = 0x02;
+  tSC->tAPDU.cP2      = 0x81;
+
+// Send password
+  tSC->tAPDU.nLc      = cPasswordLen;
+
+// New password
+  memcpy (tSC->tAPDU.cData,pcPassword,cPasswordLen);
+
+// Nothing to receive
+  tSC->tAPDU.nLe      = 0;
+
+  nRet = ISO7816_SendAPDU_NoLe_Lc (tSC);
+
+  // Check for error
+  if ((0x90 != tSC->tState.cSW1) && (0x90 != tSC->tState.cSW2))
+  {
+    nRet = FALSE;
+  }
+
+  return (nRet);
+}
+
+
 /*******************************************************************************
 
   LA_OpenPGP_V20_Verify
@@ -308,7 +372,7 @@ int LA_OpenPGP_V20_Verify (typeAPDU *tSC, unsigned char cPW,unsigned char cPassw
 // Nothing to receive
 	tSC->tAPDU.nLe      = 0;
 
-	nRet = ISO7816_SendAPDU_NoLe_Lc (tSC); // Todo _NoLe_NoLc
+	nRet = ISO7816_SendAPDU_NoLe_Lc (tSC);
 
 	// Check for error
   if ((0x90 != tSC->tState.cSW1) && (0x90 != tSC->tState.cSW2))
@@ -355,7 +419,7 @@ int LA_OpenPGP_V20_GetChallenge (typeAPDU *tSC, int nReceiveLength, unsigned cha
 // Something to receive
   tSC->tAPDU.nLe      = nReceiveLength; // nReceiveLength;
 
-  nRet = ISO7816_SendAPDU_Le_NoLc (tSC);  // Todo _NoLe_NoLc
+  nRet = ISO7816_SendAPDU_Le_NoLc (tSC);
 
   n = tSC->nReceiveDataLen;
   if (n < tSC->nReceiveDataLen)
@@ -423,7 +487,7 @@ int LA_OpenPGP_V20_GetPublicKey (typeAPDU *tSC,int nKind, int nReceiveLength, un
 // Something to receive
   tSC->tAPDU.nLe      = 0;
 
-  nRet = ISO7816_SendAPDU_Le_Lc (tSC); // Todo _NoLe_NoLc
+  nRet = ISO7816_SendAPDU_Le_Lc (tSC);
 
   n = tSC->nReceiveDataLen;
   if (n < tSC->nReceiveDataLen)
@@ -481,7 +545,7 @@ int LA_OpenPGP_V20_ComputeSignature (typeAPDU *tSC,int nSendLength,unsigned char
 // Something to receive
   tSC->tAPDU.nLe      = nReceiveLength;
 
-  nRet = ISO7816_SendAPDU_Le_Lc (tSC); // Todo _NoLe_NoLc
+  nRet = ISO7816_SendAPDU_Le_Lc (tSC);
 
   n = tSC->nReceiveDataLen;
   if (n < tSC->nReceiveDataLen)
@@ -538,7 +602,7 @@ int LA_OpenPGP_V20_Decipher (typeAPDU *tSC, int nSendLength,unsigned char *cSend
 // Something to receive
   tSC->tAPDU.nLe      = 0; // 2048; // nReceiveLength;
 
-  nRet = ISO7816_SendAPDU_Le_Lc (tSC); // Todo _NoLe_NoLc
+  nRet = ISO7816_SendAPDU_Le_Lc (tSC);
   return (nRet);
 }
 
@@ -589,7 +653,7 @@ int LA_OpenPGP_V20_Put_AES_key (typeAPDU *tSC,unsigned char cKeyLen,unsigned cha
 // Nothing to receive
   tSC->tAPDU.nLe      = 0;
 
-  nRet = ISO7816_SendAPDU_NoLe_Lc (tSC); // Todo _NoLe_NoLc
+  nRet = ISO7816_SendAPDU_NoLe_Lc (tSC);
 
   return (nRet);
 }
@@ -638,7 +702,7 @@ int LA_OpenPGP_V20_AES_Enc (typeAPDU *tSC, int nSendLength,unsigned char *cSendD
 // Something to receive
   tSC->tAPDU.nLe      = 0;  // nReceiveLength;
 
-  nRet = ISO7816_SendAPDU_Le_Lc (tSC); // Todo _NoLe_NoLc
+  nRet = ISO7816_SendAPDU_Le_Lc (tSC);
   return (nRet);
 }
 
@@ -687,7 +751,7 @@ int LA_OpenPGP_V20_AES_Dec_SUB (typeAPDU *tSC, int nSendLength,unsigned char *cS
 // Something to receive
   tSC->tAPDU.nLe      = nSendLength; // nReceiveLength;
 
-  nRet = ISO7816_SendAPDU_Le_Lc (tSC); // Todo _NoLe_NoLc
+  nRet = ISO7816_SendAPDU_Le_Lc (tSC);
 
   n = tSC->nReceiveDataLen;
   if (n < tSC->nReceiveDataLen)
@@ -1298,9 +1362,40 @@ int LA_OpenPGP_V20_ResetCard (void)
   if (FALSE == nRet)
   {
   }
-
+  return (TRUE);
 }
 
+/*******************************************************************************
+
+  LA_OpenPGP_V20_Test_ResetRetryCounter
+
+  Changes
+  Date      Author          Info
+  22.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+int LA_OpenPGP_V20_Test_ResetRetryCounter (unsigned char *pcPW)
+{
+  int nRet;
+  int n;
+
+  n = strlen ((char *)pcPW);
+
+  CI_LocalPrintf ("Reset user password  : ");
+  nRet = LA_OpenPGP_V20_ResetRetryCounter (&tSC_OpenPGP_V20,n,pcPW);
+  if (FALSE == nRet)
+  {
+    CI_LocalPrintf ("fail\n\r");
+    return (FALSE);
+  }
+  CI_LocalPrintf ("OK \n\r");
+
+  return (TRUE);
+}
 
 /*******************************************************************************
 
@@ -1702,6 +1797,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
     CI_LocalPrintf ("16 count   Generate [count] random numbers a 10 byte\r\n");
     CI_LocalPrintf ("17 count   Generate [count] *10 random numbers [output as 0,1 stream]\r\n");
     CI_LocalPrintf ("18 FiDi    FiDi Test\r\n");
+    CI_LocalPrintf ("19 UserPW1 Reset error counter with PW1 (admin access)\r\n");
     CI_LocalPrintf ("99         Factory reset smartcard \r\n");
     CI_LocalPrintf ("\r\n");
     return;
@@ -1946,6 +2042,12 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
 #endif
 
           break;
+    case 19 :
+          sprintf (LocalString_au8,"%d",Param_u32);
+          CI_LocalPrintf ("Reset user pw counter with password -%s-\r\n",LocalString_au8);
+          Ret_u32 = LA_OpenPGP_V20_Test_ResetRetryCounter (LocalString_au8);
+          break;
+
     case 99 :
         LA_OpenPGP_V20_ResetCard();
         break;

@@ -56,6 +56,7 @@
 #define ISO7816_MAX_ATR_CHARS 		40
 
 #define DEBUG_ISO7816_IO
+//#define DEBUG_ISO7816_IO_DETAIL
 
 #ifdef DEBUG_ISO7816_IO
   int CI_LocalPrintf (char *szFormat,...);
@@ -162,7 +163,7 @@ void ISO7816_SetLockCounter (u32 Value_u32)
 {
   int LockActive_u32;
 
-#ifdef DEBUG_ISO7816_IO
+#ifdef DEBUG_ISO7816_IO_DETAIL
   {
     u8 Text[20];
     itoa (xTickCount/2,Text);   // in msec
@@ -217,7 +218,7 @@ void ISO7816_DecLockCounter (void)
   if (0 != ISO7816_LockCounter_u32)
   {
     ISO7816_LockCounter_u32--;
-#ifdef DEBUG_ISO7816_IO
+#ifdef DEBUG_ISO7816_IO_DETAIL
     if (0 == ISO7816_LockCounter_u32)
     {
       u8 Text[20];
