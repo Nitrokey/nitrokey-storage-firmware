@@ -77,6 +77,7 @@
 #define CI_CMD_OTP                     31
 #define CI_CMD_PWM                     32
 #define CI_CMD_HIDDEN_VOULME           33
+#define CI_CMD_PASSWORD_SAFE           34
 
 
 

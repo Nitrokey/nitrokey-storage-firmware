@@ -73,6 +73,7 @@
 #include "..\HighLevelFunctions\HandleAesStorageKey.h"
 #include "SD_Test.h"
 #include "..\HighLevelFunctions\HiddenVolume.h"
+#include "..\HighLevelFunctions\password_safe.h"
 
 /*******************************************************************************
 
@@ -150,6 +151,7 @@ typeCommand tCommandData[CI_MAX_COMMANDS] =
     {   "otp",      "",                                          CI_CMD_OTP,             "OPT tests",},
     {   "pwm",      "",                                          CI_CMD_PWM,             "Password matrix",},
     {   "hv",       "",                                          CI_CMD_HIDDEN_VOULME,   "Hidden volumes",},
+    {   "pws",      "",                                          CI_CMD_PASSWORD_SAFE,   "Password safe",},
     { NULL,NULL,0,NULL}
 };
 
@@ -1120,6 +1122,10 @@ int CI_ExecCmd (char *szCommandLine)
       CI_LocalPrintf ("Test not enabled - activate ENABLE_IBN_HV_TESTS\n\r");
 #endif
       break;
+    case CI_CMD_PASSWORD_SAFE :
+      IBN_PWS_Tests (nParamsGet_u8,(u8)nValue[0],nValue[1],String_pu8[0]);
+      break;
+
    }
 
 #ifdef TIME_MEASURING_ENABLE

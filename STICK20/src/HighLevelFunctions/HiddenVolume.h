@@ -83,6 +83,7 @@ u8 DecryptedHiddenVolumeSlotsData (void);
 u8 GetHiddenVolumeSlotKey (u8 *HiddenVolumeKey_pu8,u8 *Password_pu8,u32 PasswordLen_u32,u8 *Salt_pu8,u32 SaltLen_u32);
 u8 SetupUpHiddenVolumeSlot (HiddenVolumeSetup_tst *HV_Setup_st);
 u8 GetHiddenVolumeKeyFromUserpassword (u8 *Userpassword_pu8,u8 *DecryptedHiddenVolumeKey_au8);
+u8 GetDecryptedHiddenVolumeSlotsKey (u8 **Key_pa8);
 void IBN_HV_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int Param_u32,unsigned char *String_pu8);
 
 

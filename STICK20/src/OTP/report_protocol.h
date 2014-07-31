@@ -50,7 +50,18 @@
 #define CMD_GET_PASSWORD_RETRY_COUNT      0x09
 #define CMD_CLEAR_WARNING                 0x0A
 
+
+#define CMD_GET_PW_SAFE_SLOT_STATUS       0x60
+#define CMD_GET_PW_SAFE_SLOT_NAME         0x61
+#define CMD_GET_PW_SAFE_SLOT_PASSWORD     0x62
+#define CMD_GET_PW_SAFE_SLOT_LOGINNAME    0x63
+#define CMD_SET_PW_SAFE_SLOT_DATA_1       0x64
+#define CMD_SET_PW_SAFE_SLOT_DATA_2       0x65
+#define CMD_PW_SAFE_ERASE_SLOT            0x66
+
+
 #define STICK20_CMD_START_VALUE                         0x10
+#define STICK20_CMD_END_VALUE                           0x60
 #define STICK20_CMD_ENABLE_CRYPTED_PARI                 (STICK20_CMD_START_VALUE +  0)
 #define STICK20_CMD_DISABLE_CRYPTED_PARI                (STICK20_CMD_START_VALUE +  1)
 #define STICK20_CMD_ENABLE_HIDDEN_CRYPTED_PARI          (STICK20_CMD_START_VALUE +  2)    // Not used
@@ -323,6 +334,13 @@ u8 cmd_erase_slot(u8 *report,u8 *output);
 u8 cmd_first_authenticate(u8 *report,u8 *output);
 u8 cmd_authorize(u8 *report,u8 *output);
 u8 cmd_getPasswordCount (u8 *report,u8 *output);
+u8 cmd_getPasswordSafeStatus (u8 *report,u8 *output);
+u8 cmd_getPasswordSafeSlotName (u8 *report,u8 *output);
+u8 cmd_getPasswordSafeSlotPassword (u8 *report,u8 *output);
+u8 cmd_getPasswordSafeSlotLoginName (u8 *report,u8 *output);
+u8 cmd_getPasswordSafeSetSlotData_1 (u8 *report,u8 *output);
+u8 cmd_getPasswordSafeSetSlotData_2 (u8 *report,u8 *output);
+u8 cmd_getPasswordSafeEraseSlot (u8 *report,u8 *output);
 
 void OTP_main (void);
 

@@ -59,6 +59,7 @@
 
 #include "HighLevelFunctions/FlashStorage.h"
 #include "User_Interface/html_io.h"
+#include "HighLevelFunctions/password_safe.h"
 
 
 /*******************************************************************************
@@ -730,6 +731,41 @@ u8 parse_report(u8 *report,u8 *output)
         output[OUTPUT_CMD_RESULT_STICK20_STATUS_START] = 0xaa;
         break;
 
+      case CMD_GET_PW_SAFE_SLOT_STATUS:
+        CI_StringOut ("Get CMD_GET_PW_SAFE_SLOT_STATUS\r\n");
+        cmd_getPasswordSafeStatus (report,output);
+        break;
+
+      case CMD_GET_PW_SAFE_SLOT_NAME:
+        CI_StringOut ("Get CMD_GET_PW_SAFE_SLOT_NAME\r\n");
+        cmd_getPasswordSafeSlotName (report,output);
+        break;
+
+      case CMD_GET_PW_SAFE_SLOT_PASSWORD:
+        CI_StringOut ("Get CMD_GET_PW_SAFE_SLOT_PASSWORD\r\n");
+        cmd_getPasswordSafeSlotPassword (report,output);
+        break;
+
+      case CMD_GET_PW_SAFE_SLOT_LOGINNAME:
+        CI_StringOut ("Get CMD_GET_PW_SAFE_SLOT_LOGINNAME\r\n");
+        cmd_getPasswordSafeSlotLoginName (report,output);
+        break;
+
+      case CMD_SET_PW_SAFE_SLOT_DATA_1 :
+        CI_StringOut ("Get CMD_GET_PW_SAFE_SET_SLOT_DATA_1\r\n");
+        cmd_getPasswordSafeSetSlotData_1 (report,output);
+        break;
+
+      case CMD_SET_PW_SAFE_SLOT_DATA_2:
+        CI_StringOut ("Get CMD_GET_PW_SAFE_SET_SLOT_DATA_2\r\n");
+        cmd_getPasswordSafeSetSlotData_2 (report,output);
+        break;
+
+      case CMD_PW_SAFE_ERASE_SLOT:
+        CI_StringOut ("Get CMD_GET_PW_SAFE_ERASE_SLOT\r\n");
+        cmd_getPasswordSafeEraseSlot (report,output);
+        break;
+
     }
     if (not_authorized)
     {
@@ -748,7 +784,7 @@ u8 parse_report(u8 *report,u8 *output)
   }
 
   // Stick 2.0 commands
-  if (STICK20_CMD_START_VALUE <=cmd_type)
+  if ((STICK20_CMD_START_VALUE <=cmd_type) && (STICK20_CMD_END_VALUE > cmd_type))
   {
     if ((calculated_crc32==received_crc32))
     {
@@ -1027,7 +1063,6 @@ u8 parse_report(u8 *report,u8 *output)
 
   }
 
-
 // Stick 20 Send password matrix ?
   if (0 != Stick20HIDSendMatrixState_u8)
   {
@@ -1083,7 +1118,6 @@ u8 parse_report(u8 *report,u8 *output)
       CI_Print8BitValue (output[i]);
   }
   CI_StringOut ("\n\r");
-
 #endif
 
   return 0;
@@ -1612,6 +1646,224 @@ u8 cmd_getPasswordCount (u8 *report,u8 *output)
 
   return (0);
 }
+
+/*******************************************************************************
+
+  cmd_getPasswordSafeStatus
+
+  Changes
+  Date      Reviewer        Info
+  30.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getPasswordSafeStatus (u8 *report,u8 *output)
+{
+  u8  Data_u8[PWS_SLOT_COUNT];
+  u32 Ret_u32;
+
+  Ret_u32 = PWS_GetAllSlotStatus (Data_u8);
+  if (TRUE == Ret_u32)
+  {
+    memcpy (&output[OUTPUT_CMD_RESULT_OFFSET],Data_u8,PWS_SLOT_COUNT);
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+  }
+  else
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
+  }
+
+  return (0);
+}
+
+
+/*******************************************************************************
+
+  cmd_getPasswordSafeSlotName
+
+  Changes
+  Date      Reviewer        Info
+  30.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getPasswordSafeSlotName (u8 *report,u8 *output)
+{
+  u32 Ret_u32;
+
+  Ret_u32 = PWS_GetSlotName (report[1],&output[OUTPUT_CMD_RESULT_OFFSET]);
+  if (TRUE == Ret_u32)
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+  }
+  else
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
+  }
+
+  return (0);
+}
+
+/*******************************************************************************
+
+  cmd_getPasswordSafeSlotPassword
+
+  Changes
+  Date      Reviewer        Info
+  30.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getPasswordSafeSlotPassword (u8 *report,u8 *output)
+{
+  u32 Ret_u32;
+
+  Ret_u32 = PWS_GetSlotPassword (report[1],&output[OUTPUT_CMD_RESULT_OFFSET]);
+  if (TRUE == Ret_u32)
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+  }
+  else
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
+  }
+
+  return (0);
+}
+
+/*******************************************************************************
+
+  cmd_getPasswordSafeSlotLoginName
+
+  Changes
+  Date      Reviewer        Info
+  30.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getPasswordSafeSlotLoginName (u8 *report,u8 *output)
+{
+  u32 Ret_u32;
+
+  Ret_u32 = PWS_GetSlotLoginName (report[1],&output[OUTPUT_CMD_RESULT_OFFSET]);
+  if (TRUE == Ret_u32)
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+  }
+  else
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
+  }
+
+  return (0);
+}
+
+/*******************************************************************************
+
+  cmd_getPasswordSafeSetSlotData_1
+
+  Changes
+  Date      Reviewer        Info
+  30.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getPasswordSafeSetSlotData_1 (u8 *report,u8 *output)
+{
+  u32 Ret_u32;
+
+// Slot name, Slot password. Don't write it into flash
+  Ret_u32 = PWS_WriteSlotData_1 (report[1],&report[2],&report[2+PWS_SLOTNAME_LENGTH]);
+
+  if (TRUE == Ret_u32)
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+  }
+  else
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
+  }
+
+  return (0);
+}
+
+/*******************************************************************************
+
+  cmd_getPasswordSafeSetSlotData_2
+
+  Changes
+  Date      Reviewer        Info
+  30.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getPasswordSafeSetSlotData_2 (u8 *report,u8 *output)
+{
+  u32 Ret_u32;
+
+// Slot login name and write to flash
+  Ret_u32 = PWS_WriteSlotData_2 (report[1],&report[2]);
+
+  if (TRUE == Ret_u32)
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+  }
+  else
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
+  }
+
+  return (0);
+}
+
+/*******************************************************************************
+
+  cmd_getPasswordSafeEraseSlot
+
+  Changes
+  Date      Reviewer        Info
+  30.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getPasswordSafeEraseSlot (u8 *report,u8 *output)
+{
+  u32 Ret_u32;
+
+  Ret_u32 = PWS_EraseSlot (report[1]);
+  if (TRUE == Ret_u32)
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+  }
+  else
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
+  }
+
+  return (0);
+}
+
 
 /*******************************************************************************
 

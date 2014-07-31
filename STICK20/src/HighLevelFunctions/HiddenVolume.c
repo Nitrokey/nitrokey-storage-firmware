@@ -94,7 +94,19 @@ void SetHiddenVolumeSizes_u32 (U32 StartBlock_u32, U32 EndBlock_u32);
 
 static u8  DecryptedHiddenVolumeSlotsActive_u8 = FALSE;
 static u32 DecryptedHiddenVolumeMagicNumber_u32;
+
+#if (defined __GNUC__) && (defined __AVR32__)
+  __attribute__((__aligned__(4)))
+#elif (defined __ICCAVR32__)
+  #pragma data_alignment = 4
+#endif
 static u8  DecryptedHiddenVolumeSlotsKey_au8[AES_KEYSIZE_256_BIT];
+
+#if (defined __GNUC__) && (defined __AVR32__)
+  __attribute__((__aligned__(4)))
+#elif (defined __ICCAVR32__)
+  #pragma data_alignment = 4
+#endif
 static u8  DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE + HV_SLOT_SIZE * HV_SLOT_COUNT];
 
 
@@ -143,6 +155,11 @@ u8 HV_PrintSlotData_u8 (u8 SlotNr_u8,HiddenVolumeKeySlot_tst *SlotData_st)
 u8 HV_ReadSlot_u8 (u8 SlotNr_u8,HiddenVolumeKeySlot_tst *SlotData_st,u8 *SlotKey_pu8)
 {
   u32 Crc32_u32;
+#if (defined __GNUC__) && (defined __AVR32__)
+  __attribute__((__aligned__(4)))
+#elif (defined __ICCAVR32__)
+  #pragma data_alignment = 4
+#endif
   u8  Buffer_au8[HV_SLOT_SIZE];
 
   if (FALSE == DecryptedHiddenVolumeSlotsActive_u8)
@@ -720,10 +737,12 @@ u8 DecryptedHiddenVolumeSlotsData (void)
 // Get the encrypted hidden volume slots key
   ReadHiddenVolumeSlotsKey (DecryptedHiddenVolumeSlotsKey_au8);
 
+/* Don't restart because the password access is lost
   if (FALSE == LA_SC_StartSmartcard ())
   {
     return (FALSE);
   }
+*/
 
   CI_LocalPrintf ("Decrypt hidden volume slots key\r\n");
 // Decrypt the slots key of the hidden volumes
@@ -743,6 +762,34 @@ u8 DecryptedHiddenVolumeSlotsData (void)
 
 // Key is ready
   DecryptedHiddenVolumeSlotsActive_u8 = TRUE;
+
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
+  DecryptedHiddenVolumeSlotsData
+
+  Changes
+  Date      Reviewer        Info
+  27.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 GetDecryptedHiddenVolumeSlotsKey (u8 **Key_pu8)
+{
+  *Key_pu8 = NULL;
+
+  if (FALSE == DecryptedHiddenVolumeSlotsActive_u8)
+  {
+    return (FALSE);
+  }
+
+  *Key_pu8 = DecryptedHiddenVolumeSlotsKey_au8;
 
   return (TRUE);
 }

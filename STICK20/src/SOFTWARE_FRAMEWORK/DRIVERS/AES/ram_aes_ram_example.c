@@ -344,7 +344,7 @@ void STICK20_ram_aes_ram(unsigned char cMode, unsigned short int u16BufferSize, 
 
   // Channel 0 Ctrl register high
   AVR32_DMACA.ctl0h =
-    (u16BufferSize << AVR32_DMACA_CTL0H_BLOCK_TS_OFFSET) | // Block transfer size
+    ((u16BufferSize/4) << AVR32_DMACA_CTL0H_BLOCK_TS_OFFSET) | // Block transfer size
     (0             << AVR32_DMACA_CTL0H_DONE_OFFSET)       // Not done
     ;
 
@@ -402,7 +402,7 @@ void STICK20_ram_aes_ram(unsigned char cMode, unsigned short int u16BufferSize, 
 
   // Channel 1 Ctrl register high
   AVR32_DMACA.ctl1h =
-    (u16BufferSize << AVR32_DMACA_CTL1H_BLOCK_TS_OFFSET) | // Block transfer size
+    ((u16BufferSize/4) << AVR32_DMACA_CTL1H_BLOCK_TS_OFFSET) | // Block transfer size
     (0             << AVR32_DMACA_CTL1H_DONE_OFFSET)       // Not done
     ;
 
@@ -827,7 +827,7 @@ void test_ram_aes_ram(unsigned short int u16BufferSize, unsigned int *pSrcBuf, u
 
   // Channel 0 Ctrl register high
   AVR32_DMACA.ctl0h =
-    (u16BufferSize << AVR32_DMACA_CTL0H_BLOCK_TS_OFFSET) | // Block transfer size
+    ((u16BufferSize/4) << AVR32_DMACA_CTL0H_BLOCK_TS_OFFSET) | // Block transfer size
     (0             << AVR32_DMACA_CTL0H_DONE_OFFSET)       // Not done
     ;
 
@@ -886,7 +886,7 @@ void test_ram_aes_ram(unsigned short int u16BufferSize, unsigned int *pSrcBuf, u
 
   // Channel 1 Ctrl register high
   AVR32_DMACA.ctl1h =
-    (u16BufferSize << AVR32_DMACA_CTL1H_BLOCK_TS_OFFSET) | // Block transfer size
+    ((u16BufferSize/4) << AVR32_DMACA_CTL1H_BLOCK_TS_OFFSET) | // Block transfer size
     (0             << AVR32_DMACA_CTL1H_DONE_OFFSET)       // Not done
     ;
 
@@ -1004,7 +1004,7 @@ void AES_Encryption (unsigned short int u16BufferSize, unsigned int *pSrcBuf, un
 
   // Channel 0 Ctrl register high
   AVR32_DMACA.ctl0h =
-    (u16BufferSize << AVR32_DMACA_CTL0H_BLOCK_TS_OFFSET) | // Block transfer size
+    ((u16BufferSize/4) << AVR32_DMACA_CTL0H_BLOCK_TS_OFFSET) | // Block transfer size
     (0             << AVR32_DMACA_CTL0H_DONE_OFFSET)       // Not done
     ;
 
@@ -1063,7 +1063,7 @@ void AES_Encryption (unsigned short int u16BufferSize, unsigned int *pSrcBuf, un
 
   // Channel 1 Ctrl register high
   AVR32_DMACA.ctl1h =
-    (u16BufferSize << AVR32_DMACA_CTL1H_BLOCK_TS_OFFSET) | // Block transfer size
+    ((u16BufferSize/4) << AVR32_DMACA_CTL1H_BLOCK_TS_OFFSET) | // Block transfer size
     (0             << AVR32_DMACA_CTL1H_DONE_OFFSET)       // Not done
     ;
 

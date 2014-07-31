@@ -731,11 +731,12 @@ int LA_OpenPGP_V20_AES_Dec_SUB (typeAPDU *tSC, int nSendLength,unsigned char *cS
     return (FALSE);
   }
 
+/* Don't restart because the password access is lost
   if (FALSE == LA_SC_StartSmartcard ())
   {
     return (FALSE);
   }
-
+*/
 // Command
   tSC->tAPDU.cCLA     = 0x00;
   tSC->tAPDU.cINS     = 0x2A;

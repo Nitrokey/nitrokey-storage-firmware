@@ -626,7 +626,7 @@ Bool flashc_quick_page_read(int page_number)
   return flashc_is_page_erased();
 }
 
-#define DEBUG_FLASHC
+//#define DEBUG_FLASHC
 
 Bool flashc_erase_page(int page_number, Bool check)
 {
