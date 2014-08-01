@@ -58,7 +58,9 @@
 #define CMD_SET_PW_SAFE_SLOT_DATA_1       0x64
 #define CMD_SET_PW_SAFE_SLOT_DATA_2       0x65
 #define CMD_PW_SAFE_ERASE_SLOT            0x66
-
+#define CMD_PW_SAFE_ENABLE                0x67
+#define CMD_PW_SAFE_INIT_KEY              0x68
+#define CMD_PW_SAFE_SEND_DATA             0x69
 
 #define STICK20_CMD_START_VALUE                         0x10
 #define STICK20_CMD_END_VALUE                           0x60
@@ -341,6 +343,9 @@ u8 cmd_getPasswordSafeSlotLoginName (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeSetSlotData_1 (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeSetSlotData_2 (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeEraseSlot (u8 *report,u8 *output);
+u8 cmd_getPasswordSafeEnable (u8 *report,u8 *output);
+u8 cmd_getPasswordSafeInitKey (u8 *report,u8 *output);
+u8 cmd_getPasswordSafeSendData (u8 *report,u8 *output);
 
 void OTP_main (void);
 

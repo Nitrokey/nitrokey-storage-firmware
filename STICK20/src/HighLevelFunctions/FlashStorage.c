@@ -64,7 +64,7 @@ typeStick20Configuration_st StickConfiguration_st;
  138 - 141    Last stored real timestamp (4 byte)
  142 - 145    ID of sc card (4 byte)
  146 - 177    XOR mask for sc tranfered keys (32 byte)
-
+ 178 - 209    Password safe key (32 byte)
 
 */
 
@@ -905,4 +905,52 @@ u8 ReadXorPatternFromFlash (u8 *XorPattern_pu8)
 
   return (TRUE);
 }
+
+
+/*******************************************************************************
+
+  WritePasswordSafeKey
+
+  Stores the encrypted password safe key
+
+  Byte
+  Len = 32 Byte
+
+  Changes
+  Date      Author          Info
+  01.08.14  RB              Renaming
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 WritePasswordSafeKey (u8 *data)
+{
+  flashc_memcpy((void*)(AVR32_FLASHC_USER_PAGE + 178),data,32,TRUE);
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  ReadPasswordSafeKey
+
+  Read the encrypted password safe key
+
+  Changes
+  Date      Author          Info
+  01.08.14  RB              Renaming
+
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 ReadPasswordSafeKey (u8 *data)
+{
+  memcpy (data,(void*)(AVR32_FLASHC_USER_PAGE + 178),32);
+  return (TRUE);
+}
+
 

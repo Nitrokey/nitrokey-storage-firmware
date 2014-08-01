@@ -766,6 +766,22 @@ u8 parse_report(u8 *report,u8 *output)
         cmd_getPasswordSafeEraseSlot (report,output);
         break;
 
+      case CMD_PW_SAFE_ENABLE:
+        CI_StringOut ("Get CMD_PW_SAFE_ENABLE\r\n");
+        cmd_getPasswordSafeEnable (report,output);
+        break;
+
+      case CMD_PW_SAFE_INIT_KEY:
+        CI_StringOut ("Get CMD_PW_SAFE_INIT_KEY\r\n");
+        cmd_getPasswordSafeInitKey (report,output);
+        break;
+
+      case CMD_PW_SAFE_SEND_DATA:
+        CI_StringOut ("Get CMD_PW_SAFE_SEND_DATA\r\n");
+        cmd_getPasswordSafeSendData (report,output);
+        break;
+
+
     }
     if (not_authorized)
     {
@@ -1587,6 +1603,8 @@ u8 cmd_first_authenticate(u8 *report,u8 *output)
 
     Ret_u32 = LA_OpenPGP_V20_Test_GetAID ();
 
+    PWS_DecryptedPasswordSafeKey ();
+
     return 0;
   }
   else
@@ -1863,6 +1881,97 @@ u8 cmd_getPasswordSafeEraseSlot (u8 *report,u8 *output)
 
   return (0);
 }
+
+/*******************************************************************************
+
+  cmd_getPasswordSafeEnable
+
+  Changes
+  Date      Reviewer        Info
+  01.08.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getPasswordSafeEnable (u8 *report,u8 *output)
+{
+  u32 Ret_u32;
+
+  Ret_u32 = PWS_EnableAccess (&report[1]);
+  if (TRUE == Ret_u32)
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+  }
+  else
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_PASSWORD;
+  }
+
+  return (0);
+}
+
+/*******************************************************************************
+
+  cmd_getPasswordSafeInitKey
+
+  Changes
+  Date      Reviewer        Info
+  30.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getPasswordSafeInitKey (u8 *report,u8 *output)
+{
+  u32 Ret_u32;
+
+  Ret_u32 = PWS_InitKey ();
+  if (TRUE == Ret_u32)
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+  }
+  else
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
+  }
+
+  return (0);
+}
+
+/*******************************************************************************
+
+  cmd_getPasswordSafeSendData
+
+  Changes
+  Date      Reviewer        Info
+  01.08.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getPasswordSafeSendData (u8 *report,u8 *output)
+{
+  u32 Ret_u32;
+
+  Ret_u32 = PWS_SendData (report[1],report[2]);
+  if (TRUE == Ret_u32)
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+  }
+  else
+  {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
+  }
+
+  return (0);
+}
+
 
 
 /*******************************************************************************

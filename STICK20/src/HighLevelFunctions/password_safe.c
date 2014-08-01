@@ -40,10 +40,16 @@
 #include "tools.h"
 #include "TIME_MEASURING.h"
 
-
-
 #include "password_safe.h"
 #include "HiddenVolume.h"
+#include "CCID/USART/ISO7816_USART.h"
+#include "CCID/USART/ISO7816_ADPU.h"
+#include "CCID/USART/ISO7816_Prot_T1.h"
+#include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
+#include "USB_CCID/USB_CCID.h"
+#include "FlashStorage.h"
+#include "HandleAesStorageKey.h"
+#include "OTP/keyboard.h"
 
 /*******************************************************************************
 
@@ -83,6 +89,17 @@
  Local declarations
 
 *******************************************************************************/
+#define AES_KEYSIZE_256_BIT     32        // 32 * 8 = 256
+
+static u8 DecryptedPasswordSafeKey_u8 = FALSE;
+
+#if (defined __GNUC__) && (defined __AVR32__)
+  __attribute__((__aligned__(4)))
+#elif (defined __ICCAVR32__)
+  #pragma data_alignment = 4
+#endif
+static u8 DecryptedPasswordSafeKey_au8[AES_KEYSIZE_256_BIT];
+
 /*
 #if (defined __GNUC__) && (defined __AVR32__)
   __attribute__((__aligned__(4)))
@@ -125,9 +142,9 @@ u8 PWS_WriteSlot (u8 Slot_u8, typePasswordSafeSlot_st *Slot_st)
     return (FALSE);
   }
 
-  if (FALSE == GetDecryptedHiddenVolumeSlotsKey(&AesKeyPointer_pu8))
+  if (FALSE == PWS_GetDecryptedPasswordSafeKey(&AesKeyPointer_pu8))
   {
-    CI_LocalPrintf ("PWS_WriteSlot: AES key not decrypted\r\n");
+    CI_LocalPrintf ("PWS_WriteSlot: Key not decrypted\r\n");
     return (FALSE);
   }
 
@@ -196,7 +213,7 @@ u8 PWS_EraseSlot (u8 Slot_u8)
   }
 
 // Check for unlock
-  if (FALSE == GetDecryptedHiddenVolumeSlotsKey(&AesKeyPointer_pu8))
+  if (FALSE == PWS_GetDecryptedPasswordSafeKey(&AesKeyPointer_pu8))
   {
     CI_LocalPrintf ("PWS_EraseSlot: user password not entered\r\n");
     return (FALSE);
@@ -256,9 +273,9 @@ u8 PWS_ReadSlot (u8 Slot_u8, typePasswordSafeSlot_st *Slot_st)
     return (FALSE);
   }
 
-  if (FALSE == GetDecryptedHiddenVolumeSlotsKey(&AesKeyPointer_pu8))
+  if (FALSE == PWS_GetDecryptedPasswordSafeKey(&AesKeyPointer_pu8))
   {
-    CI_LocalPrintf ("PWS_ReadSlot: AES key not decrypted\r\n");
+    CI_LocalPrintf ("PWS_ReadSlot: key not decrypted\r\n");
     return (FALSE);     // Aes key is not decrypted
   }
 
@@ -313,9 +330,9 @@ u8 PWS_GetAllSlotStatus (u8 *StatusArray_pu8)
   memset (StatusArray_pu8,0,PWS_SLOT_COUNT);
 
 // Check for user password enable
-  if (FALSE == GetDecryptedHiddenVolumeSlotsKey(&AesKeyPointer_pu8))
+  if (FALSE == PWS_GetDecryptedPasswordSafeKey(&AesKeyPointer_pu8))
   {
-    CI_LocalPrintf ("PWS_ReadSlot: AES key not decrypted\r\n");
+    CI_LocalPrintf ("PWS_ReadSlot: key not decrypted\r\n");
     return (FALSE);     // Aes key is not decrypted
   }
 
@@ -511,6 +528,231 @@ u8 PWS_WriteSlotData_2 (u8 Slot_u8,u8 *Loginname_pu8)
 
 /*******************************************************************************
 
+  BuildPasswordSafeKey_u32
+
+  Changes
+  Date      Author          Info
+  01.08.14  RB              Frist Implementation
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u32 BuildPasswordSafeKey_u32 (void)
+{
+  u8 Key_au8[AES_KEYSIZE_256_BIT];
+
+  CI_TickLocalPrintf ("BuildPasswordSafeKey_u32\r\n");
+  LA_RestartSmartcard_u8 ();
+
+// Get a random number for the master key
+  if (FALSE == GetRandomNumber_u32 (AES_KEYSIZE_256_BIT/2,Key_au8))
+  {
+    CI_LocalPrintf ("GetRandomNumber fails 1\n\r");
+    return (FALSE);
+  }
+
+// Get a random number for the master key
+  if (FALSE == GetRandomNumber_u32 (AES_KEYSIZE_256_BIT/2,&Key_au8[AES_KEYSIZE_256_BIT/2]))
+  {
+    CI_LocalPrintf ("GetRandomNumber fails 2\n\r");
+    return (FALSE);
+  }
+
+  WritePasswordSafeKey (Key_au8);
+
+// Old Key is invalid
+   DecryptedPasswordSafeKey_u8 = FALSE;
+
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
+  DecryptedPasswordSafeKey
+
+  Changes
+  Date      Reviewer        Info
+  01.08.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 PWS_DecryptedPasswordSafeKey (void)
+{
+  if (TRUE == DecryptedPasswordSafeKey_u8)
+  {
+    return (TRUE);
+  }
+
+  CI_LocalPrintf ("Decrypt password safe key\r\n");
+
+// Get the encrypted hidden volume slots key
+  ReadPasswordSafeKey (DecryptedPasswordSafeKey_au8);
+
+// Decrypt the slots key of the hidden volumes
+  if (FALSE == DecryptKeyViaSmartcard_u32 (DecryptedPasswordSafeKey_au8))
+  {
+    return (FALSE);
+  }
+
+// Key is ready
+  DecryptedPasswordSafeKey_u8 = TRUE;
+
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
+  PWS_EnableAccess
+
+  Changes
+  Date      Reviewer        Info
+  01.08.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 PWS_EnableAccess (u8 *password)
+{
+  u32 Ret_u32;
+
+  CI_LocalPrintf ("PWS_EnableAccess: ");
+
+  Ret_u32 = LA_SC_SendVerify (2,(unsigned char *)password); // 2 = user pw
+  if (TRUE != Ret_u32)
+  {
+    CI_LocalPrintf (" *** FAIL ***\r\n");
+    return (FALSE);
+  }
+
+  Ret_u32 = PWS_DecryptedPasswordSafeKey ();
+  if (TRUE != Ret_u32)
+  {
+    CI_LocalPrintf (" *** FAIL ***. Can't decrypt key\r\n");
+    return (FALSE);
+  }
+
+  CI_LocalPrintf ("OK\r\n");
+
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
+  PWS_EnableAccess
+
+  Changes
+  Date      Reviewer        Info
+  01.08.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 PWS_InitKey (void)
+{
+  u32 Ret_u32;
+
+  CI_LocalPrintf ("PWS_InitKey\r\n");
+
+  Ret_u32 = PWS_DecryptedPasswordSafeKey ();
+  if (TRUE != Ret_u32)
+  {
+    CI_LocalPrintf ("PWS_InitKey: *** FAIL ***\r\n");
+    return (FALSE);
+  }
+
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
+  PWS_GetDecryptedPasswordSafeKey
+
+  Changes
+  Date      Reviewer        Info
+  01.08.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 PWS_GetDecryptedPasswordSafeKey (u8 **Key_pu8)
+{
+  *Key_pu8 = NULL;
+
+  if (FALSE == DecryptedPasswordSafeKey_u8)
+  {
+    return (FALSE);
+  }
+
+  *Key_pu8 = DecryptedPasswordSafeKey_au8;
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  PWS_GetDecryptedPasswordSafeKey
+
+  Changes
+  Date      Reviewer        Info
+  01.08.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 PWS_SendData (u8 Slot_u8,u8 Kind_u8)
+{
+  u8  SendString_au8[40];
+  u32 Ret_u32;
+
+  switch (Kind_u8)
+  {
+    case PWS_SEND_PASSWORD :
+            Ret_u32 = PWS_GetSlotPassword (Slot_u8, SendString_au8);
+            if (FALSE == Ret_u32)
+            {
+              return (FALSE);
+            }
+            sendString ((char*)SendString_au8,strlen ((char*)SendString_au8));
+            break;
+    case PWS_SEND_LOGINNAME :
+            Ret_u32 = PWS_GetSlotLoginName (Slot_u8, SendString_au8);
+            if (FALSE == Ret_u32)
+            {
+              return (FALSE);
+            }
+            sendString ((char*)SendString_au8,strlen ((char*)SendString_au8));
+            break;
+    case PWS_SEND_TAB :
+            sendTab ();
+            break;
+    case PWS_SEND_CR :
+            sendEnter ();
+            break;
+
+  }
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
   IBN_PWS_Tests
 
   Changes
@@ -539,9 +781,12 @@ void IBN_PWS_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned in
   {
     CI_LocalPrintf ("Password safe test functions\r\n");
     CI_LocalPrintf ("\r\n");
-    CI_LocalPrintf ("0  [slot] Init test slot [slot]\r\n");
-    CI_LocalPrintf ("1  [slot] read test slot\r\n");
-    CI_LocalPrintf ("2         Get AES key\r\n");
+    CI_LocalPrintf ("0 [slot] Init test slot [slot]\r\n");
+    CI_LocalPrintf ("1 [slot] Read test slot\r\n");
+    CI_LocalPrintf ("2        Get password safe key\r\n");
+    CI_LocalPrintf ("3        Enable password safe access (PIN = 123456)\r\n");
+    CI_LocalPrintf ("4        Build new key\r\n");
+    CI_LocalPrintf ("5 [slot] Send password\r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }
@@ -577,13 +822,23 @@ void IBN_PWS_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned in
       break;
 
     case 2 :
-      if (FALSE == DecryptedHiddenVolumeSlotsData ())
+      if (FALSE == PWS_DecryptedPasswordSafeKey ())
       {
-        CI_LocalPrintf ("Get AES key failed. User password entered ?\r\n");
+        CI_LocalPrintf ("Get password safe failed. User//admin password entered ?\r\n");
       }
       break;
 
     case 3 :
+      CI_LocalPrintf ("Enable password safe PIN %s\r\n","123456");
+      PWS_EnableAccess ((u8*)"123456");
+      break;
+
+    case 4 :
+      BuildPasswordSafeKey_u32 ();
+      break;
+
+    case 5 :
+      PWS_SendData (Param_u32,PWS_SEND_PASSWORD);
       break;
   }
 }

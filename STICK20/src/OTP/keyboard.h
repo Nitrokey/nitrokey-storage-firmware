@@ -110,6 +110,8 @@
 #define KEY_DOWN     81
 #define KEY_LEFT     80
 #define KEY_RIGHT    79
+#define KEY_TAB      43
+#define KEY_SPACE    44
 
 extern volatile u8 numLockClicked;
 extern volatile u8 capsLockClicked;
@@ -121,4 +123,5 @@ void sendString(char* string, u8 len);
 void sendNumber(u32 number);
 void sendNumberN(u32 number,u8 len);
 void sendEnter(void);
+void sendTab (void);
 

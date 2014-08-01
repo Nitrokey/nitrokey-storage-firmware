@@ -117,7 +117,10 @@ void sendChar(u8 chr)
 		else
 		  keyboardBuffer[3]=chr-19;
 	}
-		
+  else if (chr== ' ')
+  {
+    keyboardBuffer[3] = KEY_SPACE;
+  }
   sendKeys(keyboardBuffer);
 
   keyboardBuffer[0]=0;
@@ -146,6 +149,30 @@ void sendEnter()
   keyboardBuffer[3]=0;
   sendKeys(keyboardBuffer);
 }
+
+/*******************************************************************************
+
+  sendTab
+
+  Changes
+  Date      Reviewer        Info
+  01.08.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void sendTab (void)
+{
+  keyboardBuffer[3] = KEY_TAB;
+  sendKeys(keyboardBuffer);
+
+  keyboardBuffer[0]=0;
+  keyboardBuffer[3]=0;
+  sendKeys(keyboardBuffer);
+}
+
 
 /*******************************************************************************
 

@@ -60,6 +60,10 @@ void IBN_PWS_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned in
 #define PWS_SLOT_LENGTH         (PWS_SLOTSTATE_LENGTH + PWS_SLOTNAME_LENGTH + PWS_PASSWORD_LENGTH + PWS_LOGINNAME_LENGTH) //  64 = 1 + 11 + 20 + 32
 #define PWS_WRITECOUNTER_START  (PWS_SLOT_COUNT*PWS_SLOT_LENGTH)
 
+#define PWS_SEND_PASSWORD     0
+#define PWS_SEND_LOGINNAME    1
+#define PWS_SEND_TAB          2
+#define PWS_SEND_CR           3
 
 /*******************************************************************************
 
@@ -118,5 +122,10 @@ u8 PWS_GetSlotLoginName (u8 Slot_u8, u8 *Loginname_pu8);
 u8 PWS_WriteSlotData_1 (u8 Slot_u8,u8 *Name_pu8, u8 *Password_pu8);
 u8 PWS_WriteSlotData_2 (u8 Slot_u8,u8 *Loginname_pu8);
 u8 PWS_EraseSlot (u8 Slot_u8);
+u8 PWS_DecryptedPasswordSafeKey (void);
+u8 PWS_EnableAccess (u8 *password);
+u8 PWS_InitKey (void);
+u8 PWS_GetDecryptedPasswordSafeKey (u8 **Key_pu8);
+u8 PWS_SendData (u8 Slot_u8,u8 Kind_u8);
 
 #endif /* PASSWORD_SAFE_H_ */

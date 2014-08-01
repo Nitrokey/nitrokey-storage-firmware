@@ -75,6 +75,7 @@
 
 #include "..\HighLevelFunctions\FlashStorage.h"
 #include "..\HighLevelFunctions\HiddenVolume.h"
+#include "..\HighLevelFunctions\password_safe.h"
 
 extern typeStick20Configuration_st StickConfiguration_st;
 u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st);
@@ -648,6 +649,7 @@ void HID_ExcuteCmd (void)
         SetSdEncryptedCardEnableState (TRUE);
 
         DecryptedHiddenVolumeSlotsData ();
+        PWS_DecryptedPasswordSafeKey ();
 
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
 /*
