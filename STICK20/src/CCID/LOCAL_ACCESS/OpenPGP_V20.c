@@ -37,7 +37,6 @@
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 #include "USB_CCID/USB_CCID.h"
 
-
 /*******************************************************************************
 
  Local defines
@@ -48,6 +47,7 @@
 //#define DEBUG_OPENPGP_SHOW_CALLS
 
 #ifndef DEBUG_OPENPGP
+  #define CI_LocalPrintf(...)
   #define CI_LocalPrintfDebug(...)
 #else
   #define CI_LocalPrintfDebug(...)    CI_LocalPrintf(...)
@@ -1064,6 +1064,7 @@ int LA_OpenPGP_V20_GetPasswordstatus (char *PasswordStatus)
     CI_LocalPrintf ("fail\n\r");
     return (FALSE);
   }
+
   CI_LocalPrintf ("OK  P %d - A %d\n\r",tSC_OpenPGP_V20.cReceiveData[4],tSC_OpenPGP_V20.cReceiveData[6]);
 
   // Copy password status

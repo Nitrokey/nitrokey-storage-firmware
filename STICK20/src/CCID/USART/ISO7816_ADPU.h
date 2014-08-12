@@ -74,6 +74,7 @@ u32 ISO7816_GetLockCounter (void);
 int ISO7816_SendAPDU_Le_Lc (typeAPDU *tSC);
 int ISO7816_SendAPDU_Le_NoLc (typeAPDU *tSC);
 int ISO7816_SendAPDU_NoLe_Lc (typeAPDU *tSC);
+int ISO7816_SendAPDU_NoLe_NoLc (typeAPDU *tSC);
 void ISO7816_SetFiDI (u8 FiDi);
 
 int ISO7816_CopyATR (unsigned char *szATR,int nMaxLength);

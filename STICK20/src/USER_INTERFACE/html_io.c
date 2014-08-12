@@ -39,6 +39,8 @@
 #include "pm.h"
 #include "adc.h"
 #include "time.h"
+#include "flashc.h"
+
 #include "global.h"
 #include "tools.h"
 #include "Interpreter.h"
@@ -541,13 +543,13 @@ void HTML_CheckRamDisk (void)
 
 void HID_ExcuteCmd (void)
 {
-  u8  Text_u8[HTML_INPUTBUFFER_SIZE];
+//  u8  Text_u8[HTML_INPUTBUFFER_SIZE];
   u8  StorageKey_pu8[32];
   u8  Cmd_u8;
   u8 *PasswordMatrix_pu8;
   u8  ret_u8;
   u64 timestamp;
-  u32 Ret_u32;
+//  u32 Ret_u32;
 
   Cmd_u8 = HID_CmdGet_u8;
 
@@ -1107,14 +1109,14 @@ u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st)
 {
   u8  Text_u8[20];
   u32 Ret_u32 = FALSE;
-  u32 *p_u32;
+//  u32 *p_u32;
 
 //  DelayMs (2000);
 
 /* Get password retry counts*/
   Status_st->UserPwRetryCount  = 0;
   Status_st->AdminPwRetryCount = 0;
-  Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus (Text_u8);
+  Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus ((char*)Text_u8);
   if (TRUE == Ret_u32)
   {
     Status_st->UserPwRetryCount  = Text_u8[4];
@@ -1124,7 +1126,7 @@ u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st)
 
 /* Get smartcard ID from AID */
   Status_st->ActiveSmartCardID_u32 = 0;
-  Ret_u32 = LA_OpenPGP_V20_GetAID (Text_u8);
+  Ret_u32 = LA_OpenPGP_V20_GetAID ((char*)Text_u8);
   if (TRUE == Ret_u32)
   {
     Status_st->ActiveSmartCardID_u32 =  (u32)Text_u8[10];
@@ -1136,12 +1138,25 @@ u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st)
     Status_st->ActiveSmartCardID_u32 +=  (u32)Text_u8[13];
   }
 
+
+// Bugfix: At first call sometimes the SC answered with 0 0
+  if ((0 ==Status_st->UserPwRetryCount) && (0 == Status_st->AdminPwRetryCount))
+  {
+    Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus ((char*)Text_u8);
+    if (TRUE == Ret_u32)
+    {
+      Status_st->UserPwRetryCount  = Text_u8[4];
+      Status_st->AdminPwRetryCount = Text_u8[6];
+    }
+  }
+
   Status_st->FirmwareLocked_u8 = FALSE;
   if (TRUE ==  flashc_is_security_bit_active())
   {
     Status_st->FirmwareLocked_u8 = TRUE;
   }
 
+  return (TRUE);
 }
 
 /*******************************************************************************
@@ -1160,7 +1175,7 @@ u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st)
 void GetProductionInfos (typeStick20ProductionInfos_st *Infos_st)
 {
   typeStick20Configuration_st SC_Status_st;
-  volatile u32* id_data = 0x80800204;       // Place of 120 bit CPU ID
+  volatile u32* id_data = (u32*)0x80800204;       // Place of 120 bit CPU ID
   u32           i;
   u32           CPU_ID_u32;
   cid_t        *cid;
@@ -1179,7 +1194,7 @@ void GetProductionInfos (typeStick20ProductionInfos_st *Infos_st)
 // Run the check only if the initial pw is aktive
   if (3 == SC_Status_st.UserPwRetryCount)
   {
-    if (FALSE == LA_OpenPGP_V20_Test_SendUserPW2 ("123456"))
+    if (FALSE == LA_OpenPGP_V20_Test_SendUserPW2 ((unsigned char*)"123456"))
     {
       CI_TickLocalPrintf ("GetProductionInfos: Intial password is not activ\r\n");
       Infos_st->SC_AdminPwRetryCount = 99;    // Marker for wrong pw
@@ -1209,7 +1224,7 @@ void GetProductionInfos (typeStick20ProductionInfos_st *Infos_st)
   Infos_st->SmartCardID_u32      = SC_Status_st.ActiveSmartCardID_u32;
 
 // Get SD card infos
-  cid = GetSdCidInfo ();
+  cid = (cid_t *) GetSdCidInfo ();
 
   Infos_st->SD_CardID_u32                 = (cid->psnh << 8) + cid->psnl;
   Infos_st->SD_Card_ManufacturingYear_u8  = cid->mdt/16;

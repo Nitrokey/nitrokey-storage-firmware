@@ -44,6 +44,16 @@
 #include "DFU_test.h"
 
 
+#ifdef DEBUG_DUF_TESTS
+  int CI_LocalPrintf (char *szFormat,...);
+  int CI_TickLocalPrintf (char *szFormat,...);
+  int CI_StringOut (char *szText);
+#else
+  #define CI_LocalPrintf(...)
+  #define CI_TickLocalPrintf(...)
+  #define CI_StringOut(...)
+#endif
+
 /*******************************************************************************
 
  Local defines
@@ -262,7 +272,7 @@ void DFU_EnableFirmwareUpdate (void)
   16.08.13  RB              First review
 
 *******************************************************************************/
-
+#ifdef DEBUG_DUF_TESTS
 void IBN_DFU_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int Param_u32,unsigned char *String_pu8)
 {
   u8 DFU_String_au8[4];
@@ -343,3 +353,4 @@ void IBN_DFU_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned in
 
   }
 }
+#endif

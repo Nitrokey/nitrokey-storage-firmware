@@ -1097,7 +1097,11 @@ int CI_ExecCmd (char *szCommandLine)
       IBN_LED_Tests (nParamsGet_u8,(u8)nValue[0],nValue[1],String_pu8[0]);
       break;
     case CI_CMD_DFU :
+#ifdef DEBUG_DUF_TESTS
       IBN_DFU_Tests (nParamsGet_u8,(u8)nValue[0],nValue[1],String_pu8[0]);
+#else
+      CI_LocalPrintf ("Test not enabled - activate DEBUG_DUF_TESTS\n\r");
+#endif
       break;
     case CI_CMD_INTTIME :
       TIME_MEASURING_INT_Infos (nParamsGet_u8,(u8)nValue[0],nValue[1],String_pu8[0]);

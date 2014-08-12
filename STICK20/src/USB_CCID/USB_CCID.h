@@ -78,6 +78,9 @@
 #define RDR_TO_PC_ESCAPE											             0x83
 #define RDR_TO_PC_DATA_RATE_AND_CLOCK_FREQUNCY    				 0x84
 
+#define CCID_CONTROL_ABORT                                 0x01
+#define CCID_CONTROL_GET_CLOCK_FREQUENCIES                 0x02
+#define CCID_CONTROL_GET_DATA_RATES                        0x03
 
 #define CCID_SLOT_STATUS_PRESENT_ACTIVE       0
 #define CCID_SLOT_STATUS_PRESENT_INACTIVE     1

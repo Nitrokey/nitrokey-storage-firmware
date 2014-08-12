@@ -292,6 +292,17 @@ u32 USB_CCID_GetLockCounter (void)
   return (USB_CCID_LockCounter_u32);
 }
 
+/*
+    case CCID_CONTROL_ABORT:
+      CI_TickLocalPrintf ("USB_CCID - CCID_CONTROL_ABORT\r\n");
+      break;
+    case CCID_CONTROL_GET_CLOCK_FREQUENCIES:
+      CI_TickLocalPrintf ("USB_CCID - CCID_CONTROL_GET_CLOCK_FREQUENCIES\r\n");
+      break;
+    case CCID_CONTROL_GET_DATA_RATES:
+      CI_TickLocalPrintf ("USB_CCID - CCID_CONTROL_GET_DATA_RATES\r\n");
+      break;
+*/
 
 /*******************************************************************************
 
@@ -310,7 +321,7 @@ void USB_CCID_DebugCmdStart (t_USB_CCID_data_st *USB_CCID_data_pst)
 {
   switch(USB_CCID_data_pst->USB_data[CCID_OFFSET_MESSAGE_TYPE])
   {
-    case PC_TO_RDR_ICCPOWERON:
+case PC_TO_RDR_ICCPOWERON:
       CI_TickLocalPrintf ("USB_CCID - ICCPOWERON\r\n");
       break;
     case PC_TO_RDR_ICCPOWEROFF:
@@ -1431,8 +1442,6 @@ if (mci != &AVR32_MCI)
 
 *******************************************************************************/
 
-unsigned char	SlotStabilizationDelay = 0; // RB INITIALSLOTSTABILIZATIONDELAY;
-
 void CCID_IntMessage(void)
 {
 	USB_CCID_send_INT_Message ();
@@ -1450,16 +1459,6 @@ void CCID_IntMessage(void)
 
 void CcidClassRequestAbort(void)
 {
-/*
-	if( (sUSB_vSetup.USBbmRequestType == 0x21) &&
-			(sUSB_vSetup.USBwValue0 == 0x00) && (sUSB_vSetup.USBwIndex1 == 0x00) &&
-			(sUSB_vSetup.USBwIndex0 == 0x00) && (sUSB_vSetup.USBwLength1 == 0x00) &&
-			(sUSB_vSetup.USBwLength0 == 0x00) )
-	{
-		Set_bAbortRequestFlag;
-		AbortSequenceNumber = sUSB_vSetup.USBwValue1;
-	}
-*/
 }
 /*******************************************************************************
 
@@ -1504,28 +1503,7 @@ void CRD_to_USB_SendCardDetect (void)
 	CCID_IntMessage ();
 }
 
-/*******************************************************************************
 
-  USB_to_CRD_CheckUsbInput
-
-  Reviews
-  Date      Reviewer        Info
-  16.08.13  RB              First review
-
-*******************************************************************************/
-
-void USB_to_CRD_CheckUsbInput (void)
-{
-/*
-  CCID_DispatchMessage ();
-
-  if ((TRANSMIT_HEADER    == BulkStatus)	||
-			(TRANSMIT_FINISHED  == BulkStatus))
-  {
-	  CCID_BulkInMessage();									 // something to send ?
-	}
-*/
-}
 
 
 

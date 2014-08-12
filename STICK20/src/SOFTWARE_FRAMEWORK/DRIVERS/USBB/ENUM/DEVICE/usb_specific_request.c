@@ -389,6 +389,7 @@ void usb_hid_get_idle (U8 u8_report_id)
 {
    U16 wLength;
    U16 wInterface;
+   U32 i;
 
    // Get interface number to put in idle mode
    wInterface=Usb_read_endpoint_data(EP_CONTROL, 16);
@@ -403,7 +404,15 @@ void usb_hid_get_idle (U8 u8_report_id)
    }
 #endif
 
-   while (!Is_usb_control_out_received());
+//   while (!Is_usb_control_out_received());
+   for (i=0;i<100000;i++)
+   {
+     if (!Is_usb_control_out_received())
+     {
+       break;
+     }
+   }
+
    Usb_ack_control_out_received_free();
 }
 

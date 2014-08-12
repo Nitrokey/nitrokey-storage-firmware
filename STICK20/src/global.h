@@ -85,9 +85,10 @@
 *******************************************************************************/
 
 // #define ENABLE_IBN_PWM_TESTS          // ca. 1k - Password matix - Enable the interpreter tests
-#define ENABLE_IBN_HV_TESTS           // ca. 1k - Hidden volume - Enable the interpreter tests
+// #define ENABLE_IBN_HV_TESTS           // ca. 1k - Hidden volume - Enable the interpreter tests
 // #define ENABLE_IBN_TIME_ACCESS_TESTS  // ca. 2k - Time access - Enable the interpreter tests
 // #define ENABLE_IBN_FILE_ACCESS_TESTS  // ca. 7k - file access - Enable the interpreter tests
+// #define DEBUG_DUF_TESTS               // ca. 1,5k - DFU tests - Enable the interpreter tests
 
 /*******************************************************************************
 
