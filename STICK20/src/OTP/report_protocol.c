@@ -48,7 +48,7 @@
 #include "string.h"
 #include "time.h"
 
-
+#include "polarssl/timing.h"
 #include "CCID/USART/ISO7816_ADPU.h"
 #include "CCID/USART/ISO7816_Prot_T1.h"
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
@@ -60,6 +60,7 @@
 #include "HighLevelFunctions/FlashStorage.h"
 #include "User_Interface/html_io.h"
 #include "HighLevelFunctions/password_safe.h"
+#include "hotp.h"
 
 
 /*******************************************************************************
@@ -109,11 +110,15 @@ u8 HID_GetReport_Value_tmp[KEYBOARD_FEATURE_COUNT];
 
 u8  OTP_device_status = STATUS_READY;
 u8  temp_password[25];
-u8  tmp_password_set =0;
-u32 authorized_crc   =0xFFFFFFFF;
+u8  tmp_password_set         =0;
+u32 authorized_crc           =0xFFFFFFFF;
+u8  temp_user_password[25];
+u8  tmp_user_password_set    =0;
+u32 authorized_user_crc      =0xFFFFFFFF;
+
 
 // For stick 2.0
-u8 HID_CmdGet_u8  = HTML_CMD_NOTHING;   // Todo: make function
+u8 HID_CmdGet_u8  = HTML_CMD_NOTHING;
 u8 HID_String_au8[50];
 
 HID_Stick20Status_est   HID_Stick20Status_st;
@@ -226,10 +231,10 @@ u8 Stick20HIDInitSendConfiguration (u8 state_u8)
 u8 Stick20HIDSendAccessStatusData (u8 *output)
 {
   u32 calculated_crc32;
-  typeStick20Configuration_st Configuration_st;
+  typeStick20Configuration_st Config_st;
   u8  text_au8[10];
 
-  SendStickStatusToHID (&Configuration_st);
+  SendStickStatusToHID (&Config_st);
 
   HID_Stick20SendData_st.SendDataType_u8 = OUTPUT_CMD_STICK20_SEND_DATA_TYPE_STATUS;
 
@@ -240,14 +245,14 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
 
   CI_StringOut ("Firmware version  ");
 
-  itoa (Configuration_st.VersionInfo_au8[0],text_au8);
-  CI_StringOut (text_au8);
+  itoa (Config_st.VersionInfo_au8[0],text_au8);
+  CI_StringOut ((char*)text_au8);
   CI_StringOut (".");
-  itoa (Configuration_st.VersionInfo_au8[1],text_au8);
-  CI_StringOut (text_au8);
+  itoa (Config_st.VersionInfo_au8[1],text_au8);
+  CI_StringOut ((char*)text_au8);
   CI_StringOut ("\r\n");
 
-  if (FALSE == Configuration_st.FirmwareLocked_u8)
+  if (FALSE == Config_st.FirmwareLocked_u8)
   {
     CI_StringOut ("Firmware not locked\r\n");
   }
@@ -256,7 +261,7 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
     CI_StringOut ("*** Firmware locked ***\r\n");
   }
 
-  if (READ_WRITE_ACTIVE == Configuration_st.ReadWriteFlagUncryptedVolume_u8)
+  if (READ_WRITE_ACTIVE == Config_st.ReadWriteFlagUncryptedVolume_u8)
   {
     CI_StringOut ("Uncyrpted Volume  READ/WRITE active\r\n");
   }
@@ -267,7 +272,7 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
 
   if (STICK20_SEND_STATUS_PIN == Stick20HIDSendConfigurationState_u8)    // This information only with pin
   {
-    if (0 != (Configuration_st.VolumeActiceFlag_u8 & (1 << SD_CRYPTED_VOLUME_BIT_PLACE)))
+    if (0 != (Config_st.VolumeActiceFlag_u8 & (1 << SD_CRYPTED_VOLUME_BIT_PLACE)))
     {
       CI_StringOut ("Crypted volume    active\r\n");
     }
@@ -276,14 +281,14 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
       CI_StringOut ("Crypted volume    not active\r\n");
     }
 
-    if (0 != (Configuration_st.VolumeActiceFlag_u8 & (1 << SD_HIDDEN_VOLUME_BIT_PLACE)))
+    if (0 != (Config_st.VolumeActiceFlag_u8 & (1 << SD_HIDDEN_VOLUME_BIT_PLACE)))
     {
       CI_StringOut ("Hidden volume     active\r\n");
     }
   }
 
 
-  if (0 != (Configuration_st.NewSDCardFound_u8 & 0x01))
+  if (0 != (Config_st.NewSDCardFound_u8 & 0x01))
   {
     CI_StringOut ("*** New SD card found - Change Counter:");
   }
@@ -291,11 +296,11 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   {
     CI_StringOut ("SD card              - Change Counter:");
   }
-  itoa ((Configuration_st.NewSDCardFound_u8 >> 1),text_au8);
-  CI_StringOut (text_au8);
+  itoa ((Config_st.NewSDCardFound_u8 >> 1),text_au8);
+  CI_StringOut ((char*)text_au8);
   CI_StringOut ("\r\n");
 
-  if (0 == (Configuration_st.SDFillWithRandomChars_u8 & 0x01))
+  if (0 == (Config_st.SDFillWithRandomChars_u8 & 0x01))
   {
     CI_StringOut("Not filled with random chars - Change Counter:");
   }
@@ -303,11 +308,11 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   {
     CI_StringOut("Filled with random   - Change Counter:");
   }
-  itoa ((Configuration_st.SDFillWithRandomChars_u8 >> 1),text_au8);
-  CI_StringOut (text_au8);
+  itoa ((Config_st.SDFillWithRandomChars_u8 >> 1),text_au8);
+  CI_StringOut ((char*)text_au8);
   CI_StringOut ("\r\n");
 
-  if (TRUE == Configuration_st.StickKeysNotInitiated_u8)
+  if (TRUE == Config_st.StickKeysNotInitiated_u8)
   {
     CI_StringOut("*** Stick not initiated ***\r\n");
   }
@@ -317,28 +322,28 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   }
 
   CI_StringOut ("Password retry count - User ");
-  itoa (Configuration_st.UserPwRetryCount,text_au8);
-  CI_StringOut (text_au8);
+  itoa (Config_st.UserPwRetryCount,text_au8);
+  CI_StringOut ((char*)text_au8);
   CI_StringOut (" - Admin ");
-  itoa (Configuration_st.AdminPwRetryCount,text_au8);
-  CI_StringOut (text_au8);
+  itoa (Config_st.AdminPwRetryCount,text_au8);
+  CI_StringOut ((char*)text_au8);
   CI_StringOut ("\r\n");
 
   CI_StringOut ("Smartcard serial nr: ");
-  itoa (Configuration_st.ActiveSmartCardID_u32,text_au8);
-  CI_StringOut (text_au8);
+  itoa (Config_st.ActiveSmartCardID_u32,text_au8);
+  CI_StringOut ((char*)text_au8);
   CI_StringOut ("\r\n");
 
   CI_StringOut ("SD card serial nr: ");
-  itoa (Configuration_st.ActiveSD_CardID_u32,text_au8);
-  CI_StringOut (text_au8);
+  itoa (Config_st.ActiveSD_CardID_u32,text_au8);
+  CI_StringOut ((char*)text_au8);
   CI_StringOut ("\r\n");
 
 // Set endian
-  Configuration_st.ActiveSmartCardID_u32 = change_endian_u32 (Configuration_st.ActiveSmartCardID_u32);
-  Configuration_st.ActiveSD_CardID_u32   = change_endian_u32 (Configuration_st.ActiveSD_CardID_u32);
+  Config_st.ActiveSmartCardID_u32 = change_endian_u32 (Config_st.ActiveSmartCardID_u32);
+  Config_st.ActiveSD_CardID_u32   = change_endian_u32 (Config_st.ActiveSD_CardID_u32);
 
-  memcpy (&HID_Stick20SendData_st.SendData_u8[0],&Configuration_st,sizeof (typeStick20Configuration_st));
+  memcpy (&HID_Stick20SendData_st.SendData_u8[0],&Config_st,sizeof (typeStick20Configuration_st));
 
 
   HID_Stick20SendData_st.FollowBytesFlag_u8 = 0;     // No next data
@@ -378,7 +383,6 @@ u8 Stick20HIDSendProductionInfos (u8 *output)
 {
   u32 calculated_crc32;
   typeStick20ProductionInfos_st Infos_st;
-  u8  text_au8[10];
 
   HID_Stick20SendData_st.SendDataType_u8 = OUTPUT_CMD_STICK20_SEND_DATA_TYPE_PROD_INFO;
 
@@ -661,7 +665,7 @@ u8 parse_report(u8 *report,u8 *output)
           u8 text[10];
           CI_StringOut ("Get CMD_WRITE_TO_SLOT - slot ");
           itoa ((u8)report[1],text);
-          CI_StringOut (text);
+          CI_StringOut ((char*)text);
           CI_StringOut ("\r\n");
         }
         if (calculated_crc32==authorized_crc)
@@ -679,31 +683,48 @@ u8 parse_report(u8 *report,u8 *output)
           u8 text[10];
           CI_StringOut ("Get CMD_READ_SLOT_NAME - slot ");
           itoa ((u8)report[1],text);
-          CI_StringOut (text);
+          CI_StringOut ((char*)text);
           CI_StringOut ("\r\n");
         }
         cmd_read_slot_name(report,output);
         break;
 
       case CMD_READ_SLOT:
-        CI_StringOut ("Get CMD_READ_SLOT\r\n");
-        if (calculated_crc32==authorized_crc)
+         {
+          u8 text[10];
+          CI_StringOut ("Get CMD_READ_SLOT - slot ");
+          itoa ((u8)report[1],text);
+          CI_StringOut ((char*)text);
+          CI_StringOut ("\r\n");
+        }
+
         cmd_read_slot(report,output);
+/*
+        if (calculated_crc32==authorized_crc)
+          cmd_read_slot(report,output);
         else
-        not_authorized=1;
+          not_authorized=1;
+*/
         break;
 
       case CMD_GET_CODE:
         CI_StringOut ("Get CMD_GET_CODE\r\n");
-        cmd_get_code(report,output);
+        if((calculated_crc32==authorized_user_crc) || (*((u8 *)(SLOTS_ADDRESS+GLOBAL_CONFIG_OFFSET+3)) != 1))
+        {
+          cmd_get_code(report,output);
+        }
+        else
+        {
+          not_authorized = 1;
+        }
         break;
 
       case CMD_WRITE_CONFIG:
         CI_StringOut ("Get CMD_WRITE_CONFIG\r\n");
         if (calculated_crc32==authorized_crc)
-        cmd_write_config(report,output);
+          cmd_write_config(report,output);
         else
-        not_authorized=1;
+          not_authorized=1;
         break;
 
       case CMD_ERASE_SLOT:
@@ -724,11 +745,41 @@ u8 parse_report(u8 *report,u8 *output)
         cmd_authorize(report,output);
         break;
 
+      case CMD_USER_AUTHORIZE:
+        CI_StringOut ("Get CMD_USER_AUTHORIZE\r\n");
+        cmd_user_authorize(report,output);
+        break;
+
       case CMD_GET_PASSWORD_RETRY_COUNT:
         CI_StringOut ("Get CMD_GET_PASSWORD_RETRY_COUNT\r\n");
-        cmd_getPasswordCount(report,output);
-
+//        cmd_getPasswordCount(report,output);
+        cmd_get_password_retry_count(report,output);
         output[OUTPUT_CMD_RESULT_STICK20_STATUS_START] = 0xaa;
+        break;
+
+      case CMD_GET_USER_PASSWORD_RETRY_COUNT:
+        CI_StringOut ("Get CMD_GET_USER_PASSWORD_RETRY_COUNT\r\n");
+        cmd_get_user_password_retry_count(report,output);
+        break;
+
+      case CMD_USER_AUTHENTICATE:
+        CI_StringOut ("Get CMD_USER_AUTHENTICATE\r\n");
+        cmd_user_authenticate(report,output);
+        break;
+
+      case CMD_SET_TIME:
+        CI_StringOut ("Get CMD_SET_TIME\r\n");
+        cmd_set_time(report,output);
+        break;
+
+      case CMD_TEST_COUNTER:
+        CI_StringOut ("Get CMD_SET_TIME\r\n");
+        cmd_test_counter(report,output);
+        break;
+
+      case CMD_TEST_TIME:
+        CI_StringOut ("Get CMD_TEST_TIME\r\n");
+        cmd_test_time(report,output);
         break;
 
       case CMD_GET_PW_SAFE_SLOT_STATUS:
@@ -785,7 +836,7 @@ u8 parse_report(u8 *report,u8 *output)
     }
     if (not_authorized)
     {
-      CI_StringOut ("Get CMD_AUTHORIZE\r\n");
+      CI_StringOut ("*** NOT AUTHORIZED ***\r\n");
       output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_NOT_AUTHORIZED;
     }
 
@@ -1142,6 +1193,11 @@ u8 parse_report(u8 *report,u8 *output)
 
   cmd_get_status
 
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit 426797e7c2598b6befc0b43e3dd33393195ddbf1
+                              Improvements to OTP and About Window see #75 #62 #96 #108
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -1159,8 +1215,48 @@ u8 cmd_get_status(u8 *report,u8 *output)
 	output[OUTPUT_CMD_RESULT_OFFSET+5]  =(cardSerial>>24)&0xFF;
 */
 	memcpy(output+OUTPUT_CMD_RESULT_OFFSET+6,(u8 *)SLOTS_ADDRESS+GLOBAL_CONFIG_OFFSET,3);
-
+  memcpy(output+OUTPUT_CMD_RESULT_OFFSET+9,(u8 *)SLOTS_ADDRESS+GLOBAL_CONFIG_OFFSET+3,2);
 	return 0;
+}
+
+/*******************************************************************************
+
+  cmd_get_password_retry_count
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit 426797e7c2598b6befc0b43e3dd33393195ddbf1
+                              Improvements to OTP and About Window see #75 #62 #96 #108
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_get_password_retry_count(u8 *report,u8 *output)
+{
+  output[OUTPUT_CMD_RESULT_OFFSET] = StickConfiguration_st.AdminPwRetryCount;
+  return 0;
+}
+
+/*******************************************************************************
+
+  cmd_get_user_password_retry_count
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit 426797e7c2598b6befc0b43e3dd33393195ddbf1
+                              Improvements to OTP and About Window see #75 #62 #96 #108
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_get_user_password_retry_count(u8 *report,u8 *output)
+{
+  output[OUTPUT_CMD_RESULT_OFFSET] = StickConfiguration_st.UserPwRetryCount;
+  return 0;
 }
 
 /*******************************************************************************
@@ -1168,6 +1264,12 @@ u8 cmd_get_status(u8 *report,u8 *output)
   cmd_write_to_slot
 
   Write data from pc into flash
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit 9afc711a5365fc920c6c412b612b200954ab11eb
+                              Mandatory slot name #109
 
   Reviews
   Date      Reviewer        Info
@@ -1180,12 +1282,20 @@ u8 cmd_write_to_slot(u8 *report,u8 *output)
 
 	u8 slot_no=report[CMD_WTS_SLOT_NUMBER_OFFSET];
 	u8 slot_tmp[64];//this is will be the new slot contents
+  u8 slot_name[15];
 
 	memset(slot_tmp,0,64);
 
 	slot_tmp[0]=0x01; //marks slot as programmed
 
-	memcpy(slot_tmp+1,report+CMD_WTS_SLOT_NAME_OFFSET,49);
+	memcpy(slot_tmp+1,report+CMD_WTS_SLOT_NAME_OFFSET,51);
+	memcpy(slot_name,report+CMD_WTS_SLOT_NAME_OFFSET,15);
+
+  if (slot_name[0] == 0){
+      output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NO_NAME_ERROR;
+      return 1;
+  }
+
 
 	if ((slot_no >= 0x10) && (slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS))        // HOTP slot
 	{
@@ -1236,9 +1346,9 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
 		  memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(hotp_slots[slot_no]+SLOT_NAME_OFFSET),15);
       CI_StringOut ("HOTP Slot ");
       itoa (slot_no,text);
-      CI_StringOut (text);
+      CI_StringOut ((char*)text);
       CI_StringOut (" name -");
-      CI_StringOut (output+OUTPUT_CMD_RESULT_OFFSET);
+      CI_StringOut ((char*)output+OUTPUT_CMD_RESULT_OFFSET);
       CI_StringOut ("-\r\n");
 		}
 		else
@@ -1256,9 +1366,9 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
 		  memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(totp_slots[slot_no]+SLOT_NAME_OFFSET),15);
       CI_StringOut ("TOTP Slot ");
       itoa (slot_no,text);
-      CI_StringOut (text);
+      CI_StringOut ((char*)text);
       CI_StringOut (" name -");
-      CI_StringOut (output+OUTPUT_CMD_RESULT_OFFSET);
+      CI_StringOut ((char*)output+OUTPUT_CMD_RESULT_OFFSET);
       CI_StringOut ("-\r\n");
 		}
 		else
@@ -1287,7 +1397,7 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
 u8 cmd_read_slot(u8 *report,u8 *output)
 {
 	u8 slot_no=report[CMD_RS_SLOT_NUMBER_OFFSET];
-
+	u64 counter;
 
 	if ((slot_no >= 0x10) && (slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS))    //HOTP slot
 	{
@@ -1296,10 +1406,11 @@ u8 cmd_read_slot(u8 *report,u8 *output)
 
 		if (is_programmed==0x01)
 		{
-			memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(hotp_slots[slot_no]+SECRET_OFFSET),34);
-			//memcpy(output+OUTPUT_CMD_RESULT_OFFSET+CMD_RS_OUTPUT_COUNTER_OFFSET,(u8 *)(hotp_slot_counters[slot_no]),8);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(hotp_slots[slot_no]+SLOT_NAME_OFFSET),15);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+15,(u8 *)(hotp_slots[slot_no]+CONFIG_OFFSET),1);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+16,(u8 *)(hotp_slots[slot_no]+TOKEN_ID_OFFSET),13);
 			
-			u64 counter= get_counter_value(hotp_slot_counters[slot_no]);
+			counter= get_counter_value(hotp_slot_counters[slot_no]);
 			memcpy(output+OUTPUT_CMD_RESULT_OFFSET+CMD_RS_OUTPUT_COUNTER_OFFSET,&counter,8);
 		}
 		else
@@ -1312,7 +1423,10 @@ u8 cmd_read_slot(u8 *report,u8 *output)
 		slot_no=slot_no&0x0F;
 		u8 is_programmed=*((u8 *)(totp_slots[slot_no]));
 		if (is_programmed==0x01){
-			memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(totp_slots[slot_no]+SECRET_OFFSET),34);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(totp_slots[slot_no]+SLOT_NAME_OFFSET),15);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+15,(u8 *)(totp_slots[slot_no]+CONFIG_OFFSET),1);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+16,(u8 *)(totp_slots[slot_no]+TOKEN_ID_OFFSET),13);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+29,(u8 *)(totp_slots[slot_no]+INTERVAL_OFFSET),2);
 		}
 		else
 		{
@@ -1347,7 +1461,7 @@ u8 cmd_read_slot(u8 *report,u8 *output)
 
 u8 CheckSystemtime (u32 Newtimestamp_u32)
 {
-  struct tm      tm_st;
+//  struct tm      tm_st;
   u8             Time_u8[30];
   time_t         now;
   u32            StoredTime_u32;
@@ -1360,9 +1474,9 @@ u8 CheckSystemtime (u32 Newtimestamp_u32)
   if (60*60*24*365 > now)     // If the local time is before 1971, set systemtime
   {
     CI_LocalPrintf ("Local time is not set - set to %ld = ",Newtimestamp_u32);
-    ctime_r (&Newtimestamp_u32,(char*)Time_u8);
+    ctime_r ((time_t*)&Newtimestamp_u32,(char*)Time_u8);
     CI_LocalPrintf ("%s\r\n",Time_u8);
-    set_time (Newtimestamp_u32);
+    set_time ((time_t)Newtimestamp_u32);
   }
 
 // Check timediff
@@ -1377,7 +1491,7 @@ u8 CheckSystemtime (u32 Newtimestamp_u32)
     CI_LocalPrintf ("%s",Time_u8);
 
     CI_LocalPrintf ("Timestamp :");
-    ctime_r (&Newtimestamp_u32,(char*)Time_u8);
+    ctime_r ((time_t*)&Newtimestamp_u32,(char*)Time_u8);
     CI_LocalPrintf ("%s",Time_u8);
     return (FALSE);
   }
@@ -1420,8 +1534,7 @@ u8 CheckSystemtime (u32 Newtimestamp_u32)
 
 u8 cmd_get_code(u8 *report,u8 *output)
 {
-	
-  u64 challenge = getu64(report + CMD_GC_CHALLENGE_OFFSET);
+//  u64 challenge = getu64(report + CMD_GC_CHALLENGE_OFFSET);
   u64 timestamp = getu64(report + CMD_GC_TIMESTAMP_OFFSET);
   u8  interval  = report[CMD_GC_INTERVAL_OFFSET];
 	u32 result=0;
@@ -1512,6 +1625,12 @@ u8 cmd_write_config(u8 *report,u8 *output)
 
   cmd_erase_slot
 
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit 3170acd1e68c618aaffd16b2722108c7fc7d5725
+                              Secret not overwriten when the Tool sends and empty secret
+
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -1533,10 +1652,11 @@ u8 cmd_erase_slot(u8 *report,u8 *output)
 
 	  CI_StringOut ("Erase slot HOTP ");
 	  itoa (slot_no,text_au8);
-	  CI_StringOut (text_au8);
+	  CI_StringOut ((char*)text_au8);
 	  CI_StringOut ("\r\n");
 
 	  write_to_slot(slot_tmp, hotp_slot_offsets[slot_no], 64);
+	  erase_counter(slot_no);
 	}
 	else if ((slot_no >= 0x20) && (slot_no <= 0x20 + NUMBER_OF_TOTP_SLOTS))     //TOTP slot
 	{
@@ -1544,7 +1664,7 @@ u8 cmd_erase_slot(u8 *report,u8 *output)
 
     CI_StringOut ("Erase slot TOTP ");
     itoa (slot_no,text_au8);
-    CI_StringOut (text_au8);
+    CI_StringOut ((char*)text_au8);
     CI_StringOut ("\r\n");
 
 
@@ -1616,6 +1736,49 @@ u8 cmd_first_authenticate(u8 *report,u8 *output)
 
 /*******************************************************************************
 
+  cmd_user_authenticate
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit 426797e7c2598b6befc0b43e3dd33393195ddbf1
+                              Improvements to OTP and About Window see #75 #62 #96 #108
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_user_authenticate(u8 *report,u8 *output)
+{
+  u8  res=1;
+  u8  user_password[26];
+  u32 Ret_u32;
+
+  memset(user_password,0,26);
+  memcpy(user_password,report+1,25);
+
+  Ret_u32 = LA_OpenPGP_V20_Test_SendUserPW2 ((unsigned char *)user_password);
+  if (TRUE == Ret_u32)
+  {
+    res = 0;
+  }
+
+  if (res==0)
+  {
+      memcpy(temp_user_password,report+26,25);
+      tmp_user_password_set=1;
+//      getAID();
+      return 0;
+  }
+  else
+  {
+      output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_WRONG_PASSWORD;
+      return 1; //wrong card password
+  }
+}
+
+/*******************************************************************************
+
   cmd_authorize
 
   Reviews
@@ -1629,17 +1792,59 @@ u8 cmd_authorize(u8 *report,u8 *output)
 	if (tmp_password_set == 1)
 	{
 	  if (memcmp(report+5,temp_password,25)==0)
+	  {
       authorized_crc = getu32(report+1);
+      return (0);
+	  }
 	  else
+	  {
 	    output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_WRONG_PASSWORD;
+	    return (1);
+	  }
 	}
 
-	return (0);
+  return (0);
 }
 
 /*******************************************************************************
 
+  cmd_authorize
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit 426797e7c2598b6befc0b43e3dd33393195ddbf1
+                              Improvements to OTP and About Window see #75 #62 #96 #108
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_user_authorize(u8 *report,u8 *output)
+{
+  if (tmp_user_password_set==1)
+  {
+    if (memcmp(report+5,temp_user_password,25)==0)
+    {
+      authorized_user_crc = getu32(report+1);
+      return 0;
+    }
+    else
+    {
+      output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_PASSWORD;
+      return 1;
+    }
+  }
+}
+
+
+/*******************************************************************************
+
   cmd_getPasswordCount
+
+  Changes
+  Date      Author          Info
+  20.08.14  RB              Add admin retry count
 
   Reviews
   Date      Reviewer        Info
@@ -1651,11 +1856,12 @@ u8 cmd_getPasswordCount (u8 *report,u8 *output)
   u8  Data_u8[20];
   u32 Ret_u32;
 
-  Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus (Data_u8);
+  Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus ((char *)Data_u8);
   if (TRUE == Ret_u32)
   {
-    output[OUTPUT_CMD_RESULT_OFFSET] = Data_u8[4];
-    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+//    output[OUTPUT_CMD_RESULT_OFFSET]   = Data_u8[4];
+    output[OUTPUT_CMD_RESULT_OFFSET]   = Data_u8[6];    // Admin retry counter
+    output[OUTPUT_CMD_STATUS_OFFSET]   = CMD_STATUS_OK;
   }
   else
   {
@@ -1664,6 +1870,165 @@ u8 cmd_getPasswordCount (u8 *report,u8 *output)
 
   return (0);
 }
+
+
+
+
+/*******************************************************************************
+
+  cmd_set_time
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit dde179d5d24bd3d06cab73848ba1ab7e5efda898
+                              Time in firmware Test #74 Test #105
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_set_time(u8 *report,u8 *output)
+{
+    int err;
+    u64 new_time = (getu64 (report + CMD_DATA_OFFSET + 1));
+    u32 old_time = get_time_value();
+    u32 new_time_minutes = (new_time - 1388534400)/60; // 1388534400 = 01.01.2014 00:00
+
+
+    if(old_time==0)
+    {
+      output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_TIMESTAMP_WARNING;
+      return 1;
+    }
+
+    if((old_time <= new_time_minutes) || (old_time == 0xffffffff) || (*((u8 *)(report + CMD_DATA_OFFSET)) == 1))
+    {
+      {
+        u8 text[30];
+
+        CI_StringOut ("Get CMD_SET_TIME");
+        CI_StringOut ("\r\n");
+
+        CI_StringOut ("Local time set to  = ");
+        itoa (new_time,text);
+        CI_StringOut ((char*)text);
+
+        CI_StringOut (" = ");
+        ctime_r ((time_t*)&new_time,(char*)text);
+        CI_StringOut ((char*)text);
+        CI_StringOut ("\r\n");
+      }
+
+      set_time (new_time);
+
+      current_time = new_time;
+      err = set_time_value(new_time_minutes);
+      if(err)
+      {
+          output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_TIMESTAMP_WARNING;
+          return 1;
+      }
+      return 0;
+    }
+    else
+    {
+      output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_TIMESTAMP_WARNING;
+      return 1;
+    }
+
+}
+
+
+/*******************************************************************************
+
+  cmd_test_counter
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit 7bac1a8ad3c805d52a7a1b0d327b921cebbc8d72
+                              OTP Test Scripts Test #80
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_test_counter(u8 *report,u8 *output)
+{
+    int i;
+    u8  slot_no = report[CMD_DATA_OFFSET];
+    u16 tests_number = getu16(report+CMD_DATA_OFFSET+1);
+    u16 results = 0;
+    u64 counter = get_counter_value(hotp_slot_counters[slot_no]);
+    u64 counter_new = 0;
+
+    for(i=0;i<tests_number;i++){
+        set_counter_value(hotp_slot_counters[slot_no], counter);
+        counter_new=get_counter_value(hotp_slot_counters[slot_no]);
+        if(counter == counter_new){
+            results++;
+        }
+    }
+
+    memcpy(output+OUTPUT_CMD_RESULT_OFFSET,&results,2);
+
+    return 0;
+}
+
+/*******************************************************************************
+
+  cmd_test_time
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit 7bac1a8ad3c805d52a7a1b0d327b921cebbc8d72
+                              OTP Test Scripts Test #80
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_test_time(u8 *report,u8 *output)
+{
+  int i,err;
+  u32 time_min;
+  u32 read_time;
+  u32 tests_number = getu16(report+CMD_DATA_OFFSET+1);
+  u16 results = 0;
+  time_t         now;
+
+  // Get the local ATMEL time
+  time (&now);
+  current_time = now;
+
+  for(i=0;i<tests_number;i++)
+  {
+      time_min = (current_time - 1388534400)/60;      // time = minutes after 01.01.2014 00:00
+      err = set_time_value(time_min);
+
+      read_time = get_time_value();
+
+      if(!err && (read_time == time_min))
+      {
+          results++;
+      }
+  }
+
+  memcpy(output+OUTPUT_CMD_RESULT_OFFSET,&results,2);
+
+  return 0;
+}
+
+
+
+
+
+
 
 /*******************************************************************************
 
@@ -2075,7 +2440,7 @@ void OTP_main (void)
     if (OTP_device_status == STATUS_RECEIVED_REPORT)
     {
       OTP_device_status = STATUS_BUSY;
-      CI_StringOut ("-B-");
+//      CI_StringOut ("-B-");
       parse_report(HID_SetReport_Value_tmp,HID_GetReport_Value_tmp);
       OTP_device_status = STATUS_READY;
 //      CI_StringOut ("-R-");

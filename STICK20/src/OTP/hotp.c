@@ -43,6 +43,7 @@
 #include "compiler.h"
 #include "flashc.h"
 #include "string.h"
+#include "time.h"
 
 #include "global.h"
 #include "tools.h"
@@ -231,6 +232,8 @@ u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS+1]  = {
 
 u8 page_buffer[FLASH_PAGE_SIZE*3];
 
+u64 current_time = 0x0;
+
 /*******************************************************************************
 
  Global declarations
@@ -389,6 +392,42 @@ u32 dynamic_truncate (u8 * hmac_result)
 	             | (hmac_result[offset + 3] & 0xff);
 
 	return bin_code;
+}
+
+/*******************************************************************************
+
+  crc_STM32
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit dde179d5d24bd3d06cab73848ba1ab7e5efda898
+                              Time in firmware Test #74 Test #105
+
+  Reviews
+  Date      Reviewer        Info
+
+
+*******************************************************************************/
+
+u32 crc_STM32 (u32 time)
+{
+
+  int i,j;
+  u32 value = time << 8;
+  u32 crc;
+
+  for(i=0; i<24; i++){
+      if (value & 0x80000000)
+      {
+          value = (value) ^ 0x98800000; // Polynomial used in STM32
+      }
+      value = value << 1;
+  }
+
+  time = (time<<8) + (value>>24);
+
+  return time;
 }
 
 /*******************************************************************************
@@ -564,6 +603,108 @@ u64 get_counter_value(u32 addr)
 	}
 
 	return counter;
+}
+
+
+
+/*******************************************************************************
+
+  get_time_value
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit dde179d5d24bd3d06cab73848ba1ab7e5efda898
+                              Time in firmware Test #74 Test #105
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u32 get_time_value()
+{
+  int i, flag =0;
+  u32 time=0;
+
+  if(getu32(TIME_ADDRESS) == 0xffffffff)
+  {
+      return 0xffffffff;
+  }
+
+  for (i=1;i<32;i++)
+  {
+    if(getu32(TIME_ADDRESS + TIME_OFFSET*i) == 0xffffffff)
+    {
+      time = getu32(TIME_ADDRESS+TIME_OFFSET*(i-1));
+      flag = 1;
+      break;
+    }
+  }
+
+  if(0 == flag)
+  {
+    time = getu32(TIME_ADDRESS+TIME_OFFSET*31);
+  }
+
+  if(time != crc_STM32 (time>>8))
+  {
+    return (0);
+  }
+  //uint8_t *ptr=(uint8_t *)TIME_ADDRESS;
+
+      //for (i=0;i<4;i++){
+      //time+=*ptr<<(8*i);
+      //ptr++;
+      //}
+
+  return (time >> 8);
+}
+/*******************************************************************************
+
+  set_time_value
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit dde179d5d24bd3d06cab73848ba1ab7e5efda898
+                              Time in firmware Test #74 Test #105
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 set_time_value (u32 time)
+{
+  int i,flag = 0;
+  u32 *flash_value;
+  s32 page_s32;
+
+// Add crc to time
+  time = crc_STM32(time);
+
+// Find free slot
+  for (i=0;i<32;i++)
+  {
+      flash_value = (u32*)(TIME_ADDRESS + TIME_OFFSET * i);
+      if(getu32 (*flash_value) == 0xffffffff)               // Is slot free ?
+      {
+        flashc_memcpy ((void*)(TIME_ADDRESS + TIME_OFFSET * i),(void*)&time,4,TRUE);
+        flag = 1;
+        break;
+      }
+  }
+
+  if (0 == flag)  // Clear page when no free slot was found, an write time
+  {
+    page_s32 = (TIME_ADDRESS - FLASH_START) / FLASH_PAGE_SIZE;
+    flashc_erase_page (page_s32,TRUE);
+
+    flashc_memcpy ((void*)TIME_ADDRESS,(void*)&time,4,TRUE);
+  }
+
+  return 0;
 }
 
 
@@ -771,7 +912,7 @@ u32 get_code_from_hotp_slot(u8 slot)
   {
     u8 text[20];
     u32 c;
-/*
+
     DelayMs (10);
     CI_LocalPrintf ("HOTP counter:" );
     itoa ((u32)counter,text);
@@ -782,7 +923,6 @@ u32 get_code_from_hotp_slot(u8 slot)
     c = hotp_slots[slot]+SECRET_OFFSET;
     HexPrint (4,&c);
     CI_LocalPrintf ("\n\r");
-*/
   }
 #endif
 
@@ -796,12 +936,11 @@ u32 get_code_from_hotp_slot(u8 slot)
     u8 text[20];
 
     counter = get_counter_value (hotp_slot_counters[slot]);
-/*
+
     CI_LocalPrintf ("HOTP counter after inc:" );
     itoa ((u32)counter,text);
     CI_LocalPrintf (text);
     CI_LocalPrintf ("\n\r");
-*/
   }
 #endif
 
@@ -850,6 +989,27 @@ void backup_data(u8 *data,u16 len, u32 addr)
 
 /*******************************************************************************
 
+  erase_counter
+
+  Clear HOTP slot (512 byte)
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit 3170acd1e68c618aaffd16b2722108c7fc7d5725
+                              Secret not overwriten when the Tool sends and empty secret
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void erase_counter(u8 slot)
+{
+  flashc_erase_page (hotp_slot_counters[slot],TRUE);                   // clear hole page
+}
+
+/*******************************************************************************
+
   write_to_slot
 
   Write a paramter slot to the parameter page
@@ -857,7 +1017,9 @@ void backup_data(u8 *data,u16 len, u32 addr)
   Changes
   Date      Reviewer        Info
   24.03.14  RB              Integration from Stick 1.4
-
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit 3170acd1e68c618aaffd16b2722108c7fc7d5725
+                              Secret not overwriten when the Tool sends and empty secret
   Reviews
   Date      Reviewer        Info
   16.08.13  RB              First review
@@ -867,6 +1029,7 @@ void backup_data(u8 *data,u16 len, u32 addr)
 void write_to_slot(u8 *data, u16 offset, u16 len)
 {
   u16 dummy_u16;
+  u8 *secret;
 
 //copy entire page to ram
 	u8 *page=(u8 *)SLOTS_ADDRESS;
@@ -874,6 +1037,12 @@ void write_to_slot(u8 *data, u16 offset, u16 len)
 
 //make changes to page
 	memcpy(page_buffer+offset,data,len);
+
+//check if the secret from the tool is empty and if it is use the old secret
+	secret = (u8 *)(data+SECRET_OFFSET);
+	if(secret[0] == 0){
+	  memcpy(data+SECRET_OFFSET,page_buffer+offset+SECRET_OFFSET,20);
+	}
 
 //write page to backup location
 	backup_data(page_buffer,FLASH_PAGE_SIZE*3,SLOTS_ADDRESS);
@@ -1009,12 +1178,22 @@ u8 get_totp_slot_config(u8 slot_number)
 
 u32 get_code_from_totp_slot(u8 slot, u64 challenge)
 {
+  u64 time_min;
+  u16 interval;
 	u32 result;
-	u8 config=0;
-	u8 len=6;
+	u8  config=0;
+	u8  len=6;
+  time_t         now;
+
+// Get the local ATMEL time
+  time (&now);
+  current_time = now;
 
 	if (slot >= NUMBER_OF_TOTP_SLOTS) return 0;
 
+	interval = getu16(totp_slots[slot]+INTERVAL_OFFSET);
+
+	time_min = current_time/interval;
 
 	result=*((u8 *)totp_slots[slot]);
 	if (result==0xFF)//unprogrammed slot
@@ -1026,8 +1205,8 @@ u32 get_code_from_totp_slot(u8 slot, u64 challenge)
 	if (config&(1<<SLOT_CONFIG_DIGITS))
 	  len=8;
 
-	result= get_hotp_value(challenge,(u8 *)(totp_slots[slot]+SECRET_OFFSET),20,len);
-
+	// result= get_hotp_value(challenge,(u8 *)(totp_slots[slot]+SECRET_OFFSET),20,len);
+	result= get_hotp_value(time_min,(u8 *)(totp_slots[slot]+SECRET_OFFSET),20,len);
 
 	return result;
 

@@ -1113,16 +1113,6 @@ u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st)
 
 //  DelayMs (2000);
 
-/* Get password retry counts*/
-  Status_st->UserPwRetryCount  = 0;
-  Status_st->AdminPwRetryCount = 0;
-  Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus ((char*)Text_u8);
-  if (TRUE == Ret_u32)
-  {
-    Status_st->UserPwRetryCount  = Text_u8[4];
-    Status_st->AdminPwRetryCount = Text_u8[6];
-  }
-
 
 /* Get smartcard ID from AID */
   Status_st->ActiveSmartCardID_u32 = 0;
@@ -1139,15 +1129,14 @@ u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st)
   }
 
 
-// Bugfix: At first call sometimes the SC answered with 0 0
-  if ((0 ==Status_st->UserPwRetryCount) && (0 == Status_st->AdminPwRetryCount))
+/* Get password retry counts*/
+  Status_st->UserPwRetryCount  = 0;
+  Status_st->AdminPwRetryCount = 0;
+  Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus ((char*)Text_u8);
+  if (TRUE == Ret_u32)
   {
-    Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus ((char*)Text_u8);
-    if (TRUE == Ret_u32)
-    {
-      Status_st->UserPwRetryCount  = Text_u8[4];
-      Status_st->AdminPwRetryCount = Text_u8[6];
-    }
+    Status_st->UserPwRetryCount  = Text_u8[4];
+    Status_st->AdminPwRetryCount = Text_u8[6];
   }
 
   Status_st->FirmwareLocked_u8 = FALSE;

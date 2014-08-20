@@ -45,7 +45,7 @@
 // Achtung: Bootloader in trampoline.x aktivieren
 
 // *** Activate only for PROD version ***
-#define STICK_20_A_MUSTER_PROD
+//#define STICK_20_A_MUSTER_PROD
 
 
 //#define STICK_20_SEND_DEBUGINFOS_VIA_HID      // Use ca. 2k flash
@@ -83,6 +83,15 @@
   Defines for enabling interpreter test
 
 *******************************************************************************/
+
+// Flash map (Block 0 - 511)
+//  Bootloader / flash loader   block     0 -  16   8 KB
+//  Programm code               block    16 - 497
+//  Hidden volume setup data    block   498 - 499   HV_FLASH_START_PAGE (block 499 is free for extensions)
+//  OTP data                    block   500 - 510   OTP_FLASH_START_PAGE
+//  Password safe data          block   510 - 511   PWS_FLASH_START_PAGE
+//
+// Warning flash data starts at block 498 > space for program code + bootloader is 254976 byte
 
 // #define ENABLE_IBN_PWM_TESTS          // ca. 1k - Password matix - Enable the interpreter tests
 // #define ENABLE_IBN_HV_TESTS           // ca. 1k - Hidden volume - Enable the interpreter tests

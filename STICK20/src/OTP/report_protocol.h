@@ -50,6 +50,12 @@
 #define CMD_GET_PASSWORD_RETRY_COUNT      0x09
 #define CMD_CLEAR_WARNING                 0x0A
 
+#define CMD_SET_TIME                      0x0B
+#define CMD_TEST_COUNTER                  0x0C
+#define CMD_TEST_TIME                     0x0D
+#define CMD_USER_AUTHENTICATE             0x0E
+#define CMD_GET_USER_PASSWORD_RETRY_COUNT 0x0F
+#define CMD_USER_AUTHORIZE                0x10
 
 #define CMD_GET_PW_SAFE_SLOT_STATUS       0x60
 #define CMD_GET_PW_SAFE_SLOT_NAME         0x61
@@ -62,7 +68,7 @@
 #define CMD_PW_SAFE_INIT_KEY              0x68
 #define CMD_PW_SAFE_SEND_DATA             0x69
 
-#define STICK20_CMD_START_VALUE                         0x10
+#define STICK20_CMD_START_VALUE                         0x20
 #define STICK20_CMD_END_VALUE                           0x60
 #define STICK20_CMD_ENABLE_CRYPTED_PARI                 (STICK20_CMD_START_VALUE +  0)
 #define STICK20_CMD_DISABLE_CRYPTED_PARI                (STICK20_CMD_START_VALUE +  1)
@@ -124,7 +130,8 @@
 #define CMD_STATUS_SLOT_NOT_PROGRAMMED    3
 #define CMD_STATUS_WRONG_PASSWORD         4
 #define CMD_STATUS_NOT_AUTHORIZED         5
-
+#define CMD_STATUS_TIMESTAMP_WARNING      6
+#define CMD_STATUS_NO_NAME_ERROR          7
 
 /*
 Output report
@@ -183,6 +190,7 @@ typedef struct {
 
 void SetStick20Interface (u8 Command_u8);
 void UpdateStick20Command (u8 Status_u8,u8 ProgressBarValue_u8);
+
 
 #define OUTPUT_CMD_STICK20_MAX_MATRIX_ROWS  20
 
@@ -335,6 +343,14 @@ u8 cmd_write_config(u8 *report,u8 *output);
 u8 cmd_erase_slot(u8 *report,u8 *output);
 u8 cmd_first_authenticate(u8 *report,u8 *output);
 u8 cmd_authorize(u8 *report,u8 *output);
+u8 cmd_get_password_retry_count(u8 *report,u8 *output);
+u8 cmd_get_user_password_retry_count(u8 *report,u8 *output);
+u8 cmd_user_authenticate(u8 *report,u8 *output);
+u8 cmd_user_authorize(u8 *report,u8 *output);
+u8 cmd_set_time(u8 *report,u8 *output);
+u8 cmd_test_counter(u8 *report,u8 *output);
+u8 cmd_test_time(u8 *report,u8 *output);
+
 u8 cmd_getPasswordCount (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeStatus (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeSlotName (u8 *report,u8 *output);
@@ -348,6 +364,8 @@ u8 cmd_getPasswordSafeInitKey (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeSendData (u8 *report,u8 *output);
 
 void OTP_main (void);
+
+#define CMD_DATA_OFFSET 0x01
 
 #define KEYBOARD_FEATURE_COUNT                64
 
