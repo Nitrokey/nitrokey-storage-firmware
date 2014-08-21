@@ -773,7 +773,7 @@ u8 parse_report(u8 *report,u8 *output)
         break;
 
       case CMD_TEST_COUNTER:
-        CI_StringOut ("Get CMD_SET_TIME\r\n");
+        CI_StringOut ("Get CMD_TEST_COUNTER\r\n");
         cmd_test_counter(report,output);
         break;
 
@@ -1895,21 +1895,40 @@ u8 cmd_set_time(u8 *report,u8 *output)
     u64 new_time = (getu64 (report + CMD_DATA_OFFSET + 1));
     u32 old_time = get_time_value();
     u32 new_time_minutes = (new_time - 1388534400)/60; // 1388534400 = 01.01.2014 00:00
-
-
-    if(old_time==0)
+/*
     {
-      output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_TIMESTAMP_WARNING;
-      return 1;
+      u8 text[30];
+
+      CI_StringOut ("cmd_set_time: ");
+
+      CI_StringOut ("new_time  = ");
+      itoa (new_time,text);
+      CI_StringOut ((char*)text);
+
+      CI_StringOut (" = ");
+      ctime_r ((time_t*)&new_time,(char*)text);
+      CI_StringOut ((char*)text);
+      CI_StringOut ("\r\n");
+    }
+*/
+
+    if (0 == report[CMD_DATA_OFFSET])   // Check valid time only at check time
+    {
+      if(old_time == 0)
+      {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_TIMESTAMP_WARNING;
+        return 1;
+      }
     }
 
-    if((old_time <= new_time_minutes) || (old_time == 0xffffffff) || (*((u8 *)(report + CMD_DATA_OFFSET)) == 1))
+//    if((old_time <= new_time_minutes) || (old_time == 0xffffffff) || (*((u8 *)(report + CMD_DATA_OFFSET)) == 1))
+    if((old_time <= new_time_minutes) || (old_time == 0xffffffff) || (report[CMD_DATA_OFFSET] == 1))
     {
+/*
       {
         u8 text[30];
 
-        CI_StringOut ("Get CMD_SET_TIME");
-        CI_StringOut ("\r\n");
+        CI_StringOut ("cmd_set_time: ");
 
         CI_StringOut ("Local time set to  = ");
         itoa (new_time,text);
@@ -1920,7 +1939,7 @@ u8 cmd_set_time(u8 *report,u8 *output)
         CI_StringOut ((char*)text);
         CI_StringOut ("\r\n");
       }
-
+*/
       set_time (new_time);
 
       current_time = new_time;

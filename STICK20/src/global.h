@@ -30,15 +30,6 @@
 #define TRUE		1
 #define FALSE   0
 
-/******************************************************************************
-
-  Defines for debugging
-
-******************************************************************************/
-//#define DEBUG_LOG_CCID_DETAIL          // Shows details of smartcard io + set CCID_T1_DebugLevel = 3;
-//#define DEBUG_USB_CCID_IO_DETAIL        // Shows details of CCID USB transfers
-
-//#define MMC_DEBUG_PRINT             // Shows details of SD card actions
 
 
 // Define to activate A_Muster specific handling
@@ -69,6 +60,7 @@
 #endif
 
 
+
 /*******************************************************************************
 
   Security defines
@@ -76,6 +68,16 @@
 *******************************************************************************/
 
 #define GENERATE_RANDOM_NUMBER_WITH_2ND_SOURCE
+
+/******************************************************************************
+
+  Defines for debugging
+
+******************************************************************************/
+//#define DEBUG_LOG_CCID_DETAIL          // Shows details of smartcard io + set CCID_T1_DebugLevel = 3;
+//#define DEBUG_USB_CCID_IO_DETAIL        // Shows details of CCID USB transfers
+
+//#define MMC_DEBUG_PRINT             // Shows details of SD card actions
 
 
 /*******************************************************************************

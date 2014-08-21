@@ -606,6 +606,65 @@ u64 get_counter_value(u32 addr)
 }
 
 
+/*******************************************************************************
+
+  get_flash_time_value
+
+  Changes
+  Date      Reviewer        Info
+  14.08.14  RB              Integration from Stick 1.4
+                              Commit dde179d5d24bd3d06cab73848ba1ab7e5efda898
+                              Time in firmware Test #74 Test #105
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u32 get_flash_time_value (void)
+{
+  int i, flag =0;
+  u32 time=0;
+  u32 *p;
+
+  if(getu32(TIME_ADDRESS) == 0xffffffff)
+  {
+      return 0xffffffff;
+  }
+
+  for (i=1;i<32;i++)
+  {
+    if(getu32(TIME_ADDRESS + TIME_OFFSET*i) == 0xffffffff)
+    {
+      p = (TIME_ADDRESS+TIME_OFFSET*(i-1));
+      time = *p;
+      flag = 1;
+      break;
+    }
+  }
+
+  if(0 == flag)
+  {
+    p = TIME_ADDRESS+TIME_OFFSET*31;
+    time = *p;
+  }
+/*
+  {
+    u8 text[30];
+
+    CI_StringOut ("get_time_value: time ");
+    itoa (time,text);
+    CI_StringOut ((char*)text);
+
+    CI_StringOut (" = ");
+    itoa (crc_STM32 (time>>8),text);
+    CI_StringOut ((char*)text);
+    CI_StringOut ("\r\n");
+  }
+*/
+  return (time);
+}
+
 
 /*******************************************************************************
 
@@ -622,29 +681,16 @@ u64 get_counter_value(u32 addr)
 
 *******************************************************************************/
 
-u32 get_time_value()
+u32 get_time_value(void)
 {
   int i, flag =0;
   u32 time=0;
 
-  if(getu32(TIME_ADDRESS) == 0xffffffff)
+  time = get_flash_time_value ();
+
+  if(time == 0xffffffff)
   {
       return 0xffffffff;
-  }
-
-  for (i=1;i<32;i++)
-  {
-    if(getu32(TIME_ADDRESS + TIME_OFFSET*i) == 0xffffffff)
-    {
-      time = getu32(TIME_ADDRESS+TIME_OFFSET*(i-1));
-      flag = 1;
-      break;
-    }
-  }
-
-  if(0 == flag)
-  {
-    time = getu32(TIME_ADDRESS+TIME_OFFSET*31);
   }
 
   if(time != crc_STM32 (time>>8))
@@ -680,6 +726,7 @@ u8 set_time_value (u32 time)
   int i,flag = 0;
   u32 *flash_value;
   s32 page_s32;
+  u32 time_1 = time;
 
 // Add crc to time
   time = crc_STM32(time);
@@ -688,7 +735,7 @@ u8 set_time_value (u32 time)
   for (i=0;i<32;i++)
   {
       flash_value = (u32*)(TIME_ADDRESS + TIME_OFFSET * i);
-      if(getu32 (*flash_value) == 0xffffffff)               // Is slot free ?
+      if(getu32 ((u8*)flash_value) == 0xffffffff)               // Is slot free ?
       {
         flashc_memcpy ((void*)(TIME_ADDRESS + TIME_OFFSET * i),(void*)&time,4,TRUE);
         flag = 1;
@@ -702,6 +749,18 @@ u8 set_time_value (u32 time)
     flashc_erase_page (page_s32,TRUE);
 
     flashc_memcpy ((void*)TIME_ADDRESS,(void*)&time,4,TRUE);
+  }
+
+  {
+    u8 text[30];
+
+    CI_StringOut ("set_time_value: time ");
+    itoa (time_1,text);
+    CI_StringOut ((char*)text);
+    CI_StringOut (" = ");
+    itoa (crc_STM32 (time_1),text);
+    CI_StringOut ((char*)text);
+    CI_StringOut ("\r\n");
   }
 
   return 0;

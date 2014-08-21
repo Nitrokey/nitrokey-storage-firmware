@@ -174,6 +174,7 @@ void erase_counter(u8 slot);
 void write_data_to_flash(u8 *data,u16 len,u32 addr);
 u32 get_hotp_value(u64 counter,u8 * secret,u8 secret_length,u8 len);
 u64 get_counter_value(u32 addr);
+u32 get_flash_time_value (void);
 u32 get_time_value(void);
 u8 set_time_value(u32 time);
 u8 set_counter_value(u32 addr, u64 counter);

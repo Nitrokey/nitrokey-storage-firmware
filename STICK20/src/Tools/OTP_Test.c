@@ -104,7 +104,9 @@ void IBN_OTP_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned in
     CI_LocalPrintf ("3   Show hotp config [slot nr]\r\n");
     CI_LocalPrintf ("4   Get HOTP [slot]\r\n");
     CI_LocalPrintf ("5   Show HOTP counter page [slot]\r\n");
-    CI_LocalPrintf ("6   Show totp config [slot nr]\r\n");
+    CI_LocalPrintf ("6   Show TOTP config [slot nr]\r\n");
+    CI_LocalPrintf ("7   Get TOTP time\r\n");
+    CI_LocalPrintf ("8   Set TOTP time\r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }
@@ -292,8 +294,20 @@ void IBN_OTP_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned in
       CI_LocalPrintf ("\n\r");
 
       CI_LocalPrintf ("slot name -%.15.15s-\n\r",&Data_pu8[1]);
-
       break;
+
+    case 7 :    // Show topt time
+      result = get_flash_time_value ();
+      CI_LocalPrintf ("Flash time : 0x%08x - %ld\n\r",result,result);
+      break;
+
+    case 8 :    // Set topt time
+      CI_LocalPrintf ("Set flash time : to 0x%08x - %ld\n\r",100,100);
+      set_time_value (100);
+      result = get_flash_time_value ();
+      CI_LocalPrintf ("Flash time : 0x%08x - %ld\n\r",result,result);
+      break;
+
 
     case 11 :
 //      parse_report (NULL,NULL);
