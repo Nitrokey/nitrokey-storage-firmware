@@ -305,7 +305,7 @@ void SD_WriteMultipleBlocksWithRandoms (u8 *Addr_u8,u32 Block_u32,u32 Count_u32,
       {
         SD_ProgressInPercent = 100;
       }
-      LED_GreenToggle ();
+      LED_RedGreenToggle ();
     }
 
     if (0 == i % (Count_u32/100))
@@ -332,7 +332,7 @@ void SD_WriteMultipleBlocksWithRandoms (u8 *Addr_u8,u32 Block_u32,u32 Count_u32,
 #endif
   }
 
-  LED_GreenOff ();
+  LED_RedGreenOff ();
 
   if( !sd_mmc_mci_read_close(SD_SLOT) )
   {

@@ -278,11 +278,18 @@ u8 BUFFERED_SIO_GetByte (u8 *Data_pu8)
         return (FALSE);
     }
 
-    *Data_pu8 = BUFFERED_SIO_RxBuffer[BUFFERED_SIO_RxBuffer_StartPointer+1];
+    if (BUFFERED_SIO_RX_BUFFER_SIZE >= BUFFERED_SIO_RxBuffer_StartPointer+1)
+    {
+      *Data_pu8 = BUFFERED_SIO_RxBuffer[BUFFERED_SIO_RxBuffer_StartPointer+1];
+    }
+    else
+    {
+      *Data_pu8 = BUFFERED_SIO_RxBuffer[0];
+    }
 
     BUFFERED_SIO_RxBuffer_StartPointer++;
 
-    if (BUFFERED_SIO_RX_BUFFER_SIZE <= BUFFERED_SIO_RxBuffer_StartPointer)
+    if (BUFFERED_SIO_RX_BUFFER_SIZE < BUFFERED_SIO_RxBuffer_StartPointer)
     {
         BUFFERED_SIO_RxBuffer_StartPointer = 0;
     }

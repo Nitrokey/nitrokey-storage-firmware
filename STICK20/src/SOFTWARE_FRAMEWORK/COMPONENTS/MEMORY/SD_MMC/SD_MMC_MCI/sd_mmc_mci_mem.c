@@ -497,7 +497,7 @@ Ctrl_status sd_mmc_mci_usb_read_10_0(U32 addr, U16 nb_sector)
 {
   Ctrl_status Ret;
 
-  LED_GreenOn ();
+  LED_RedGreenOn ();
 
   if (addr > sd_MaxAccessedBlock_u32)
   {
@@ -516,7 +516,7 @@ Ctrl_status sd_mmc_mci_usb_read_10_0(U32 addr, U16 nb_sector)
 
   Ret = sd_mmc_mci_usb_read_10(0, addr, nb_sector);
 
-  LED_GreenOff ();
+  LED_RedGreenOff ();
 
   return (Ret);
 }
@@ -971,7 +971,7 @@ Ctrl_status sd_mmc_mci_multiple_ram_2_mem(U8 slot, U32 addr, const void *ram, U3
      return CTRL_NO_PRESENT;
    }
 
-   LED_GreenOn ();
+   LED_RedGreenOn ();
 
    if( !sd_mmc_mci_write_open(slot, addr, nb_sectors) )
      return CTRL_FAIL;
@@ -984,7 +984,7 @@ Ctrl_status sd_mmc_mci_multiple_ram_2_mem(U8 slot, U32 addr, const void *ram, U3
 
    Sd_mmc_mci_access_signal_off();
 
-   LED_GreenOff ();
+   LED_RedGreenOff ();
 
    return CTRL_GOOD;
 }

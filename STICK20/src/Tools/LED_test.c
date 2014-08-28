@@ -66,11 +66,19 @@
  Local declarations
 
 *******************************************************************************/
+/*
+  LED Access
 
+  smart card        red
+  OTP               green
+  mass storage      yellow (= red + green)
+
+*/
 
 static u8 LED_GreenToggleFlag_u8      = LED_OFF;
 static u8 LED_RedToggleFlag_u8        = LED_OFF;
 static u8 LED_RedGreenToggleFlag_u8   = LED_OFF;
+
 
 /*******************************************************************************
 

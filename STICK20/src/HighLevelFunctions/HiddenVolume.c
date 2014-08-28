@@ -1036,7 +1036,7 @@ u32 getPBKDF2Iterations(void)
 #ifdef TEST_PBKDF2
   return 1024;
 #else
-  return (128);       // for local CPU speed (ca. 0,3 sec)
+  return (256);       // for local CPU speed (ca. 0,6 sec)
 #endif
 }
 

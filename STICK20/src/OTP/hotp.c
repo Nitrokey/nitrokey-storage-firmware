@@ -52,7 +52,7 @@
 //#include "memory_ops.h"
 //#include "otp_sha1.h"
 #include "hmac-sha1.h"
-
+#include "LED_test.h"
 
 
 /*******************************************************************************
@@ -475,6 +475,8 @@ u32 get_hotp_value(u64 counter,u8 * secret,u8 secret_length,u8 len)
 	u8 hmac_result[20];
   u64 c = endian_swap(counter);
 
+  LED_GreenOn ();
+
 
 #ifdef DEBUG_HOTP
   {
@@ -532,6 +534,8 @@ u32 get_hotp_value(u64 counter,u8 * secret,u8 secret_length,u8 len)
     CI_LocalPrintf ("\n\r");
   }
 #endif
+
+  LED_GreenOff ();
 
 	if (len==6)
 	  hotp_result = hotp_result % 1000000;
@@ -728,6 +732,8 @@ u8 set_time_value (u32 time)
   s32 page_s32;
   u32 time_1 = time;
 
+  LED_GreenOn ();
+
 // Add crc to time
   time = crc_STM32(time);
 
@@ -750,6 +756,8 @@ u8 set_time_value (u32 time)
 
     flashc_memcpy ((void*)TIME_ADDRESS,(void*)&time,4,TRUE);
   }
+
+  LED_GreenOff ();
 
   {
     u8 text[30];
@@ -824,6 +832,8 @@ u8 increment_counter_page(u32 addr)
 	u8 *ptr;
 	u64 counter;
 	FLASH_Status err = FLASH_COMPLETE;
+
+  LED_GreenOn ();
 
 	ptr=(u8 *)addr;       // Set counter page slot
 
@@ -920,6 +930,8 @@ u8 increment_counter_page(u32 addr)
 
 	}
 
+  LED_GreenOff ();
+
 	return err; //no error
 }
 
@@ -957,6 +969,8 @@ u32 get_code_from_hotp_slot(u8 slot)
 
 	if (result==0xFF)//unprogrammed slot
 	  return 0;
+
+  LED_GreenOn ();
 
 	counter = get_counter_value (hotp_slot_counters[slot]);
 /*
@@ -1002,6 +1016,8 @@ u32 get_code_from_hotp_slot(u8 slot)
     CI_LocalPrintf ("\n\r");
   }
 #endif
+
+  LED_GreenOff ();
 
 	if (err!=FLASH_COMPLETE) return 0;
 
@@ -1064,7 +1080,12 @@ void backup_data(u8 *data,u16 len, u32 addr)
 
 void erase_counter(u8 slot)
 {
+  LED_GreenOff ();
+
   flashc_erase_page (hotp_slot_counters[slot],TRUE);                   // clear hole page
+
+  LED_GreenOn ();
+
 }
 
 /*******************************************************************************
@@ -1090,6 +1111,9 @@ void write_to_slot(u8 *data, u16 offset, u16 len)
   u16 dummy_u16;
   u8 *secret;
 
+  LED_GreenOn ();
+
+
 //copy entire page to ram
 	u8 *page=(u8 *)SLOTS_ADDRESS;
 	memcpy(page_buffer,page,FLASH_PAGE_SIZE*3);
@@ -1114,6 +1138,9 @@ void write_to_slot(u8 *data, u16 offset, u16 len)
 // Init backup block
   dummy_u16 = 0x4F4B;
   flashc_memcpy ((void*)(BACKUP_PAGE_ADDRESS+BACKUP_OK_OFFSET),(void*)&dummy_u16,2,TRUE);
+
+  LED_GreenOff ();
+
 }
 
 

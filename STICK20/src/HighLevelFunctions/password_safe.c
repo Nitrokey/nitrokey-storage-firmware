@@ -50,6 +50,7 @@
 #include "FlashStorage.h"
 #include "HandleAesStorageKey.h"
 #include "OTP/keyboard.h"
+#include "LED_test.h"
 
 /*******************************************************************************
 
@@ -148,6 +149,8 @@ u8 PWS_WriteSlot (u8 Slot_u8, typePasswordSafeSlot_st *Slot_st)
     return (FALSE);
   }
 
+  LED_GreenOn ();
+
 // Activate data in slot
   Slot_st->SlotActiv_u8 = PWS_SLOT_ACTIV_TOKEN;
 
@@ -173,6 +176,8 @@ u8 PWS_WriteSlot (u8 Slot_u8, typePasswordSafeSlot_st *Slot_st)
 // Write to flash
   p = (void*)Slot_st;
   flashc_memcpy ((void*)WritePointer_pu8,p,PWS_SLOT_LENGTH,TRUE);
+
+  LED_GreenOff ();
 
   return (TRUE);
 }
@@ -219,6 +224,8 @@ u8 PWS_EraseSlot (u8 Slot_u8)
     return (FALSE);
   }
 
+  LED_GreenOn ();
+
 // Clear data in slot
   memset ((char*)&Slot_st,0,sizeof (Slot_st));
   Slot_st.SlotActiv_u8 = PWS_SLOT_INACTIV_TOKEN;
@@ -244,6 +251,8 @@ u8 PWS_EraseSlot (u8 Slot_u8)
 // Write to flash
   p = (void*)&Slot_st;
   flashc_memcpy ((void*)WritePointer_pu8,p,PWS_SLOT_LENGTH,TRUE);
+
+  LED_GreenOff ();
 
   return (TRUE);
 }
@@ -279,6 +288,8 @@ u8 PWS_ReadSlot (u8 Slot_u8, typePasswordSafeSlot_st *Slot_st)
     return (FALSE);     // Aes key is not decrypted
   }
 
+  LED_GreenOn ();
+
 // Get read address
   ReadPointer_pu8 = (u8*)(PWS_FLASH_START_ADDRESS + PWS_SLOT_LENGTH * Slot_u8);
   memcpy (Slot_st,ReadPointer_pu8,PWS_SLOT_LENGTH);
@@ -297,6 +308,8 @@ u8 PWS_ReadSlot (u8 Slot_u8, typePasswordSafeSlot_st *Slot_st)
   HexPrint (PWS_SLOT_LENGTH, Slot_st);
   CI_LocalPrintf ("\n\r");
 #endif
+
+  LED_GreenOff ();
 
   return (TRUE);
 }
@@ -515,10 +528,12 @@ u8 PWS_WriteSlotData_1 (u8 Slot_u8,u8 *Name_pu8, u8 *Password_pu8)
 
 u8 PWS_WriteSlotData_2 (u8 Slot_u8,u8 *Loginname_pu8)
 {
+
   memcpy (PWS_BufferSlot_st.SlotLoginName_au8,Loginname_pu8,PWS_LOGINNAME_LENGTH);
 
   if (FALSE == PWS_WriteSlot (Slot_u8,&PWS_BufferSlot_st))
   {
+    LED_GreenOff ();
     return (FALSE);
   }
 
@@ -721,6 +736,8 @@ u8 PWS_SendData (u8 Slot_u8,u8 Kind_u8)
   u8  SendString_au8[40];
   u32 Ret_u32;
 
+  LED_GreenOn ();
+
   switch (Kind_u8)
   {
     case PWS_SEND_PASSWORD :
@@ -747,6 +764,8 @@ u8 PWS_SendData (u8 Slot_u8,u8 Kind_u8)
             break;
 
   }
+
+  LED_GreenOff ();
 
   return (TRUE);
 }

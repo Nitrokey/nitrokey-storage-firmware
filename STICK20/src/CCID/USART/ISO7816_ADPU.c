@@ -43,7 +43,7 @@
 #include "ISO7816_USART.h"
 #include "ISO7816_ADPU.h"
 #include "ISO7816_Prot_T1.h"
-
+#include "LED_test.h"
 
 
 
@@ -602,6 +602,8 @@ int ISO7816_SendAPDU_NoLe_NoLc (typeAPDU *tSC)
   int           nRet;
 //  int       nPointer;
 
+  LED_RedOn ();
+
   ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_NORMAL);
 
 // Build the send string
@@ -617,6 +619,8 @@ int ISO7816_SendAPDU_NoLe_NoLc (typeAPDU *tSC)
   nRet = ISO7816_T1_SendAPDU (tSC);
 
   ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_CLEAR);
+
+  LED_RedOff ();
 
   return (nRet);
 }
@@ -636,6 +640,8 @@ int ISO7816_SendAPDU_Le_NoLc (typeAPDU *tSC)
 {
 	int           nRet;
 //	int 		  nPointer;
+
+	LED_RedOn ();
 
 	ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_NORMAL);
 
@@ -667,6 +673,8 @@ int ISO7816_SendAPDU_Le_NoLc (typeAPDU *tSC)
 
   ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_CLEAR);
 
+  LED_RedOff ();
+
 	return (nRet);
 }
 
@@ -683,6 +691,8 @@ int ISO7816_SendAPDU_Le_NoLc (typeAPDU *tSC)
 int ISO7816_SendAPDU_NoLe_Lc (typeAPDU *tSC)
 {
 	int           nRet;
+
+	LED_RedOn ();
 
   ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_NORMAL);
 
@@ -719,6 +729,8 @@ int ISO7816_SendAPDU_NoLe_Lc (typeAPDU *tSC)
 
   ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_CLEAR);
 
+  LED_RedOff ();
+
 	return (nRet);
 }
 
@@ -735,6 +747,8 @@ int ISO7816_SendAPDU_NoLe_Lc (typeAPDU *tSC)
 int ISO7816_SendAPDU_Le_Lc (typeAPDU *tSC)
 {
 	int           nRet;
+
+	LED_RedOn ();
 
 	ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_NORMAL);
 
@@ -791,6 +805,8 @@ int ISO7816_SendAPDU_Le_Lc (typeAPDU *tSC)
 	nRet = ISO7816_T1_SendAPDU (tSC);
 
   ISO7816_SetLockCounter (ISO7816_LOCK_COUNT_CLEAR);
+
+  LED_RedOff ();
 
 	return (nRet);
 }
