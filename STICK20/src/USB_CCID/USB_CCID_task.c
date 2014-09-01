@@ -94,7 +94,6 @@
 #include "usb_descriptors.h"
 #include "usb_standard_request.h"
 #include "ctrl_access.h"
-//#include "scsi_decoder.h"
 #include "USB_CCID_task.h"
 
 #include "global.h"
@@ -129,20 +128,11 @@
 
 *******************************************************************************/
 
-
-extern volatile Bool ms_multiple_drive;
-
-//static U32  dCBWTag;
-
-
 /*******************************************************************************
 
  Local declarations
 
 *******************************************************************************/
-
-U8 usb_LUN;
-U8 ms_endpoint;
 
 // For testing
 t_USB_CCID_data_st USB_CCID_data_st;

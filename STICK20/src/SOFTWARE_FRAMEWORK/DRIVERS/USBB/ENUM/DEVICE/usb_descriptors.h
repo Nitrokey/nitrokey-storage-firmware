@@ -253,7 +253,7 @@
 #define EP_SIZE_3_FS            EP_OUT_LENGTH_3_FS
 #define EP_OUT_LENGTH_3_HS      16 // 64
 #define EP_SIZE_3_HS            EP_OUT_LENGTH_3_HS
-#define EP_INTERVAL_3           0x18            //! ???? Interrupt polling interval from host
+#define EP_INTERVAL_3           0x10    // 0x18            //! ???? Interrupt polling interval from host
 
             // USB Endpoint 4 descriptor - CCID OUT
 #define ENDPOINT_NB_4           EP_CCID_OUT

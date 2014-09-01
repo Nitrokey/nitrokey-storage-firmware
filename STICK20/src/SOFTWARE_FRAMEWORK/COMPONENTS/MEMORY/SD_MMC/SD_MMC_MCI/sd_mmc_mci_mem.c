@@ -229,6 +229,8 @@ Ctrl_status sd_mmc_mci_test_unit_ready_0(void)
     return (CTRL_NO_PRESENT);
   }
 
+  return sd_mmc_mci_test_unit_ready(0);
+/*
 	if (CTRL_GOOD == sd_mmc_mci_unit_state_e)
 	{
 		return sd_mmc_mci_test_unit_ready(0);
@@ -237,6 +239,7 @@ Ctrl_status sd_mmc_mci_test_unit_ready_0(void)
 	{
 		return (sd_mmc_mci_unit_state_e);		// Simulate local state
 	}
+*/
 }
 
 

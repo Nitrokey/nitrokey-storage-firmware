@@ -1865,6 +1865,7 @@ u8 cmd_getPasswordCount (u8 *report,u8 *output)
   }
   else
   {
+    output[OUTPUT_CMD_RESULT_OFFSET] = 88;    // Admin retry counter
     output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_PASSWORD;
   }
 

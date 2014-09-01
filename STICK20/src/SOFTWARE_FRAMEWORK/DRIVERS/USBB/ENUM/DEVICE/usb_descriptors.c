@@ -151,34 +151,6 @@ const S_usb_device_descriptor usb_dev_desc =
 };
 
 
-
-#ifdef NOT_USED
-const uint8_t CCID_DeviceDescriptor[CCID_SIZ_DEVICE_DESC] =
-  {
-    0x12,   				/* DeviceDescriptor bLength  */
-    0x01,   				/* bDescriptorType */
-  	WBVAL(0x0110), 	/* bcdUSB, version 1.10 */
-    0x00,   				/* bDeviceClass : each interface define the device class */
-    0x00,   				/* bDeviceSubClass */
-    0x00,   				/* bDeviceProtocol */
-    0x40,   				/* bMaxPacketSize0 0x08 - 0x40 = 64 */
-
-  	WBVAL(0x20A0),  /* Test VID for MS CCID driver idVendor */
-  	WBVAL(0x4107),  /* Test PID for MS CCID driver idProduct */
-//  	WBVAL(0x0800),  /* Test VID for MS CCID driver idVendor */
-//  	WBVAL(0x0006),  /* Test PID for MS CCID driver idProduct */
-//  	WBVAL(0x08e6),  /* 0x08e6 = idVendor  germalto - for testing */
-//  	WBVAL(0x3437),  /* 0x3437 = idProduct germalto usb-sl reader  - for testing */
-
-  	WBVAL(0x0100), 	/* bcdDevice version 1.00   */
-
-    1,              /* index of string Manufacturer  */
-    2,              /* index of string descriptor of product*/
-    0,  //3, RB            /* index of serial number */
-    0x01    				/*bNumConfigurations */
-  };
-#endif
-
 // usb_user_configuration_descriptor FS
 const S_usb_user_configuration_descriptor usb_conf_desc_fs =
 {
@@ -280,21 +252,6 @@ const S_usb_user_configuration_descriptor usb_conf_desc_fs =
 	0x01 															/* bMaxCCIDBusySlots	*/
   },
 
-#ifdef NOT_USED
-  {
-  // Interface 0 descriptor (Interface 0 = Smart Card Reader)
-    0x09,           										/* bLength */
-    0x04,     													/* bDescriptorType */
-    0x00,                              	/* bInterfaceNumber */
-    0x00,                              	/* bAlternateSetting */
-    0x03,                              	/* bNumEndpoints = 3 */
-    0x0B,             					/* bInterfaceClass = CCID */
-    0x00,                 				/* bInterfaceSubClass */
-    0x00,            					/* bInterfaceProtocol */
-    0x00,                              	/* 0x04,  = 0 ??? iInterface Index of string descriptor (befor 0x64)*/
-  }
-#endif
-
   {
     sizeof(S_usb_endpoint_descriptor),
     ENDPOINT_DESCRIPTOR,
@@ -336,18 +293,6 @@ const S_usb_user_configuration_descriptor usb_conf_desc_fs =
     KB_INTERFACE_PROTOCOL,
     KB_INTERFACE_INDEX
   },
-#ifdef NOT_USED
-      /******************** Descriptor of Keyboard HID ********************/
-    0x09,         /*bLength: HID Descriptor size*/
-    HID_DESCRIPTOR_TYPE, /*bDescriptorType: HID*/
-    0x10,         /*bcdHID: HID Class Spec release number*/
-    0x01,
-    0x00,         /*bCountryCode: Hardware target country*/
-    0x01,         /*bNumDescriptors: Number of HID class descriptors to follow*/
-    0x22,         /*bDescriptorType*/
-    KEYBOARD_SIZ_REPORT_DESC,/*wItemLength: Total length of Report descriptor*/
-    0x00,
-#endif // NOT_USED
   {
     sizeof(S_usb_hid_descriptor),
     HID_DESCRIPTOR,

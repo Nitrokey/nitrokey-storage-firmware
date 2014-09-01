@@ -166,25 +166,6 @@ void device_mass_storage_task(void)
     if (!Is_device_enumerated()) return;
 #endif  // FREERTOS_USED
 
-
-
-/* RB not used
-#if BOARD == EVK1100
-    // Display Start-of-Frame counter on LEDs
-    LED_Display_Field(LED_MONO0_GREEN |
-                      LED_MONO1_GREEN |
-                      LED_MONO2_GREEN |
-                      LED_MONO3_GREEN,
-                      sof_cnt >> 5);
-#elif BOARD == EVK1101 || BOARD == EVK1104 || BOARD == EVK1105 || BOARD == UC3C_EK
-    // Display Start-of-Frame counter on LEDs
-    LED_Display_Field(LED0 |
-                      LED1,
-                      sof_cnt >> 5);
-#else
-  #error The display of the SOFs must be defined here.
-#endif
-*/
     // If we receive something in the OUT endpoint, parse it
     if (Is_usb_out_received(EP_MS_OUT))
     {
@@ -230,6 +211,15 @@ static void usb_mass_storage_cbw(void)
   g_scsi_data_remaining = Usb_read_endpoint_data(EP_MS_OUT, 32);
   g_scsi_data_remaining = usb_format_usb_to_mcu_data(32, g_scsi_data_remaining);
 
+/* Show the remaining bytes
+  {
+    U8 Text_u8[20];
+    CI_StringOut (" - ");
+    itoa ((S32)g_scsi_data_remaining,Text_u8);
+    CI_StringOut (Text_u8);
+    CI_StringOut (" - ");
+  }
+*/
   //! if (bmCBWFlags.bit7 == 1) {direction = IN;}
   if (Usb_read_endpoint_data(EP_MS_OUT, 8))
   {

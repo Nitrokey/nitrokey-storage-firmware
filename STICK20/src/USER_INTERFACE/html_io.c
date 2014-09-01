@@ -1138,6 +1138,11 @@ u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st)
     Status_st->UserPwRetryCount  = Text_u8[4];
     Status_st->AdminPwRetryCount = Text_u8[6];
   }
+  else
+  {
+    Status_st->UserPwRetryCount  = 88;
+    Status_st->AdminPwRetryCount = 88;
+  }
 
   Status_st->FirmwareLocked_u8 = FALSE;
   if (TRUE ==  flashc_is_security_bit_active())

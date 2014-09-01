@@ -692,7 +692,7 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
-<entry excluding="Cipher/Xts/gentest.c|CCID/UNIT_TEST/CONVERT_USB_LOG.h|CCID/UNIT_TEST/CONVERT_USB_LOG.c|SOFTWARE_FRAMEWORK/DRIVERS/INTC/exception.x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+<entry excluding="SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM/host_mem.c|SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM/host_mem.h|SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST/usb_host_enum.c|Cipher/Xts/gentest.c|CCID/UNIT_TEST/CONVERT_USB_LOG.h|CCID/UNIT_TEST/CONVERT_USB_LOG.c|SOFTWARE_FRAMEWORK/DRIVERS/INTC/exception.x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 </sourceEntries>
 </configuration>
 </storageModule>
@@ -3993,7 +3993,7 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
-<entry excluding="Cipher/Xts/gentest.c|CCID/UNIT_TEST/CONVERT_USB_LOG.h|CCID/UNIT_TEST/CONVERT_USB_LOG.c|SOFTWARE_FRAMEWORK/DRIVERS/INTC/exception.x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+<entry excluding="SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM/host_mem.c|SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM/host_mem.h|SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST/usb_host_enum.c|Cipher/Xts/gentest.c|CCID/UNIT_TEST/CONVERT_USB_LOG.h|CCID/UNIT_TEST/CONVERT_USB_LOG.c|SOFTWARE_FRAMEWORK/DRIVERS/INTC/exception.x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 </sourceEntries>
 </configuration>
 </storageModule>
@@ -7446,7 +7446,7 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
-<entry excluding="Cipher/Xts/gentest.c|CCID/UNIT_TEST/CONVERT_USB_LOG.h|CCID/UNIT_TEST/CONVERT_USB_LOG.c|SOFTWARE_FRAMEWORK/DRIVERS/INTC/exception.x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+<entry excluding="SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM/host_mem.c|SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM/host_mem.h|Cipher/Xts/gentest.c|CCID/UNIT_TEST/CONVERT_USB_LOG.h|CCID/UNIT_TEST/CONVERT_USB_LOG.c|SOFTWARE_FRAMEWORK/DRIVERS/INTC/exception.x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 </sourceEntries>
 </configuration>
 </storageModule>

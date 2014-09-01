@@ -92,7 +92,7 @@
 #define LUN_5                DISABLE
 #define LUN_6                DISABLE
 #define LUN_7                DISABLE
-#define LUN_USB              ENABLE  //!< Host Mass-Storage Memory.
+#define LUN_USB              DISABLE    // ENABLE  //!< Host Mass-Storage Memory.
 //! @}
 
 /*! \name LUN 0 Definitions
@@ -199,6 +199,7 @@
 /*! \name USB LUNs Definitions
  */
 //! @{
+/*
 #define MEM_USB                                 LUN_USB
 #define LUN_ID_MEM_USB                          LUN_ID_USB
 #define LUN_USB_INCLUDE                         "host_mem.h"
@@ -210,6 +211,7 @@
 #define Lun_usb_mem_2_ram(addr, ram)            host_read_10_ram(addr, ram)
 #define Lun_usb_ram_2_mem(addr, ram)            host_write_10_ram(addr, ram)
 #define LUN_USB_NAME                            "\"Host Mass-Storage Memory\""
+*/
 //! @}
 
 /*! \name Actions Associated with Memory Accesses
