@@ -941,6 +941,7 @@ u8 parse_report(u8 *report,u8 *output)
           memcpy (HID_String_au8,&report[1],33);
           break;
 
+#ifdef HID_PASSWORD_MARTIX_AKTIV
         case STICK20_CMD_SEND_PASSWORD_MATRIX :
           CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_MATRIX\r\n");
 
@@ -970,7 +971,7 @@ u8 parse_report(u8 *report,u8 *output)
           HID_CmdGet_u8  = HTML_CMD_SEND_PASSWORD_MATRIX_SETUP;
           memcpy (HID_String_au8,&report[1],33);
           break;
-
+#endif
 
         case STICK20_CMD_GET_DEVICE_STATUS :
           CI_StringOut ("Get STICK20_CMD_GET_DEVICE_STATUS\r\n");

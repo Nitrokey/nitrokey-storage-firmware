@@ -121,13 +121,8 @@
 #define SBC_CMD_SYNCHRONIZE_CACHE_16                    0x91
 #define SBC_CMD_WRITE_SAME_16                           0x93
 #define SBC_CMD_SERVICE_ACTION_IN_16                    0x9E
-
-
 #define SBC_CMD_REPORT_LUNS                             0xA0
-
 #define SBC_CMD_ATA_PASS_THROUGH                        0xA1
-
-
 #define SBC_CMD_READ_12                                 0xA8
 #define SBC_CMD_WRITE_12                                0xAA
 #define SBC_CMD_WRITE_AND_VERIFY_12                     0xAE
