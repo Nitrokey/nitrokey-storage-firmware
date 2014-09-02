@@ -56,6 +56,7 @@
 #define CMD_USER_AUTHENTICATE             0x0E
 #define CMD_GET_USER_PASSWORD_RETRY_COUNT 0x0F
 #define CMD_USER_AUTHORIZE                0x10
+#define CMD_UNLOCK_USER_PASSOWRD          0x11
 
 #define CMD_GET_PW_SAFE_SLOT_STATUS       0x60
 #define CMD_GET_PW_SAFE_SLOT_NAME         0x61
@@ -363,6 +364,7 @@ u8 cmd_getPasswordSafeEraseSlot (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeEnable (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeInitKey (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeSendData (u8 *report,u8 *output);
+u8 cmd_unlock_userpassword (u8 *report,u8 *output);
 
 void OTP_main (void);
 

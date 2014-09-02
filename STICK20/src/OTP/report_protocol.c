@@ -616,7 +616,7 @@ u8 parse_report(u8 *report,u8 *output)
 	memset(output,0,KEYBOARD_FEATURE_COUNT);
 
 // Set last command value
-	output[OUTPUT_LAST_CMD_TYPE_OFFSET]=cmd_type;
+	output[OUTPUT_LAST_CMD_TYPE_OFFSET] = cmd_type;
 
 // Get CRC from HID report block
   received_crc32 = getu32(report+KEYBOARD_FEATURE_COUNT-4);
@@ -745,6 +745,11 @@ u8 parse_report(u8 *report,u8 *output)
         cmd_authorize(report,output);
         break;
 
+      case CMD_UNLOCK_USER_PASSOWRD:
+        CI_StringOut ("Get CMD_UNLOCK_USER_PASSOWRD\r\n");
+        cmd_unlock_userpassword (report,output);
+        break;
+
       case CMD_USER_AUTHORIZE:
         CI_StringOut ("Get CMD_USER_AUTHORIZE\r\n");
         cmd_user_authorize(report,output);
@@ -832,7 +837,15 @@ u8 parse_report(u8 *report,u8 *output)
         cmd_getPasswordSafeSendData (report,output);
         break;
 
-
+      default:
+        {
+           u8 text[10];
+           CI_StringOut ("Get unknown cmd ");
+           itoa (cmd_type,text);
+           CI_StringOut ((char*)text);
+           CI_StringOut ("\r\n");
+        }
+        break;
     }
     if (not_authorized)
     {
@@ -1780,6 +1793,47 @@ u8 cmd_user_authenticate(u8 *report,u8 *output)
 
 /*******************************************************************************
 
+  cmd_unlock_userpassword
+
+  Changes
+  Date      Reviewer        Info
+  02.09.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_unlock_userpassword (u8 *report,u8 *output)
+{
+  u8  res=1;
+  u8  admin_password[40];
+  u32 Ret_u32;
+
+  memset(admin_password,0,40);
+  memcpy(admin_password,report+1,30);
+
+  Ret_u32 = LA_OpenPGP_V20_Test_ResetRetryCounter ((unsigned char *)admin_password);
+  if (TRUE == Ret_u32)
+  {
+    res = 0;
+  }
+
+  memset(admin_password,0,40);
+
+  if (0 == res)
+  {
+      return (0);
+  }
+  else
+  {
+      output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_WRONG_PASSWORD;
+      return (1);       //wrong password
+  }
+}
+
+/*******************************************************************************
+
   cmd_authorize
 
   Reviews
@@ -2462,7 +2516,7 @@ void OTP_main (void)
     {
       OTP_device_status = STATUS_BUSY;
 //      CI_StringOut ("-B-");
-      parse_report(HID_SetReport_Value_tmp,HID_GetReport_Value_tmp);
+      parse_report (HID_SetReport_Value_tmp,HID_GetReport_Value_tmp);
       OTP_device_status = STATUS_READY;
 //      CI_StringOut ("-R-");
 
