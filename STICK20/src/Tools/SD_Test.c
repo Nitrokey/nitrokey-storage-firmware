@@ -584,7 +584,7 @@ u8 SD_SecureEraseCryptedVolume (void)
 
   CI_LocalPrintf ("Erase SD: blocks from %d to %d\r\n",GetStartCryptedVolume_u32 (),Blockcount_u32);
 
-Blockcount_u32 = 100000;
+// Blockcount_u32 = 100000; // for testing
 
   SD_WriteBlocks (GetStartCryptedVolume_u32 (),Blockcount_u32,1);
   return (TRUE);
