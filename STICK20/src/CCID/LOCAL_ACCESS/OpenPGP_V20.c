@@ -1387,7 +1387,7 @@ int LA_OpenPGP_V20_Test_ResetRetryCounter (unsigned char *pcPW)
 
   n = strlen ((char *)pcPW);
 
-  CI_LocalPrintf ("Reset user password  : ");
+  CI_LocalPrintf ("Reset user password new password -%s- : ",pcPW);
   nRet = LA_OpenPGP_V20_ResetRetryCounter (&tSC_OpenPGP_V20,n,pcPW);
   if (FALSE == nRet)
   {

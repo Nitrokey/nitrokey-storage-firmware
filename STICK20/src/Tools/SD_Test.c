@@ -314,7 +314,7 @@ void SD_WriteMultipleBlocksWithRandoms (u8 *Addr_u8,u32 Block_u32,u32 Count_u32,
     }
 
 // Generate new random chars
-    if (0 == i % (Count_u32/127))
+    if (0 == (i % (Count_u32/127)))
     {
       SD_GetRandomBlock (Addr_u8);
     }
@@ -583,6 +583,8 @@ u8 SD_SecureEraseCryptedVolume (void)
   sd_mmc_mci_read_capacity (SD_SLOT,(U32 *)&Blockcount_u32);
 
   CI_LocalPrintf ("Erase SD: blocks from %d to %d\r\n",GetStartCryptedVolume_u32 (),Blockcount_u32);
+
+Blockcount_u32 = 100000;
 
   SD_WriteBlocks (GetStartCryptedVolume_u32 (),Blockcount_u32,1);
   return (TRUE);

@@ -1807,19 +1807,19 @@ u8 cmd_user_authenticate(u8 *report,u8 *output)
 u8 cmd_unlock_userpassword (u8 *report,u8 *output)
 {
   u8  res=1;
-  u8  admin_password[40];
+  u8  newUserPassword_au8[40];
   u32 Ret_u32;
 
-  memset(admin_password,0,40);
-  memcpy(admin_password,report+1,30);
+  memset(newUserPassword_au8,0,40);
+  memcpy(newUserPassword_au8,report+2,30);
 
-  Ret_u32 = LA_OpenPGP_V20_Test_ResetRetryCounter ((unsigned char *)admin_password);
+  Ret_u32 = LA_OpenPGP_V20_Test_ResetRetryCounter ((unsigned char *)newUserPassword_au8);
   if (TRUE == Ret_u32)
   {
     res = 0;
   }
 
-  memset(admin_password,0,40);
+  memset(newUserPassword_au8,0,40);
 
   if (0 == res)
   {
