@@ -310,7 +310,14 @@ u8 *Keyboard_SetReport_Feature(u16 Length)
 
 
   Usb_ack_setup_received_free();
-  while (!Is_usb_control_out_received());
+  for (i=0;i<100000;i++)
+  {
+    if (0 != Is_usb_control_out_received())
+    {
+      break;
+    }
+  }
+
 
   Usb_reset_endpoint_fifo_access(EP_CONTROL);
 

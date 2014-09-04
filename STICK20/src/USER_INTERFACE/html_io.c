@@ -834,10 +834,11 @@ void HID_ExcuteCmd (void)
       if (TRUE == IW_SendToSC_PW1 (&HID_String_au8[1]))
       {
         // Todo : send update to host
-        SetSdUncryptedCardEnableState (FALSE);      // Disable access
-        vTaskDelay (1000);
         SetSdUncryptedCardReadWriteEnableState (READ_ONLY_ACTIVE);
+        SetSdUncryptedCardEnableState (FALSE);      // Disable access
+        vTaskDelay (1400);
         SetSdUncryptedCardEnableState (TRUE);       // Enable access
+
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
         CI_TickLocalPrintf ("ok\r\n");
       }
@@ -854,7 +855,7 @@ void HID_ExcuteCmd (void)
       {
         // Todo : send update to host
         SetSdUncryptedCardEnableState (FALSE);      // Disable access
-        vTaskDelay (1000);
+        vTaskDelay (1400);
         SetSdUncryptedCardReadWriteEnableState (READ_WRITE_ACTIVE);
         SetSdUncryptedCardEnableState (TRUE);       // Enable access
 

@@ -853,7 +853,7 @@ Bool sbc_write_10(void)
   if (mem_wr_protect(usb_LUN))
   {
     sbc_lun_status_is_protected();
-    return FALSE;
+    return TRUE; //FALSE;
   }
 
   switch (usb_2_memory(usb_LUN, mass_addr, g_scsi_data_remaining/512 ))
