@@ -51,6 +51,7 @@ void AsciiHexPrint (int nNumberChars,unsigned char sData[]);
 
 void itoa(u32 n, u8 *s);
 void itoa_s(s32 n, u8 *s);
+void itoa_h (u32 n, u8 *s);
 void reverse(char *s);
 
 

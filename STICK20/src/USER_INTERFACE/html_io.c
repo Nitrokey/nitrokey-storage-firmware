@@ -730,6 +730,8 @@ void HID_ExcuteCmd (void)
         // Enable uncrypted SD card access via USB
         SetSdUncryptedCardEnableState (TRUE);
         SetSdUncryptedCardReadWriteEnableState (READ_WRITE_ACTIVE);
+        SetSdEncryptedCardEnableState (FALSE);
+        SetSdEncryptedHiddenState (FALSE);
 
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_BUSY_PROGRESSBAR,100);
         vTaskDelay (500);
@@ -820,6 +822,10 @@ void HID_ExcuteCmd (void)
       CI_TickLocalPrintf ("Generate new keys\r\n");
       if (TRUE == BuildStorageKeys_u32 ((u8*)&HID_String_au8[1]))
       {
+        SetSdEncryptedCardEnableState (FALSE);
+        SetSdEncryptedHiddenState (FALSE);
+        memset (StorageKey_pu8,0,32);
+        AES_SetNewStorageKey ((u8*)"0000");       // Set dummy key
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
       }
       else

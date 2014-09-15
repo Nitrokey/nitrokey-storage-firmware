@@ -317,6 +317,8 @@ void SD_WriteMultipleBlocksWithRandoms (u8 *Addr_u8,u32 Block_u32,u32 Count_u32,
     if (0 == (i % (Count_u32/127)))
     {
       SD_GetRandomBlock (Addr_u8);
+#ifdef  STICK_20_A_MUSTER_PROD
+#endif
     }
 
 #ifdef TIME_MEASURING_ENABLE
@@ -584,7 +586,9 @@ u8 SD_SecureEraseCryptedVolume (void)
 
   CI_LocalPrintf ("Erase SD: blocks from %d to %d\r\n",GetStartCryptedVolume_u32 (),Blockcount_u32);
 
-// Blockcount_u32 = 100000; // for testing
+#ifndef  STICK_20_A_MUSTER_PROD
+  Blockcount_u32 = 100000; // for testing
+#endif
 
   SD_WriteBlocks (GetStartCryptedVolume_u32 (),Blockcount_u32,1);
   return (TRUE);

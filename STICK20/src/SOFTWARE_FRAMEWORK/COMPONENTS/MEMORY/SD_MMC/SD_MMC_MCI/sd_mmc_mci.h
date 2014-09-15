@@ -851,5 +851,6 @@ Bool is_dma_ram_2_mci_complete( void );
 
 const cid_t *GetSdCidInfo (void);
 unsigned char CheckForNewSdCard (void);
+unsigned char GetSdEncryptedHiddenState (void);
 
 #endif  // _SD_MMC_MCI_H_

@@ -334,8 +334,8 @@ u8 Stick20HIDSendAccessStatusData (u8 *output)
   CI_StringOut ((char*)text_au8);
   CI_StringOut ("\r\n");
 
-  CI_StringOut ("SD card serial nr: ");
-  itoa (Config_st.ActiveSD_CardID_u32,text_au8);
+  CI_StringOut ("SD card serial nr: 0x");
+  itoa_h (Config_st.ActiveSD_CardID_u32,text_au8);
   CI_StringOut ((char*)text_au8);
   CI_StringOut ("\r\n");
 

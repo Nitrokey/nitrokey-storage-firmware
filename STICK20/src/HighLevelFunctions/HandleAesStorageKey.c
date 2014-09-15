@@ -311,16 +311,6 @@ u32 BuildNewXorPattern_u32 (void)
     return (FALSE);
   }
 
-/* Now integrated in GetRandomNumber_u32
-// Paranoia: if the random key is not really random, xor it with another random key from a second source
-  time (&now);        // Get the local time
-  srand (now);        // Init the local random generator
-  for (i=0;i<AES_KEYSIZE_256_BIT;i++)
-  {
-    XorPattern_au8[i] = XorPattern_au8[i] ^ (u8)(rand () % 256);
-  }
-*/
-
   WriteXorPatternToFlash (XorPattern_au8);
 
   return (TRUE);
@@ -379,6 +369,22 @@ u32 BuildStorageKeys_u32 (u8 *AdminPW_pu8)
 {
   u32 Ret_u32;
   u8  MasterKey_au8[AES_KEYSIZE_256_BIT];
+
+// Check admin password
+  // Unlock smartcard for sending master key
+  if (FALSE == LA_OpenPGP_V20_Test_SendAdminPW (AdminPW_pu8))
+  {
+#ifdef LOCAL_DEBUG
+  CI_TickLocalPrintf ("AdminPW wrong\r\n");
+#endif
+    return (FALSE);
+  }
+
+  Ret_u32 = EraseLocalFlashKeyValues_u32 ();
+  if (FALSE == Ret_u32)
+  {
+    return (FALSE);
+  }
 
 
   Ret_u32 = BuildNewXorPattern_u32 ();
@@ -543,7 +549,7 @@ u8 StartupCheck_u8 (void)
 
   ReadStickConfigurationFromUserPage ();
 
-  if (FALSE == StickConfiguration_st.StickKeysNotInitiated_u8)
+  if (TRUE == StickConfiguration_st.StickKeysNotInitiated_u8)
   {
     CI_LocalPrintf ("*** Set flash bit NotInitated ***\r\n");
     SetStickKeysNotInitatedToFlash ();

@@ -51,7 +51,7 @@
 
 *******************************************************************************/
 
-#define LOCAL_DEBUG
+//#define LOCAL_DEBUG
 
 //#define TEST_PBKDF2         // Check test vectors for PBKDF2, last test fails: password is over 500 byte long
 #define DEBUG_KEYS          //

@@ -47,6 +47,7 @@ u8 Write_ReadWriteStatusUncryptedVolume_u8 (u8 NewStatus_u8);
 u8 WriteDatetime (u32 Datetime_u32);
 u8 ReadDatetime (u32 *Datetime_u32);
 
+u32 EraseLocalFlashKeyValues_u32 (void);
 
 /***************************************************************************************
 

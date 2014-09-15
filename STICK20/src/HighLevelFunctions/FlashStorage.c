@@ -40,6 +40,9 @@
 #include "tools.h"
 #include "OTP/report_protocol.h"
 #include "FlashStorage.h"
+#include "HiddenVolume.h"
+#include "OTP\\hotp.h"
+#include "password_safe.h"
 
 typeStick20Configuration_st StickConfiguration_st;
 
@@ -284,7 +287,7 @@ u8 InitStickConfigurationToUserPage_u8 (void)
   StickConfiguration_st.VolumeActiceFlag_u8             = 0;
   StickConfiguration_st.NewSmartCardFound_u8            = 0;
   StickConfiguration_st.ActiveSmartCardID_u32           = 0;
-  StickConfiguration_st.StickKeysNotInitiated_u8        = 0;
+  StickConfiguration_st.StickKeysNotInitiated_u8        = TRUE;
 
   WriteStickConfigurationToUserPage ();
   return (TRUE);
@@ -533,7 +536,7 @@ u8 WriteNewSdCardFoundToFlash (u32 *SdId_u32)
     InitStickConfigurationToUserPage_u8 ();
   }
 
-  CI_LocalPrintf ("*** New SD card found ***  Serial number 0x%08x\r\n",SdId_u32);
+  CI_LocalPrintf ("*** New SD card found ***  Serial number 0x%08x\r\n",*SdId_u32);
 
   WriteSdId (SdId_u32);
 
@@ -953,4 +956,100 @@ u8 ReadPasswordSafeKey (u8 *data)
   return (TRUE);
 }
 
+/*******************************************************************************
+
+  EraseLocalFlashKeyValues_u32
+
+  Changes
+  Date      Author          Info
+  10.09.14  RB              Implementation
+
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+#if (defined __GNUC__) && (defined __AVR32__)
+  __attribute__((__aligned__(4)))
+#elif (defined __ICCAVR32__)
+  #pragma data_alignment = 4
+#endif
+u8 EraseStoreData_au8[256];
+
+u32 EraseLocalFlashKeyValues_u32 (void)
+{
+  u32 i;
+  u32 i1;
+
+// Clear user page
+  for (i1=0;i1<7;i1++)
+  {
+    for (i=0;i<256;i++)
+    {
+      EraseStoreData_au8[i] = (u8)(rand () % 256);
+    }
+    flashc_memcpy((void*)AVR32_FLASHC_USER_PAGE,EraseStoreData_au8,256,TRUE);
+  }
+
+  flashc_erase_user_page (TRUE);
+
+// Set default values
+  InitStickConfigurationToUserPage_u8 ();
+
+  DFU_DisableFirmwareUpdate ();     // Stick always starts in application mode
+  CheckForNewSdCard ();             // Get SD ID
+
+// Clear password safe
+  for (i1=0;i1<7;i1++)
+  {
+    for (i=0;i<256;i++)
+    {
+      EraseStoreData_au8[i] = (u8)(rand () % 256);
+    }
+    flashc_memcpy((void*)(PWS_FLASH_START_ADDRESS    ),EraseStoreData_au8,256,TRUE);
+    flashc_memcpy((void*)(PWS_FLASH_START_ADDRESS+256),EraseStoreData_au8,256,TRUE);
+  }
+
+  flashc_erase_page(PWS_FLASH_START_PAGE,TRUE);
+
+// Clear OTP
+  for (i1=0;i1<7;i1++)
+  {
+    for (i=0;i<256;i++)
+    {
+      EraseStoreData_au8[i] = (u8)(rand () % 256);
+    }
+    for (i=0;i<10;i++)
+    {
+      flashc_memcpy((void*)(SLOTS_ADDRESS+i*512    ),EraseStoreData_au8,256,TRUE);
+      flashc_memcpy((void*)(SLOTS_ADDRESS+i*512+256),EraseStoreData_au8,256,TRUE);
+    }
+  }
+
+  for (i=0;i<10;i++)
+  {
+    flashc_erase_page(OTP_FLASH_START_PAGE+i,TRUE);
+  }
+
+// Clear hidden volumes
+  for (i1=0;i1<7;i1++)
+  {
+    for (i=0;i<256;i++)
+    {
+      EraseStoreData_au8[i] = (u8)(rand () % 256);
+    }
+    for (i=0;i<2;i++)
+    {
+      flashc_memcpy((void*)(HV_MAGIC_NUMBER_ADDRESS+i*512    ),EraseStoreData_au8,256,TRUE);
+      flashc_memcpy((void*)(HV_MAGIC_NUMBER_ADDRESS+i*512+256),EraseStoreData_au8,256,TRUE);
+    }
+  }
+  for (i=0;i<10;i++)
+  {
+    flashc_erase_page(HV_FLASH_START_PAGE+i,TRUE);
+  }
+
+  return (TRUE);
+}
 
