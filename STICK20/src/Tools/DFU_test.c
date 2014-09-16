@@ -237,6 +237,28 @@ void DFU_DisableFirmwareUpdate (void)
 
 /*******************************************************************************
 
+  DFU_ResetCPU
+
+  Reviews
+  Date      Reviewer        Info
+
+
+*******************************************************************************/
+
+void DFU_ResetCPU (void)
+{
+  DFU_UsbStop();
+  Disable_global_interrupt();
+  vTaskEndScheduler ();
+
+  __builtin_mtdr(AVR32_DC, AVR32_DC_DBE_MASK);
+  __builtin_mtdr(AVR32_DC, AVR32_DC_RES_MASK);
+
+  while(1);
+}
+
+/*******************************************************************************
+
   DFU_EnableFirmwareUpdate
 
   Reviews
@@ -288,7 +310,7 @@ void IBN_DFU_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned in
     CI_LocalPrintf ("4   Set security bit\r\n");
     CI_LocalPrintf ("5   Show bootloader protected size\r\n");
     CI_LocalPrintf ("6   Set bootloader protected size = 0x2000\r\n");
-    CI_LocalPrintf ("7   Reset system (don't work)\r\n");
+    CI_LocalPrintf ("7   Reset system\r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }
@@ -331,24 +353,7 @@ void IBN_DFU_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned in
       break;
 
     case 7 :
-
-//      DFU_ForceIsp (FALSE);
-
-      DFU_UsbStop();
-
-      Disable_global_interrupt();
-/*
-      _trampoline ();
-*/
-      AVR32_WDT.ctrl = AVR32_WDT_CTRL_EN_MASK |
-                       (10 << AVR32_WDT_CTRL_PSEL_OFFSET) |
-                       (AVR32_WDT_KEY_VALUE << AVR32_WDT_CTRL_KEY_OFFSET);
-      AVR32_WDT.ctrl = AVR32_WDT_CTRL_EN_MASK |
-                       (10 << AVR32_WDT_CTRL_PSEL_OFFSET) |
-                       ((~AVR32_WDT_KEY_VALUE << AVR32_WDT_CTRL_KEY_OFFSET) & AVR32_WDT_CTRL_KEY_MASK);
-
-      while (1);  // Now the end comes
-
+      DFU_ResetCPU ();
       break;
 
   }

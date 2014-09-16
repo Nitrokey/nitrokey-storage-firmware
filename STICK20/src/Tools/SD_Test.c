@@ -316,8 +316,8 @@ void SD_WriteMultipleBlocksWithRandoms (u8 *Addr_u8,u32 Block_u32,u32 Count_u32,
 // Generate new random chars
     if (0 == (i % (Count_u32/127)))
     {
-      SD_GetRandomBlock (Addr_u8);
 #ifdef  STICK_20_A_MUSTER_PROD
+      SD_GetRandomBlock (Addr_u8);
 #endif
     }
 
@@ -620,7 +620,7 @@ u16 SD_SpeedTest (void)
   u16 SpeedInKBPerSec_u16;
   u8  Ret_u8;
 
-  CI_LocalPrintf ("Speedtest SD: blocks from %d to %d\r\n",SD_SPEED_TEST_START_BLOCK,SD_SPEED_TEST_BLOCK_COUNT);
+  CI_LocalPrintf ("Speedtest SD: blocks from %d. %d blocks\r\n",SD_SPEED_TEST_START_BLOCK,SD_SPEED_TEST_BLOCK_COUNT);
   Runtime_u64 = 1000;
 
   SetSdUncryptedCardEnableState (FALSE);      // Disable access

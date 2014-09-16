@@ -691,6 +691,7 @@ void HID_ExcuteCmd (void)
       {
         CI_TickLocalPrintf ("good bye\r\n");
         DFU_EnableFirmwareUpdate ();
+        DFU_ResetCPU ();
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
       }
       else

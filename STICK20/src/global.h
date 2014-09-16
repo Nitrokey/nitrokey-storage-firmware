@@ -36,10 +36,10 @@
 // Achtung: Bootloader in trampoline.x aktivieren
 
 // *** Activate only for PROD version ***
-//#define STICK_20_A_MUSTER_PROD
+#define STICK_20_A_MUSTER_PROD
 
 
-#define STICK_20_SEND_DEBUGINFOS_VIA_HID      // Use ca. 2k flash
+//#define STICK_20_SEND_DEBUGINFOS_VIA_HID      // Use ca. 2k flash
 
 
 #define STICK_20_AES_ENABLE
