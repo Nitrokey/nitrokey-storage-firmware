@@ -124,6 +124,8 @@ u64 getu64 (u8 *array);
 *******************************************************************************/
 void AES_SetNewStorageKey (unsigned char *pcKey);
 
+extern int sd_mmc_mci_test_unit_only_local_access;
+
 /*******************************************************************************
 
  Local declarations
@@ -836,14 +838,13 @@ void HID_ExcuteCmd (void)
       break;
 
     case HTML_CMD_ENABLE_READONLY_UNCRYPTED_LUN :
-      CI_TickLocalPrintf ("Set readonly uncrypted lun\r\n");
-      SetSdUncryptedCardReadWriteEnableState (READ_ONLY_ACTIVE);
+      CI_TickLocalPrintf ("Set readonly to unencrypted volume\r\n");
       if (TRUE == IW_SendToSC_PW1 (&HID_String_au8[1]))
       {
-        // Todo : send update to host
-        SetSdUncryptedCardReadWriteEnableState (READ_ONLY_ACTIVE);
         SetSdUncryptedCardEnableState (FALSE);      // Disable access
-        vTaskDelay (1400);
+        SetSdEncryptedCardEnableState (FALSE);
+        SetSdUncryptedCardReadWriteEnableState (READ_ONLY_ACTIVE);
+        vTaskDelay (6000);
         SetSdUncryptedCardEnableState (TRUE);       // Enable access
 
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
@@ -852,18 +853,18 @@ void HID_ExcuteCmd (void)
       else
       {
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
-        CI_TickLocalPrintf ("*** worng password ***\r\n");
+        CI_TickLocalPrintf ("*** wrong password ***\r\n");
       }
       break;
 
     case HTML_CMD_ENABLE_READWRITE_UNCRYPTED_LUN :
-      CI_TickLocalPrintf ("Set readwrite uncrypted lun\r\n");
+      CI_TickLocalPrintf ("Set readwrite to unencrypted volume\r\n");
       if (TRUE == IW_SendToSC_PW1 (&HID_String_au8[1]))
       {
-        // Todo : send update to host
         SetSdUncryptedCardEnableState (FALSE);      // Disable access
-        vTaskDelay (1400);
+        SetSdEncryptedCardEnableState (FALSE);
         SetSdUncryptedCardReadWriteEnableState (READ_WRITE_ACTIVE);
+        vTaskDelay (6000);
         SetSdUncryptedCardEnableState (TRUE);       // Enable access
 
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
@@ -872,7 +873,7 @@ void HID_ExcuteCmd (void)
       else
       {
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
-        CI_TickLocalPrintf ("*** worng password ***\r\n");
+        CI_TickLocalPrintf ("*** wrong password ***\r\n");
       }
 
       break;

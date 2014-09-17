@@ -165,6 +165,7 @@ void SD_PrintSDBlock (u32 Block_u32)
     CI_LocalPrintf ("0x%03x : ",i*SC_RANDOM_SIZE);
     AsciiHexPrint (SC_RANDOM_SIZE,&sector_buf_0[i*SC_RANDOM_SIZE]);
     CI_LocalPrintf ("\r\n");
+    DelayMs (10);
   }
 }
 

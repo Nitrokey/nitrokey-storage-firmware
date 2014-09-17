@@ -382,6 +382,7 @@ void DebugScsiCommand (U8 *ScsiCommand_pu8)
     Text_u8[1] = 0;
     CI_StringOut (Text_u8);
     CI_StringOut ("\r\n");
+    DelayMs (10);
   }
   else
   {
@@ -424,11 +425,11 @@ Bool scsi_decode_command(void)
   case SBC_CMD_INQUIRY:                       // 0x12 - Mandatory.
     status = sbc_inquiry();
     break;
-/*
+
   case SBC_CMD_MODE_SENSE_6:                  // 0x1A - Optional.
     status = sbc_mode_sense(FALSE);
     break;
-*/
+
   case SBC_CMD_PREVENT_ALLOW_MEDIUM_REMOVAL:  // 0x1E - Optional.
     status = sbc_prevent_allow_medium_removal();
     break;
