@@ -271,8 +271,8 @@ extern void host_suspend_action(void);
 #define Usb_set_configuration_action()
     //! @}
 
-#define SBC_VENDOR_ID                   "GPF     "          //  8 bytes only
-#define SBC_PRODUCT_ID                  "Cryptostick 2.0 "  // 16 bytes only
+#define SBC_VENDOR_ID                   "NitroKey"          //  8 bytes only
+#define SBC_PRODUCT_ID                  "NitroKey Storage"  // 16 bytes only
 #define SBC_REVISION_ID                 "1.00"              //  4 bytes only
 
     //! @defgroup device_scsi_cst_actions USB device SCSI custom actions

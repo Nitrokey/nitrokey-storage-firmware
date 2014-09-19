@@ -326,63 +326,66 @@
 #define LANG_ID               0x00
 
 
-#define USB_MN_LENGTH         25
+#define USB_MN_LENGTH         8 // 25
 #define USB_MANUFACTURER_NAME \
 {\
-  Usb_unicode('G'),\
-  Usb_unicode('e'),\
-  Usb_unicode('r'),\
-  Usb_unicode('m'),\
-  Usb_unicode('a'),\
-  Usb_unicode('n'),\
-  Usb_unicode(' '),\
-  Usb_unicode('P'),\
-  Usb_unicode('r'),\
+  Usb_unicode('N'),\
   Usb_unicode('i'),\
-  Usb_unicode('v'),\
-  Usb_unicode('a'),\
-  Usb_unicode('c'),\
-  Usb_unicode('y'),\
-  Usb_unicode(' '),\
-  Usb_unicode('F'),\
-  Usb_unicode('o'),\
-  Usb_unicode('u'),\
-  Usb_unicode('n'),\
-  Usb_unicode('d'),\
-  Usb_unicode('a'),\
   Usb_unicode('t'),\
-  Usb_unicode('i'),\
+  Usb_unicode('r'),\
   Usb_unicode('o'),\
-  Usb_unicode('n'),\
+  Usb_unicode('K'),\
+  Usb_unicode('e'),\
+  Usb_unicode('y'),\
 }
 
-#define USB_PN_LENGTH         17
+/*
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+  Usb_unicode(' '),\
+*/
+#define USB_PN_LENGTH         16 // 17
 #define USB_PRODUCT_NAME \
 {\
-  Usb_unicode('C'),\
-  Usb_unicode('r'),\
-  Usb_unicode('y'),\
-  Usb_unicode('p'),\
+  Usb_unicode('N'),\
+  Usb_unicode('i'),\
   Usb_unicode('t'),\
+  Usb_unicode('r'),\
   Usb_unicode('o'),\
+  Usb_unicode('K'),\
+  Usb_unicode('e'),\
+  Usb_unicode('y'),\
   Usb_unicode(' '),\
   Usb_unicode('S'),\
   Usb_unicode('t'),\
-  Usb_unicode('i'),\
-  Usb_unicode('c'),\
-  Usb_unicode('k'),\
-  Usb_unicode(' '),\
-  Usb_unicode('v'),\
-  Usb_unicode('2'),\
-  Usb_unicode('.'),\
-  Usb_unicode('0'),\
+  Usb_unicode('o'),\
+  Usb_unicode('r'),\
+  Usb_unicode('a'),\
+  Usb_unicode('g'),\
+  Usb_unicode('e'),\
 }
+
+//  Usb_unicode(' '),
 
 /*
   Usb_unicode('v'),\
   Usb_unicode('2'),\
   Usb_unicode('.'),\
-  Usb_unicode('1'),\*
+  Usb_unicode('1'),\
  */
 
 #define USB_SN_LENGTH         13

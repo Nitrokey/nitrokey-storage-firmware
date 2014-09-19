@@ -541,7 +541,7 @@ u8 WriteNewSdCardFoundToFlash (u32 *SdId_u32)
   WriteSdId (SdId_u32);
 
   StickConfiguration_st.NewSDCardFound_u8 |= 0x01;            // Bit 0 = new card found
-  StickConfiguration_st.NewSDCardFound_u8 += 2;               // add change counter +1
+//  StickConfiguration_st.NewSDCardFound_u8 += 2;               // add change counter +1
 
   StickConfiguration_st.SDFillWithRandomChars_u8 &= 0xFE;     // Clear the "card with random chars filled"  bit
 
@@ -574,7 +574,7 @@ u8 SetSdCardFilledWithRandomsToFlash (void)
   CI_LocalPrintf ("SD is filled with random chars\r\n");
 
   StickConfiguration_st.SDFillWithRandomChars_u8 |= 0x01;     // Set the "SD card filled with randoms"  bit
-  StickConfiguration_st.SDFillWithRandomChars_u8 += 2;        // add counter +1
+//  StickConfiguration_st.SDFillWithRandomChars_u8 += 2;        // add counter +1
 
   WriteStickConfigurationToUserPage ();
 

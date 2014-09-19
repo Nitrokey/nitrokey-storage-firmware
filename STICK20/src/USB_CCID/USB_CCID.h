@@ -111,5 +111,6 @@ u32 USB_CCID_GetLockCounter (void);
 void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst);
 u8 CCID_GetSlotStatus_u8 (void);
 u8 CCID_RestartSmartcard_u8 (void);
+u8 CCID_InternalSmartcardOff_u8 (void);
 
 #endif /* USB_CCID_H_ */

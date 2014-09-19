@@ -447,6 +447,9 @@ int ISO7816_SendPTS (typedef_ISO7816_ATR *tATR)
 
 *******************************************************************************/
 
+#define USB_CCID_POWER_OFF_NORMAL   3000    // = 30000 ms
+void USB_CCID_SetPowerOffDelayCounter (u32 Value_u32);
+
 int ISO7816_InitSC (void)
 {
 	nISO7816_Error = USART_SUCCESS;
@@ -462,6 +465,9 @@ int ISO7816_InitSC (void)
 
 	for (i=0;i<nRetryCount;i++)
 	{
+// Restart power off counter
+	  USB_CCID_SetPowerOffDelayCounter (USB_CCID_POWER_OFF_NORMAL);
+
     SmartcardPowerOff ();
     Smartcard_Reset_off ();
     ISO7816_T1_InitSendNr ();

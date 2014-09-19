@@ -111,6 +111,9 @@ static u8 CCID_ClockStatus_u8 = CCID_SLOT_STATUS_CLOCK_UNKNOWN;
 #define USB_CCID_LOCK_COUNT_LONG    3000    // = 30000 ms
 #define USB_CCID_LOCK_COUNT_CLEAR     10    // =   100 ms
 
+#define USB_CCID_POWER_OFF_NORMAL   3000    // = 30000 ms
+
+
 /*******************************************************************************
 
   USB_CCID_SetPowerOffDelayCounter
@@ -158,7 +161,7 @@ void USB_CCID_DecPowerOffDelayCounter (void)
 {
   if (0 != USB_CCID_PowerOffDelay_u32)
   {
-    USB_CCID_LockCounter_u32--;
+    USB_CCID_PowerOffDelay_u32--;
 #ifdef DEBUG_USB_CCID_LOCK
     if (0 == USB_CCID_PowerOffDelay_u32)
     {
@@ -235,6 +238,10 @@ void USB_CCID_SetLockCounter (u32 Value_u32)
 
 // Set lock counter
   USB_CCID_LockCounter_u32 = Value_u32;
+
+// Restart power of counter
+  USB_CCID_SetPowerOffDelayCounter (USB_CCID_POWER_OFF_NORMAL);
+
   portEXIT_CRITICAL();
 
   if (TRUE == LockActive_u32)     // Clear the IO line when switching the access route
@@ -259,6 +266,9 @@ void USB_CCID_SetLockCounter (u32 Value_u32)
 
 void USB_CCID_DecLockCounter (void)
 {
+
+  USB_CCID_DecPowerOffDelayCounter ();
+
   if (0 != USB_CCID_LockCounter_u32)
   {
     USB_CCID_LockCounter_u32--;
@@ -425,22 +435,59 @@ u8 CCID_RestartSmartcard_u8 (void)
   16.08.13  RB              First review
 
 *******************************************************************************/
+u8 CCID_ExternalSetSmartcardOffFlag_u8 = FALSE;
 
 u8 CCID_SmartcardOff_u8 (void)
 {
 
   if (0 == ISO7816_GetLockCounter ())
   {
-    CI_TickLocalPrintf ("*** Smartcard off ***\n");
+    CI_TickLocalPrintf ("*** Smartcard off (CCID)***\n");
     Smartcard_Reset_off ();		// Disable SC
     CCID_SlotStatus_u8 = CCID_SLOT_STATUS_PRESENT_INACTIVE;
+    CCID_ExternalSetSmartcardOffFlag_u8 = FALSE;
   }
   else
   {
     CI_TickLocalPrintf ("*** Smartcard NOT switched off (because internal access) ***\n");
+    CCID_ExternalSetSmartcardOffFlag_u8 = TRUE;
   }
 
 	return (TRUE);
+}
+
+/*******************************************************************************
+
+  CCID_InternalSmartcardOff_u8
+
+  Changes
+  Date      Author          Info
+  18.09.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 CCID_InternalSetSmartcardOffFlag_u8 = FALSE;
+
+u8 CCID_InternalSmartcardOff_u8 (void)
+{
+
+  if (0 == USB_CCID_GetPowerOffDelayCounter ())
+  {
+    CI_TickLocalPrintf ("*** Smartcard off (I)***\n");
+    Smartcard_Reset_off ();   // Disable SC
+    CCID_SlotStatus_u8 = CCID_SLOT_STATUS_PRESENT_INACTIVE;
+    CCID_InternalSetSmartcardOffFlag_u8 = FALSE;
+  }
+  else
+  {
+    CI_TickLocalPrintf ("*** Smartcard NOT switched off (because external access) ***\n");
+    CCID_InternalSetSmartcardOffFlag_u8 = TRUE;
+  }
+
+  return (TRUE);
 }
 
 /*******************************************************************************
@@ -725,8 +772,8 @@ u8 PC_to_RDR_IccPowerOff_u8 (t_USB_CCID_data_st *USB_CCID_data_pst)
 		return (CCID_ERROR_BAD_LENTGH);
 	}
 
-// Do nothing, restart card at SM on
-    CCID_SmartcardOff_u8 ();
+// Do nothing, restart card at SC on
+  CCID_SmartcardOff_u8 ();
 
 	return (CCID_NO_ERROR);
 }
