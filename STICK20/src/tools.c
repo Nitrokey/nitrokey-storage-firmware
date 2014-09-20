@@ -509,6 +509,65 @@ u32 generateCRC_org(u8 commandType,u8 *data)
 
 /*******************************************************************************
 
+  atoi_reverse
+
+  Changes
+  Date      Reviewer        Info
+  20.09.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void atoi_reverse (u8 *String_pu8,u32 *Value_u32,u8 MaxChars_u8)
+{
+    s32 i;
+    u8  Found_u8;
+
+    *Value_u32 = 0;
+    i          = 0;
+    Found_u8   = FALSE;
+
+    if (0 == String_pu8[0])
+    {
+        return;
+    }
+
+// Find end if string
+    for (i=0;i<MaxChars_u8;i++)
+    {
+      if (0 == String_pu8[i])
+      {
+        i--;
+        Found_u8 = TRUE;
+        break;
+      }
+    }
+
+    if (FALSE == Found_u8)
+    {
+      i = MaxChars_u8;  // Set i to max length
+    }
+
+// Get value
+    for (;i>=0;i--)
+    {
+        if (('0' <= String_pu8[i]) && ('9' >= String_pu8[i]))
+        {
+          *Value_u32 *= 10;
+          *Value_u32 += String_pu8[i] - '0';
+        }
+        else
+        {
+          return;
+        }
+    }
+}
+
+
+/*******************************************************************************
+
   itoa
 
   Changes

@@ -49,6 +49,7 @@ void ToolPinClr (void);
 void HexPrint (int nNumberChars,unsigned char *sData);
 void AsciiHexPrint (int nNumberChars,unsigned char sData[]);
 
+void atoi_reverse (u8 *String_pu8,u32 *Value_u32,u8 MaxChars_u8);
 void itoa(u32 n, u8 *s);
 void itoa_s(s32 n, u8 *s);
 void itoa_h (u32 n, u8 *s);

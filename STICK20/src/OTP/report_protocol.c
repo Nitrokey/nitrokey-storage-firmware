@@ -1297,6 +1297,8 @@ u8 cmd_write_to_slot(u8 *report,u8 *output)
 	u8 slot_no=report[CMD_WTS_SLOT_NUMBER_OFFSET];
 	u8 slot_tmp[64];//this is will be the new slot contents
   u8 slot_name[15];
+  u32 Counter_u32;
+  u64 counter;
 
 	memset(slot_tmp,0,64);
 
@@ -1315,7 +1317,25 @@ u8 cmd_write_to_slot(u8 *report,u8 *output)
 	{
 		slot_no = slot_no & 0x0F;
 		
-		u64 counter = getu64(report+CMD_WTS_COUNTER_OFFSET);
+//    u64 counter = getu64 (report+CMD_WTS_COUNTER_OFFSET);
+//    u64 counter = atoi (report+CMD_WTS_COUNTER_OFFSET);
+
+		atoi_reverse (&report[CMD_WTS_COUNTER_OFFSET],&Counter_u32,8);
+		counter = Counter_u32;
+		{
+      u8 text[20];
+      CI_StringOut ("Write HOTP Slot ");
+      itoa (slot_no,text);
+      CI_StringOut ((char*)text);
+      CI_StringOut (" counter -");
+      itoa (counter,text);
+      CI_StringOut ((char*)text);
+      CI_StringOut (" -");
+      memcpy (text,(char*)report+CMD_WTS_COUNTER_OFFSET,8);
+      text[8] = 0;
+      CI_StringOut ((char*)text);
+      CI_StringOut ("-\r\n");
+		}
 
 		set_counter_value(hotp_slot_counters[slot_no], counter);
 
@@ -1424,8 +1444,27 @@ u8 cmd_read_slot(u8 *report,u8 *output)
       memcpy(output+OUTPUT_CMD_RESULT_OFFSET+15,(u8 *)(hotp_slots[slot_no]+CONFIG_OFFSET),1);
       memcpy(output+OUTPUT_CMD_RESULT_OFFSET+16,(u8 *)(hotp_slots[slot_no]+TOKEN_ID_OFFSET),13);
 			
-			counter= get_counter_value(hotp_slot_counters[slot_no]);
-			memcpy(output+OUTPUT_CMD_RESULT_OFFSET+CMD_RS_OUTPUT_COUNTER_OFFSET,&counter,8);
+			counter = get_counter_value(hotp_slot_counters[slot_no]);
+			itoa ((u32)counter,&output[OUTPUT_CMD_RESULT_OFFSET+29]);    // Byte after OUTPUT_CMD_RESULT_OFFSET+29 is unused
+			reverse(&output[OUTPUT_CMD_RESULT_OFFSET+29]);
+
+//			memcpy(output+OUTPUT_CMD_RESULT_OFFSET+29,&counter,8);
+
+	    {
+	      u8 text[20];
+	      CI_StringOut ("Read HOTP Slot ");
+	      itoa (slot_no,text);
+	      CI_StringOut ((char*)text);
+	      CI_StringOut (" counter -");
+	      itoa (counter,text);
+	      CI_StringOut ((char*)text);
+	      CI_StringOut ("- -");
+	      memcpy (text,(char*)&output[OUTPUT_CMD_RESULT_OFFSET+29],8);
+	      text[8] = 0;
+	      CI_StringOut ((char*)text);
+	      CI_StringOut ("-\r\n");
+	    }
+
 		}
 		else
 		{
