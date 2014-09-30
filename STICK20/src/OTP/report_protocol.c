@@ -1230,6 +1230,21 @@ u8 cmd_get_status(u8 *report,u8 *output)
 */
 	memcpy(output+OUTPUT_CMD_RESULT_OFFSET+6,(u8 *)SLOTS_ADDRESS+GLOBAL_CONFIG_OFFSET,3);
   memcpy(output+OUTPUT_CMD_RESULT_OFFSET+9,(u8 *)SLOTS_ADDRESS+GLOBAL_CONFIG_OFFSET+3,2);
+
+  {
+    u8 text_au8[10];
+    u32 i;
+
+    CI_StringOut ("Send config: ");
+    for (i=0;i<5;i++)
+    {
+      itoa (output[OUTPUT_CMD_RESULT_OFFSET+6+i],text_au8);
+      CI_StringOut ((char*)text_au8);
+      CI_StringOut (" ");
+    }
+    CI_StringOut ("\r\n");
+  }
+
 	return 0;
 }
 
@@ -1378,6 +1393,7 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
 		if (is_programmed==0x01)
 		{
 		  memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(hotp_slots[slot_no]+SLOT_NAME_OFFSET),15);
+
       CI_StringOut ("HOTP Slot ");
       itoa (slot_no,text);
       CI_StringOut ((char*)text);
@@ -1440,12 +1456,12 @@ u8 cmd_read_slot(u8 *report,u8 *output)
 
 		if (is_programmed==0x01)
 		{
-      memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(hotp_slots[slot_no]+SLOT_NAME_OFFSET),15);
-      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+15,(u8 *)(hotp_slots[slot_no]+CONFIG_OFFSET),1);
-      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+16,(u8 *)(hotp_slots[slot_no]+TOKEN_ID_OFFSET),13);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET,   (u8 *)(hotp_slots[slot_no]+SLOT_NAME_OFFSET),15);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+15,(u8 *)(hotp_slots[slot_no]+CONFIG_OFFSET)   ,1);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+16,(u8 *)(hotp_slots[slot_no]+TOKEN_ID_OFFSET) ,13);
 			
 			counter = get_counter_value(hotp_slot_counters[slot_no]);
-			itoa ((u32)counter,&output[OUTPUT_CMD_RESULT_OFFSET+29]);    // Byte after OUTPUT_CMD_RESULT_OFFSET+29 is unused
+			itoa ((u32)counter,&output[OUTPUT_CMD_RESULT_OFFSET+29]);    // Bytes after OUTPUT_CMD_RESULT_OFFSET+29+8 is unused
 			reverse(&output[OUTPUT_CMD_RESULT_OFFSET+29]);
 
 //			memcpy(output+OUTPUT_CMD_RESULT_OFFSET+29,&counter,8);
@@ -1475,11 +1491,12 @@ u8 cmd_read_slot(u8 *report,u8 *output)
 	{
 		slot_no=slot_no&0x0F;
 		u8 is_programmed=*((u8 *)(totp_slots[slot_no]));
-		if (is_programmed==0x01){
-      memcpy(output+OUTPUT_CMD_RESULT_OFFSET,(u8 *)(totp_slots[slot_no]+SLOT_NAME_OFFSET),15);
-      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+15,(u8 *)(totp_slots[slot_no]+CONFIG_OFFSET),1);
-      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+16,(u8 *)(totp_slots[slot_no]+TOKEN_ID_OFFSET),13);
-      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+29,(u8 *)(totp_slots[slot_no]+INTERVAL_OFFSET),2);
+		if (is_programmed==0x01)
+		{
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET,   (u8 *)(totp_slots[slot_no]+SLOT_NAME_OFFSET),15);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+15,(u8 *)(totp_slots[slot_no]+CONFIG_OFFSET)   ,1);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+16,(u8 *)(totp_slots[slot_no]+TOKEN_ID_OFFSET) ,13);
+      memcpy(output+OUTPUT_CMD_RESULT_OFFSET+29,(u8 *)(totp_slots[slot_no]+INTERVAL_OFFSET) ,2);
 		}
 		else
 		{
@@ -1664,13 +1681,27 @@ u8 cmd_get_code(u8 *report,u8 *output)
 
 u8 cmd_write_config(u8 *report,u8 *output)
 {
-	u8 slot_tmp[3];          //this is will be the new slot contents
+	u8 slot_tmp[64];          //this is will be the new slot contents
 	
-	memset(slot_tmp,0,3);
+	memset(slot_tmp,0,5);
 
-	memcpy(slot_tmp,report+1,3);
+	memcpy(slot_tmp,report+1,5);
 
-	write_to_slot(slot_tmp,GLOBAL_CONFIG_OFFSET, 3);
+{
+	u8 text_au8[10];
+	u32 i;
+
+  CI_StringOut ("Write config: ");
+  for (i=0;i<5;i++)
+  {
+    itoa (slot_tmp[i],text_au8);
+    CI_StringOut ((char*)text_au8);
+    CI_StringOut (" ");
+  }
+  CI_StringOut ("\r\n");
+}
+
+	write_to_slot(slot_tmp,GLOBAL_CONFIG_OFFSET, 5);
 	
 	return 0;
 }

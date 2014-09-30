@@ -271,6 +271,33 @@ static void usb_mass_storage_cbw(void)
 //!
 static void usb_mass_storage_csw(void)
 {
+  int i;
+
+  i = 1;
+  while (1 == i)
+  {
+    i = 0;
+    if (Is_usb_endpoint_stall_requested(EP_MS_IN))
+    {
+      i = 1;
+      if (Is_usb_setup_received())
+      {
+        usb_process_request();
+      }
+    }
+
+    if (Is_usb_endpoint_stall_requested(EP_MS_OUT))
+    {
+      i = 1;
+      if (Is_usb_setup_received())
+      {
+        usb_process_request();
+      }
+    }
+  }
+
+/*
+
   while (Is_usb_endpoint_stall_requested(EP_MS_IN))
   {
     if (Is_usb_setup_received()) usb_process_request();
@@ -281,6 +308,7 @@ static void usb_mass_storage_csw(void)
     if (Is_usb_setup_received()) usb_process_request();
   }
 
+*/
   // MSC Compliance - Free BAD out receiv during SCSI command
   while( Is_usb_out_received(EP_MS_OUT) ) {
     Usb_ack_out_received_free(EP_MS_OUT);
@@ -306,10 +334,19 @@ static void usb_mass_storage_csw(void)
   Usb_ack_in_ready_send(EP_MS_IN);
   
   // MSC Compliance - Wait end of all transmitions on USB line
-  while( 0 != Usb_nb_busy_bank(EP_MS_IN) )
+  for (i=0;i<1000;i++)
   {
-    if (Is_usb_setup_received()) usb_process_request();
+    if( 0 != Usb_nb_busy_bank(EP_MS_IN) )
+    {
+      if (Is_usb_setup_received()) usb_process_request();
+    }
   }
+/*
+    while( 0 != Usb_nb_busy_bank(EP_MS_IN) )
+    {
+      if (Is_usb_setup_received()) usb_process_request();
+    }
+*/
 }
 
 

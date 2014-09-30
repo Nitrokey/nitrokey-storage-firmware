@@ -82,6 +82,8 @@
 
   Flash storage description OTP
 
+Stick 1.x
+
   OTP parameter block
 
     The OTP parameter block save the configuration data of each slot. The size of each slot is 64 byte
@@ -95,9 +97,22 @@
       TOTP_SLOT2      256     319
       TOTP_SLOT3      320     383
       TOTP_SLOT4      384     447
+      TOTP_SLOT5      448     511
+      TOTP_SLOT6      512     575
+      TOTP_SLOT7      576     639
+      TOTP_SLOT8      640     703
+      TOTP_SLOT9      704     767
+      TOTP_SLOT10     768     831
+      TOTP_SLOT11     832     895
+      TOTP_SLOT12     896     959
+      TOTP_SLOT13     960    1023
+      TOTP_SLOT14    1024    1087
+      TOTP_SLOT15    1088    1151
+      TOTP_SLOT16    1152    1215
 
 
   OTP configuration slot
+
 
     Slot size 64 byte
 
@@ -108,6 +123,49 @@
     SECRET_OFFSET       16      20 byte secret key
     CONFIG_OFFSET       36       1 byte config byte
     TOKEN_ID_OFFSET     37      12 byte token ID
+
+Stick 2.x
+
+  OTP parameter block
+
+    The OTP parameter block save the configuration data of each slot. The size of each slot is 80 byte
+
+         Slot        Start    End
+      GLOBAL_CONFIG     0       2
+      free              3      63
+
+      HOTP_SLOT1       64     127
+      HOTP_SLOT2      128     191
+      HOTP_SLOT3      192     255
+
+      TOTP_SLOT1      256     335
+      TOTP_SLOT2      336     415
+      TOTP_SLOT3      416     495
+      TOTP_SLOT4      496     575
+      TOTP_SLOT5      576     655
+      TOTP_SLOT6      656     735
+      TOTP_SLOT7      736     815
+      TOTP_SLOT8      816     895
+      TOTP_SLOT9      896     975
+      TOTP_SLOT10     976    1055
+      TOTP_SLOT11    1056    1135
+      TOTP_SLOT12    1136    1215
+      TOTP_SLOT13    1216    1295
+      TOTP_SLOT14    1296    1375
+      TOTP_SLOT15    1376    1455
+      TOTP_SLOT16    1456    1535
+
+
+    Slot size 64 byte
+
+    Contain the parameter data - 50 data byte
+                       Start   Description
+    SLOT_TYPE_OFFSET     0       1 byte slot type TOTP, HOTP
+    SLOT_NAME_OFFSET     1      15 byte slot name
+    SECRET_OFFSET       16      20 byte secret key
+    CONFIG_OFFSET       36       1 byte config byte
+    TOKEN_ID_OFFSET     37      12 byte token ID
+    INTERVAL_OFFSET     50       8 byte (Only HOPT)
 
 
   OTP counter storage slot
@@ -1123,16 +1181,18 @@ void write_to_slot(u8 *data, u16 offset, u16 len)
 
 //check if the secret from the tool is empty and if it is use the old secret
 	secret = (u8 *)(data+SECRET_OFFSET);
-	if(secret[0] == 0){
+	if(secret[0] == 0)
+	{
 	  memcpy(data+SECRET_OFFSET,page_buffer+offset+SECRET_OFFSET,20);
 	}
 
 //write page to backup location
 	backup_data(page_buffer,FLASH_PAGE_SIZE*3,SLOTS_ADDRESS);
 
-//write page to regular location
-  flashc_memset8 ((void*)SLOTS_ADDRESS,0xFF,FLASH_PAGE_SIZE*3,TRUE);
+// Clear flash mem
+//  flashc_memset8 ((void*)SLOTS_ADDRESS,0xFF,FLASH_PAGE_SIZE*3,TRUE);
 
+//write page to regular location
 	write_data_to_flash (page_buffer,FLASH_PAGE_SIZE*3,SLOTS_ADDRESS);
 
 // Init backup block

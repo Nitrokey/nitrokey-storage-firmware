@@ -85,6 +85,8 @@ slot structure:
 #define SLOT_CONFIG_DIGITS 0
 #define SLOT_CONFIG_ENTER 1
 #define SLOT_CONFIG_TOKENID 2
+#define SLOT_CONFIG_PASSWORD_USED   3
+#define SLOT_CONFIG_PASSWORD_TIMED  4
 
 /*
 global config slot:
