@@ -534,7 +534,7 @@ void atoi_reverse (u8 *String_pu8,u32 *Value_u32,u8 MaxChars_u8)
         return;
     }
 
-// Find end if string
+// Find end of string
     for (i=0;i<MaxChars_u8;i++)
     {
       if (0 == String_pu8[i])

@@ -1335,7 +1335,7 @@ u8 cmd_write_to_slot(u8 *report,u8 *output)
 //    u64 counter = getu64 (report+CMD_WTS_COUNTER_OFFSET);
 //    u64 counter = atoi (report+CMD_WTS_COUNTER_OFFSET);
 
-		atoi_reverse (&report[CMD_WTS_COUNTER_OFFSET],&Counter_u32,8);
+		Counter_u32 = atoi (&report[CMD_WTS_COUNTER_OFFSET]);
 		counter = Counter_u32;
 		{
       u8 text[20];
@@ -1462,9 +1462,6 @@ u8 cmd_read_slot(u8 *report,u8 *output)
 			
 			counter = get_counter_value(hotp_slot_counters[slot_no]);
 			itoa ((u32)counter,&output[OUTPUT_CMD_RESULT_OFFSET+29]);    // Bytes after OUTPUT_CMD_RESULT_OFFSET+29+8 is unused
-			reverse(&output[OUTPUT_CMD_RESULT_OFFSET+29]);
-
-//			memcpy(output+OUTPUT_CMD_RESULT_OFFSET+29,&counter,8);
 
 	    {
 	      u8 text[20];

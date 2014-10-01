@@ -794,7 +794,7 @@ void HID_ExcuteCmd (void)
       AES_SetNewStorageKey ((u8*)"0000");       // Set dummy key
       HID_NextPasswordIsHiddenPassword_u32 = FALSE;
 
-      vTaskDelay (2000);    // Wait 2 sec to send LUN not active
+      vTaskDelay (3000);                        // Wait 3 sec to send LUN not active
       CI_TickLocalPrintf ("SD card hidden AES LUN disabled\r\n");
       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
       break;
@@ -808,9 +808,8 @@ void HID_ExcuteCmd (void)
 
         FileIO_SaveAppImage_u8 ();
 
-// Todo : send update to host
         SetSdUncryptedCardEnableState (FALSE);      // Disable access
-        vTaskDelay (1000);
+        vTaskDelay (6000);
         SetSdUncryptedCardEnableState (TRUE);       // Enable access
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
       }

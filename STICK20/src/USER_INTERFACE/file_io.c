@@ -261,12 +261,69 @@ u8 FileIO_AppendBin_u8 (u8 *Filename_pu8,u8 *Bin_pu8,u16 Count_u16)
 *******************************************************************************/
 
 #define FILEIO_STATUS_DIR        "status"
-#define FILEIO_IMAGE_FILE        "status\\app.bin"
+#define FILEIO_IMAGE_FILE        "firmware.bin"
 #define FILEIO_IMAGE_START       0x80000000
 #define FILEIO_IMAGE_SIZE        (498*512) // 0x3E400 // Don't save the hidden volume and OTP data area below - 0x40000 -        // 256 k
 #define FILEIO_IMAGE_BLOCKSIZE   4096
 
 u8 FileIO_SaveAppImage_u8 (void)
+{
+  u16 i;
+  s32 FileID_s32;
+  s32 Ret_s32;
+
+// Init uncrypted file io
+  SD_UncryptedFileIO_Init_u8 ();
+
+// Delete possible old file
+  FAI_DeleteFile ((u8*)FILEIO_IMAGE_FILE);
+
+// Open File
+  FileID_s32 = open ((char*)FILEIO_IMAGE_FILE,O_CREAT|O_APPEND);
+  if (0 > FileID_s32)
+  {
+    CI_LocalPrintf ("Error open %s - %d - %s\r\n",FILEIO_IMAGE_FILE,fs_g_status, IBN_FileSystemErrorText(fs_g_status));
+    return (FALSE);
+  }
+
+// Write data
+  for (i=0;i<(FILEIO_IMAGE_SIZE/FILEIO_IMAGE_BLOCKSIZE);i++)
+  {
+    CI_LocalPrintf ("Write block = %3d\r\n",i);
+    Ret_s32 = write (FileID_s32,(u8*)(FILEIO_IMAGE_START + i * FILEIO_IMAGE_BLOCKSIZE),FILEIO_IMAGE_BLOCKSIZE);
+  }
+
+// Close file
+  Ret_s32 = close (FileID_s32);
+  if (-1 == Ret_s32)
+  {
+    CI_LocalPrintf ("Close  = %d \r\n",Ret_s32);
+  }
+
+// Flush and close the file
+  file_flush ();
+
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
+  FileIO_SaveAppImage_u8
+
+  Reviews
+  Date      Reviewer        Info
+  16.08.13  RB              First review
+
+*******************************************************************************/
+/*
+#define FILEIO_STATUS_DIR        "status"
+#define FILEIO_IMAGE_FILE        "status\\app.bin"
+#define FILEIO_IMAGE_START       0x80000000
+#define FILEIO_IMAGE_SIZE        (498*512) // 0x3E400 // Don't save the hidden volume and OTP data area below - 0x40000 -        // 256 k
+#define FILEIO_IMAGE_BLOCKSIZE   4096
+
+u8 FileIO_SaveAppImage_u8_old (void)
 {
   u16 i;
   s32 FileID_s32;
@@ -311,7 +368,7 @@ u8 FileIO_SaveAppImage_u8 (void)
 
   return (TRUE);
 }
-
+*/
 
 /*******************************************************************************
 

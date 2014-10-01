@@ -44,6 +44,7 @@
 #include "HandleAesStorageKey.h"
 
 #include "polarssl/sha4.h"
+#include "USB_CCID/USB_CCID.h"
 
 /*******************************************************************************
 
@@ -737,12 +738,12 @@ u8 DecryptedHiddenVolumeSlotsData (void)
 // Get the encrypted hidden volume slots key
   ReadHiddenVolumeSlotsKey (DecryptedHiddenVolumeSlotsKey_au8);
 
-/* Don't restart because the password access is lost
-  if (FALSE == LA_SC_StartSmartcard ())
+/* Don't restart because the password access is lost*/
+// Check for smartcard on
+  if (CCID_SLOT_STATUS_PRESENT_ACTIVE != CCID_GetSlotStatus_u8 ())
   {
-    return (FALSE);
+    return (FALSE);    // Smartcard is off - return error
   }
-*/
 
   CI_LocalPrintf ("Decrypt hidden volume slots key\r\n");
 // Decrypt the slots key of the hidden volumes

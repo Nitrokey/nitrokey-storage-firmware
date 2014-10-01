@@ -657,7 +657,7 @@ u64 get_counter_value(u32 addr)
 	{
 		if (*ptr==0xff)
 		{
-		  break;      // A free tocken entry found
+		  break;      // A free token entry found
 		}
 		ptr++;
 		counter++;
