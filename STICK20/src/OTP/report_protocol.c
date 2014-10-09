@@ -837,6 +837,22 @@ u8 parse_report(u8 *report,u8 *output)
         cmd_getPasswordSafeSendData (report,output);
         break;
 
+      case CMD_SD_CARD_HIGH_WATERMARK:
+        CI_StringOut ("Get CMD_SD_CARD_HIGH_WATERMARK\r\n");
+        cmd_getSdCardHighWaterMark (report,output);
+        {
+           u8 text[10];
+           CI_StringOut ("Send high water mark: write ");
+           itoa (output[OUTPUT_CMD_RESULT_OFFSET+0],text);
+           CI_StringOut ((char*)text);
+           CI_StringOut (" % - read ");
+           itoa (output[OUTPUT_CMD_RESULT_OFFSET+1],text);
+           CI_StringOut ((char*)text);
+           CI_StringOut (" %\r\n");
+        }
+        break;
+
+
       default:
         {
            u8 text[10];
@@ -2479,6 +2495,47 @@ u8 cmd_getPasswordSafeSendData (u8 *report,u8 *output)
   return (0);
 }
 
+/*******************************************************************************
+
+  cmd_getSdCardHighWaterMark
+
+  Changes
+  Date      Reviewer        Info
+  08.10.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+extern u32 sd_MaxAccessedBlockReadMin_u32;
+extern u32 sd_MaxAccessedBlockReadMax_u32;
+extern u32 sd_MaxAccessedBlockWriteMin_u32;
+extern u32 sd_MaxAccessedBlockWriteMax_u32;
+
+#define SD_SLOT    0
+
+#define DEVICE_HIGH_WATERMARK_SD_CARD_WRITE_MIN         0
+#define DEVICE_HIGH_WATERMARK_SD_CARD_WRITE_MAX         1
+#define DEVICE_HIGH_WATERMARK_SD_CARD_READ_MIN          2
+#define DEVICE_HIGH_WATERMARK_SD_CARD_READ_MAX          3
+
+u8 cmd_getSdCardHighWaterMark (u8 *report,u8 *output)
+{
+  u32 Blockcount_u32;
+
+  sd_mmc_mci_read_capacity (SD_SLOT,(u32 *)&Blockcount_u32);
+
+// +-1 needed by rounding cuts
+  output[OUTPUT_CMD_RESULT_OFFSET+DEVICE_HIGH_WATERMARK_SD_CARD_WRITE_MIN] = (u8)((u64)sd_MaxAccessedBlockWriteMin_u32 * (u64)100 / (u64)Blockcount_u32) + 1;   // In % of sd size
+  output[OUTPUT_CMD_RESULT_OFFSET+DEVICE_HIGH_WATERMARK_SD_CARD_WRITE_MAX] = (u8)((u64)sd_MaxAccessedBlockWriteMax_u32 * (u64)100 / (u64)Blockcount_u32) - 1;   // In % of sd size
+  output[OUTPUT_CMD_RESULT_OFFSET+DEVICE_HIGH_WATERMARK_SD_CARD_READ_MIN]  = (u8)((u64)sd_MaxAccessedBlockReadMin_u32  * (u64)100 / (u64)Blockcount_u32) + 1;   // In % of sd size
+  output[OUTPUT_CMD_RESULT_OFFSET+DEVICE_HIGH_WATERMARK_SD_CARD_READ_MAX]  = (u8)((u64)sd_MaxAccessedBlockReadMax_u32  * (u64)100 / (u64)Blockcount_u32) - 1;   // In % of sd size
+
+  output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+
+  return (0);
+}
 
 
 /*******************************************************************************

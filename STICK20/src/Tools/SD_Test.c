@@ -694,6 +694,19 @@ u16 SD_SpeedTest (void)
 
 *******************************************************************************/
 
+extern u32 sd_MaxAccessedBlockReadMin_u32;
+extern u32 sd_MaxAccessedBlockReadMax_u32;
+extern u32 sd_MaxAccessedBlockWriteMin_u32;
+extern u32 sd_MaxAccessedBlockWriteMax_u32;
+
+#define SD_SLOT    0
+
+#define DEVICE_HIGH_WATERMARK_SD_CARD_WRITE_MIN         0
+#define DEVICE_HIGH_WATERMARK_SD_CARD_WRITE_MAX         1
+#define DEVICE_HIGH_WATERMARK_SD_CARD_READ_MIN          2
+#define DEVICE_HIGH_WATERMARK_SD_CARD_READ_MAX          3
+
+
 void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 Param_2_u32)
 {
 //  volatile avr32_mci_t *mci = &AVR32_MCI;
@@ -706,20 +719,21 @@ void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 
   {
     CI_LocalPrintf ("SD test functions\r\n");
     CI_LocalPrintf ("\r\n");
-    CI_LocalPrintf ("0   Show SD stat\r\n");
-    CI_LocalPrintf ("1   Init SD driver\r\n");
-    CI_LocalPrintf ("2 X Test unit ready [X=slot]\r\n");
-    CI_LocalPrintf ("3 X 0 = Stop SD card, 1 = Start\r\n");
-    CI_LocalPrintf ("4 X Read SD [X=Block]\r\n");
-    CI_LocalPrintf ("5 X Write SD [X=Block]\r\n");
-    CI_LocalPrintf ("6 X Write SD start = 0[X=Blockcount]\r\n");
-    CI_LocalPrintf ("7 X fill SD start = 0[X=fill char]\r\n");
-    CI_LocalPrintf ("8   Show SD block count\r\n");
-    CI_LocalPrintf ("9   Erase encrypted volume with random numbers via AES\r\n");
-    CI_LocalPrintf ("10  Lock USB access\r\n");
-    CI_LocalPrintf ("11  Unlock USB access\r\n");
-    CI_LocalPrintf ("14  Get CID from sd card\r\n");
-    CI_LocalPrintf ("15  SD card speed test\r\n");
+    CI_LocalPrintf ("0    Show SD stat\r\n");
+    CI_LocalPrintf ("1    Init SD driver\r\n");
+    CI_LocalPrintf ("2  X Test unit ready [X=slot]\r\n");
+    CI_LocalPrintf ("3  X 0 = Stop SD card, 1 = Start\r\n");
+    CI_LocalPrintf ("4  X Read SD [X=Block]\r\n");
+    CI_LocalPrintf ("5  X Write SD [X=Block]\r\n");
+    CI_LocalPrintf ("6  X Write SD start = 0[X=Blockcount]\r\n");
+    CI_LocalPrintf ("7  X fill SD start = 0[X=fill char]\r\n");
+    CI_LocalPrintf ("8    Show SD block count\r\n");
+    CI_LocalPrintf ("9    Erase encrypted volume with random numbers via AES\r\n");
+    CI_LocalPrintf ("10   Lock USB access\r\n");
+    CI_LocalPrintf ("11   Unlock USB access\r\n");
+    CI_LocalPrintf ("14   Get CID from sd card\r\n");
+    CI_LocalPrintf ("15   SD card speed test\r\n");
+    CI_LocalPrintf ("16 X SD high water mark 0 = show, 1 = clear\r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }
@@ -845,6 +859,37 @@ void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 
         break;
       case 15 :
         SD_SpeedTest ();
+        break;
+
+      case 16 :
+        if (0 == Param_u32)
+        {
+          u32 Blockcount_u32;
+          u64 min;
+          u64 max;
+
+          sd_mmc_mci_read_capacity (SD_SLOT,(u32 *)&Blockcount_u32);
+          CI_LocalPrintf ("SD high water mark\r\n");
+          min = (u64)sd_MaxAccessedBlockReadMin_u32  * (u64)100 / (u64)Blockcount_u32;
+          max = (u64)sd_MaxAccessedBlockReadMax_u32  * (u64)100 / (u64)Blockcount_u32;
+          CI_LocalPrintf ("Read  MIN %3d %% - block %u\r\n",(u8)min,sd_MaxAccessedBlockReadMin_u32);
+          CI_LocalPrintf ("Read  MAX %3d %% - block %u\r\n",(u8)max,sd_MaxAccessedBlockReadMax_u32);
+
+          min = (u64)sd_MaxAccessedBlockWriteMin_u32  * (u64)100 / (u64)Blockcount_u32;
+          max = (u64)sd_MaxAccessedBlockWriteMax_u32  * (u64)100 / (u64)Blockcount_u32;
+          CI_LocalPrintf ("Write MIN %3d %% - block %u\r\n",(u8)min,sd_MaxAccessedBlockWriteMin_u32);
+          CI_LocalPrintf ("Write MAX %3d %% - block %u\r\n",(u8)max,sd_MaxAccessedBlockWriteMax_u32);
+        }
+        else
+        {
+          u32 Blockcount_u32;
+
+          sd_mmc_mci_read_capacity (SD_SLOT,(u32 *)&Blockcount_u32);
+          sd_MaxAccessedBlockWriteMin_u32 = 0;
+          sd_MaxAccessedBlockWriteMax_u32 = Blockcount_u32;
+          sd_MaxAccessedBlockReadMin_u32  = 0;
+          sd_MaxAccessedBlockReadMax_u32  = Blockcount_u32;
+        }
         break;
   }
 }

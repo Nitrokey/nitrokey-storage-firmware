@@ -68,6 +68,7 @@
 #define CMD_PW_SAFE_ENABLE                0x67
 #define CMD_PW_SAFE_INIT_KEY              0x68
 #define CMD_PW_SAFE_SEND_DATA             0x69
+#define CMD_SD_CARD_HIGH_WATERMARK        0x70
 
 #define STICK20_CMD_START_VALUE                         0x20
 #define STICK20_CMD_END_VALUE                           0x60
@@ -365,6 +366,7 @@ u8 cmd_getPasswordSafeEnable (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeInitKey (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeSendData (u8 *report,u8 *output);
 u8 cmd_unlock_userpassword (u8 *report,u8 *output);
+u8 cmd_getSdCardHighWaterMark (u8 *report,u8 *output);
 
 void OTP_main (void);
 

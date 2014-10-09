@@ -118,8 +118,11 @@ U32 gSdEndHiddenVolume_u32      = (2*1024*2048) + (2*1024*2048) - 1;
 U32 gSdEndOfCard_u32            = 0;    // 0 = SD size is not present
 
 
-U32 sd_FlagHiddenLun_u32    = 0;
-U32 sd_MaxAccessedBlock_u32 = 0;
+U32 sd_FlagHiddenLun_u32         = 0;
+U32 sd_MaxAccessedBlockReadMin_u32  = 0;
+U32 sd_MaxAccessedBlockReadMax_u32  = 4000000000;
+U32 sd_MaxAccessedBlockWriteMin_u32 = 0;
+U32 sd_MaxAccessedBlockWriteMax_u32 = 4000000000;
 
 U32 sd_mmc_mci_access_signal_on_flag_u32 = FALSE;
 
@@ -502,11 +505,6 @@ Ctrl_status sd_mmc_mci_usb_read_10_0(U32 addr, U16 nb_sector)
 
   LED_RedGreenOn ();
 
-  if (addr > sd_MaxAccessedBlock_u32)
-  {
-    sd_MaxAccessedBlock_u32 = addr;
-  }
-
 // Add offset for the crypted or hidden volume
   if (SD_MAGIC_NUMBER_HIDDEN_CRYPTED_PARITION == sd_FlagHiddenLun_u32)
   {
@@ -515,6 +513,19 @@ Ctrl_status sd_mmc_mci_usb_read_10_0(U32 addr, U16 nb_sector)
   else
   {
     addr += GetStartCryptedVolume_u32 ();     // crypted volume
+  }
+
+  if ((addr > sd_MaxAccessedBlockReadMin_u32) && (addr < gSdEndOfCard_u32/2))    // Min is only in the low half
+  {
+    sd_MaxAccessedBlockReadMin_u32 = addr;
+  }
+
+  if (addr > sd_MaxAccessedBlockReadMin_u32)    // Don't log min values
+  {
+    if (addr < sd_MaxAccessedBlockReadMax_u32)
+    {
+      sd_MaxAccessedBlockReadMax_u32 = addr;
+    }
   }
 
   Ret = sd_mmc_mci_usb_read_10(0, addr, nb_sector);
@@ -527,6 +538,18 @@ Ctrl_status sd_mmc_mci_usb_read_10_0(U32 addr, U16 nb_sector)
 
 Ctrl_status sd_mmc_mci_usb_read_10_1(U32 addr, U16 nb_sector)   // RB
 {
+  if ((addr > sd_MaxAccessedBlockReadMin_u32) && (addr < gSdEndOfCard_u32/2))    // Min is only in the low half
+  {
+    sd_MaxAccessedBlockReadMin_u32 = addr;
+  }
+  if (addr > sd_MaxAccessedBlockReadMin_u32)      // Don't log min values
+  {
+    if (addr < sd_MaxAccessedBlockReadMax_u32)
+    {
+      sd_MaxAccessedBlockReadMax_u32 = addr;
+    }
+  }
+
   return sd_mmc_mci_usb_read_10(0, addr, nb_sector);    // uncrypted volume
 }
 
@@ -634,20 +657,6 @@ Ctrl_status sd_mmc_mci_usb_write_10(U8 slot,U32 addr, U16 nb_sector)
 
 Ctrl_status sd_mmc_mci_usb_write_10_0(U32 addr, U16 nb_sector)
 {
-  if (addr > sd_MaxAccessedBlock_u32)
-  {
-    sd_MaxAccessedBlock_u32 = addr;
-  }
-/*
-  addr += SD_SIZE_UNCRYPTED_PARITION;     // Start of the AES paritition
-
-//  Used for the hidden lun
-  if (SD_MAGIC_NUMBER_HIDDEN_CRYPTED_PARITION == sd_FlagHiddenLun_u32)
-  {
-    addr += SD_START_HIDDEN_CRYPTED_PARITION;
-  }
-*/
-
 // Add offset for the crypted or hidden volume
   if (SD_MAGIC_NUMBER_HIDDEN_CRYPTED_PARITION == sd_FlagHiddenLun_u32)
   {
@@ -658,12 +667,35 @@ Ctrl_status sd_mmc_mci_usb_write_10_0(U32 addr, U16 nb_sector)
     addr += GetStartCryptedVolume_u32 ();     // crypted volume
   }
 
+  if ((addr > sd_MaxAccessedBlockWriteMin_u32) && (addr < gSdEndOfCard_u32/2))    // Min is only in the low half
+  {
+    sd_MaxAccessedBlockWriteMin_u32 = addr;
+  }
+  if (addr > sd_MaxAccessedBlockWriteMin_u32)      // Don't log min values
+  {
+    if (addr < sd_MaxAccessedBlockWriteMax_u32)
+    {
+      sd_MaxAccessedBlockWriteMax_u32 = addr;
+    }
+  }
+
   return sd_mmc_mci_usb_write_10(0, addr, nb_sector);
 }
 
 
-Ctrl_status sd_mmc_mci_usb_write_10_1(U32 addr, U16 nb_sector)    // RB
+Ctrl_status sd_mmc_mci_usb_write_10_1(U32 addr, U16 nb_sector)
 {
+if ((addr > sd_MaxAccessedBlockWriteMin_u32) && (addr < gSdEndOfCard_u32/2))    // Min is only in the low half
+  {
+    sd_MaxAccessedBlockWriteMin_u32 = addr;
+  }
+  if (addr > sd_MaxAccessedBlockWriteMin_u32)      // Don't log min values
+  {
+    if (addr < sd_MaxAccessedBlockWriteMax_u32)    // Real SD Block
+    {
+      sd_MaxAccessedBlockWriteMax_u32 = addr;
+    }
+  }
   return sd_mmc_mci_usb_write_10(0, addr, nb_sector);
 }
 
@@ -763,10 +795,6 @@ Ctrl_status sd_mmc_mci_dma_mem_2_ram(U8 slot, U32 addr, void *ram)
 
 Ctrl_status sd_mmc_mci_mem_2_ram_0(U32 addr, void *ram)
 {
-  if (addr > sd_MaxAccessedBlock_u32)
-  {
-    sd_MaxAccessedBlock_u32 = addr;
-  }
 
 // Add offset for the crypted or hidden volume
   if (SD_MAGIC_NUMBER_HIDDEN_CRYPTED_PARITION == sd_FlagHiddenLun_u32)
@@ -776,6 +804,18 @@ Ctrl_status sd_mmc_mci_mem_2_ram_0(U32 addr, void *ram)
   else
   {
     addr += GetStartCryptedVolume_u32 ();     // crypted volume
+  }
+
+  if ((addr > sd_MaxAccessedBlockReadMin_u32) && (addr < gSdEndOfCard_u32/2))    // Min is only in the low half
+  {
+    sd_MaxAccessedBlockReadMin_u32 = addr;
+  }
+  if (addr > sd_MaxAccessedBlockReadMin_u32)      // Don't log min values
+  {
+    if (addr < sd_MaxAccessedBlockReadMax_u32)     // Real SD block
+    {
+      sd_MaxAccessedBlockReadMax_u32 = addr;
+    }
   }
 
   return sd_mmc_mci_mem_2_ram(0, addr, ram);
@@ -848,10 +888,6 @@ Ctrl_status sd_mmc_mci_dma_multiple_mem_2_ram(U8 slot, U32 addr, void *ram, U32 
 
 Ctrl_status sd_mmc_mci_multiple_mem_2_ram_0(U32 addr, void *ram, U32 nb_sectors)
 {
-  if (addr > sd_MaxAccessedBlock_u32)
-  {
-    sd_MaxAccessedBlock_u32 = addr;
-  }
 
 // Add offset for the crypted or hidden volume
   if (SD_MAGIC_NUMBER_HIDDEN_CRYPTED_PARITION == sd_FlagHiddenLun_u32)
@@ -863,6 +899,17 @@ Ctrl_status sd_mmc_mci_multiple_mem_2_ram_0(U32 addr, void *ram, U32 nb_sectors)
     addr += GetStartCryptedVolume_u32 ();     // crypted volume
   }
 
+  if ((addr > sd_MaxAccessedBlockReadMin_u32) && (addr < gSdEndOfCard_u32/2))    // Min is only in the low half
+  {
+    sd_MaxAccessedBlockReadMin_u32 = addr;
+  }
+  if (addr > sd_MaxAccessedBlockReadMin_u32)      // Don't log min values
+  {
+    if (addr < sd_MaxAccessedBlockReadMax_u32)     // Real SD block
+    {
+      sd_MaxAccessedBlockReadMax_u32 = addr;
+    }
+  }
   return sd_mmc_mci_multiple_mem_2_ram(0, addr, ram, nb_sectors);
 }
 
@@ -933,19 +980,6 @@ Ctrl_status sd_mmc_mci_dma_ram_2_mem(U8 slot, U32 addr, const void *ram)
 
 Ctrl_status sd_mmc_mci_ram_2_mem_0(U32 addr, const void *ram)
 {
-  if (addr > sd_MaxAccessedBlock_u32)
-  {
-    sd_MaxAccessedBlock_u32 = addr;
-  }
-/*
-  addr += SD_SIZE_UNCRYPTED_PARITION;     // Start of the AES paritition
-
-//  Used for the hidden lun
-  if (SD_MAGIC_NUMBER_HIDDEN_CRYPTED_PARITION == sd_FlagHiddenLun_u32)
-  {
-    addr += SD_START_HIDDEN_CRYPTED_PARITION;
-  }
-*/
 // Add offset for the crypted or hidden volume
   if (SD_MAGIC_NUMBER_HIDDEN_CRYPTED_PARITION == sd_FlagHiddenLun_u32)
   {
@@ -954,6 +988,18 @@ Ctrl_status sd_mmc_mci_ram_2_mem_0(U32 addr, const void *ram)
   else
   {
     addr += GetStartCryptedVolume_u32 ();     // crypted volume
+  }
+
+  if ((addr > sd_MaxAccessedBlockWriteMin_u32) && (addr < gSdEndOfCard_u32/2))    // Min is only in the low half
+  {
+    sd_MaxAccessedBlockWriteMin_u32 = addr;
+  }
+  if (addr > sd_MaxAccessedBlockWriteMin_u32)      // Don't log min values
+  {
+    if (addr < sd_MaxAccessedBlockWriteMax_u32)    // Real SD Block
+    {
+      sd_MaxAccessedBlockWriteMax_u32 = addr;
+    }
   }
 
   return sd_mmc_mci_ram_2_mem(0, addr, ram);
@@ -1031,19 +1077,6 @@ Ctrl_status sd_mmc_mci_dma_multiple_ram_2_mem(U8 slot, U32 addr, const void *ram
 
 Ctrl_status sd_mmc_mci_multiple_ram_2_mem_0(U32 addr, const void *ram, U32 nb_sectors)
 {
-  if (addr > sd_MaxAccessedBlock_u32)
-  {
-    sd_MaxAccessedBlock_u32 = addr;
-  }
-/*
-  addr += SD_SIZE_UNCRYPTED_PARITION;     // Start of the AES paritition
-
-//  Used for the hidden lun
-  if (SD_MAGIC_NUMBER_HIDDEN_CRYPTED_PARITION == sd_FlagHiddenLun_u32)
-  {
-    addr += SD_START_HIDDEN_CRYPTED_PARITION;
-  }
-*/
 // Add offset for the crypted or hidden volume
   if (SD_MAGIC_NUMBER_HIDDEN_CRYPTED_PARITION == sd_FlagHiddenLun_u32)
   {
@@ -1052,6 +1085,18 @@ Ctrl_status sd_mmc_mci_multiple_ram_2_mem_0(U32 addr, const void *ram, U32 nb_se
   else
   {
     addr += GetStartCryptedVolume_u32 ();     // crypted volume
+  }
+
+  if ((addr > sd_MaxAccessedBlockWriteMin_u32) && (addr < gSdEndOfCard_u32/2))    // Min is only in the low half
+  {
+    sd_MaxAccessedBlockWriteMin_u32 = addr;
+  }
+  if (addr > sd_MaxAccessedBlockWriteMin_u32)      // Don't log min values
+  {
+    if (addr < sd_MaxAccessedBlockWriteMax_u32)    // Real SD Block
+    {
+      sd_MaxAccessedBlockWriteMax_u32 = addr;
+    }
   }
 
   return sd_mmc_mci_multiple_ram_2_mem(0, addr, ram, nb_sectors);
@@ -1127,6 +1172,13 @@ U32 InitSDVolumeSizes_u32 (void)
 
   gSdStartHiddenVolume_u32    = SD_START_HIDDEN_CRYPTED_PARITION + SD_SIZE_UNCRYPTED_PARITION;
   gSdEndHiddenVolume_u32      = EndBlockOfSdCard_u32;
+
+  sd_MaxAccessedBlockReadMin_u32  = 0;
+  sd_MaxAccessedBlockReadMax_u32  = EndBlockOfSdCard_u32+1;
+  sd_MaxAccessedBlockWriteMin_u32 = 0;
+  sd_MaxAccessedBlockWriteMax_u32 = EndBlockOfSdCard_u32+1;
+
+  CI_LocalPrintf ("SD card size %d MB - %d blocks\r\n",(EndBlockOfSdCard_u32+1)/2000,EndBlockOfSdCard_u32+1);
 
   return (TRUE);
 }

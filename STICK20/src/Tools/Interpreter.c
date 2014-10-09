@@ -1242,13 +1242,19 @@ s32 IDF_Debugtool (void)
 
 *******************************************************************************/
 
-extern U32 sd_MaxAccessedBlock_u32;
+extern u32 sd_MaxAccessedBlockReadMin_u32;
+extern u32 sd_MaxAccessedBlockReadMax_u32;
+extern u32 sd_MaxAccessedBlockWriteMin_u32;
+extern u32 sd_MaxAccessedBlockWriteMax_u32;
 
 void IDF_task(void *pvParameters)
 {
 	u32 LoopCount_u32 = 0;
 	portTickType xLastWakeTime;
-	u32 sd_LastAccessedBlock_u32 = 0;
+  u32 sd_LastAccessedBlockReadMin_u32  = 0;
+  u32 sd_LastAccessedBlockReadMax_u32  = 4000000000;
+  u32 sd_LastAccessedBlockWriteMin_u32 = 0;
+  u32 sd_LastAccessedBlockWriteMax_u32 = 4000000000;
 
 	xLastWakeTime = xTaskGetTickCount();
 //	while (1) ;
@@ -1257,13 +1263,32 @@ void IDF_task(void *pvParameters)
 	{
 		vTaskDelayUntil(&xLastWakeTime, configTSK_IDF_TEST_PERIOD);
 
-    if(0 == LoopCount_u32 % 100)      // Every second
+    if(0 == LoopCount_u32 % 2000)      // Every second
     {
-      if (sd_LastAccessedBlock_u32 < sd_MaxAccessedBlock_u32)
+      if (sd_LastAccessedBlockReadMin_u32 < sd_MaxAccessedBlockReadMin_u32)
       {
-        CI_LocalPrintf ("Highest sd block accessed = %ld = %ld MB\n\r",sd_MaxAccessedBlock_u32,sd_MaxAccessedBlock_u32/2000);
+        CI_LocalPrintf ("Highest sd block accessed read : MIN %ld = %ld MB\n\r",sd_MaxAccessedBlockReadMin_u32,sd_MaxAccessedBlockReadMin_u32/2000);
 
-        sd_LastAccessedBlock_u32 = sd_MaxAccessedBlock_u32;
+        sd_LastAccessedBlockReadMin_u32 = sd_MaxAccessedBlockReadMin_u32;
+      }
+      if (sd_LastAccessedBlockWriteMin_u32 < sd_MaxAccessedBlockWriteMin_u32)
+      {
+        CI_LocalPrintf ("Highest sd block accessed write : MIN %ld = %ld MB\n\r",sd_MaxAccessedBlockWriteMin_u32,sd_MaxAccessedBlockWriteMin_u32/2000);
+
+        sd_LastAccessedBlockWriteMin_u32 = sd_MaxAccessedBlockWriteMin_u32;
+      }
+
+      if (sd_LastAccessedBlockReadMax_u32 > sd_MaxAccessedBlockReadMax_u32)
+      {
+        CI_LocalPrintf ("Highest sd block accessed read : MAX %ld = %ld MB\n\r",sd_MaxAccessedBlockReadMax_u32,sd_MaxAccessedBlockReadMax_u32/2000);
+
+        sd_LastAccessedBlockReadMax_u32 = sd_MaxAccessedBlockReadMax_u32;
+      }
+      if (sd_LastAccessedBlockWriteMax_u32 < sd_MaxAccessedBlockWriteMax_u32)
+      {
+        CI_LocalPrintf ("Highest sd block accessed write : MAX %ld = %ld MB\n\r",sd_MaxAccessedBlockWriteMax_u32,sd_MaxAccessedBlockWriteMax_u32/2000);
+
+        sd_LastAccessedBlockWriteMax_u32 = sd_MaxAccessedBlockWriteMax_u32;
       }
     }
 
