@@ -148,7 +148,7 @@ extern  volatile long xTickCount;
 extern unsigned int LastLunAccessInTick_u32[2];
 extern int sd_mmc_mci_test_unit_only_local_access;
 
-#define MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE          4000    //  4000 ticks =  2 sec
+#define MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE          8000    //  8000 ticks =  4 sec
 #define MAX_TICKS_STATUP_UNTIL_RESTART_MSD_INTERFACE  20000    // 20000 ticks = 10 sec
 
 #ifdef FREERTOS_USED
