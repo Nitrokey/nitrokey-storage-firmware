@@ -301,6 +301,8 @@ U8 get_cur_lun(void)
   return LUN_ID_0;
 }
 
+extern  volatile long xTickCount;
+u32 LastLunAccessInTick_u32[2] = {0,0};
 
 Ctrl_status mem_test_unit_ready(U8 lun)
 {
@@ -319,7 +321,39 @@ Ctrl_status mem_test_unit_ready(U8 lun)
 #endif
 
   Ctrl_access_unlock();
-
+/*
+  {
+    U8 Text[10];
+    CI_StringOut ("STATUS ");
+    switch (lun)
+    {
+      case 0:
+        CI_StringOut (" UNCYP L0");
+        break;
+      case 1:
+        CI_StringOut (" ENCYP L1");
+        break;
+      default:
+        CI_StringOut (" *** ERROR LUN ***");
+        break;
+    }
+    switch (status)
+    {
+      case CTRL_GOOD        :
+        CI_StringOut (" CTRL_GOOD\r\n");
+        break;
+    case CTRL_FAIL        :
+        CI_StringOut (" CTRL_FAIL\r\n");
+        break;
+    case CTRL_NO_PRESENT  :
+        CI_StringOut (" CTRL_NO_PRESENT\r\n");
+        break;
+    case CTRL_BUSY        :
+        CI_StringOut (" CTRL_BUSY\r\n");
+        break;
+    }
+  }
+*/
   return status;
 }
 

@@ -750,6 +750,11 @@ u8 parse_report(u8 *report,u8 *output)
         cmd_unlock_userpassword (report,output);
         break;
 
+      case CMD_LOCK_DEVICE:
+        CI_StringOut ("Get CMD_LOCK_DEVICE\r\n");
+        cmd_lock_device (report,output);
+        break;
+
       case CMD_USER_AUTHORIZE:
         CI_StringOut ("Get CMD_USER_AUTHORIZE\r\n");
         cmd_user_authorize(report,output);
@@ -1913,6 +1918,25 @@ u8 cmd_unlock_userpassword (u8 *report,u8 *output)
       output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_WRONG_PASSWORD;
       return (1);       //wrong password
   }
+}
+
+/*******************************************************************************
+
+  cmd_lock_device
+
+  Changes
+  Date      Reviewer        Info
+  18.10.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_lock_device (u8 *report,u8 *output)
+{
+  LockDevice ();
+  return (0);
 }
 
 /*******************************************************************************

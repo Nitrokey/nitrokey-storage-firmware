@@ -130,6 +130,11 @@ void usb_device_task_init(void)
 #endif  // FREERTOS_USED
 }
 
+void usb_device_task_delete(void)
+{
+  vTaskDelete(usb_device_tsk);
+  usb_device_tsk = NULL;
+}
 
 //!
 //! @brief This function starts the USB device controller.

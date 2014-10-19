@@ -663,7 +663,7 @@ u8 PWS_EnableAccess (u8 *password)
 
 /*******************************************************************************
 
-  PWS_EnableAccess
+  PWS_InitKey
 
   Changes
   Date      Reviewer        Info
@@ -686,6 +686,28 @@ u8 PWS_InitKey (void)
     CI_LocalPrintf ("PWS_InitKey: *** FAIL ***\r\n");
     return (FALSE);
   }
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  PWS_DisableKey
+
+  Changes
+  Date      Reviewer        Info
+  18.10.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 PWS_DisableKey (void)
+{
+  memset (DecryptedPasswordSafeKey_au8,0,AES_KEYSIZE_256_BIT);
+
+  DecryptedPasswordSafeKey_u8 = FALSE;
 
   return (TRUE);
 }

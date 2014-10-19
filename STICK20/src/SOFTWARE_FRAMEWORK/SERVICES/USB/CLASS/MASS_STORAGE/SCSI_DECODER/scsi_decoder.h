@@ -402,10 +402,11 @@
  * \param sasc  <tt>ADDITIONAL SENSE CODE</tt>.
  * \param sascq <tt>ADDITIONAL SENSE CODE QUALIFIER</tt>.
  */
+/*
 #define Sbc_build_sense(skey, sasc, sascq)  (g_scsi_sense.key  = (skey),\
                                              g_scsi_sense.asc  = (sasc),\
                                              g_scsi_sense.ascq = (sascq))
-
+*/
 
 //! Sense data.
 typedef struct
@@ -475,7 +476,7 @@ extern U8 g_scsi_status;
 extern U32 g_scsi_data_remaining;
 
 //! Sense data.
-extern s_scsi_sense g_scsi_sense;
+extern s_scsi_sense g_scsi_sense[2];
 
 //! USB mass-storage IN endpoint.
 extern U8 g_scsi_ep_ms_in;

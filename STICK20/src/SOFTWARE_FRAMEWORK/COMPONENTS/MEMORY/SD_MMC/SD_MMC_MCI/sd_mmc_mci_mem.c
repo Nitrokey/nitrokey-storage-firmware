@@ -151,6 +151,23 @@ U32 Check_Sd_mmc_mci_access_signal_on (void)
 
 int sd_mmc_mci_test_unit_only_local_access = FALSE;
 
+
+/*******************************************************************************
+
+  sd_mmc_mci_test_unit_ready
+
+  Unit 0 = LUN 0 = Encrypted volume or hidden volume
+  Unit 1 = LUN 1 = Uncrypted volume
+
+  Changes
+  Date      Author          Info
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+
 Ctrl_status sd_mmc_mci_test_unit_ready(U8 slot)
 {
 //  static U8 LastStateTestUnitReady[MCI_NR_SLOTS] = { 0 ,0 };
@@ -164,7 +181,7 @@ Ctrl_status sd_mmc_mci_test_unit_ready(U8 slot)
     return (CTRL_NO_PRESENT);
   }
 
-  if (0 == slot)    // slot = 0 > encrypted, slot = 1 > uncrypted
+  if (0 == slot)    // slot = 0 > encrypted or hidden volume
   {
     if (FALSE == GetSdEncryptedCardEnableState ())    // Flag for enabling the encrypted sd card lun
     {
@@ -172,7 +189,7 @@ Ctrl_status sd_mmc_mci_test_unit_ready(U8 slot)
     }
   }
 
-  if (1 == slot)    // slot = 0 > encrypted, slot = 1 > uncrypted
+  if (1 == slot)    // slot = 1 > uncrypted volume
   {
     if (FALSE == GetSdUncryptedCardEnableState ())    // Flag for enabling the uncrypted sd card lun
     {
@@ -222,6 +239,20 @@ Ctrl_status sd_mmc_mci_test_unit_ready(U8 slot)
 
 Ctrl_status sd_mmc_mci_unit_state_e = CTRL_GOOD;
 
+/*******************************************************************************
+
+  sd_mmc_mci_test_unit_ready_0
+
+  Unit 0 = LUN 0 = Encrypted volume or hidden volume
+
+  Changes
+  Date      Author          Info
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
 Ctrl_status sd_mmc_mci_test_unit_ready_0(void)
 {
 //return sd_mmc_mci_test_unit_ready(0);
@@ -244,6 +275,20 @@ Ctrl_status sd_mmc_mci_test_unit_ready_0(void)
 	}
 */
 }
+
+/*******************************************************************************
+
+  sd_mmc_mci_test_unit_ready_1
+
+  Unit 1 = LUN 1 = Uncrypted volume
+
+  Changes
+  Date      Author          Info
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
 
 
 Ctrl_status sd_mmc_mci_test_unit_ready_1(void)
@@ -276,7 +321,9 @@ Ctrl_status sd_mmc_mci_read_capacity(U8 slot, U32 *u32_nb_sector)
 
   sd_mmc_mci_read_capacity_0
 
-  Size of volume 1, the crypted of hidden volume
+  Unit 0 = LUN 0 = Encrypted volume or hidden volume
+
+  Size of the encrypted or hidden volume
 
   Changes
   Date      Author    Info
@@ -290,21 +337,6 @@ Ctrl_status sd_mmc_mci_read_capacity(U8 slot, U32 *u32_nb_sector)
 
 Ctrl_status sd_mmc_mci_read_capacity_0(U32 *u32_nb_sector)
 {
-/*
- * Ctrl_status Ret;
-
-  Ret = sd_mmc_mci_read_capacity(0, u32_nb_sector);
-
-  *u32_nb_sector -= SD_SIZE_UNCRYPTED_PARITION;
-
-//  Used for the hidden lun
-  if (SD_MAGIC_NUMBER_HIDDEN_CRYPTED_PARITION == sd_FlagHiddenLun_u32)
-  {
-    *u32_nb_sector -= SD_START_HIDDEN_CRYPTED_PARITION;
-  }
-
-  return (Ret);
-*/
   *u32_nb_sector = GetSizeCryptedVolume_u32 ();
 
 //  Used for the hidden lun
@@ -335,14 +367,6 @@ Ctrl_status sd_mmc_mci_read_capacity_0(U32 *u32_nb_sector)
 
 Ctrl_status sd_mmc_mci_read_capacity_1(U32 *u32_nb_sector)
 {
-/*  Ctrl_status Ret;
-
-  Ret = sd_mmc_mci_read_capacity(0, u32_nb_sector);
-
-  *u32_nb_sector = SD_SIZE_UNCRYPTED_PARITION;
-
-  return (Ret);
-*/
   *u32_nb_sector = GetSizeUncryptedVolume_u32 ();
 
   return (CTRL_GOOD);

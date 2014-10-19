@@ -143,12 +143,23 @@ void device_mass_storage_task_init(void)
 //!
 //! This function links the device mass-storage SCSI commands to the USB bus.
 //!
+
+extern  volatile long xTickCount;
+extern unsigned int LastLunAccessInTick_u32[2];
+extern int sd_mmc_mci_test_unit_only_local_access;
+
+#define MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE          4000    //  4000 ticks =  2 sec
+#define MAX_TICKS_STATUP_UNTIL_RESTART_MSD_INTERFACE  20000    // 20000 ticks = 10 sec
+
 #ifdef FREERTOS_USED
 void device_mass_storage_task(void *pvParameters)
 #else
 void device_mass_storage_task(void)
 #endif
 {
+  unsigned int TickDelayToRestart = MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE;
+  int ErrorFound;
+
 #ifdef FREERTOS_USED
   portTickType xLastWakeTime;
 
@@ -172,6 +183,38 @@ void device_mass_storage_task(void)
       usb_mass_storage_cbw();
       usb_mass_storage_csw();
     }
+
+    // Check LUN activity
+    if (FALSE == sd_mmc_mci_test_unit_only_local_access)    // On local access > disable check
+    {
+      ErrorFound = FALSE;
+      if (xTickCount - LastLunAccessInTick_u32[0] > TickDelayToRestart)
+      {
+        CI_StringOut ("UNC LUN 0 - TIMEOUT\r\n");
+        LastLunAccessInTick_u32[0] = xTickCount;
+        ErrorFound = TRUE;
+      }
+      // Check LUN activity
+      if (xTickCount - LastLunAccessInTick_u32[1] > TickDelayToRestart)
+      {
+        CI_StringOut ("CRY LUN 1 - TIMEOUT\r\n");
+        LastLunAccessInTick_u32[1] = xTickCount;
+        ErrorFound = TRUE;
+      }
+      if (TRUE == ErrorFound)
+      {
+        CI_StringOut ("*** RESTART MSD DEVICE TASK ***\r\n");
+        usb_device_task_delete();
+        usb_device_task_init();
+      }
+    }
+    else
+    {
+      LastLunAccessInTick_u32[0] = xTickCount;            // Avoid wrong timeout
+      LastLunAccessInTick_u32[1] = xTickCount;
+    }
+
+
 #ifdef FREERTOS_USED
   }
 #endif

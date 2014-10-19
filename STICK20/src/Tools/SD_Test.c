@@ -45,7 +45,8 @@
 #include "sd_mmc_mci.h"
 #include "sd_mmc_mci_mem.h"
 
-
+#include "usb_task.h"
+#include "usb_drv.h"
 #include "time.h"
 
 #include "TIME_MEASURING.h"
@@ -679,7 +680,7 @@ u16 SD_SpeedTest (void)
 
   sd_mmc_mci_test_unit_only_local_access = FALSE;
   SetSdEncryptedCardEnableState (TRUE);
-  SetSdUncryptedCardEnableState (TRUE);       // Enable access
+  SetSdUncryptedCardEnableState (FALSE);       // Enable access
 
   return (SpeedInKBPerSec_u16);
 }
@@ -734,6 +735,7 @@ void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 
     CI_LocalPrintf ("14   Get CID from sd card\r\n");
     CI_LocalPrintf ("15   SD card speed test\r\n");
     CI_LocalPrintf ("16 X SD high water mark 0 = show, 1 = clear\r\n");
+    CI_LocalPrintf ("17 X Set new SD card found 0 = found, 1 = clear found\r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }
@@ -889,6 +891,56 @@ void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 
           sd_MaxAccessedBlockWriteMax_u32 = Blockcount_u32;
           sd_MaxAccessedBlockReadMin_u32  = 0;
           sd_MaxAccessedBlockReadMax_u32  = Blockcount_u32;
+        }
+        break;
+      case 17 :
+        if (0 == Param_u32)
+        {
+          WriteNewSdCardFoundToFlash (&Param_u32);
+        }
+        else
+        {
+          SetSdCardFilledWithRandomsToFlash ();
+        }
+        break;
+      case 18 :
+        switch (Param_u32)
+        {
+          case 0:
+            Usb_enable ();
+            break;
+          case 1 :
+            Usb_disable ();
+            break;
+          case 2 :
+            Usb_enable_id_pin ();
+            break;
+          case 3 :
+            Usb_disable_id_pin ();
+            break;
+          case 4 :
+            usb_start_device ();
+            break;
+          case 5 :
+            usb_start_device();
+            Usb_send_event(EVT_USB_POWERED);
+            Usb_vbus_on_action();
+            break;
+          case 6 :
+            break;
+
+          case 7 :
+            usb_device_task_delete();
+            break;
+          case 8 :
+            usb_device_task_init();
+            break;
+          case 9 :
+            usb_start_device ();
+            break;
+          case 10 :
+            usb_start_device ();
+            break;
         }
         break;
   }

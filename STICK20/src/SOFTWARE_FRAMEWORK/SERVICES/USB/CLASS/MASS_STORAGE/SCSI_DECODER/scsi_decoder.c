@@ -94,7 +94,7 @@ U8  g_scsi_command[16];
 U8  g_scsi_status;
 U32 g_scsi_data_remaining;
 
-s_scsi_sense g_scsi_sense;
+s_scsi_sense g_scsi_sense[2];
 
 U8 g_scsi_ep_ms_in;
 U8 g_scsi_ep_ms_out;
@@ -148,6 +148,7 @@ static const sbc_st_std_inquiry_data sbc_std_inquiry_data =
 
 extern int sd_mmc_mci_test_unit_only_local_access ;
 
+extern S32 xTickCount;
 
 #include "global.h"
 
@@ -161,6 +162,24 @@ extern int sd_mmc_mci_test_unit_only_local_access ;
   #define CI_StringOut(...)
 #endif
 
+
+
+void Sbc_build_sense (U8 lun,U8 skey,U8 sasc,U8 sascq)
+{
+  switch (lun)
+  {
+    case 0 :        // Uncrypted volume
+      g_scsi_sense[0].key  = skey;
+      g_scsi_sense[0].asc  = sasc;
+      g_scsi_sense[0].ascq = sascq;
+      break;
+    case 1 :        // Encrypted or hidden volume
+      g_scsi_sense[1].key  = skey;
+      g_scsi_sense[1].asc  = sasc;
+      g_scsi_sense[1].ascq = sascq;
+      break;
+  }
+}
 
 /*******************************************************************************
 
@@ -176,9 +195,10 @@ extern int sd_mmc_mci_test_unit_only_local_access ;
   In USB context > don't use printf
 
 *******************************************************************************/
+
+
 #ifdef DEBUG_SCSI_IO
 
-extern S32 xTickCount;
 
 void DebugScsiCommand (U8 *ScsiCommand_pu8)
 {
@@ -189,7 +209,7 @@ void DebugScsiCommand (U8 *ScsiCommand_pu8)
 
   if ((ScsiCommand_pu8[0] != LastScsiCommand_u8) || (LastLun_u8 != usb_LUN) )
   {
-    itoa ((S32)xTickCount,Text_u8);
+    itoa ((S32)xTickCount/2,Text_u8);   // Tick = 0,5 ms
     CI_StringOut (Text_u8);
     CI_StringOut (" - ");
 
@@ -377,11 +397,25 @@ void DebugScsiCommand (U8 *ScsiCommand_pu8)
 
         break;                                    // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
     }
+    switch (usb_LUN)
+    {
+      case 0:
+        CI_StringOut (" - UNCYP L0\r\n");
+        break;
+      case 1:
+        CI_StringOut (" - ENCYP L1\r\n");
+        break;
+      default:
+        CI_StringOut (" - *** ERROR LUN ***\r\n");
+        break;
+    }
+/*
     CI_StringOut (" - Lun ");
     Text_u8[0] = '0' + usb_LUN;
     Text_u8[1] = 0;
     CI_StringOut (Text_u8);
     CI_StringOut ("\r\n");
+*/
     DelayMs (10);
   }
   else
@@ -396,7 +430,7 @@ void DebugScsiCommand (U8 *ScsiCommand_pu8)
   #define DebugScsiCommand(...)
 #endif // DEBUG_SCSI_IO
 
-
+extern unsigned int LastLunAccessInTick_u32[2];
 
 Bool scsi_decode_command(void)
 {
@@ -409,12 +443,18 @@ Bool scsi_decode_command(void)
     return (TRUE);
   }
 
+// Log LUN activity
+  if (2 > usb_LUN)
+  {
+    LastLunAccessInTick_u32[usb_LUN] = xTickCount;
+  }
+
   DebugScsiCommand (g_scsi_command);
 
   switch (g_scsi_command[0])  // Check received command.
   {
   case SBC_CMD_TEST_UNIT_READY:               // 0x00 - Mandatory.
-    DelayMs (1);                              // To avoid USB host error
+    DelayMs (2);                              // To avoid USB host error
     status = sbc_test_unit_ready();
     break;
 
@@ -533,7 +573,7 @@ Bool scsi_decode_command(void)
   default:
     // Command not supported.
     Sbc_send_failed();
-    Sbc_build_sense(SBC_SENSE_KEY_ILLEGAL_REQUEST, SBC_ASC_INVALID_COMMAND_OPERATION_CODE, 0x00);
+    Sbc_build_sense(usb_LUN,SBC_SENSE_KEY_ILLEGAL_REQUEST, SBC_ASC_INVALID_COMMAND_OPERATION_CODE, 0x00);
     break;
   }
 
@@ -569,17 +609,19 @@ Bool sbc_test_unit_ready(void)
 
 Bool sbc_request_sense(void)
 {
+  U32 i;
   U8 allocation_length;
   U8 request_sense_output[18];  // The maximal size of request is 17.
 
+
   allocation_length = min(g_scsi_command[4], sizeof(request_sense_output));
 
-  if( allocation_length != 0 )
+  if (( allocation_length != 0 ) && (2 > usb_LUN))
   {
      // Initialize the request sense data.
      request_sense_output[ 0] = SBC_RESPONSE_CODE_SENSE; // 0x70.
      request_sense_output[ 1] = 0x00;                    // Obsolete.
-     request_sense_output[ 2] = g_scsi_sense.key;
+     request_sense_output[ 2] = g_scsi_sense[usb_LUN].key;
    
      request_sense_output[ 3] = 0x00;  // For direct access media, Information field.
      request_sense_output[ 4] = 0x00;  // Give the unsigned logical block.
@@ -592,8 +634,8 @@ Bool sbc_request_sense(void)
      request_sense_output[10] = SBC_COMMAND_SPECIFIC_INFORMATION_1;
      request_sense_output[11] = SBC_COMMAND_SPECIFIC_INFORMATION_0;
    
-     request_sense_output[12] = g_scsi_sense.asc;
-     request_sense_output[13] = g_scsi_sense.ascq;
+     request_sense_output[12] = g_scsi_sense[usb_LUN].asc;
+     request_sense_output[13] = g_scsi_sense[usb_LUN].ascq;
    
      request_sense_output[14] = SBC_FIELD_REPLACEABLE_UNIT_CODE;
      request_sense_output[15] = SBC_SENSE_KEY_SPECIFIC_2;
@@ -967,42 +1009,42 @@ static void send_informational_exceptions_page(void)
 void sbc_lun_status_is_good(void)
 {
   Sbc_send_good();
-  Sbc_build_sense(SBC_SENSE_KEY_NO_SENSE, SBC_ASC_NO_ADDITIONAL_SENSE_INFORMATION, 0x00);
+  Sbc_build_sense(usb_LUN,SBC_SENSE_KEY_NO_SENSE, SBC_ASC_NO_ADDITIONAL_SENSE_INFORMATION, 0x00);
 }
 
 
 void sbc_lun_status_is_not_present(void)
 {
   Sbc_send_failed();
-  Sbc_build_sense(SBC_SENSE_KEY_NOT_READY, SBC_ASC_MEDIUM_NOT_PRESENT, 0x00);
+  Sbc_build_sense(usb_LUN,SBC_SENSE_KEY_NOT_READY, SBC_ASC_MEDIUM_NOT_PRESENT, 0x00);
 }
 
 
 void sbc_lun_status_is_busy_or_change(void)
 {
   Sbc_send_failed();
-  Sbc_build_sense(SBC_SENSE_KEY_UNIT_ATTENTION, SBC_ASC_NOT_READY_TO_READY_CHANGE, 0x00);
+  Sbc_build_sense(usb_LUN,SBC_SENSE_KEY_UNIT_ATTENTION, SBC_ASC_NOT_READY_TO_READY_CHANGE, 0x00);
 }
 
 
 void sbc_lun_status_is_fail(void)
 {
   Sbc_send_failed();
-  Sbc_build_sense(SBC_SENSE_KEY_HARDWARE_ERROR, SBC_ASC_NO_ADDITIONAL_SENSE_INFORMATION, 0x00);
+  Sbc_build_sense(usb_LUN,SBC_SENSE_KEY_HARDWARE_ERROR, SBC_ASC_NO_ADDITIONAL_SENSE_INFORMATION, 0x00);
 }
 
 
 void sbc_lun_status_is_protected(void)
 {
   Sbc_send_failed();
-  Sbc_build_sense(SBC_SENSE_KEY_DATA_PROTECT, SBC_ASC_WRITE_PROTECTED, 0x00);
+  Sbc_build_sense(usb_LUN,SBC_SENSE_KEY_DATA_PROTECT, SBC_ASC_WRITE_PROTECTED, 0x00);
 }
 
 
 void sbc_lun_status_is_cdb_field(void)
 {
    Sbc_send_failed();
-   Sbc_build_sense(SBC_SENSE_KEY_ILLEGAL_REQUEST, SBC_ASC_INVALID_FIELD_IN_CDB, 0x00);
+   Sbc_build_sense(usb_LUN,SBC_SENSE_KEY_ILLEGAL_REQUEST, SBC_ASC_INVALID_FIELD_IN_CDB, 0x00);
 }
 
 

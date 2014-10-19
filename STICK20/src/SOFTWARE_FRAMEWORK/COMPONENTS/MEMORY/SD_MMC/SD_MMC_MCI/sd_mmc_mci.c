@@ -163,7 +163,7 @@ unsigned char cSdEncryptedCardEnabledByUserRW = READ_WRITE_ACTIVE;
 
 
 unsigned char cSdUncryptedCardEnabledByUser    = TRUE;
-unsigned char cSdUncryptedCardReadWriteEnabled = READ_WRITE_ACTIVE;      // TRUE = no write protection
+unsigned char cSdUncryptedCardReadWriteEnabled = READ_WRITE_ACTIVE;
 
 // #define MMC_DEBUG_PRINT      // set in global.h
 

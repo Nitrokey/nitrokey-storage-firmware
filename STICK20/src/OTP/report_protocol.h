@@ -57,6 +57,8 @@
 #define CMD_GET_USER_PASSWORD_RETRY_COUNT 0x0F
 #define CMD_USER_AUTHORIZE                0x10
 #define CMD_UNLOCK_USER_PASSOWRD          0x11
+#define CMD_LOCK_DEVICE                   0x12
+
 
 #define CMD_GET_PW_SAFE_SLOT_STATUS       0x60
 #define CMD_GET_PW_SAFE_SLOT_NAME         0x61
@@ -74,7 +76,7 @@
 #define STICK20_CMD_END_VALUE                           0x60
 #define STICK20_CMD_ENABLE_CRYPTED_PARI                 (STICK20_CMD_START_VALUE +  0)
 #define STICK20_CMD_DISABLE_CRYPTED_PARI                (STICK20_CMD_START_VALUE +  1)
-#define STICK20_CMD_ENABLE_HIDDEN_CRYPTED_PARI          (STICK20_CMD_START_VALUE +  2)    // Not used
+#define STICK20_CMD_ENABLE_HIDDEN_CRYPTED_PARI          (STICK20_CMD_START_VALUE +  2)
 #define STICK20_CMD_DISABLE_HIDDEN_CRYPTED_PARI         (STICK20_CMD_START_VALUE +  3)    // Not used
 #define STICK20_CMD_ENABLE_FIRMWARE_UPDATE              (STICK20_CMD_START_VALUE +  4)
 #define STICK20_CMD_EXPORT_FIRMWARE_TO_FILE             (STICK20_CMD_START_VALUE +  5)
@@ -366,6 +368,7 @@ u8 cmd_getPasswordSafeEnable (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeInitKey (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeSendData (u8 *report,u8 *output);
 u8 cmd_unlock_userpassword (u8 *report,u8 *output);
+u8 cmd_lock_device (u8 *report,u8 *output);
 u8 cmd_getSdCardHighWaterMark (u8 *report,u8 *output);
 
 void OTP_main (void);

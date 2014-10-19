@@ -94,6 +94,7 @@ typedef struct {
 extern typeStick20ProductionInfos_st Stick20ProductionInfos_st;
 
 void GetProductionInfos (typeStick20ProductionInfos_st *Infos_st);
+void LockDevice (void);
 
 void HTML_GenerateStartPage (void);
 

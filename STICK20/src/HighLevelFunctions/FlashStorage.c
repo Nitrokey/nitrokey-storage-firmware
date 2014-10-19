@@ -519,6 +519,15 @@ u8 ReadSdId (u32 *SdId_u32)
 
   WriteNewSdCardFoundToFlash
 
+  NewSDCardFound_u8
+  Bit 0 = 0   New SD card found
+  Bit 0 = 1   Previous SD card found
+
+
+  SDFillWithRandomChars_u8
+  Bit 0 = 0   SD card is *** not *** filled with random chars
+  Bit 0 = 1   SD card is filled with random chars
+
   Changes
   Date      Author          Info
   08.02.14  RB              Implementation of save new SD card found
@@ -644,6 +653,9 @@ u8 SetSdCardFilledWithRandomCharsToFlash (void)
 /*******************************************************************************
 
   SetSdCardNotFilledWithRandomCharsToFlash
+
+  Bit 0 = 0   SD card is *** not *** filled with random chars
+  Bit 0 = 1   SD card is filled with random chars
 
   Changes
   Date      Author          Info
