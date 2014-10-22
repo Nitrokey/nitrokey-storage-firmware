@@ -422,7 +422,7 @@ int LA_OpenPGP_V20_GetChallenge (typeAPDU *tSC, int nReceiveLength, unsigned cha
   nRet = ISO7816_SendAPDU_Le_NoLc (tSC);
 
   n = tSC->nReceiveDataLen;
-  if (n < tSC->nReceiveDataLen)
+  if (n < nReceiveLength)
   {
     n = nReceiveLength;
   }
@@ -490,7 +490,7 @@ int LA_OpenPGP_V20_GetPublicKey (typeAPDU *tSC,int nKind, int nReceiveLength, un
   nRet = ISO7816_SendAPDU_Le_Lc (tSC);
 
   n = tSC->nReceiveDataLen;
-  if (n < tSC->nReceiveDataLen)
+  if (n < nReceiveLength)
   {
     n = nReceiveLength;
   }
@@ -548,7 +548,7 @@ int LA_OpenPGP_V20_ComputeSignature (typeAPDU *tSC,int nSendLength,unsigned char
   nRet = ISO7816_SendAPDU_Le_Lc (tSC);
 
   n = tSC->nReceiveDataLen;
-  if (n < tSC->nReceiveDataLen)
+  if (n < nReceiveLength)
   {
     n = nReceiveLength;
   }
@@ -755,7 +755,7 @@ int LA_OpenPGP_V20_AES_Dec_SUB (typeAPDU *tSC, int nSendLength,unsigned char *cS
   nRet = ISO7816_SendAPDU_Le_Lc (tSC);
 
   n = tSC->nReceiveDataLen;
-  if (n < tSC->nReceiveDataLen)
+  if (n < nReceiveLength)
   {
     n = nReceiveLength;
   }
