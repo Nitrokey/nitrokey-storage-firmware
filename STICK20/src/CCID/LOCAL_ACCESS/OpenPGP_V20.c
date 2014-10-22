@@ -490,7 +490,7 @@ int LA_OpenPGP_V20_GetPublicKey (typeAPDU *tSC,int nKind, int nReceiveLength, un
   nRet = ISO7816_SendAPDU_Le_Lc (tSC);
 /* Not necessary
   n = tSC->nReceiveDataLen;
-  if (n < tSC->nReceiveDataLen)
+  if (n < nReceiveLength)
   {
     n = nReceiveLength;
   }
@@ -549,7 +549,7 @@ int LA_OpenPGP_V20_ComputeSignature (typeAPDU *tSC,int nSendLength,unsigned char
 
 /* Not necessary
   n = tSC->nReceiveDataLen;
-  if (n < tSC->nReceiveDataLen)
+  if (n < nReceiveLength)
   {
     n = nReceiveLength;
   }
