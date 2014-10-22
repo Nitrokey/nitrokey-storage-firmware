@@ -1121,7 +1121,7 @@ int AES_StorageKeyEncryption (unsigned int nLength, unsigned char *cData, unsign
 //****************************************************************************
 //               CIPHER IN DMA MODE: RAM -> AES -> RAM
 //  - 256bit cryptographic key
-//  - CBC cipher mode
+//  - EBC cipher mode
 //  - No counter measures
 //****************************************************************************
 
@@ -1142,7 +1142,7 @@ int AES_StorageKeyEncryption (unsigned int nLength, unsigned char *cData, unsign
   // encryption is notified by the DMACA transfer complete interrupt. The output
   // is available in the OutputData[] buffer.
 
-  AesConf.CFBSize            = 0;                       // Don't-care because we're using the CBC mode.
+  AesConf.CFBSize            = 0;                       // Don't-care because we're using the EBC mode.
   AesConf.CounterMeasureMask = 0;                       // Disable all counter measures.
 
   aes_configure(&AVR32_AES, &AesConf);
