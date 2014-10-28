@@ -471,9 +471,9 @@ u32 dynamic_truncate (u8 * hmac_result)
 u32 crc_STM32 (u32 time)
 {
 
-  int i,j;
+  int i;
   u32 value = time << 8;
-  u32 crc;
+//  u32 crc;
 
   for(i=0; i<24; i++){
       if (value & 0x80000000)

@@ -445,7 +445,7 @@ int LA_OpenPGP_V20_GetChallenge (typeAPDU *tSC, int nReceiveLength, unsigned cha
 int LA_OpenPGP_V20_GetPublicKey (typeAPDU *tSC,int nKind, int nReceiveLength, unsigned char **cReceiveData)
 {
   int     nRet;
-  int     n;
+//  int     n;
 
 #ifdef DEBUG_OPENPGP_SHOW_CALLS
   CI_TickLocalPrintf ("ISO7816: Call GetPublicKey\r\n");
@@ -521,7 +521,7 @@ int LA_OpenPGP_V20_GetPublicKey (typeAPDU *tSC,int nKind, int nReceiveLength, un
 int LA_OpenPGP_V20_ComputeSignature (typeAPDU *tSC,int nSendLength,unsigned char *cSendData, int nReceiveLength, unsigned char **cReceiveData)
 {
   int     nRet;
-  int     n;
+//  int     n;
 
 #ifdef DEBUG_OPENPGP_SHOW_CALLS
   CI_TickLocalPrintf ("ISO7816: Call ComputeSignature\r\n");

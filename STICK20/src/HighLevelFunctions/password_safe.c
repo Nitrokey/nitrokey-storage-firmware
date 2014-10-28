@@ -58,8 +58,10 @@
 
 *******************************************************************************/
 
-#define ENABLE_IBN_PWS_TESTS
-//#define ENABLE_IBN_PWS_TESTS_ENCRYPTION
+#ifdef INTERPRETER_ENABLE
+  #define ENABLE_IBN_PWS_TESTS
+  //#define ENABLE_IBN_PWS_TESTS_ENCRYPTION
+#endif
 
 #ifdef ENABLE_IBN_PWS_TESTS
   int CI_LocalPrintf (char *szFormat,...);

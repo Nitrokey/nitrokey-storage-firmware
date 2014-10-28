@@ -280,8 +280,8 @@ u32 BuildNewAesMasterKey_u32 (u8 *AdminPW_pu8,u8 *MasterKey_pu8)
 u32 BuildNewXorPattern_u32 (void)
 {
   u8      XorPattern_au8[AES_KEYSIZE_256_BIT];
-  time_t  now;
-  u32     i;
+//  time_t  now;
+//  u32     i;
 
 #ifdef LOCAL_DEBUG
   CI_TickLocalPrintf ("BuildNewXorPattern_u32\r\n");

@@ -184,6 +184,7 @@ void usb_device_task(void)
   TaskTimerForClockCounter_u32 = 0;
 
   xLastWakeTime = xTaskGetTickCount();
+
   while (TRUE)
   {
     vTaskDelayUntil(&xLastWakeTime, configTSK_USB_DEV_PERIOD);

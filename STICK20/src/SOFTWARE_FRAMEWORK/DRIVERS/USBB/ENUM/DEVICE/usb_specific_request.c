@@ -414,7 +414,7 @@ void usb_hid_get_idle (U8 u8_report_id)
 //   while (!Is_usb_control_out_received());
    for (i=0;i<100000;i++)
    {
-     if (!Is_usb_control_out_received())
+     if (Is_usb_control_out_received())
      {
        break;
      }

@@ -966,7 +966,7 @@ int main(void)
 */
 
   // Configure system clocks.
-	local_pcl_freq_param = pcl_freq_param;
+  local_pcl_freq_param = pcl_freq_param;
 
 	if (pcl_configure_clocks(&local_pcl_freq_param) != PASS)
 	{
@@ -1069,6 +1069,7 @@ int main(void)
   USB_CCID_task_init();
 #endif
 
+/**/
 // Protect bootloader
 #ifdef STICK_20_A_MUSTER_PROD     //
   flashc_set_bootloader_protected_size (0x2000);

@@ -48,9 +48,11 @@
 
 *******************************************************************************/
 
-#define DEBUG_MP_IO
+#ifdef INTERPRETER_ENABLE
+  #define DEBUG_MP_IO
 //#define DEBUG_MP_IO_LEVEL_1   // Print matrix
 //#define DEBUG_MP_IO_LEVEL_2   // Error messages
+#endif
 
 #ifdef DEBUG_MP_IO
   int CI_LocalPrintf (char *szFormat,...);

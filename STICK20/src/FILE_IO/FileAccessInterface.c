@@ -52,7 +52,9 @@
 
 *******************************************************************************/
 
-#define FAI_DEBUG_PRINT   1
+#ifdef INTERPRETER_ENABLE
+//#define FAI_DEBUG_PRINT   1
+#endif
 
 #ifdef FAI_DEBUG_PRINT
   int CI_LocalPrintf (char *szFormat,...);

@@ -72,7 +72,8 @@
 
 // The DUF file
 //#define ISP_BIN             "../src/SOFTWARE_FRAMEWORK/UTILS/1.bin"
-#define ISP_BIN             "../src/SOFTWARE_FRAMEWORK/UTILS/at32uc3a3-isp.bin"
+//#define ISP_BIN             "../src/SOFTWARE_FRAMEWORK/UTILS/at32uc3a3-isp.bin"
+#define ISP_BIN             "../src/SOFTWARE_FRAMEWORK/UTILS/DFU_1.0.3.bin"
 //#define ISP_BIN             "../src/SOFTWARE_FRAMEWORK/UTILS/at32uc3a-isp.bin"
   
 // To enable Application execute
@@ -142,7 +143,7 @@ _trampoline:
 //  rjmp    program_start
  
   // Include the ISP raw binary image.
-  .incbin ISP_BIN
+//  .incbin ISP_BIN
 
   .org  PROGRAM_START_OFFSET
 program_start:

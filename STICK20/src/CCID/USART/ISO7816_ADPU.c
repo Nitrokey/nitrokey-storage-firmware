@@ -55,8 +55,10 @@
 
 #define ISO7816_MAX_ATR_CHARS 		40
 
-#define DEBUG_ISO7816_IO
+#ifdef INTERPRETER_ENABLE
+  #define DEBUG_ISO7816_IO
 //#define DEBUG_ISO7816_IO_DETAIL
+#endif
 
 #ifdef DEBUG_ISO7816_IO
   int CI_LocalPrintf (char *szFormat,...);

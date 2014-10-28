@@ -76,8 +76,9 @@
  Local defines
 
 *******************************************************************************/
-
-#define DEBUG_IW_IO
+#ifdef INTERPRETER_ENABLE
+  #define DEBUG_IW_IO
+#endif
 
 #ifdef DEBUG_IW_IO
   int CI_LocalPrintf (char *szFormat,...);

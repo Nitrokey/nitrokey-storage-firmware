@@ -399,6 +399,7 @@ void usb_get_configuration(void)
 void usb_get_status(void)
 {
   U8 wIndex;
+  U32 i;
 
   switch (bmRequestType)
   {
@@ -433,6 +434,15 @@ void usb_get_status(void)
   Usb_ack_control_in_ready_send();
 
   while (!Is_usb_control_out_received());
+/*
+  for (i=0;i<100000;i++)        // Make break out
+  {
+    if (Is_usb_control_out_received())
+    {
+      break;
+    }
+  }
+*/
   Usb_ack_control_out_received_free();
 }
 

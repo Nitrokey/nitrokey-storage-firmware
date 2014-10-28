@@ -184,7 +184,7 @@ u8 SD_WriteMultipleBlocks (u8 *Addr_u8,u32 Block_u32,u32 Count_u32)
 {
   u32 i;
 #ifdef TIME_MEASURING_ENABLE
-  u64 Runtime_u64;
+//  u64 Runtime_u64;
 #endif
 
   CI_TickLocalPrintf ("SD_WriteMultipleBlocks - Addr %x Block %d Count %d \r\n",Addr_u8,Block_u32,Count_u32);
@@ -213,7 +213,7 @@ u8 SD_WriteMultipleBlocks (u8 *Addr_u8,u32 Block_u32,u32 Count_u32)
       if(FALSE == sd_mmc_mci_dma_write_open(SD_SLOT, Block_u32, Addr_u8, 1) )
       {
         CI_TickLocalPrintf ("SD block open fails. Block %d\r\n",i);
-        return;
+        return (FALSE);
       }
       dma_ram_2_mci(Addr_u8, SD_MMC_SECTOR_SIZE,Block_u32+i);
   }
@@ -617,7 +617,7 @@ u8 SD_SecureEraseCryptedVolume (void)
 
 u16 SD_SpeedTest (void)
 {
-  u32 Blockcount_u32;
+//  u32 Blockcount_u32;
   u64 Runtime_u64;
   u16 SpeedInKBPerSec_u16;
   u8  Ret_u8;

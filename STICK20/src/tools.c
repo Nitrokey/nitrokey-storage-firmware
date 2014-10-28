@@ -45,7 +45,9 @@
 
 #include "global.h"
 
-int CI_LocalPrintf (char *szFormat,...);
+#ifdef INTERPRETER_ENABLE
+  int CI_LocalPrintf (char *szFormat,...);
+#endif
 
 
 /*******************************************************************************

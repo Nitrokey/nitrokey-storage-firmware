@@ -357,7 +357,7 @@ void USB_CCID_task(void *pvParameters)
   Usb_raise_in_ready (EP_KB_IN);
 
 
-	xLastWakeTime = xTaskGetTickCount();
+  xLastWakeTime = xTaskGetTickCount();
 
 	while (TRUE)
 	{

@@ -321,6 +321,7 @@ void IBN_ShowTaskStatusAll (void)
 
 void IBN_ShowHeadinfo (void)
 {
+#ifdef INTERPRETER_ENABLE
 	extern void __heap_start__;
 	extern void __heap_end__;
 	struct mallinfo info = mallinfo();
@@ -331,6 +332,7 @@ void IBN_ShowHeadinfo (void)
 	CI_LocalPrintf ("HEAP max used  %d\r\n",info.arena);
 	CI_LocalPrintf ("HEAP used      %d\r\n",info.usmblks + info.uordblks);
 	CI_LocalPrintf ("HEAP free      %d\r\n",(&__heap_end__ - &__heap_start__) - (info.usmblks + info.uordblks));
+#endif
 }
 
 /*******************************************************************************

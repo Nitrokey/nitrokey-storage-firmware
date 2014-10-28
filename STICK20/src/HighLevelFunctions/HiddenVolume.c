@@ -318,7 +318,7 @@ u8 HV_CheckFlashPageIsInitiated (void)
 
 u8 HV_InitAllSlotData (void)
 {
-  u8  RandomCharArray_au8[16];
+//  u8  RandomCharArray_au8[16];
   u32 i;
 
 // Create salt

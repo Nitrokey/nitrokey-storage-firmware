@@ -301,9 +301,6 @@ U8 get_cur_lun(void)
   return LUN_ID_0;
 }
 
-extern  volatile long xTickCount;
-u32 LastLunAccessInTick_u32[2] = {0,0};
-
 Ctrl_status mem_test_unit_ready(U8 lun)
 {
   Ctrl_status status;

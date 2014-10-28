@@ -89,6 +89,7 @@
 #define CI_CMD_STATE_PRINT_PROMT    1
 #define CI_CMD_STATE_WAIT_FOR_CMD   2
 
+#ifdef INTERPRETER_ENABLE
 int CI_LocalPrintf (char *szFormat,...);
 int CI_TickLocalPrintf (char *szFormat,...);
 void CI_Print8BitValue (unsigned char cValue);
@@ -96,5 +97,6 @@ int CI_StringOut (char *szText);
 s32 IDF_Debugtool (void);
 void IDF_task_init(void);
 void IDF_PrintStartupInfo (void);
+#endif
 
 #endif /* INTERPRETER_HEADER */

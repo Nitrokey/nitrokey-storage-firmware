@@ -55,13 +55,14 @@
 
 *******************************************************************************/
 
-#define DEBUG_USB_CCID_IO
-//#define DEBUG_USB_CCID_IO_DETAIL
-//#define DEBUG_USB_CCID_LOCK
-
-
-#ifdef DEBUG_USB_CCID_IO_DETAIL
+#ifdef INTERPRETER_ENABLE
   #define DEBUG_USB_CCID_IO
+  //#define DEBUG_USB_CCID_IO_DETAIL
+  //#define DEBUG_USB_CCID_LOCK
+
+  #ifdef DEBUG_USB_CCID_IO_DETAIL
+    #define DEBUG_USB_CCID_IO
+  #endif
 #endif
 
 #ifdef DEBUG_USB_CCID_IO
