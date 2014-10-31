@@ -143,7 +143,7 @@ _trampoline:
 //  rjmp    program_start
  
   // Include the ISP raw binary image.
-//  .incbin ISP_BIN
+  .incbin ISP_BIN
 
   .org  PROGRAM_START_OFFSET
 program_start:

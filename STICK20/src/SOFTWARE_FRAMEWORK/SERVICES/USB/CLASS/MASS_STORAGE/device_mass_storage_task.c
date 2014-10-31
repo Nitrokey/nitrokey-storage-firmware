@@ -86,11 +86,22 @@
 #include "scsi_decoder.h"
 #include "device_mass_storage_task.h"
 
-
 //_____ M A C R O S ________________________________________________________
 
 
 //_____ D E F I N I T I O N S ______________________________________________
+
+#define TIME_MEASURING_TICKS_IN_USEC              (FCPU_HZ/1000000ul)
+
+//#define DEBUG_SCSI_IO
+
+#ifdef DEBUG_SCSI_IO
+  int CI_StringOut (char *szText);
+#else
+  #define CI_LocalPrintf(...)
+  #define CI_TickLocalPrintf(...)
+  #define CI_StringOut(...)
+#endif
 
 
 //_____ D E C L A R A T I O N S ____________________________________________
@@ -144,12 +155,12 @@ void device_mass_storage_task_init(void)
 //! This function links the device mass-storage SCSI commands to the USB bus.
 //!
 
-extern  volatile long xTickCount;
-extern unsigned int LastLunAccessInTick_u32[2];
+unsigned long long TIME_MEASURING_GetTime (void);
+unsigned long long LastLunAccessInTick_u64[2] = {0,0};
 extern int sd_mmc_mci_test_unit_only_local_access;
 
-#define MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE          8000    //  8000 ticks =  4 sec
-#define MAX_TICKS_STATUP_UNTIL_RESTART_MSD_INTERFACE  20000    // 20000 ticks = 10 sec
+#define MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE           (5000ULL *(unsigned long long)TIME_MEASURING_TICKS_IN_USEC * 1000ULL)    //  5 sec
+#define MAX_TICKS_STARTUP_UNTIL_RESTART_MSD_INTERFACE   (   0ULL *(unsigned long long)TIME_MEASURING_TICKS_IN_USEC * 1000ULL)    //  no delay 0 sec
 
 #ifdef FREERTOS_USED
 void device_mass_storage_task(void *pvParameters)
@@ -159,6 +170,7 @@ void device_mass_storage_task(void)
 {
   unsigned int TickDelayToRestart = MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE;
   int ErrorFound;
+  unsigned long long ActualTime_u64;
 
 #ifdef FREERTOS_USED
   portTickType xLastWakeTime;
@@ -185,33 +197,37 @@ void device_mass_storage_task(void)
     }
 
     // Check LUN activity
-    if (FALSE == sd_mmc_mci_test_unit_only_local_access)    // On local access > disable check
+    ActualTime_u64 = TIME_MEASURING_GetTime ();
+    if ((FALSE == sd_mmc_mci_test_unit_only_local_access)          // On local access > disable check
+//        || (ActualTime_u64 > MAX_TICKS_STARTUP_UNTIL_RESTART_MSD_INTERFACE) // Not check on startup
+       )
     {
       ErrorFound = FALSE;
-      if (xTickCount - LastLunAccessInTick_u32[0] > TickDelayToRestart)
+      if (ActualTime_u64 - LastLunAccessInTick_u64[0] > TickDelayToRestart)
       {
-        CI_StringOut ("UNC LUN 0 - TIMEOUT\r\n");
-        LastLunAccessInTick_u32[0] = xTickCount;
+        CI_StringOut ("UNCRYPTED LUN 0 - TIMEOUT\r\n");
         ErrorFound = TRUE;
       }
       // Check LUN activity
-      if (xTickCount - LastLunAccessInTick_u32[1] > TickDelayToRestart)
+      if (ActualTime_u64  - LastLunAccessInTick_u64[1] > TickDelayToRestart)
       {
-        CI_StringOut ("CRY LUN 1 - TIMEOUT\r\n");
-        LastLunAccessInTick_u32[1] = xTickCount;
+        CI_StringOut ("ENCRYPTED LUN 1 - TIMEOUT\r\n");
         ErrorFound = TRUE;
       }
+
       if (TRUE == ErrorFound)
       {
         CI_StringOut ("*** RESTART MSD DEVICE TASK ***\r\n");
+        LastLunAccessInTick_u64[0] = ActualTime_u64;
+        LastLunAccessInTick_u64[1] = ActualTime_u64;
         usb_device_task_delete();
         usb_device_task_init();
       }
     }
     else
     {
-      LastLunAccessInTick_u32[0] = xTickCount;            // Avoid wrong timeout
-      LastLunAccessInTick_u32[1] = xTickCount;
+      LastLunAccessInTick_u64[0] = ActualTime_u64;            // Avoid wrong timeout
+      LastLunAccessInTick_u64[1] = ActualTime_u64;
     }
 
 
@@ -315,7 +331,7 @@ static void usb_mass_storage_cbw(void)
 static void usb_mass_storage_csw(void)
 {
   int i;
-
+/*
   i = 1;
   while (1 == i)
   {
@@ -338,8 +354,8 @@ static void usb_mass_storage_csw(void)
       }
     }
   }
+*/
 
-/*
 
   while (Is_usb_endpoint_stall_requested(EP_MS_IN))
   {
@@ -351,14 +367,22 @@ static void usb_mass_storage_csw(void)
     if (Is_usb_setup_received()) usb_process_request();
   }
 
-*/
+
   // MSC Compliance - Free BAD out receiv during SCSI command
   while( Is_usb_out_received(EP_MS_OUT) ) {
     Usb_ack_out_received_free(EP_MS_OUT);
   }
 
   while (!Is_usb_in_ready(EP_MS_IN));
-
+/*
+//  for (i=0;i<100000;i++)                // Make break out
+  {
+    if (Is_usb_in_ready(EP_MS_IN))
+    {
+      break;
+    }
+  }
+*/
   Usb_reset_endpoint_fifo_access(EP_MS_IN);
 
   //! Write CSW Signature
@@ -382,6 +406,10 @@ static void usb_mass_storage_csw(void)
     if( 0 != Usb_nb_busy_bank(EP_MS_IN) )
     {
       if (Is_usb_setup_received()) usb_process_request();
+    }
+    else
+    {
+      break;
     }
   }
 /*

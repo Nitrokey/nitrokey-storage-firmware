@@ -61,9 +61,17 @@
 *******************************************************************************/
 
 #define TOOL_DFU_ISP_CONFIG_ADDR_1 (AVR32_FLASHC_USER_PAGE + 0x1FC)
+
+
+#define TOOL_DFU_ISP_CONFIG_WORD_DEFAULT_0      (0x929E2A9E)
+#define TOOL_DFU_ISP_CONFIG_WORD_DEFAULT_0_0 (0x92)
+#define TOOL_DFU_ISP_CONFIG_WORD_DEFAULT_0_1 (0x9E)
+#define TOOL_DFU_ISP_CONFIG_WORD_DEFAULT_0_2 (0x2A)
+#define TOOL_DFU_ISP_CONFIG_WORD_DEFAULT_0_3 (0x9E)
+
 /*
 //#define TOOL_DFU_ISP_CONFIG_ADDR_1 (AVR32_FLASHC_USER_PAGE + 0x1F8)
-
+ *
 #define TOOL_DFU_ISP_CONFIG_WORD_START_APPL_0   (0x929E0E62)
 #define TOOL_DFU_ISP_CONFIG_WORD_START_APPL_0_0 (0x92)
 #define TOOL_DFU_ISP_CONFIG_WORD_START_APPL_0_1 (0x9E)
@@ -76,6 +84,8 @@
 #define TOOL_DFU_ISP_CONFIG_WORD_START_APPL_1_2 (0xFC)
 #define TOOL_DFU_ISP_CONFIG_WORD_START_APPL_1_3 (0xDE)
 */
+
+/*  For DFU 1.1.0*/
 #define TOOL_DFU_ISP_CONFIG_WORD_START_APPL   (0xE11EFCDE)
 #define TOOL_DFU_ISP_CONFIG_WORD_START_APPL_0 (0xE1)
 #define TOOL_DFU_ISP_CONFIG_WORD_START_APPL_1 (0x1E)
@@ -108,68 +118,7 @@
 
 *******************************************************************************/
 
-/*******************************************************************************
 
-  usb_dfu_stop
-
-  Reviews
-  Date      Reviewer        Info
-  16.08.13  RB              First review
-
-*******************************************************************************/
-
-/*
- static void usb_dfu_stop(void)
-{
-  force_isp(FALSE);
-
-  Usb_ack_control_out_received_free();
-  Usb_ack_control_in_ready_send();
-
-  while (!Is_usb_setup_received());
-  Usb_ack_setup_received_free();
-  Usb_ack_control_in_ready_send();
-
-  while (!Is_usb_control_in_ready());
-
-  Disable_global_interrupt();
-  Usb_disable();
-  (void)Is_usb_enabled();
-  Enable_global_interrupt();
-  Usb_disable_otg_pad();
-}
-
-        case CMD_START_APPLI_ARG_RESET:
-          usb_dfu_stop();
-          Disable_global_interrupt();
-          AVR32_WDT.ctrl = AVR32_WDT_CTRL_EN_MASK |
-                           (10 << AVR32_WDT_CTRL_PSEL_OFFSET) |
-                           (AVR32_WDT_KEY_VALUE << AVR32_WDT_CTRL_KEY_OFFSET);
-          AVR32_WDT.ctrl = AVR32_WDT_CTRL_EN_MASK |
-                           (10 << AVR32_WDT_CTRL_PSEL_OFFSET) |
-                           ((~AVR32_WDT_KEY_VALUE << AVR32_WDT_CTRL_KEY_OFFSET) & AVR32_WDT_CTRL_KEY_MASK);
-          while (1);
-
-        case CMD_START_APPLI_ARG_NO_RESET:
-          usb_dfu_stop();
-          sys_clk_gen_stop();
-          wait_10_ms();
-          boot_program();
-          break;
-
-
-#define ISP_GPFB_FORCE                31
-#define ISP_GPFB_FORCE_MASK           0x80000000
-#define ISP_GPFB_FORCE_OFFSET         31
-#define ISP_GPFB_FORCE_SIZE           1
-
-void DUF_ForceIsp(Bool force)
-{
-  flashc_set_gp_fuse_bit(ISP_GPFB_FORCE_OFFSET, force);
-}
-
-
- */
 
 /*******************************************************************************
 
@@ -284,6 +233,55 @@ void DFU_EnableFirmwareUpdate (void)
   flashc_write_gp_fuse_bit (30,1);              // Set SP_IO_COND_EN  = 1 for DUF 1.0.3
   flashc_write_gp_fuse_bit (31,1);              // Set to 1 to start application for DUF 1.0.3
 }
+
+/*******************************************************************************
+
+  DFU_FirmwareResetUserpage
+
+  Changes
+  Date      Author          Info
+  28.10.14  RB              Creation of function
+
+  Reviews
+  Date      Reviewer        Info
+
+
+*******************************************************************************/
+
+void DFU_FirmwareResetUserpage (void)
+{
+  u8 DFU_String_au8[4];
+
+/*
+  flashc_erase_all_gp_fuses (TRUE);
+
+  flashc_write_gp_fuse_bit
+  FC07FFFF
+
+  flashc_set_all_gp_fuses ();
+*/
+
+  flashc_write_gp_fuse_bit (30,0);              // Set SP_IO_COND_EN  = 0 for DUF 1.0.3
+  flashc_write_gp_fuse_bit (31,0);              // Set to 0 to start application for DUF 1.0.3
+
+
+
+  flashc_erase_user_page (TRUE);
+
+  DFU_String_au8[0] = TOOL_DFU_ISP_CONFIG_WORD_DEFAULT_0_0;
+  DFU_String_au8[1] = TOOL_DFU_ISP_CONFIG_WORD_DEFAULT_0_1;
+  DFU_String_au8[2] = TOOL_DFU_ISP_CONFIG_WORD_DEFAULT_0_2;
+  DFU_String_au8[3] = TOOL_DFU_ISP_CONFIG_WORD_DEFAULT_0_3;
+/*
+  DFU_String_au8[0] = TOOL_DFU_ISP_CONFIG_WORD_START_APPL_0_0;
+  DFU_String_au8[1] = TOOL_DFU_ISP_CONFIG_WORD_START_APPL_0_1;
+  DFU_String_au8[2] = TOOL_DFU_ISP_CONFIG_WORD_START_APPL_0_2;
+  DFU_String_au8[3] = TOOL_DFU_ISP_CONFIG_WORD_START_APPL_0_3;
+*/
+
+  flashc_memcpy(TOOL_DFU_ISP_CONFIG_ADDR_1,DFU_String_au8,4,TRUE);
+}
+
 
 /*******************************************************************************
 

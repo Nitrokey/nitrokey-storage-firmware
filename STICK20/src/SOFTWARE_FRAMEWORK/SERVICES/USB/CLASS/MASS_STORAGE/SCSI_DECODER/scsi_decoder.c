@@ -430,7 +430,8 @@ void DebugScsiCommand (U8 *ScsiCommand_pu8)
   #define DebugScsiCommand(...)
 #endif // DEBUG_SCSI_IO
 
-extern unsigned int LastLunAccessInTick_u32[2];
+extern unsigned long long LastLunAccessInTick_u64[2];
+unsigned long long TIME_MEASURING_GetTime (void);
 
 Bool scsi_decode_command(void)
 {
@@ -446,7 +447,7 @@ Bool scsi_decode_command(void)
 // Log LUN activity
   if (2 > usb_LUN)
   {
-    LastLunAccessInTick_u32[usb_LUN] = xTickCount;
+    LastLunAccessInTick_u64[usb_LUN] = TIME_MEASURING_GetTime ();
   }
 
   DebugScsiCommand (g_scsi_command);
@@ -609,7 +610,7 @@ Bool sbc_test_unit_ready(void)
 
 Bool sbc_request_sense(void)
 {
-  U32 i;
+//  U32 i;
   U8 allocation_length;
   U8 request_sense_output[18];  // The maximal size of request is 17.
 

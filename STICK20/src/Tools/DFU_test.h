@@ -32,5 +32,6 @@ void DFU_DisableFirmwareUpdate (void);
 void DFU_EnableFirmwareUpdate (void);
 void IBN_DFU_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int Param_u32,unsigned char *String_pu8);
 void DFU_ResetCPU (void);
+void DFU_FirmwareResetUserpage (void);
 
 #endif /* DFU_TEST_H_ */

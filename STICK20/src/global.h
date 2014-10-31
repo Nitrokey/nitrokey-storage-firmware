@@ -24,7 +24,7 @@
 //#include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 12   // 0 = development // last Version 10
+#define VERSION_MINOR 13   // 0 = development // last Version 13
 
 
 #define TRUE		1
@@ -86,6 +86,7 @@
 
 //#define MMC_DEBUG_PRINT             // Shows details of SD card actions
 
+//#define DEBUG_SCSI_IO               // Debug SCSI IO
 
 /*******************************************************************************
 

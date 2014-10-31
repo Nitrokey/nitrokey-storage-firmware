@@ -910,9 +910,13 @@ void SmartcardPowerOff (void)
 
   // Init Vcc for smartcard
 #ifdef STICK_20_A_MUSTER_PROD
+  gpio_set_gpio_open_drain_pin (AVR32_PIN_PA01);
+  gpio_set_gpio_open_drain_pin (AVR32_PIN_PB05);
   gpio_clr_gpio_pin (AVR32_PIN_PA01);
   gpio_clr_gpio_pin (AVR32_PIN_PB05);
 #else
+  gpio_set_gpio_open_drain_pin (AVR32_PIN_PA05);
+  gpio_set_gpio_open_drain_pin (AVR32_PIN_PA06);
   gpio_clr_gpio_pin (AVR32_PIN_PA05);
   gpio_clr_gpio_pin (AVR32_PIN_PA06);
 #endif // STICK_20_A_MUSTER_PROD
@@ -921,6 +925,8 @@ void SmartcardPowerOff (void)
 /*******************************************************************************
 
   Smartcard_Reset_on
+
+  Smart card set active
 
   Reviews
   Date      Reviewer        Info
@@ -936,6 +942,8 @@ void Smartcard_Reset_on (void)
 /*******************************************************************************
 
   Smartcard_Reset_off
+
+  Smart card set in reset mode
 
   Reviews
   Date      Reviewer        Info

@@ -1807,6 +1807,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
     CI_LocalPrintf ("17 count   Generate [count] *10 random numbers [output as 0,1 stream]\r\n");
     CI_LocalPrintf ("18 FiDi    FiDi Test\r\n");
     CI_LocalPrintf ("19 UserPW1 Reset error counter with PW1 (admin access)\r\n");
+    CI_LocalPrintf ("20         SC power off\r\n");
     CI_LocalPrintf ("99         Factory reset smartcard \r\n");
     CI_LocalPrintf ("\r\n");
     return;
@@ -2055,6 +2056,26 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
           sprintf (LocalString_au8,"%d",Param_u32);
           CI_LocalPrintf ("Reset user pw counter with password -%s-\r\n",LocalString_au8);
           Ret_u32 = LA_OpenPGP_V20_Test_ResetRetryCounter (LocalString_au8);
+          break;
+
+    case 20 :
+          CI_LocalPrintf ("SC power off\r\n");
+          SmartcardPowerOff ();
+          break;
+
+    case 21 :
+          if (0 == Param_u32)
+          {
+            CI_LocalPrintf ("SC power set open drain\r\n");
+            gpio_set_gpio_open_drain_pin (AVR32_PIN_PA05);
+            gpio_set_gpio_open_drain_pin (AVR32_PIN_PA06);
+          }
+          else
+          {
+            CI_LocalPrintf ("SC power clear open drain\r\n");
+            gpio_clr_gpio_open_drain_pin (AVR32_PIN_PA05);
+            gpio_clr_gpio_open_drain_pin (AVR32_PIN_PA06);
+          }
           break;
 
     case 99 :

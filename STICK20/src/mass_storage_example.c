@@ -1076,6 +1076,8 @@ int main(void)
   flashc_lock_external_privileged_fetch (TRUE); // Disable external instruction fetch
 #endif
 
+//  DFU_FirmwareResetUserpage ();
+
   DFU_DisableFirmwareUpdate ();     // Stick always starts in application mode
 
 

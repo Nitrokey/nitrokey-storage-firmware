@@ -445,6 +445,7 @@ u8 CCID_SmartcardOff_u8 (void)
   {
     CI_TickLocalPrintf ("*** Smartcard off (CCID)***\n");
     Smartcard_Reset_off ();		// Disable SC
+    SmartcardPowerOff ();
     CCID_SlotStatus_u8 = CCID_SLOT_STATUS_PRESENT_INACTIVE;
     CCID_ExternalSetSmartcardOffFlag_u8 = FALSE;
   }
@@ -479,6 +480,7 @@ u8 CCID_InternalSmartcardOff_u8 (void)
   {
     CI_TickLocalPrintf ("*** Smartcard off (I)***\n");
     Smartcard_Reset_off ();   // Disable SC
+    SmartcardPowerOff ();
     CCID_SlotStatus_u8 = CCID_SLOT_STATUS_PRESENT_INACTIVE;
     CCID_InternalSetSmartcardOffFlag_u8 = FALSE;
   }
