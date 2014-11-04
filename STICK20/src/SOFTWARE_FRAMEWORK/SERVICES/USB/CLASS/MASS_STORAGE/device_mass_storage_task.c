@@ -93,7 +93,7 @@
 
 #define TIME_MEASURING_TICKS_IN_USEC              (FCPU_HZ/1000000ul)
 
-//#define DEBUG_SCSI_IO
+#define DEBUG_SCSI_IO
 
 #ifdef DEBUG_SCSI_IO
   int CI_StringOut (char *szText);

@@ -28,6 +28,9 @@
 #ifndef LED_TEST_H
 #define LED_TEST_H
 
+void LED_Manager10ms_v (void);
+void LED_ScCardOnline_v (void);
+void LED_SdCardOnline_v (void);
 void LED_GreenToggle (void);
 void LED_GreenOff (void);
 void LED_GreenOn (void);

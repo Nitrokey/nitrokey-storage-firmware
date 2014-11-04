@@ -84,7 +84,7 @@
 #include "global.h"
 #include "tools.h"
 #include "TIME_MEASURING.h"
-
+#include "LED_test.h"
 
 #include "..\HighLevelFunctions\FlashStorage.h"
 
@@ -1307,7 +1307,10 @@ Bool sd_mmc_mci_mem_check(U8 slot)
     }
   }
   if (sd_mmc_mci_init_done[slot] == TRUE)
+  {
+    LED_SdCardOnline_v ();
     return TRUE;
+  }
   else
     return FALSE;
 }

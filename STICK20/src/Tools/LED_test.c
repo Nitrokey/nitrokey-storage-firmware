@@ -43,9 +43,6 @@
 
 *******************************************************************************/
 
-//#define TOOL_LED_RED_PIN       AVR32_PIN_PX41
-//#define TOOL_LED_GREEN_PIN     AVR32_PIN_PX45
-
 #define LED_OFF       0
 #define LED_ON        1
 
@@ -75,14 +72,58 @@
 
 */
 
-static u8 LED_GreenToggleFlag_u8      = LED_OFF;
-static u8 LED_RedToggleFlag_u8        = LED_OFF;
-static u8 LED_RedGreenToggleFlag_u8   = LED_OFF;
+static volatile u8 LED_StartUpActiv            = TRUE;
+static volatile u8 LED_StartUpSdCardOnline     = FALSE;         // Offline = red LED flashing on
+static volatile u8 LED_StartUpScCardOnline     = FALSE;         // Offline = red LED on
+
+static volatile u8 LED_GreenToggleFlag_u8      = LED_OFF;
+static volatile u8 LED_RedToggleFlag_u8        = LED_OFF;
+static volatile u8 LED_RedGreenToggleFlag_u8   = LED_OFF;
 
 
 /*******************************************************************************
 
+  LED_ScCardOnline_v
+
+  Changes
+  Date      Author          Info
+  04.11.14  RB              Implementation of function
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void LED_ScCardOnline_v (void)
+{
+  LED_StartUpScCardOnline = TRUE;
+}
+
+/*******************************************************************************
+
+  LED_SdCardOnline_v
+
+  Changes
+  Date      Author          Info
+  04.11.14  RB              Implementation of function
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void LED_SdCardOnline_v (void)
+{
+  LED_StartUpSdCardOnline = TRUE;
+}
+
+/*******************************************************************************
+
   LED_GreenToggle
+
+  Changes
+  Date      Author          Info
+  04.11.14  RB              Change to manager architecture
 
   Reviews
   Date      Reviewer        Info
@@ -94,12 +135,12 @@ void LED_GreenToggle (void)
 {
   if (LED_OFF == LED_GreenToggleFlag_u8)
   {
-    gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
+//    gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
     LED_GreenToggleFlag_u8 = LED_ON;
   }
   else
   {
-    gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
+//    gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
     LED_GreenToggleFlag_u8 = LED_OFF;
   }
 }
@@ -107,6 +148,10 @@ void LED_GreenToggle (void)
 /*******************************************************************************
 
   LED_GreenOff
+
+  Changes
+  Date      Author          Info
+  04.11.14  RB              Change to manager architecture
 
   Reviews
   Date      Reviewer        Info
@@ -116,7 +161,7 @@ void LED_GreenToggle (void)
 
 void LED_GreenOff (void)
 {
-  gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
+//  gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
   LED_GreenToggleFlag_u8 = LED_OFF;
 }
 
@@ -132,13 +177,17 @@ void LED_GreenOff (void)
 
 void LED_GreenOn (void)
 {
-  gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
+//  gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
   LED_GreenToggleFlag_u8 = LED_ON;
 }
 
 /*******************************************************************************
 
   LED_RedToggle
+
+  Changes
+  Date      Author          Info
+  04.11.14  RB              Change to manager architecture
 
   Reviews
   Date      Reviewer        Info
@@ -150,12 +199,12 @@ void LED_RedToggle (void)
 {
   if (LED_OFF == LED_RedToggleFlag_u8)
   {
-    gpio_set_gpio_pin (TOOL_LED_RED_PIN);
+//    gpio_set_gpio_pin (TOOL_LED_RED_PIN);
     LED_RedToggleFlag_u8 = LED_ON;
   }
   else
   {
-    gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
+//    gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
     LED_RedToggleFlag_u8 = LED_OFF;
   }
 }
@@ -163,6 +212,10 @@ void LED_RedToggle (void)
 /*******************************************************************************
 
   LED_RedOff
+
+  Changes
+  Date      Author          Info
+  04.11.14  RB              Change to manager architecture
 
   Reviews
   Date      Reviewer        Info
@@ -172,13 +225,17 @@ void LED_RedToggle (void)
 
 void LED_RedOff (void)
 {
-  gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
+//  gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
   LED_RedToggleFlag_u8 = LED_OFF;
 }
 
 /*******************************************************************************
 
   LED_RedOn
+
+  Changes
+  Date      Author          Info
+  04.11.14  RB              Change to manager architecture
 
   Reviews
   Date      Reviewer        Info
@@ -188,13 +245,17 @@ void LED_RedOff (void)
 
 void LED_RedOn (void)
 {
-  gpio_set_gpio_pin (TOOL_LED_RED_PIN);
+//  gpio_set_gpio_pin (TOOL_LED_RED_PIN);
   LED_RedToggleFlag_u8 = LED_ON;
 }
 
 /*******************************************************************************
 
   LED_RedGreenToggle
+
+  Changes
+  Date      Author          Info
+  04.11.14  RB              Change to manager architecture
 
   Reviews
   Date      Reviewer        Info
@@ -206,12 +267,13 @@ void LED_RedGreenToggle (void)
 {
   if (LED_OFF == LED_RedToggleFlag_u8)
   {
-    gpio_set_gpio_pin (TOOL_LED_RED_PIN);
-    gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
+//    gpio_set_gpio_pin (TOOL_LED_RED_PIN);
+//    gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
     LED_RedToggleFlag_u8 = LED_ON;
   }
   else
   {
+/*
     if (LED_OFF == LED_RedToggleFlag_u8)
     {
       gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
@@ -220,6 +282,7 @@ void LED_RedGreenToggle (void)
     {
       gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
     }
+*/
     LED_RedGreenToggleFlag_u8 = LED_OFF;
   }
 }
@@ -227,6 +290,10 @@ void LED_RedGreenToggle (void)
 /*******************************************************************************
 
   LED_RedGreenOff
+
+  Changes
+  Date      Author          Info
+  04.11.14  RB              Change to manager architecture
 
   Reviews
   Date      Reviewer        Info
@@ -236,6 +303,7 @@ void LED_RedGreenToggle (void)
 
 void LED_RedGreenOff (void)
 {
+/*
   if (LED_OFF == LED_GreenToggleFlag_u8)
   {
     gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
@@ -244,8 +312,10 @@ void LED_RedGreenOff (void)
   {
     gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
   }
+*/
   LED_RedGreenToggleFlag_u8 = LED_OFF;
 }
+
 
 /*******************************************************************************
 
@@ -259,10 +329,105 @@ void LED_RedGreenOff (void)
 
 void LED_RedGreenOn (void)
 {
+/*
   gpio_set_gpio_pin (TOOL_LED_RED_PIN);
   gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
+*/
   LED_RedGreenToggleFlag_u8 = LED_ON;
 }
+
+
+/*******************************************************************************
+
+  LED_Manager10ms_v
+
+  Called every 10 ms
+
+  Changes
+  Date      Author          Info
+  04.11.14  RB              Implementation of function
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+#define LED_FLASH_DELAY 30      // = 300 ms
+
+void LED_Manager10ms_v (void)
+{
+  u8  StateRedLed_u8         = LED_OFF;
+  u8  StateGreenLed_u8       = LED_OFF;
+  u8  StateRedLedFlashing_u8 = LED_OFF;
+  static u8 FlashCounter_u8  = 0;
+
+  if (TRUE == LED_StartUpActiv)                 // Startup usage
+  {
+    if (FALSE == LED_StartUpSdCardOnline)
+    {
+      StateRedLedFlashing_u8 = LED_ON;
+    }
+    if (FALSE == LED_StartUpScCardOnline)
+    {
+      StateRedLed_u8         = LED_ON;
+    }
+
+    if ((TRUE == LED_StartUpSdCardOnline) && (TRUE == LED_StartUpScCardOnline))
+    {
+      LED_StartUpActiv = FALSE;
+    }
+  }
+  else
+  {                                               // Normal LED usage
+    StateRedLed_u8   = LED_RedToggleFlag_u8;
+    StateGreenLed_u8 = LED_GreenToggleFlag_u8;
+
+    if (LED_ON == LED_RedGreenToggleFlag_u8)      // Red-green has higher prio
+    {
+      StateRedLed_u8   = LED_ON;
+      StateGreenLed_u8 = LED_ON;
+    }
+  }
+
+// Flash controller
+  FlashCounter_u8++;
+  if (LED_ON == StateRedLedFlashing_u8)
+  {
+    if (LED_FLASH_DELAY/2 > FlashCounter_u8)
+    {
+      StateRedLed_u8 = LED_ON;
+    }
+    else
+    {
+      StateRedLed_u8 = LED_OFF;
+    }
+  }
+
+  if (LED_FLASH_DELAY == FlashCounter_u8)       // Restart counter
+  {
+    FlashCounter_u8 = 0;
+  }
+
+// Set the configuration
+  if (LED_ON == StateRedLed_u8)
+  {
+    gpio_set_gpio_pin (TOOL_LED_RED_PIN);
+  }
+  else
+  {
+    gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
+  }
+
+  if (LED_ON == StateGreenLed_u8)
+  {
+    gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
+  }
+  else
+  {
+    gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
+  }
+
+}
+
 
 /*******************************************************************************
 

@@ -24,7 +24,7 @@
 //#include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 13   // 0 = development // last Version 13
+#define VERSION_MINOR 14   // 0 = development // last Version 13
 
 
 #define TRUE		1
@@ -160,8 +160,8 @@
 
 
 // Led ports
-#define TOOL_LED_RED_PIN       AVR32_PIN_PX41
-#define TOOL_LED_GREEN_PIN     AVR32_PIN_PX45
+#define TOOL_LED_RED_PIN       AVR32_PIN_PX45
+#define TOOL_LED_GREEN_PIN     AVR32_PIN_PX41
 
 
 /*********************************************************************************

@@ -481,6 +481,7 @@ int ISO7816_InitSC (void)
       {
         CI_TickLocalPrintf ("ISO7816_InitSC : OK\n");
         DelayMs (10);
+        LED_ScCardOnline_v ();
         return (TRUE);      // Exit
       }
       else
@@ -497,16 +498,11 @@ int ISO7816_InitSC (void)
 
 	if (i != nRetryCount)
 	{
+    LED_ScCardOnline_v ();
 	  return (TRUE);
 	}
 
   CI_TickLocalPrintf ("ISO7816_InitSC : Init FAIL\n");
-
-//  CI_TickLocalPrintf ("ISO7816_InitSC : Reset_CPU\n");
-
-//  DelayMs (50);
-//  Reset_CPU ();
-
 	return (FALSE);
 }
 

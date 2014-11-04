@@ -195,7 +195,7 @@ void IW_task(void *pvParameters)
 #endif
 
      LoopCount_u32++;
-     if(0 == LoopCount_u32 % 100)
+     if(0 == LoopCount_u32 % 10)          // Every 100 ms
      {
 #ifdef HTML_ENABLE_HTML_INTERFACE
        HTML_CheckRamDisk ();
@@ -203,8 +203,7 @@ void IW_task(void *pvParameters)
        HID_ExcuteCmd ();
      }
 
-
-
+     LED_Manager10ms_v ();                // Call LED manager every 10 ms
 
 #ifdef TIME_MEASURING_ENABLE
    TIME_MEASURING_Stop (TIME_MEASURING_TIMER_IW_10MS);
