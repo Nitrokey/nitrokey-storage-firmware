@@ -80,6 +80,7 @@
 <listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/HID"/>
 </option>
 <option id="avr32.c.compiler.option.flashvault.1169817728" name="Enable FlashVault support" superClass="avr32.c.compiler.option.flashvault" value="false" valueType="boolean"/>
+<option id="gnu.c.compiler.option.misc.other.1230076824" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0" valueType="string"/>
 <inputType id="avr32.managedbuild.tool.gnu.c.compiler.input.262133958" superClass="avr32.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
 <tool command="avr32-gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="avr32.managedbuild.tool.gnu.c.linker.exe.debug.800857456" name="AVR32/GNU C Linker" superClass="avr32.managedbuild.tool.gnu.c.linker.exe.debug">

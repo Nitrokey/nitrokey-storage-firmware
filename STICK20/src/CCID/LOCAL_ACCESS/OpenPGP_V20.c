@@ -76,19 +76,19 @@ typeAPDU 	tSC_OpenPGP_V20;
 
 /*******************************************************************************
 
-  LA_OpenPGP_V20_ChangeReset1
+  LA_OpenPGP_V20_ChangeReset2
 
   Reviews
   Date      Reviewer        Info
 
 *******************************************************************************/
 
-int LA_OpenPGP_V20_ChangeReset1 (typeAPDU *tSC)
+int LA_OpenPGP_V20_ChangeReset2 (typeAPDU *tSC)
 {
   int     nRet;
 
 #ifdef DEBUG_OPENPGP_SHOW_CALLS
-  CI_TickLocalPrintf ("ISO7816: Call Reset1\r\n");
+  CI_TickLocalPrintf ("ISO7816: Call Reset2\r\n");
 #endif
 
   if (FALSE == LA_SC_StartSmartcard ())
@@ -116,19 +116,19 @@ int LA_OpenPGP_V20_ChangeReset1 (typeAPDU *tSC)
 
 /*******************************************************************************
 
-  LA_OpenPGP_V20_ChangeReset2
+  LA_OpenPGP_V20_ChangeReset1
 
   Reviews
   Date      Reviewer        Info
 
 *******************************************************************************/
 
-int LA_OpenPGP_V20_ChangeReset2 (typeAPDU *tSC)
+int LA_OpenPGP_V20_ChangeReset1 (typeAPDU *tSC)
 {
   int     nRet;
 
 #ifdef DEBUG_OPENPGP_SHOW_CALLS
-  CI_TickLocalPrintf ("ISO7816: Call Reset2\r\n");
+  CI_TickLocalPrintf ("ISO7816: Call Reset1\r\n");
 #endif
 
   if (FALSE == LA_SC_StartSmartcard ())

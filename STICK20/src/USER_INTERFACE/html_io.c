@@ -82,6 +82,8 @@
 extern typeStick20Configuration_st StickConfiguration_st;
 u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st);
 
+const u8 AES_DummyKey_au8[32] = "00000000000000000000000000000000";
+
 /*******************************************************************************
 
  Local defines
@@ -433,7 +435,7 @@ void HTML_CheckRamDisk (void)
       case HTML_CMD_DISABLE_AES_LUN :
         SetSdEncryptedCardEnableState (FALSE);
         SetSdEncryptedHiddenState (FALSE);
-        AES_SetNewStorageKey ("0000");      // Set dummy key
+        AES_SetNewStorageKey (AES_DummyKey_au8);      // Set dummy key
         CI_TickLocalPrintf ("SD card AES LUN disabled\r\n");
         break;
 
@@ -468,7 +470,7 @@ void HTML_CheckRamDisk (void)
       case HTML_CMD_DISABLE_HIDDEN_AES_LUN :
         SetSdEncryptedCardEnableState (FALSE);
         SetSdEncryptedHiddenState (FALSE);
-        AES_SetNewStorageKey ("0000");      // Set dummy key
+        AES_SetNewStorageKey (AES_DummyKey_au8);      // Set dummy key
         CI_TickLocalPrintf ("SD card hidden AES LUN disabled\r\n");
         break;
 
@@ -673,7 +675,7 @@ void HID_ExcuteCmd (void)
     case HTML_CMD_DISABLE_AES_LUN :
       SetSdEncryptedCardEnableState (FALSE);
       SetSdEncryptedHiddenState (FALSE);
-      AES_SetNewStorageKey ((u8*)"0000");      // Set dummy key
+      AES_SetNewStorageKey ((u8*)AES_DummyKey_au8);      // Set dummy key
       HID_NextPasswordIsHiddenPassword_u32 = FALSE;
       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
 
@@ -716,7 +718,7 @@ void HID_ExcuteCmd (void)
         SetSdEncryptedHiddenState (FALSE);
         vTaskDelay (3000);
 
-        AES_SetNewStorageKey ((u8*)"0000");       // Set dummy key
+        AES_SetNewStorageKey ((u8*)AES_DummyKey_au8);       // Set dummy key
 
 /*
         if (STICK20_FILL_SD_CARD_WITH_RANDOM_CHARS_ALL_VOL == HID_String_au8[0])
@@ -753,17 +755,16 @@ void HID_ExcuteCmd (void)
 //      SetSdUncryptedCardEnableState (FALSE);    // look for >> sd_mmc_mci_test_unit_only_local_access = hard disabel
 
       // Get w AES key for hidden volume - we use always the password that was send
+      memset (StorageKey_pu8,0,32);
       ret_u8 = GetHiddenVolumeKeyFromUserpassword ((u8*)&HID_String_au8[1],StorageKey_pu8);
       switch (ret_u8)
       {
         case HIDDEN_VOLUME_OUTPUT_STATUS_OK :
           SetSdEncryptedCardEnableState (FALSE);
           SetSdEncryptedHiddenState (FALSE);
+          AES_SetNewStorageKey ((u8*)AES_DummyKey_au8);       // Set dummy key
 
-          memset (StorageKey_pu8,0,32);
-          AES_SetNewStorageKey ((u8*)"0000");       // Set dummy key
-
-          vTaskDelay (3000);    // Wait 2 sec to send LUN not active
+          vTaskDelay (3000);    // Wait 3 sec to send LUN not active
 
           AES_SetNewStorageKey (StorageKey_pu8);
           SetSdEncryptedHiddenState (TRUE);
@@ -794,7 +795,7 @@ void HID_ExcuteCmd (void)
       SetSdEncryptedCardEnableState (FALSE);
       SetSdEncryptedHiddenState (FALSE);
       memset (StorageKey_pu8,0,32);             // Set dummy key
-      AES_SetNewStorageKey ((u8*)"0000");       // Set dummy key
+      AES_SetNewStorageKey ((u8*)AES_DummyKey_au8);       // Set dummy key
       HID_NextPasswordIsHiddenPassword_u32 = FALSE;
 
       vTaskDelay (3000);                        // Wait 3 sec to send LUN not active
@@ -807,12 +808,11 @@ void HID_ExcuteCmd (void)
       if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
       {
         CI_TickLocalPrintf ("Export binary\r\n");
-
+        SetSdUncryptedCardEnableState (FALSE);      // Disable access
 
         FileIO_SaveAppImage_u8 ();
 
-        SetSdUncryptedCardEnableState (FALSE);      // Disable access
-        vTaskDelay (6000);
+        vTaskDelay (3000);
         SetSdUncryptedCardEnableState (TRUE);       // Enable access
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
       }
@@ -830,7 +830,7 @@ void HID_ExcuteCmd (void)
         SetSdEncryptedCardEnableState (FALSE);
         SetSdEncryptedHiddenState (FALSE);
         memset (StorageKey_pu8,0,32);
-        AES_SetNewStorageKey ((u8*)"0000");       // Set dummy key
+        AES_SetNewStorageKey ((u8*)AES_DummyKey_au8);       // Set dummy key
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
       }
       else
@@ -1267,7 +1267,7 @@ void LockDevice (void)
   SetSdEncryptedCardEnableState (FALSE);
   SetSdEncryptedHiddenState (FALSE);
 
-  AES_SetNewStorageKey ((u8*)"0000");       // Set dummy AES key
+  AES_SetNewStorageKey ((u8*)AES_DummyKey_au8);       // Set dummy AES key
 
   HID_AdminPasswordEnabled_u32 = FALSE;
   HID_UserPasswordEnabled_u32  = FALSE;
@@ -1279,7 +1279,7 @@ void LockDevice (void)
 
 // Powerdown smartcard
   ISO7816_SetLockCounter (0);
-  CCID_SmartcardOff_u8 ();          // To avoid smart card error - after GetRandomNumber_u32
+  CCID_SmartcardOff_u8 ();
 
 // or  DFU_ResetCPU ();
 }

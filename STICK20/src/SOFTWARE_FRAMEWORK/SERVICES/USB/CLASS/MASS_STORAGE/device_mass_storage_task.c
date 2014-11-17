@@ -214,7 +214,7 @@ void device_mass_storage_task(void)
         CI_StringOut ("ENCRYPTED LUN 1 - TIMEOUT\r\n");
         ErrorFound = TRUE;
       }
-
+/*
       if (TRUE == ErrorFound)
       {
         CI_StringOut ("*** RESTART MSD DEVICE TASK ***\r\n");
@@ -223,6 +223,7 @@ void device_mass_storage_task(void)
         usb_device_task_delete();
         usb_device_task_init();
       }
+*/
     }
     else
     {

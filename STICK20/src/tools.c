@@ -740,3 +740,57 @@ u16 change_endian_u16 (u16 x)
     return ( (((x)& 0x00ff)<<8) | (((x)& 0xff00)>>8) );
 }
 
+/*******************************************************************************
+
+  UpdateMsdLastAccessTimer
+
+  Changes
+  Date      Reviewer        Info
+  06.11.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void UpdateMsdLastAccessTimer (u32 NewTime)
+{
+  USB_Log_st.MSD_LastReadAccess_u32  = NewTime;
+  USB_Log_st.MSD_LastWriteAccess_u32 = NewTime;
+}
+
+/*******************************************************************************
+
+  MSD_AccessManager100ms
+
+  Changes
+  Date      Reviewer        Info
+  06.11.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void MSD_AccessManager100ms (void)
+{
+  static u32 SaveLastReadAccess_u32 = 0;
+  static u32 SaveLastWriteAccess_u32 = 0;
+  u32 ReadDiffTime_u32;
+  u32 WriteDiffTime_u32;
+
+  if (SaveLastReadAccess_u32 != USB_Log_st.MSD_LastReadAccess_u32)
+  {
+    ReadDiffTime_u32 = USB_Log_st.MSD_LastReadAccess_u32 - SaveLastReadAccess_u32;
+  }
+  if (SaveLastWriteAccess_u32 != USB_Log_st.MSD_LastWriteAccess_u32)
+  {
+    WriteDiffTime_u32 = USB_Log_st.MSD_LastReadAccess_u32 - SaveLastWriteAccess_u32;
+  }
+
+}
+
+
+
+
+

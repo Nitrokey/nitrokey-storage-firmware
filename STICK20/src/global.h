@@ -24,7 +24,7 @@
 //#include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 14   // 0 = development // last Version 13
+#define VERSION_MINOR 15   // 0 = development // last Version 14
 
 
 #define TRUE		1
@@ -36,7 +36,7 @@
 // Achtung: Bootloader in trampoline.x aktivieren
 
 // *** Activate only for PROD version ***
-#define STICK_20_A_MUSTER_PROD
+//#define STICK_20_A_MUSTER_PROD
 
 
 //#define STICK_20_SEND_DEBUGINFOS_VIA_HID      // Use ca. 2k flash
@@ -66,7 +66,7 @@
 
 *******************************************************************************/
 
-// #define HID_PASSWORD_MARTIX_AKTIV
+#define HID_PASSWORD_MARTIX_AKTIV
 
 /*******************************************************************************
 

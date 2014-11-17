@@ -780,6 +780,8 @@ void USB_CCID_send_INT_Message (void);
 
 void IBN_USB_Stats (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u8 *String_pu8)
 {
+  u8      Time_u8[30];
+  time_t  now;
 
   if (0 == nParamsGet_u8)
   {
@@ -800,6 +802,15 @@ void IBN_USB_Stats (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u8 *String_pu8)
        CI_LocalPrintf ("Read        : %9d blocks\r\n",USB_Log_st.MSD_BytesRead_u32);
        CI_LocalPrintf ("Write calls : %9d\r\n",USB_Log_st.MSD_WriteCalls_u32);
        CI_LocalPrintf ("Write       : %9d blocks\r\n",USB_Log_st.MSD_BytesWrite_u32);
+
+       CI_LocalPrintf ("\r\nLast MSD access time\r\n");
+       time (&now);
+       ctime_r (&now,(char*)Time_u8);
+       CI_LocalPrintf ("Actual time       : %s",Time_u8);
+       ctime_r (&USB_Log_st.MSD_LastReadAccess_u32,(char*)Time_u8);
+       CI_LocalPrintf ("Last read access  : %s",Time_u8);
+       ctime_r (&USB_Log_st.MSD_LastWriteAccess_u32,(char*)Time_u8);
+       CI_LocalPrintf ("Last write access : %s",Time_u8);
 
        CI_LocalPrintf ("\r\nCCID\r\n");
        CI_LocalPrintf ("USB > CCID calls : %9d\r\n",USB_Log_st.CCID_WriteCalls_u32);

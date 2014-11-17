@@ -201,6 +201,8 @@ void IW_task(void *pvParameters)
        HTML_CheckRamDisk ();
 #endif
        HID_ExcuteCmd ();
+
+       MSD_AccessManager100ms ();         // Check MSD access
      }
 
      LED_Manager10ms_v ();                // Call LED manager every 10 ms

@@ -86,6 +86,7 @@
 #endif
 #include "ctrl_access.h"
 #include "tools.h"
+#include "time.h"
 
 //_____ D E F I N I T I O N S ______________________________________________
 
@@ -488,8 +489,9 @@ Ctrl_status memory_2_usb(U8 lun, U32 addr, U16 nb_sector)
 
   Ctrl_access_unlock();
 
-  USB_Log_st.MSD_ReadCalls_u32 ++;
+  USB_Log_st.MSD_ReadCalls_u32++;
   USB_Log_st.MSD_BytesRead_u32 += nb_sector;
+  time ((time_t*)&USB_Log_st.MSD_LastReadAccess_u32);
 
   return status;
 }
@@ -513,6 +515,7 @@ Ctrl_status usb_2_memory(U8 lun, U32 addr, U16 nb_sector)
 
   USB_Log_st.MSD_WriteCalls_u32 ++;
   USB_Log_st.MSD_BytesWrite_u32 += nb_sector;
+  time ((time_t*)&USB_Log_st.MSD_LastWriteAccess_u32);
 
   return status;
 }

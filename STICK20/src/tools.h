@@ -65,6 +65,9 @@ u32 generateCRC(u8 *data);
 u32 change_endian_u32 (u32 x);
 u16 change_endian_u16 (u16 x);
 
+void UpdateMsdLastAccessTimer (u32 NewTime);
+void MSD_AccessManager100ms (void);
+
 typedef struct {
   u32 MSD_ReadCalls_u32;
   u32 MSD_BytesRead_u32;
@@ -72,12 +75,13 @@ typedef struct {
   u32 MSD_WriteCalls_u32;
   u32 MSD_BytesWrite_u32;
 
+  u32 MSD_LastReadAccess_u32;
+  u32 MSD_LastWriteAccess_u32;
+
   u32 CCID_ReadCalls_u32;
   u32 CCID_BytesRead_u32;
   u32 CCID_WriteCalls_u32;
   u32 CCID_BytesWrite_u32;
-
-
 } USB_Log_tst ;
 
 extern USB_Log_tst USB_Log_st;

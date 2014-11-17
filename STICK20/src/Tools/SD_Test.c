@@ -375,7 +375,7 @@ void SD_FillBlocks (u8 Pattern_u8,u32 Block_u32,u32 Count_u32)
 
 /*******************************************************************************
 
-  SD_WriteBlock
+  SD_WriteBlockRandom
 
   Used the usb msd buffer
 
@@ -385,7 +385,7 @@ void SD_FillBlocks (u8 Pattern_u8,u32 Block_u32,u32 Count_u32)
 
 *******************************************************************************/
 
-void SD_WriteBlock (u32 Block_u32)
+void SD_WriteBlockRandom (u32 Block_u32)
 {
 //  u8  WriteBlock_u8[SD_BLOCK_SIZE];
   u16 i;
@@ -503,7 +503,7 @@ u8 SD_GetRandomBlock (u8 *RandomData_u8)
 
 /*******************************************************************************
 
-  SD_WriteBlocks
+  SD_WriteBlocksRandom
 
   Changes
   Date      Author          Info
@@ -518,7 +518,7 @@ u8 SD_GetRandomBlock (u8 *RandomData_u8)
 extern int sd_mmc_mci_test_unit_only_local_access;
 extern U32 Check_Sd_mmc_mci_access_signal_on (void);
 
-void SD_WriteBlocks (u32 Block_u32,u32 Count_u32,u8 CryptionFlag_u8)
+void SD_WriteBlocksRandom (u32 Block_u32,u32 Count_u32,u8 CryptionFlag_u8)
 {
   u16 i;
 
@@ -557,11 +557,13 @@ u8 SD_SecureEraseHoleCard (void)
 
   sd_mmc_mci_read_capacity (SD_SLOT,(U32 *)&Blockcount_u32);
 
-//  Blockcount_u32 = 1000000; // for testing
+#ifndef  STICK_20_A_MUSTER_PROD
+  Blockcount_u32 = 100000; // for testing
+#endif
 
   CI_LocalPrintf ("Erase SD: %d blocks\r\n",Blockcount_u32);
 
-  SD_WriteBlocks (0,Blockcount_u32,1);
+  SD_WriteBlocksRandom (0,Blockcount_u32,1);
   return (TRUE);
 }
 
@@ -592,7 +594,7 @@ u8 SD_SecureEraseCryptedVolume (void)
   Blockcount_u32 = 100000; // for testing
 #endif
 
-  SD_WriteBlocks (GetStartCryptedVolume_u32 (),Blockcount_u32,1);
+  SD_WriteBlocksRandom (GetStartCryptedVolume_u32 (),Blockcount_u32,1);
   return (TRUE);
 }
 
@@ -815,11 +817,11 @@ void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 
 
       case 5 :
         CI_LocalPrintf ("SD - Write block with random AES\r\n");
-        SD_WriteBlock (Param_u32);
+        SD_WriteBlockRandom (Param_u32);
         break;
       case 6 :
         CI_LocalPrintf ("SD - Write %d blocks - Crypted %d\r\n",Param_u32,Param_1_u32);
-        SD_WriteBlocks (0,Param_u32,Param_1_u32);
+        SD_WriteBlocksRandom (0,Param_u32,Param_1_u32);
         break;
       case 7 :
         CI_LocalPrintf ("SD - Fill block with 0\r\n");

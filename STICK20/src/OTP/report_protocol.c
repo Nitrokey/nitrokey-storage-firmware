@@ -1027,7 +1027,7 @@ u8 parse_report(u8 *report,u8 *output)
           memcpy (HID_String_au8,&report[1],33);
           break;
 
-  /*
+ /*
         case STICK20_CMD_SEND_HIDDEN_VOLUME_PASSWORD :
           CI_StringOut ("Get STICK20_CMD_SEND_HIDDEN_VOLUME_PASSWORD\r\n");
 
@@ -1037,7 +1037,7 @@ u8 parse_report(u8 *report,u8 *output)
           HID_CmdGet_u8  = HTML_SEND_HIDDEN_VOLUME_PASSWORD;
           memcpy (HID_String_au8,&report[1],33);
           break;
-  */
+*/
 /*
         case STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP :
           CI_StringOut ("Get STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP\r\n");
@@ -1565,6 +1565,9 @@ u8 CheckSystemtime (u32 Newtimestamp_u32)
     ctime_r ((time_t*)&Newtimestamp_u32,(char*)Time_u8);
     CI_LocalPrintf ("%s\r\n",Time_u8);
     set_time ((time_t)Newtimestamp_u32);
+
+    // Update MSD readwrite timer
+    UpdateMsdLastAccessTimer (Newtimestamp_u32);
   }
 
 // Check timediff
