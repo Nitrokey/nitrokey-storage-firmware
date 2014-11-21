@@ -171,6 +171,7 @@ void device_mass_storage_task(void)
   unsigned int TickDelayToRestart = MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE;
   int ErrorFound;
   unsigned long long ActualTime_u64;
+  static unsigned int LoopCounter_u32 = 0;
 
 #ifdef FREERTOS_USED
   portTickType xLastWakeTime;
@@ -197,38 +198,46 @@ void device_mass_storage_task(void)
     }
 
     // Check LUN activity
-    ActualTime_u64 = TIME_MEASURING_GetTime ();
-    if ((FALSE == sd_mmc_mci_test_unit_only_local_access)          // On local access > disable check
-//        || (ActualTime_u64 > MAX_TICKS_STARTUP_UNTIL_RESTART_MSD_INTERFACE) // Not check on startup
-       )
+
+    if (30 <= LoopCounter_u32)
     {
-      ErrorFound = FALSE;
-      if (ActualTime_u64 - LastLunAccessInTick_u64[0] > TickDelayToRestart)
+      ActualTime_u64 = TIME_MEASURING_GetTime ();
+      if ((FALSE == sd_mmc_mci_test_unit_only_local_access)          // On local access > disable check
+  //        || (ActualTime_u64 > MAX_TICKS_STARTUP_UNTIL_RESTART_MSD_INTERFACE) // Not check on startup
+         )
       {
-        CI_StringOut ("UNCRYPTED LUN 0 - TIMEOUT\r\n");
-        ErrorFound = TRUE;
+        ErrorFound = FALSE;
+        if (ActualTime_u64 - LastLunAccessInTick_u64[0] > TickDelayToRestart)
+        {
+          CI_StringOut ("UNCRYPTED LUN 0 - TIMEOUT\r\n");
+          ErrorFound = TRUE;
+        }
+        // Check LUN activity
+        if (ActualTime_u64  - LastLunAccessInTick_u64[1] > TickDelayToRestart)
+        {
+          CI_StringOut ("ENCRYPTED LUN 1 - TIMEOUT\r\n");
+          ErrorFound = TRUE;
+        }
+  /*
+        if (TRUE == ErrorFound)
+        {
+          CI_StringOut ("*** RESTART MSD DEVICE TASK ***\r\n");
+          LastLunAccessInTick_u64[0] = ActualTime_u64;
+          LastLunAccessInTick_u64[1] = ActualTime_u64;
+          usb_device_task_delete();
+          usb_device_task_init();
+        }
+  */
       }
-      // Check LUN activity
-      if (ActualTime_u64  - LastLunAccessInTick_u64[1] > TickDelayToRestart)
+      else
       {
-        CI_StringOut ("ENCRYPTED LUN 1 - TIMEOUT\r\n");
-        ErrorFound = TRUE;
-      }
-/*
-      if (TRUE == ErrorFound)
-      {
-        CI_StringOut ("*** RESTART MSD DEVICE TASK ***\r\n");
-        LastLunAccessInTick_u64[0] = ActualTime_u64;
+        LastLunAccessInTick_u64[0] = ActualTime_u64;            // Avoid wrong timeout
         LastLunAccessInTick_u64[1] = ActualTime_u64;
-        usb_device_task_delete();
-        usb_device_task_init();
       }
-*/
     }
     else
     {
-      LastLunAccessInTick_u64[0] = ActualTime_u64;            // Avoid wrong timeout
-      LastLunAccessInTick_u64[1] = ActualTime_u64;
+      LoopCounter_u32 = 0;
     }
 
 

@@ -148,6 +148,28 @@ static u32 ISO7816_LockCounter_u32 = 0;
 #define ISO7816_LOCK_COUNT_LONG    3000    // = 30000 ms
 #define ISO7816_LOCK_COUNT_CLEAR     10    // =   100 ms
 
+static u8 ISO7816_SmartcardIsUsable = FALSE;
+
+
+/*******************************************************************************
+
+  ISO7816_IsSmartcardUsable
+
+  Changes
+  Date      Author          Info
+  21.11.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 ISO7816_IsSmartcardUsable (void)
+{
+  return (ISO7816_SmartcardIsUsable);
+}
+
+
 /*******************************************************************************
 
   ISO7816_SetLockCounter
@@ -479,6 +501,7 @@ int ISO7816_InitSC (void)
     {
       if (TRUE == ISO7816_SendPTS (&tISO7816_ATR))
       {
+        ISO7816_SmartcardIsUsable = TRUE;
         CI_TickLocalPrintf ("ISO7816_InitSC : OK\n");
         DelayMs (10);
         LED_ScCardOnline_v ();
@@ -498,6 +521,7 @@ int ISO7816_InitSC (void)
 
 	if (i != nRetryCount)
 	{
+    ISO7816_SmartcardIsUsable = TRUE;
     LED_ScCardOnline_v ();
 	  return (TRUE);
 	}

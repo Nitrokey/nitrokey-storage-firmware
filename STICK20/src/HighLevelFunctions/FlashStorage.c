@@ -360,6 +360,8 @@ u8 ReadHiddenVolumeSlotsKey (u8 *data)
 
 void SendStickStatusToHID (typeStick20Configuration_st *Status_st)
 {
+  cid_t *cid;
+
   // If configuration not found then init it
   if (FALSE == ReadStickConfigurationFromUserPage ())
   {
@@ -389,7 +391,10 @@ void SendStickStatusToHID (typeStick20Configuration_st *Status_st)
     }
   }
 
-  ReadSdId (&Status_st->ActiveSD_CardID_u32);
+// Read actual SD id
+  cid = (cid_t *) GetSdCidInfo ();
+  Status_st->ActiveSD_CardID_u32 = (cid->psnh << 8) + cid->psnl;
+//  ReadSdId (&Status_st->ActiveSD_CardID_u32);
 
   Status_st->FirmwareLocked_u8 = FALSE;
   if (TRUE ==  flashc_is_security_bit_active())

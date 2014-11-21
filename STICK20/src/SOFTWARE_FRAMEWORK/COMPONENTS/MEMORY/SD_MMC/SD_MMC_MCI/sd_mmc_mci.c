@@ -102,7 +102,7 @@ U32   g_u32_card_size[     MCI_NR_SLOTS]; // Global Card Size
 U16   g_u16_card_freq[     MCI_NR_SLOTS]; // Global Card Frequency
 U8    g_u8_card_bus_width[ MCI_NR_SLOTS]; // Global Card Bus Width
 
-cid_t g_sd_card_cid;    // Stores the CID data from the SD card
+cid_t g_sd_card_cid = {0,0,0,0};    // Stores the CID data from the SD card
 
 #if 1
   // These buffers should be dynamically allocated; may be in the sd_mmc driver initialization.

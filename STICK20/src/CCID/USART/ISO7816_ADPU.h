@@ -65,7 +65,7 @@ typedef struct {
 	typeAPDU_Status	tState;
 } typeAPDU;
 
-
+u8 ISO7816_IsSmartcardUsable (void);
 void ISO7816_SetLockCounter (u32 Value_u32);
 void ISO7816_DecLockCounter (void);
 u32 ISO7816_GetLockCounter (void);

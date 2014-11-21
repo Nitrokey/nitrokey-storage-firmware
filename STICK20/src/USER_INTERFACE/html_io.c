@@ -910,6 +910,13 @@ void HID_ExcuteCmd (void)
 
     case HTML_CMD_GET_DEVICE_STATUS :
       CI_TickLocalPrintf ("Get HTML_CMD_GET_DEVICE_STATUS\r\n");
+
+      StickConfiguration_st.FirmwareLocked_u8 = FALSE;
+      if (TRUE ==  flashc_is_security_bit_active())
+      {
+        StickConfiguration_st.FirmwareLocked_u8 = TRUE;
+      }
+
       GetSmartCardStatus (&StickConfiguration_st);
       Stick20HIDInitSendConfiguration (STICK20_SEND_STATUS_PIN);
       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
@@ -1127,13 +1134,19 @@ u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st)
 {
   u8  Text_u8[20];
   u32 Ret_u32 = FALSE;
-//  u32 *p_u32;
 
-//  DelayMs (2000);
+  Status_st->ActiveSmartCardID_u32 = 0;
+  Status_st->UserPwRetryCount      = 77;
+  Status_st->AdminPwRetryCount     = 77;
+
+// Check for active smartcard
+  if (FALSE == ISO7816_IsSmartcardUsable ())
+  {
+    return (FALSE);
+  }
 
 
 /* Get smartcard ID from AID */
-  Status_st->ActiveSmartCardID_u32 = 0;
   Ret_u32 = LA_OpenPGP_V20_GetAID ((char*)Text_u8);
   if (TRUE == Ret_u32)
   {
@@ -1148,8 +1161,6 @@ u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st)
 
 
 /* Get password retry counts*/
-  Status_st->UserPwRetryCount  = 0;
-  Status_st->AdminPwRetryCount = 0;
   Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus ((char*)Text_u8);
   if (TRUE == Ret_u32)
   {
@@ -1160,12 +1171,6 @@ u8 GetSmartCardStatus (typeStick20Configuration_st *Status_st)
   {
     Status_st->UserPwRetryCount  = 88;
     Status_st->AdminPwRetryCount = 88;
-  }
-
-  Status_st->FirmwareLocked_u8 = FALSE;
-  if (TRUE ==  flashc_is_security_bit_active())
-  {
-    Status_st->FirmwareLocked_u8 = TRUE;
   }
 
   return (TRUE);
