@@ -58,6 +58,7 @@
 #define CMD_USER_AUTHORIZE                0x10
 #define CMD_UNLOCK_USER_PASSOWRD          0x11
 #define CMD_LOCK_DEVICE                   0x12
+#define CMD_FACTORY_RESET                 0x13
 
 
 #define CMD_GET_PW_SAFE_SLOT_STATUS       0x60
@@ -355,6 +356,7 @@ u8 cmd_user_authorize(u8 *report,u8 *output);
 u8 cmd_set_time(u8 *report,u8 *output);
 u8 cmd_test_counter(u8 *report,u8 *output);
 u8 cmd_test_time(u8 *report,u8 *output);
+u8 cmd_getFactoryReset (u8 *report,u8 *output);
 
 u8 cmd_getPasswordCount (u8 *report,u8 *output);
 u8 cmd_getPasswordSafeStatus (u8 *report,u8 *output);

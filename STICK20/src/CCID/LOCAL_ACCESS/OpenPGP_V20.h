@@ -47,7 +47,7 @@ u32 LA_SC_StartSmartcard (void);
 int LA_OpenPGP_V20_GetPasswordstatus (char *PasswordStatus);
 int LA_OpenPGP_V20_GetAID (char *AID);
 
-int LA_OpenPGP_V20_Test_GetAID (void);
+int LA_OpenPGP_V20_Test_GetAID (unsigned char *cMainVersion,unsigned char *cSecVersion);
 int LA_OpenPGP_V20_Test_SendAdminPW (unsigned char *pcPW);
 int LA_OpenPGP_V20_Test_SendUserPW2 (unsigned char *pcPW);
 int LA_OpenPGP_V20_Test_SendAESMasterKey (int nLen,unsigned char *pcMasterKey);

@@ -92,6 +92,7 @@ extern  volatile portTickType xTickCount            ;
 extern const usart_iso7816_options_t ISO7816_USART_ISO7816;
 
 typedef struct  {
+  int       nValid;
   int       nLen;
   unsigned char   szATR[ISO7816_MAX_ATR_CHARS];
 }typedef_ISO7816_ATR;
@@ -306,6 +307,8 @@ int ISO7816_GetATP (typedef_ISO7816_ATR *tATR)
 {
 	int nRet;
 
+	tATR->nValid = FALSE;
+
 // Disable SC
 	Smartcard_Reset_off ();
 
@@ -352,6 +355,7 @@ int ISO7816_GetATP (typedef_ISO7816_ATR *tATR)
 // Get an ATR ?
 	if (4 <= tATR->nLen)
 	{
+	  tATR->nValid = TRUE;
 	  return (TRUE);     // get ATR
 	}
 
@@ -364,6 +368,8 @@ int ISO7816_GetATP (typedef_ISO7816_ATR *tATR)
 	  nISO7816_Error = nRet; // No
 		return (FALSE);
 	}
+
+  tATR->nValid  = TRUE;
 
   return (TRUE);     // get ATR
 }

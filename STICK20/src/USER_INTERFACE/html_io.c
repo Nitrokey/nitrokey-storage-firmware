@@ -824,18 +824,41 @@ void HID_ExcuteCmd (void)
       break;
 
     case HTML_CMD_GENERATE_NEW_KEYS :
-      CI_TickLocalPrintf ("Generate new keys\r\n");
-      if (TRUE == BuildStorageKeys_u32 ((u8*)&HID_String_au8[1]))
       {
-        SetSdEncryptedCardEnableState (FALSE);
-        SetSdEncryptedHiddenState (FALSE);
-        memset (StorageKey_pu8,0,32);
-        AES_SetNewStorageKey ((u8*)AES_DummyKey_au8);       // Set dummy key
-        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
-      }
-      else
-      {
-        UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
+        u8 CmdOk_u8 = TRUE;
+        CI_TickLocalPrintf ("Generate new keys\r\n");
+        if (TRUE == BuildStorageKeys_u32 ((u8*)&HID_String_au8[1]))
+        {
+          SetSdEncryptedCardEnableState (FALSE);
+          SetSdEncryptedHiddenState (FALSE);
+          memset (StorageKey_pu8,0,32);
+          AES_SetNewStorageKey ((u8*)AES_DummyKey_au8);       // Set dummy key
+        }
+        else
+        {
+          CmdOk_u8 = FALSE;
+        }
+
+        CI_TickLocalPrintf ("Generate new keys for hidden volume slots\r\n");
+        if (FALSE == InitHiddenSlots ())
+        {
+          CmdOk_u8 = FALSE;
+        }
+
+        CI_TickLocalPrintf ("Generate new keys for password safe store\r\n");
+        if (FALSE == BuildPasswordSafeKey_u32 ())
+        {
+          CmdOk_u8 = FALSE;
+        }
+
+        if (TRUE == CmdOk_u8)
+        {
+          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
+        }
+        else
+        {
+          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
+        }
       }
       break;
 

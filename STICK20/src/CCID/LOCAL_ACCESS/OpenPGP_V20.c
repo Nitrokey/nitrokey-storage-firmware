@@ -1015,15 +1015,22 @@ int LA_OpenPGP_V20_Test_ChangeAdminPin (unsigned char *pcOldPin,unsigned char *p
 
   LA_OpenPGP_V20_Test_GetAID
 
+  Changes
+  Date      Author          Info
+  24.11.14  RB              Get SC version
+
   Reviews
   Date      Reviewer        Info
   14.08.13  RB              First review
 
 *******************************************************************************/
 
-int LA_OpenPGP_V20_Test_GetAID (void)
+int LA_OpenPGP_V20_Test_GetAID (unsigned char *cMainVersion,unsigned char *cSecVersion)
 {
   int nRet;
+
+  *cMainVersion = 0;
+  *cSecVersion  = 0;
 
   CI_LocalPrintf ("Get AID  : ");
   nRet = LA_OpenPGP_V20_GetData (&tSC_OpenPGP_V20,0x00,0x4F);
@@ -1032,7 +1039,11 @@ int LA_OpenPGP_V20_Test_GetAID (void)
     CI_LocalPrintf ("fail\n\r");
     return (FALSE);
   }
-  CI_LocalPrintf ("OK \n\r");
+
+  *cMainVersion = tSC_OpenPGP_V20.cReceiveData[6];
+  *cSecVersion  = tSC_OpenPGP_V20.cReceiveData[7];
+
+  CI_LocalPrintf ("Version %d.%d \n\r",*cMainVersion,*cSecVersion);
 
   return (TRUE);
 }
@@ -1808,6 +1819,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
     CI_LocalPrintf ("18 FiDi    FiDi Test\r\n");
     CI_LocalPrintf ("19 UserPW1 Reset error counter with PW1 (admin access)\r\n");
     CI_LocalPrintf ("20         SC power off\r\n");
+    CI_LocalPrintf ("22         Show SC version\r\n");
     CI_LocalPrintf ("99         Factory reset smartcard \r\n");
     CI_LocalPrintf ("\r\n");
     return;
@@ -2075,6 +2087,13 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int
             CI_LocalPrintf ("SC power clear open drain\r\n");
             gpio_clr_gpio_open_drain_pin (AVR32_PIN_PA05);
             gpio_clr_gpio_open_drain_pin (AVR32_PIN_PA06);
+          }
+          break;
+    case 22 :
+          {
+            unsigned char cMain;
+            unsigned char cSec;
+            LA_OpenPGP_V20_Test_GetAID (&cMain,&cSec);
           }
           break;
 

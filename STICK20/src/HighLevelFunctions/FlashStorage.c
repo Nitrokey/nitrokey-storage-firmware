@@ -1000,7 +1000,7 @@ u32 EraseLocalFlashKeyValues_u32 (void)
   u32 i1;
 
 // Clear user page
-  for (i1=0;i1<7;i1++)
+  for (i1=0;i1<5;i1++)
   {
     for (i=0;i<256;i++)
     {
@@ -1018,7 +1018,7 @@ u32 EraseLocalFlashKeyValues_u32 (void)
   CheckForNewSdCard ();             // Get SD ID
 
 // Clear password safe
-  for (i1=0;i1<7;i1++)
+  for (i1=0;i1<5;i1++)
   {
     for (i=0;i<256;i++)
     {
@@ -1031,7 +1031,7 @@ u32 EraseLocalFlashKeyValues_u32 (void)
   flashc_erase_page(PWS_FLASH_START_PAGE,TRUE);
 
 // Clear OTP
-  for (i1=0;i1<7;i1++)
+  for (i1=0;i1<5;i1++)
   {
     for (i=0;i<256;i++)
     {
@@ -1050,7 +1050,7 @@ u32 EraseLocalFlashKeyValues_u32 (void)
   }
 
 // Clear hidden volumes
-  for (i1=0;i1<7;i1++)
+  for (i1=0;i1<5;i1++)
   {
     for (i=0;i<256;i++)
     {

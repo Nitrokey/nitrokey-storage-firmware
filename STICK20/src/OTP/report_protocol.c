@@ -857,6 +857,10 @@ u8 parse_report(u8 *report,u8 *output)
         }
         break;
 
+      case CMD_FACTORY_RESET:
+        CI_StringOut ("Get CMD_FACTORY_RESET\r\n");
+        cmd_getFactoryReset (report,output);
+        break;
 
       default:
         {
@@ -1797,7 +1801,9 @@ u8 cmd_first_authenticate(u8 *report,u8 *output)
 	u8 res = 1;
 	u8 card_password[26];
 	u32 Ret_u32;
-		
+  u8 cMainVersion_u8;
+  u8 cSecVersion_u8;
+
 	memset (card_password,0,26);
 		
 	memcpy (card_password,report+1,25);
@@ -1826,7 +1832,7 @@ u8 cmd_first_authenticate(u8 *report,u8 *output)
 
 //  getAID();
 
-    Ret_u32 = LA_OpenPGP_V20_Test_GetAID ();
+    Ret_u32 = LA_OpenPGP_V20_Test_GetAID (&cMainVersion_u8,&cSecVersion_u8);
 
     PWS_DecryptedPasswordSafeKey ();
 
@@ -2562,6 +2568,40 @@ u8 cmd_getSdCardHighWaterMark (u8 *report,u8 *output)
   output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
 
   return (0);
+}
+
+
+/*******************************************************************************
+
+  cmd_getFactoryReset
+
+  Changes
+  Date      Reviewer        Info
+  21.11.14  RB              Creation of function
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getFactoryReset (u8 *report,u8 *output)
+{
+  u8  admin_password[26];
+  u32 Ret_u32;
+
+  memset(admin_password,0,26);
+  memcpy(admin_password,report+1,25);
+
+  Ret_u32 = LA_OpenPGP_V20_Test_SendAdminPW ((unsigned char *)admin_password);
+  if (TRUE != Ret_u32)
+  {
+      output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_WRONG_PASSWORD;
+      return 1; //wrong card password
+  }
+
+  LA_OpenPGP_V20_ResetCard ();      // Factory reset smartcard
+
+  EraseLocalFlashKeyValues_u32 ();  // Factory reset local flash
 }
 
 
