@@ -24,7 +24,7 @@
 //#include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 17   // 0 = development // last Version 16
+#define VERSION_MINOR 18   // 0 = development // last Version 16
 
 
 #define TRUE		1

@@ -808,18 +808,20 @@ void HID_ExcuteCmd (void)
       if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
       {
         CI_TickLocalPrintf ("Export binary\r\n");
-        SetSdUncryptedCardEnableState (FALSE);      // Disable access
+        //        SetSdUncryptedCardEnableState (FALSE);      // todo: Check disable access,  don't work here
 
         FileIO_SaveAppImage_u8 ();
 
+        SetSdUncryptedCardEnableState (FALSE);      // Disable access
         vTaskDelay (3000);
         SetSdUncryptedCardEnableState (TRUE);       // Enable access
+
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
       }
       else
       {
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
-        CI_TickLocalPrintf ("*** worng password ***\r\n");
+        CI_TickLocalPrintf ("*** wrong password ***\r\n");
       }
       break;
 

@@ -176,7 +176,7 @@
 #define Lun_0_usb_write_10                      sd_mmc_mci_usb_write_10_1
 #define Lun_0_mem_2_ram                         sd_mmc_mci_mem_2_ram_1
 #define Lun_0_ram_2_mem                         sd_mmc_mci_ram_2_mem_1
-#define LUN_0_NAME                              "\"SD Card LUN 2\""
+#define LUN_0_NAME                              "\"SD Card LUN 0\""
 //! @}
 
 // \name LUN 3 Definitions - crypted SD partition = LUN 1
@@ -193,7 +193,7 @@
 #define Lun_3_usb_write_10                      sd_mmc_mci_usb_write_10_0
 #define Lun_3_mem_2_ram                         sd_mmc_mci_mem_2_ram_0
 #define Lun_3_ram_2_mem                         sd_mmc_mci_ram_2_mem_0
-#define LUN_3_NAME                              "\"SD Card LUN 3 AES\""
+#define LUN_3_NAME                              "\"SD Card LUN 1 AES\""
 
 
 

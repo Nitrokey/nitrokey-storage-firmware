@@ -442,6 +442,36 @@ u8 InitRamdomBaseForHiddenKey (void)
 
 /*******************************************************************************
 
+  HV_CheckHiddenVolumeSlotKey_u8
+
+  Changes
+  Date      Reviewer        Info
+  02.12.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 HV_CheckHiddenVolumeSlotKey_u8 (void)
+{
+  u8 Key_au8[AES_KEYSIZE_256_BIT];
+  u32 *p_pu32;
+
+  ReadHiddenVolumeSlotsKey (Key_au8);
+
+  p_pu32 = (u32*)&Key_au8[0];
+  if ((u32)0xFFFFFFFF == *p_pu32)
+  {
+    return (FALSE);   // No key generated - this is a security leak
+  }
+
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
   InitHiddenSlots
 
   Creates a new master key for the hidden volume slots and clears all slot entry

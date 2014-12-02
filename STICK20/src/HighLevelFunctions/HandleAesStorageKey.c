@@ -36,7 +36,8 @@
 #include "CCID/Local_ACCESS/OpenPGP_V20.h"
 #include "FlashStorage.h"
 #include "HandleAesStorageKey.h"
-
+#include "password_safe.h"
+#include "HiddenVolume.h"
 
 /*******************************************************************************
 
@@ -540,9 +541,26 @@ u8 CheckStorageKey_u8 (void)
 
 u8 StartupCheck_u8 (void)
 {
-  if (TRUE == CheckStorageKey_u8 ())
+  u8 CheckStatus_u8 = TRUE;
+
+  if (FALSE == CheckStorageKey_u8 ())
   {
-    return (TRUE);        // Keys ok
+    CheckStatus_u8 = FALSE;
+  }
+
+  if (FALSE == PWS_CheckPasswordSafeKey_u8 ())
+  {
+    CheckStatus_u8 = FALSE;
+  }
+
+  if (FALSE == HV_CheckHiddenVolumeSlotKey_u8 ())
+  {
+    CheckStatus_u8 = FALSE;
+  }
+
+  if (TRUE == CheckStatus_u8)
+  {
+    return (TRUE);
   }
 
   CI_LocalPrintf ("*** AES keys unsecure ***\r\n");

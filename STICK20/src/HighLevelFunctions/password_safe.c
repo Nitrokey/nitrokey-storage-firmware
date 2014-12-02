@@ -744,6 +744,36 @@ u8 PWS_GetDecryptedPasswordSafeKey (u8 **Key_pu8)
 
 /*******************************************************************************
 
+  PWS_CheckPasswordSafeKey_u8
+
+  Changes
+  Date      Reviewer        Info
+  02.12.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 PWS_CheckPasswordSafeKey_u8 (void)
+{
+  u8 Key_au8[AES_KEYSIZE_256_BIT];
+  u32 *p_pu32;
+
+  ReadPasswordSafeKey (Key_au8);
+
+  p_pu32 = (u32*)&Key_au8[0];
+  if ((u32)0xFFFFFFFF == *p_pu32)
+  {
+    return (FALSE);   // No key generated - this is a security leak
+  }
+
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
   PWS_GetDecryptedPasswordSafeKey
 
   Changes
