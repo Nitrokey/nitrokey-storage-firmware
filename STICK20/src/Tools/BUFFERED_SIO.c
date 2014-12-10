@@ -106,6 +106,8 @@ u8 BUFFERED_SIO_WriteString (u16 Len,u8 *String_pu8)
     // Save end pointer 
     Value = BUFFERED_SIO_TxBuffer_EndPointer;
 
+    Disable_global_interrupt();
+
     // For each byte
     while (0 < Len)
     {
@@ -122,6 +124,7 @@ u8 BUFFERED_SIO_WriteString (u16 Len,u8 *String_pu8)
         if (Value == BUFFERED_SIO_TxBuffer_StartPointer)
         {
             // Abort sending
+            Enable_global_interrupt();
             return (FALSE);
         }
 
@@ -140,6 +143,7 @@ u8 BUFFERED_SIO_WriteString (u16 Len,u8 *String_pu8)
 // Todo ISR Lock end
     }
 
+    Enable_global_interrupt();
     return (TRUE);
 }
 

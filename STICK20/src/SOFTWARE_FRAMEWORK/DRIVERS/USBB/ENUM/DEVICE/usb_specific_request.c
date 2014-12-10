@@ -129,6 +129,8 @@ extern u8 Stick20HIDSendConfigurationState_u8;
 #define STICK20_SEND_STATUS_PIN      1
 #define STICK20_SEND_STARTUP         2
 #define STICK20_SEND_PRODUCTION_TEST 3
+#define STICK20_SEND_DEBUG_DATA      4
+
 
 /*******************************************************************************
 * Function Name  : CCID_Status_In
@@ -264,16 +266,12 @@ u8 *Keyboard_GetReport_Feature(u16 Length)
     {
       Stick20HIDSendProductionInfos (HID_GetReport_Value);
     }
-
+/*
 #ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
     else   // Send debug data
     {
       Stick20HIDSendDebugData (HID_GetReport_Value);
     }
-#endif
-/*
-#ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
-    Stick20HIDSendDebugData (HID_GetReport_Value);
 #endif
 */
     hid_get_descriptor(KEYBOARD_FEATURE_COUNT, (const U8*) HID_GetReport_Value);
@@ -758,7 +756,7 @@ Bool usb_user_read_request(U8 type, U8 request)
                 return TRUE;
 
               case HID_REPORT_FEATURE:
-                CI_StringOut ("Get HID_SET_REPORT_FEATURE\r\n");
+//                CI_StringOut ("Get HID_SET_REPORT_FEATURE\r\n");
                 Keyboard_SetReport_Feature(0);    // RB  Length todo
                 break;
               default:

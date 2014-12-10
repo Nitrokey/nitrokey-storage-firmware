@@ -38,7 +38,12 @@
 #define BUFFERED_SIO_USART_IRQ           AVR32_USART0_IRQ
 
 
-#define BUFFERED_SIO_TX_BUFFER_SIZE   	2000
+#ifndef STICK_20_SEND_DEBUGINFOS_VIA_HID
+  #define BUFFERED_SIO_TX_BUFFER_SIZE     2000
+#else
+  #define BUFFERED_SIO_TX_BUFFER_SIZE     6000    // More buffer for slow HID communication
+#endif
+
 #define BUFFERED_SIO_RX_BUFFER_SIZE      200
 
 

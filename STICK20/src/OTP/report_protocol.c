@@ -182,7 +182,15 @@ void Stick20HIDSendDebugData (u8 *output)
   HID_Stick20SendData_st.SendCounter_u8  += 1;
   HID_Stick20SendData_st.SendDataType_u8  = OUTPUT_CMD_STICK20_SEND_DATA_TYPE_DEBUG;
   HID_Stick20SendData_st.SendSize_u8      = Size_u8;
-
+/*
+{
+  u8  text_au8[20];
+  CI_StringOut ("<");
+  itoa (HID_Stick20SendData_st.SendCounter_u8,text_au8);
+  CI_StringOut ((char*)text_au8);
+  CI_StringOut (">");
+}
+*/
   memcpy (&output[OUTPUT_CMD_RESULT_STICK20_DATA_START],(void*)&HID_Stick20SendData_st,sizeof (HID_Stick20SendData_est));
 
   // Build CRC, can overwritten by new CRC computation
@@ -863,6 +871,7 @@ u8 parse_report(u8 *report,u8 *output)
         break;
 
       default:
+        if ((STICK20_CMD_START_VALUE < cmd_type) || (STICK20_CMD_END_VALUE > cmd_type))
         {
            u8 text[10];
            CI_StringOut ("Get unknown cmd ");
@@ -1153,6 +1162,13 @@ u8 parse_report(u8 *report,u8 *output)
           memcpy (HID_String_au8,&report[1],33);
           break;
 
+#ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
+        case STICK20_CMD_SEND_DEBUG_DATA :
+//          CI_StringOut ("Get STICK20_CMD_SEND_DEBUG_DATA\r\n");
+          Stick20HIDSendDebugData (output);
+          DelayMs (1);
+          break;
+#endif
 
         default:
           break;
@@ -1174,12 +1190,7 @@ u8 parse_report(u8 *report,u8 *output)
   {
     Stick20HIDSendMatrixData (output);
   }
-#ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
-  else   // Send debug data
-  {
-    Stick20HIDSendDebugData (output);
-  }
-#endif
+
 
   calculated_crc32 = generateCRC (output);
 

@@ -1124,7 +1124,6 @@ void HID_ExcuteCmd (void)
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
         break;
 
-
     default:
       CI_TickLocalPrintf ("HID_ExcuteCmd: Get unknown command: %d \r\n",Cmd_u8);
       UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_IDLE,0);

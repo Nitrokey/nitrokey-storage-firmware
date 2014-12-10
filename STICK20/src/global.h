@@ -23,8 +23,8 @@
 
 //#include "portmacro.h" Don't use is here, system crashes
 
-#define VERSION_MAJOR 0
-#define VERSION_MINOR 18   // 0 = development // last Version 16
+#define VERSION_MAJOR 0    // 255 = debug version
+#define VERSION_MINOR 19   // 0 = development // last Version 16
 
 
 #define TRUE		1
@@ -39,7 +39,12 @@
 #define STICK_20_A_MUSTER_PROD
 
 
-//#define STICK_20_SEND_DEBUGINFOS_VIA_HID      // Use ca. 2k flash
+//#define STICK_20_SEND_DEBUGINFOS_VIA_HID      // = Debug version, use ca. 2k flash
+
+#ifdef  STICK_20_SEND_DEBUGINFOS_VIA_HID
+  #undef VERSION_MAJOR
+  #define VERSION_MAJOR 255
+#endif
 
 
 #define STICK_20_AES_ENABLE
