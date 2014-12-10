@@ -871,7 +871,7 @@ u8 parse_report(u8 *report,u8 *output)
         break;
 
       default:
-        if ((STICK20_CMD_START_VALUE < cmd_type) || (STICK20_CMD_END_VALUE > cmd_type))
+        if ((STICK20_CMD_START_VALUE > cmd_type) || (STICK20_CMD_END_VALUE < cmd_type))
         {
            u8 text[10];
            CI_StringOut ("Get unknown cmd ");
