@@ -753,8 +753,8 @@ u8 parse_report(u8 *report,u8 *output)
         cmd_authorize(report,output);
         break;
 
-      case CMD_UNLOCK_USER_PASSOWRD:
-        CI_StringOut ("Get CMD_UNLOCK_USER_PASSOWRD\r\n");
+      case CMD_UNLOCK_USER_PASSWORD:
+        CI_StringOut ("Get CMD_UNLOCK_USER_PASSWORD\r\n");
         cmd_unlock_userpassword (report,output);
         break;
 
