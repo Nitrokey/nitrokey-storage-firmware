@@ -1,20 +1,20 @@
 /*
 * Author: Copyright (C) Rudolf Boeddeker  Date: 03.04.2012
 *
-* This file is part of GPF Crypto Stick 2
+* This file is part of Nitrokey
 *
-* GPF Crypto Stick 2  is free software: you can redistribute it and/or modify
+* Nitrokey  is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * any later version.
 *
-* GPF Crypto Stick is distributed in the hope that it will be useful,
+* Nitrokey is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with GPF Crypto Stick. If not, see <http://www.gnu.org/licenses/>.
+* along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -231,7 +231,7 @@ u8 *HTML_Code_Startpage1_pu8 =
 {
 "<html>"
 "<body>"
-"<h1>Cryptostick 2.1</h1>"
+"<h1>Nitrokey</h1>"
 "<form action='input_button.htm'>"
 "<p>Kennwort:<br><input name='kennwort' type='password' size='16' maxlength='16'></p>"
 "<p><input type='button' name='Text 2' value='Pin eingeben' onclick="

@@ -1,20 +1,20 @@
 /*
 * Author: Copyright (C) Rudolf Boeddeker  Date: 26.11.2012
 *
-* This file is part of GPF Crypto Stick 2
+* This file is part of Nitrokey
 *
-* GPF Crypto Stick 2  is free software: you can redistribute it and/or modify
+* Nitrokey  is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * any later version.
 *
-* GPF Crypto Stick is distributed in the hope that it will be useful,
+* Nitrokey is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with GPF Crypto Stick. If not, see <http://www.gnu.org/licenses/>.
+* along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
 */
 
 /*
@@ -382,7 +382,7 @@ u8 FileIO_SaveAppImage_u8_old (void)
 
 
 #define FILEIO_STATUS_FILE        "status\\status.txt"
-#define FILEIO_STATUS_TEXT_START  "Welcome to Cryptostick 2.0"
+#define FILEIO_STATUS_TEXT_START  "Welcome to Nitrokey"
 
 
 u8 InitStatusFiles_u8 (void)
