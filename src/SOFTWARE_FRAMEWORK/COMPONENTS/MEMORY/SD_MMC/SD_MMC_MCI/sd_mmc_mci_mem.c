@@ -120,9 +120,9 @@ U32 gSdEndOfCard_u32            = 0;    // 0 = SD size is not present
 
 U32 sd_FlagHiddenLun_u32         = 0;
 U32 sd_MaxAccessedBlockReadMin_u32  = 0;
-U32 sd_MaxAccessedBlockReadMax_u32  = 4000000000;
+U32 sd_MaxAccessedBlockReadMax_u32  = 4000000000UL;
 U32 sd_MaxAccessedBlockWriteMin_u32 = 0;
-U32 sd_MaxAccessedBlockWriteMax_u32 = 4000000000;
+U32 sd_MaxAccessedBlockWriteMax_u32 = 4000000000UL;
 
 U32 sd_mmc_mci_access_signal_on_flag_u32 = FALSE;
 

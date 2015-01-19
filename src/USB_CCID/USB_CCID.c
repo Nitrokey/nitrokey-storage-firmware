@@ -1360,6 +1360,7 @@ void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst)
 {
 	u8 ErrorCode_u8 = CCID_NO_ERROR;
 	u8 n;
+	u8 LockFlag_u8;
 
 	USB_CCID_data_pst->CCID_datalen = USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH+1] * 256 +
 									   USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH];
@@ -1375,6 +1376,7 @@ void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst)
   USB_CCID_DebugCmdStart (USB_CCID_data_pst);
 #endif
 
+  LockFlag_u8 = TRUE;
   USB_CCID_SetLockCounter (USB_CCID_LOCK_COUNT_LONG);
 
 	switch(USB_CCID_data_pst->USB_data[CCID_OFFSET_MESSAGE_TYPE])
@@ -1395,7 +1397,6 @@ void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst)
 
 
 			RDR_to_PC_DataBlock_u8 (USB_CCID_data_pst);
-//			portDBG_TRACE("ICCPOWERON End   %d",xTaskGetTickCount());
 			break;
 
 		case PC_TO_RDR_ICCPOWEROFF:
@@ -1408,6 +1409,7 @@ void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst)
 		case PC_TO_RDR_GETSLOTSTATUS:
 			ErrorCode_u8 = PC_to_RDR_GetSlotStatus_u8 (USB_CCID_data_pst);
 			RDR_to_PC_SlotStatus_v (USB_CCID_data_pst,ErrorCode_u8);
+		  LockFlag_u8 = FALSE;
 			break;
 
 		case PC_TO_RDR_XFRBLOCK:
@@ -1463,6 +1465,7 @@ if (mci != &AVR32_MCI)
 		case PC_TO_RDR_SET_DATA_RATE_AND_CLOCK_FREQUENCY:
 		default:
 			RDR_to_PC_CmdNotSupported_v (USB_CCID_data_pst);
+		  LockFlag_u8 = FALSE;
 			break;
 	}
 
@@ -1471,6 +1474,11 @@ if (mci != &AVR32_MCI)
 #endif
 
   USB_CCID_SetLockCounter (USB_CCID_LOCK_COUNT_NORMAL);     // Set delay to lock the smartcard for the next command
+
+  if (FALSE == LockFlag_u8)
+  {
+    USB_CCID_SetLockCounter (USB_CCID_LOCK_COUNT_CLEAR);
+  }
 
   if (mci != &AVR32_MCI)
   {
