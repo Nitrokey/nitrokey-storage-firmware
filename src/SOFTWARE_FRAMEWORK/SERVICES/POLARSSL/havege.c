@@ -1,4 +1,7 @@
-/* This source file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This source file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /*
  *  HAVEGE: HArdware Volatile Entropy Gathering and Expansion
@@ -40,18 +43,16 @@
 #include "polarssl/havege.h"
 #include "polarssl/timing.h"
 
-/* ------------------------------------------------------------------------
- * On average, one iteration accesses two 8-word blocks in the havege WALK
- * table, and generates 16 words in the RES array.
- *
- * The data read in the WALK table is updated and permuted after each use.
- * The result of the hardware clock counter read is used  for this update.
- *
- * 25 conditional tests are present.  The conditional tests are grouped in
- * two nested  groups of 12 conditional tests and 1 test that controls the
- * permutation; on average, there should be 6 tests executed and 3 of them
- * should be mispredicted.
+/*
  * ------------------------------------------------------------------------
+ * On average, one iteration accesses two 8-word blocks in the havege WALK
+ * table, and generates 16 words in the RES array. The data read in the WALK 
+ * table is updated and permuted after each use. The result of the hardware
+ * clock counter read is used for this update. 25 conditional tests are
+ * present.  The conditional tests are grouped in two nested groups of 12
+ * conditional tests and 1 test that controls the permutation; on average,
+ * there should be 6 tests executed and 3 of them should be mispredicted.
+ * ------------------------------------------------------------------------ 
  */
 
 #define SWAP(X,Y) { int *T = X; X = Y; Y = T; }
@@ -156,29 +157,25 @@
 /*
  * Entropy gathering function
  */
-static void havege_fill( havege_state *hs )
+static void havege_fill (havege_state * hs)
 {
-    int i, n = 0;
-    int  U1,  U2, *A, *B, *C, *D;
-    int PT1, PT2, *WALK, RES[16];
-    int PTX, PTY, CLK, PTEST, IN;
+int i, n = 0;
+int U1, U2, *A, *B, *C, *D;
+int PT1, PT2, *WALK, RES[16];
+int PTX, PTY, CLK, PTEST, IN;
 
     WALK = hs->WALK;
-    PT1  = hs->PT1;
-    PT2  = hs->PT2;
+    PT1 = hs->PT1;
+    PT2 = hs->PT2;
 
-    PTX  = U1 = 0;
-    PTY  = U2 = 0;
+    PTX = U1 = 0;
+    PTY = U2 = 0;
 
-    memset( RES, 0, sizeof( RES ) );
+    memset (RES, 0, sizeof (RES));
 
-    while( n < COLLECT_SIZE * 4 )
+    while (n < COLLECT_SIZE * 4)
     {
-        ONE_ITERATION
-        ONE_ITERATION
-        ONE_ITERATION
-        ONE_ITERATION
-    }
+    ONE_ITERATION ONE_ITERATION ONE_ITERATION ONE_ITERATION}
 
     hs->PT1 = PT1;
     hs->PT2 = PT2;
@@ -190,35 +187,35 @@ static void havege_fill( havege_state *hs )
 /*
  * HAVEGE initialization
  */
-void havege_init( havege_state *hs )
+void havege_init (havege_state * hs)
 {
-    memset( hs, 0, sizeof( havege_state ) );
+    memset (hs, 0, sizeof (havege_state));
 
-    havege_fill( hs );
+    havege_fill (hs);
 }
 
 /*
  * HAVEGE rand function
  */
-int havege_rand( void *p_rng )
+int havege_rand (void *p_rng)
 {
     int ret;
     havege_state *hs = (havege_state *) p_rng;
 
-    if( hs->offset[1] >= COLLECT_SIZE )
-        havege_fill( hs );
+    if (hs->offset[1] >= COLLECT_SIZE)
+        havege_fill (hs);
 
-    ret  = hs->pool[hs->offset[0]++];
+    ret = hs->pool[hs->offset[0]++];
     ret ^= hs->pool[hs->offset[1]++];
 
-    return( ret );
+    return (ret);
 }
 
 #if defined(POLARSSL_RAND_TEST)
 
 #include <stdio.h>
 
-int main( int argc, char *argv[] )
+int main (int argc, char *argv[])
 {
     FILE *f;
     time_t t;
@@ -226,39 +223,39 @@ int main( int argc, char *argv[] )
     havege_state hs;
     unsigned char buf[1024];
 
-    if( argc < 2 )
+    if (argc < 2)
     {
-        fprintf( stderr, "usage: %s <output filename>\n", argv[0] );
-        return( 1 );
+        fprintf (stderr, "usage: %s <output filename>\n", argv[0]);
+        return (1);
     }
 
-    if( ( f = fopen( argv[1], "wb+" ) ) == NULL )
+    if ((f = fopen (argv[1], "wb+")) == NULL)
     {
-        printf( "failed to open '%s' for writing.\n", argv[0] );
-        return( 1 );
+        printf ("failed to open '%s' for writing.\n", argv[0]);
+        return (1);
     }
 
-    havege_init( &hs );
+    havege_init (&hs);
 
-    t = time( NULL );
+    t = time (NULL);
 
-    for( i = 0, k = 32768; i < k; i++ )
+    for (i = 0, k = 32768; i < k; i++)
     {
-        for( j = 0; j < sizeof( buf ); j++ )
-            buf[j] = havege_rand( &hs );
+        for (j = 0; j < sizeof (buf); j++)
+            buf[j] = havege_rand (&hs);
 
-        fwrite( buf, sizeof( buf ), 1, f );
+        fwrite (buf, sizeof (buf), 1, f);
 
-        printf( "Generating 32Mb of data in file '%s'... %04.1f" \
-                "%% done\r", argv[1], (100 * (float) (i + 1)) / k );
-        fflush( stdout );
+        printf ("Generating 32Mb of data in file '%s'... %04.1f"
+                "%% done\r", argv[1], (100 * (float) (i + 1)) / k);
+        fflush (stdout);
     }
 
-    if( t == time( NULL ) )
+    if (t == time (NULL))
         t--;
 
-    fclose( f );
-    return( 0 );
+    fclose (f);
+    return (0);
 }
 
 #endif

@@ -1,48 +1,44 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
-/*This file is prepared for Doxygen automatic documentation generation.*/
-/*! \file *********************************************************************
- *
- * \brief NEWLIB_ADDONS USART include file for AVR32.
- *
- * - Compiler:           GNU GCC for AVR32
- * - Supported devices:  All AVR32 devices can be used.
- * - AppNote:
- *
- * \author               Atmel Corporation: http://www.atmel.com \n
- *                       Support and FAQ: http://support.atmel.no/
- *
- ******************************************************************************/
+/*
+ * This file is prepared for Doxygen automatic documentation generation.
+ */
+/*
+ * ! \file
+ * *********************************************************************
+ * \brief NEWLIB_ADDONS USART include file for AVR32. - Compiler: GNU GCC
+ * for AVR32 - Supported devices: All AVR32 devices can be used. - AppNote:
+ * \author Atmel Corporation: http://www.atmel.com \n Support and FAQ:
+ * http://support.atmel.no/
+ * ****************************************************************************
+ */
 
-/* Copyright (c) 2009 Atmel Corporation. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an Atmel
- * AVR product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+/*
+ * Copyright (c) 2009 Atmel Corporation. All rights reserved. Redistribution 
+ * and use in source and binary forms, with or without modification, are
+ * permitted provided that the following conditions are met: 1.
+ * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer. 2. Redistributions
+ * in binary form must reproduce the above copyright notice, this list of
+ * conditions and the following disclaimer in the documentation and/or other
+ * materials provided with the distribution. 3. The name of Atmel may not be 
+ * used to endorse or promote products derived from this software without
+ * specific prior written permission. 4. This software may only be
+ * redistributed and used in connection with an Atmel AVR product. THIS
+ * SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
- *
+ * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
+ * DAMAGE 
  */
 
 #ifndef __AVR32_NEWLIB_ADDONS_USART_H__
@@ -52,28 +48,29 @@
 
 #include "nlao_io.h"
 
-_BEGIN_STD_C
-
-struct usart3 {
-	volatile u32	us_cr;
-	volatile u32	us_mr;
-	volatile u32	us_ier;
-	volatile u32	us_idr;
-	volatile u32	us_imr;
-	volatile u32	us_csr;
-	volatile u32	us_rhr;
-	volatile u32	us_thr;
-	volatile u32	us_brgr;
-	volatile u32	us_rtor;
-	volatile u32	us_ttgr;
-	volatile u32	us_reserved[5];
-	volatile u32	us_fidi;
-	volatile u32	us_ner;
-	volatile u32	us_xxr;
-	volatile u32	us_if;
+_BEGIN_STD_C struct usart3
+{
+    volatile u32 us_cr;
+    volatile u32 us_mr;
+    volatile u32 us_ier;
+    volatile u32 us_idr;
+    volatile u32 us_imr;
+    volatile u32 us_csr;
+    volatile u32 us_rhr;
+    volatile u32 us_thr;
+    volatile u32 us_brgr;
+    volatile u32 us_rtor;
+    volatile u32 us_ttgr;
+    volatile u32 us_reserved[5];
+    volatile u32 us_fidi;
+    volatile u32 us_ner;
+    volatile u32 us_xxr;
+    volatile u32 us_if;
 };
 
-/* Register offsets */
+/*
+ * Register offsets 
+ */
 #define US_CR			0x0000
 #define US_MR			0x0004
 #define US_IER			0x0008
@@ -105,7 +102,9 @@ struct usart3 {
 
 
 
-/* USART3 Control Register */
+/*
+ * USART3 Control Register 
+ */
 #define US_CR_RSTRX		(1 <<  2)
 #define US_CR_RSTTX		(1 <<  3)
 #define US_CR_RXEN		(1 <<  4)
@@ -121,7 +120,9 @@ struct usart3 {
 #define US_CR_RTSEN		(1 << 18)
 #define US_CR_RTSDIS		(1 << 19)
 
-/* USART3 Mode Register */
+/*
+ * USART3 Mode Register 
+ */
 #define US_MR_MODE		(15 <<  0)
 #define US_MR_MODE_NORMAL	( 0 <<  0)
 #define US_MR_MODE_HWFLOW	( 2 <<  0)
@@ -148,7 +149,9 @@ struct usart3 {
 #define US_MR_OVER_X16		( 0 << 19)
 #define US_MR_OVER_X8		( 1 << 19)
 
-/* USART3 Channel Status Register */
+/*
+ * USART3 Channel Status Register 
+ */
 #define US_CSR_RXRDY		(1 <<  0)
 #define US_CSR_TXRDY		(1 <<  1)
 #define US_CSR_RXBRK		(1 <<  2)
@@ -173,7 +176,9 @@ struct usart3 {
 #define US_CSR_DCD		(1 << 22)
 #define US_CSR_CTS		(1 << 23)
 
-/* USART3 Baud Rate Generator Register */
+/*
+ * USART3 Baud Rate Generator Register 
+ */
 #define US_BRGR_CD_OFFSET	0
 #define US_BRGR_FP_OFFSET	16
 
@@ -183,26 +188,29 @@ struct usart3 {
 #define US_BRGR_CD		(0xFFFF <<  0)
 #define US_BRGR_FP		(     7 << 16)
 
-/*USART3 PDC Transfer Control Register */
+/*
+ * USART3 PDC Transfer Control Register 
+ */
 #define US_PTCR_RXTEN           (1 << 0)
 #define US_PTCR_RXTDIS          (1 << 1)
 #define US_PTCR_TXTEN           (1 << 8)
 #define US_PTCR_TXTDIS          (1 << 9)
 
-/*USART3 PDC Transfer Status Register */
+/*
+ * USART3 PDC Transfer Status Register 
+ */
 #define US_PTSR_RXTEN           (1 << 0)
 #define US_PTSR_TXTEN           (1 << 8)
 
 
-int usart_init(int baudrate);
-void usart_putc(char c);
-void usart_puts(const char *s);
-int usart_getc(void);
-int usart_tstc(void);
-void usart_setbrg(int baudrate, int cpu_clock);
-void set_usart_base(void *usart_base);
+int usart_init (int baudrate);
+void usart_putc (char c);
+void usart_puts (const char *s);
+int usart_getc (void);
+int usart_tstc (void);
+void usart_setbrg (int baudrate, int cpu_clock);
+void set_usart_base (void *usart_base);
 
 
 _END_STD_C
-
 #endif /* MERLIN_USART3_H */

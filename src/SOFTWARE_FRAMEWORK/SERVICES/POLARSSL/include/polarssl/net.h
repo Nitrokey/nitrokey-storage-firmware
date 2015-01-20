@@ -1,4 +1,7 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /**
  * \file net.h
@@ -37,7 +40,8 @@
 #define POLARSSL_ERR_NET_TRY_AGAIN                         -0x0F90
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -52,7 +56,7 @@ extern "C" {
  *                      POLARSSL_ERR_NET_UNKNOWN_HOST,
  *                      POLARSSL_ERR_NET_CONNECT_FAILED
  */
-int net_connect( int *fd, char *host, int port );
+    int net_connect (int *fd, char *host, int port);
 
 /**
  * \brief          Create a listening socket on bind_ip:port.
@@ -67,7 +71,7 @@ int net_connect( int *fd, char *host, int port );
  *                      POLARSSL_ERR_NET_BIND_FAILED,
  *                      POLARSSL_ERR_NET_LISTEN_FAILED
  */
-int net_bind( int *fd, char *bind_ip, int port );
+    int net_bind (int *fd, char *bind_ip, int port);
 
 /**
  * \brief           Accept a connection from a remote client
@@ -80,7 +84,7 @@ int net_bind( int *fd, char *bind_ip, int port );
  *                  POLARSSL_ERR_NET_WOULD_BLOCK is bind_fd was set to
  *                  non-blocking and accept() is blocking.
  */
-int net_accept( int bind_fd, int *client_fd, void *client_ip );
+    int net_accept (int bind_fd, int *client_fd, void *client_ip);
 
 /**
  * \brief          Set the socket blocking
@@ -89,7 +93,7 @@ int net_accept( int bind_fd, int *client_fd, void *client_ip );
  *
  * \return         0 if successful, or a non-zero error code
  */
-int net_set_block( int fd );
+    int net_set_block (int fd);
 
 /**
  * \brief          Set the socket non-blocking
@@ -98,7 +102,7 @@ int net_set_block( int fd );
  *
  * \return         0 if successful, or a non-zero error code
  */
-int net_set_nonblock( int fd );
+    int net_set_nonblock (int fd);
 
 /**
  * \brief          Portable usleep helper
@@ -108,7 +112,7 @@ int net_set_nonblock( int fd );
  * \note           Real amount of time slept will not be less than
  *                 select()'s timeout granularity (typically, 10ms).
  */
-void net_usleep( unsigned long usec );
+    void net_usleep (unsigned long usec);
 
 /**
  * \brief          Read at most 'len' characters. If no error occurs,
@@ -122,7 +126,7 @@ void net_usleep( unsigned long usec );
  *                 or a non-zero error code; POLARSSL_ERR_NET_TRY_AGAIN
  *                 indicates read() is blocking.
  */
-int net_recv( void *ctx, unsigned char *buf, int len );
+    int net_recv (void *ctx, unsigned char *buf, int len);
 
 /**
  * \brief          Write at most 'len' characters. If no error occurs,
@@ -136,14 +140,14 @@ int net_recv( void *ctx, unsigned char *buf, int len );
  *                 or a non-zero error code; POLARSSL_ERR_NET_TRY_AGAIN
  *                 indicates write() is blocking.
  */
-int net_send( void *ctx, unsigned char *buf, int len );
+    int net_send (void *ctx, unsigned char *buf, int len);
 
 /**
  * \brief          Gracefully shutdown the connection
  *
  * \param fd       The socket to close
  */
-void net_close( int fd );
+    void net_close (int fd);
 
 #ifdef __cplusplus
 }

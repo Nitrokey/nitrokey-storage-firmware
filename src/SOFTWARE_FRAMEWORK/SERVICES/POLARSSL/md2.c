@@ -1,4 +1,7 @@
-/* This source file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This source file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /*
  *  RFC 1115/1319 compliant MD2 implementation
@@ -38,8 +41,7 @@
 #include <string.h>
 #include <stdio.h>
 
-static const unsigned char PI_SUBST[256] =
-{
+static const unsigned char PI_SUBST[256] = {
     0x29, 0x2E, 0x43, 0xC9, 0xA2, 0xD8, 0x7C, 0x01, 0x3D, 0x36,
     0x54, 0xA1, 0xEC, 0xF0, 0x06, 0x13, 0x62, 0xA7, 0x05, 0xF3,
     0xC0, 0xC7, 0x73, 0x8C, 0x98, 0x93, 0x2B, 0xD9, 0xBC, 0x4C,
@@ -71,72 +73,70 @@ static const unsigned char PI_SUBST[256] =
 /*
  * MD2 context setup
  */
-void md2_starts( md2_context *ctx )
+void md2_starts (md2_context * ctx)
 {
-    memset( ctx->cksum, 0, 16 );
-    memset( ctx->state, 0, 46 );
-    memset( ctx->buffer, 0, 16 );
+    memset (ctx->cksum, 0, 16);
+    memset (ctx->state, 0, 46);
+    memset (ctx->buffer, 0, 16);
     ctx->left = 0;
 }
 
-static void md2_process( md2_context *ctx )
+static void md2_process (md2_context * ctx)
 {
-    int i, j;
-    unsigned char t = 0;
+int i, j;
+unsigned char t = 0;
 
-    for( i = 0; i < 16; i++ )
+    for (i = 0; i < 16; i++)
     {
         ctx->state[i + 16] = ctx->buffer[i];
-        ctx->state[i + 32] =
-            (unsigned char)( ctx->buffer[i] ^ ctx->state[i]);
+        ctx->state[i + 32] = (unsigned char) (ctx->buffer[i] ^ ctx->state[i]);
     }
 
-    for( i = 0; i < 18; i++ )
+    for (i = 0; i < 18; i++)
     {
-        for( j = 0; j < 48; j++ )
+        for (j = 0; j < 48; j++)
         {
-            ctx->state[j] = (unsigned char)
-               ( ctx->state[j] ^ PI_SUBST[t] );
-            t  = ctx->state[j];
+            ctx->state[j] = (unsigned char) (ctx->state[j] ^ PI_SUBST[t]);
+            t = ctx->state[j];
         }
 
-        t = (unsigned char)( t + i );
+        t = (unsigned char) (t + i);
     }
 
     t = ctx->cksum[15];
 
-    for( i = 0; i < 16; i++ )
+    for (i = 0; i < 16; i++)
     {
         ctx->cksum[i] = (unsigned char)
-           ( ctx->cksum[i] ^ PI_SUBST[ctx->buffer[i] ^ t] );
-        t  = ctx->cksum[i];
+            (ctx->cksum[i] ^ PI_SUBST[ctx->buffer[i] ^ t]);
+        t = ctx->cksum[i];
     }
 }
 
 /*
  * MD2 process buffer
  */
-void md2_update( md2_context *ctx, unsigned char *input, int ilen )
+void md2_update (md2_context * ctx, unsigned char *input, int ilen)
 {
     int fill;
 
-    while( ilen > 0 )
+    while (ilen > 0)
     {
-        if( ctx->left + ilen > 16 )
+        if (ctx->left + ilen > 16)
             fill = 16 - ctx->left;
         else
             fill = ilen;
 
-        memcpy( ctx->buffer + ctx->left, input, fill );
+        memcpy (ctx->buffer + ctx->left, input, fill);
 
         ctx->left += fill;
         input += fill;
-        ilen  -= fill;
+        ilen -= fill;
 
-        if( ctx->left == 16 )
+        if (ctx->left == 16)
         {
             ctx->left = 0;
-            md2_process( ctx );
+            md2_process (ctx);
         }
     }
 }
@@ -144,137 +144,137 @@ void md2_update( md2_context *ctx, unsigned char *input, int ilen )
 /*
  * MD2 final digest
  */
-void md2_finish( md2_context *ctx, unsigned char output[16] )
+void md2_finish (md2_context * ctx, unsigned char output[16])
 {
     int i;
     unsigned char x;
 
-    x = (unsigned char)( 16 - ctx->left );
+    x = (unsigned char) (16 - ctx->left);
 
-    for( i = ctx->left; i < 16; i++ )
+    for (i = ctx->left; i < 16; i++)
         ctx->buffer[i] = x;
 
-    md2_process( ctx );
+    md2_process (ctx);
 
-    memcpy( ctx->buffer, ctx->cksum, 16 );
-    md2_process( ctx );
+    memcpy (ctx->buffer, ctx->cksum, 16);
+    md2_process (ctx);
 
-    memcpy( output, ctx->state, 16 );
+    memcpy (output, ctx->state, 16);
 }
 
 /*
  * output = MD2( input buffer )
  */
-void md2( unsigned char *input, int ilen, unsigned char output[16] )
+void md2 (unsigned char *input, int ilen, unsigned char output[16])
 {
     md2_context ctx;
 
-    md2_starts( &ctx );
-    md2_update( &ctx, input, ilen );
-    md2_finish( &ctx, output );
+    md2_starts (&ctx);
+    md2_update (&ctx, input, ilen);
+    md2_finish (&ctx, output);
 
-    memset( &ctx, 0, sizeof( md2_context ) );
+    memset (&ctx, 0, sizeof (md2_context));
 }
 
 /*
  * output = MD2( file contents )
  */
-int md2_file( char *path, unsigned char output[16] )
+int md2_file (char *path, unsigned char output[16])
 {
     FILE *f;
     size_t n;
     md2_context ctx;
     unsigned char buf[1024];
 
-    if( ( f = fopen( path, "rb" ) ) == NULL )
-        return( 1 );
+    if ((f = fopen (path, "rb")) == NULL)
+        return (1);
 
-    md2_starts( &ctx );
+    md2_starts (&ctx);
 
-    while( ( n = fread( buf, 1, sizeof( buf ), f ) ) > 0 )
-        md2_update( &ctx, buf, (int) n );
+    while ((n = fread (buf, 1, sizeof (buf), f)) > 0)
+        md2_update (&ctx, buf, (int) n);
 
-    md2_finish( &ctx, output );
+    md2_finish (&ctx, output);
 
-    memset( &ctx, 0, sizeof( md2_context ) );
+    memset (&ctx, 0, sizeof (md2_context));
 
-    if( ferror( f ) != 0 )
+    if (ferror (f) != 0)
     {
-        fclose( f );
-        return( 2 );
+        fclose (f);
+        return (2);
     }
 
-    fclose( f );
-    return( 0 );
+    fclose (f);
+    return (0);
 }
 
 /*
  * MD2 HMAC context setup
  */
-void md2_hmac_starts( md2_context *ctx, unsigned char *key, int keylen )
+void md2_hmac_starts (md2_context * ctx, unsigned char *key, int keylen)
 {
     int i;
     unsigned char sum[16];
 
-    if( keylen > 64 )
+    if (keylen > 64)
     {
-        md2( key, keylen, sum );
+        md2 (key, keylen, sum);
         keylen = 16;
         key = sum;
     }
 
-    memset( ctx->ipad, 0x36, 64 );
-    memset( ctx->opad, 0x5C, 64 );
+    memset (ctx->ipad, 0x36, 64);
+    memset (ctx->opad, 0x5C, 64);
 
-    for( i = 0; i < keylen; i++ )
+    for (i = 0; i < keylen; i++)
     {
-        ctx->ipad[i] = (unsigned char)( ctx->ipad[i] ^ key[i] );
-        ctx->opad[i] = (unsigned char)( ctx->opad[i] ^ key[i] );
+        ctx->ipad[i] = (unsigned char) (ctx->ipad[i] ^ key[i]);
+        ctx->opad[i] = (unsigned char) (ctx->opad[i] ^ key[i]);
     }
 
-    md2_starts( ctx );
-    md2_update( ctx, ctx->ipad, 64 );
+    md2_starts (ctx);
+    md2_update (ctx, ctx->ipad, 64);
 
-    memset( sum, 0, sizeof( sum ) );
+    memset (sum, 0, sizeof (sum));
 }
 
 /*
  * MD2 HMAC process buffer
  */
-void md2_hmac_update( md2_context *ctx, unsigned char *input, int ilen )
+void md2_hmac_update (md2_context * ctx, unsigned char *input, int ilen)
 {
-    md2_update( ctx, input, ilen );
+    md2_update (ctx, input, ilen);
 }
 
 /*
  * MD2 HMAC final digest
  */
-void md2_hmac_finish( md2_context *ctx, unsigned char output[16] )
+void md2_hmac_finish (md2_context * ctx, unsigned char output[16])
 {
     unsigned char tmpbuf[16];
 
-    md2_finish( ctx, tmpbuf );
-    md2_starts( ctx );
-    md2_update( ctx, ctx->opad, 64 );
-    md2_update( ctx, tmpbuf, 16 );
-    md2_finish( ctx, output );
+    md2_finish (ctx, tmpbuf);
+    md2_starts (ctx);
+    md2_update (ctx, ctx->opad, 64);
+    md2_update (ctx, tmpbuf, 16);
+    md2_finish (ctx, output);
 
-    memset( tmpbuf, 0, sizeof( tmpbuf ) );
+    memset (tmpbuf, 0, sizeof (tmpbuf));
 }
 
 /*
  * output = HMAC-MD2( hmac key, input buffer )
  */
-void md2_hmac( unsigned char *key, int keylen, unsigned char *input, int ilen,
-               unsigned char output[16] )
+void md2_hmac (unsigned char *key, int keylen, unsigned char *input, int ilen,
+               unsigned char output[16])
 {
     md2_context ctx;
 
-    md2_hmac_starts( &ctx, key, keylen );
-    md2_hmac_update( &ctx, input, ilen );
-    md2_hmac_finish( &ctx, output );
+    md2_hmac_starts (&ctx, key, keylen);
+    md2_hmac_update (&ctx, input, ilen);
+    md2_hmac_finish (&ctx, output);
 
-    memset( &ctx, 0, sizeof( md2_context ) );
+    memset (&ctx, 0, sizeof (md2_context));
 }
 
 #if defined(POLARSSL_SELF_TEST)
@@ -282,68 +282,66 @@ void md2_hmac( unsigned char *key, int keylen, unsigned char *input, int ilen,
 /*
  * RFC 1319 test vectors
  */
-static const char md2_test_str[7][81] =
-{
-    { "" },
-    { "a" },
-    { "abc" },
-    { "message digest" },
-    { "abcdefghijklmnopqrstuvwxyz" },
-    { "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" },
-    { "12345678901234567890123456789012345678901234567890123456789012" \
-      "345678901234567890" }
+static const char md2_test_str[7][81] = {
+    {""},
+    {"a"},
+    {"abc"},
+    {"message digest"},
+    {"abcdefghijklmnopqrstuvwxyz"},
+    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"},
+    {"12345678901234567890123456789012345678901234567890123456789012"
+     "345678901234567890"}
 };
 
-static const unsigned char md2_test_sum[7][16] =
-{
-    { 0x83, 0x50, 0xE5, 0xA3, 0xE2, 0x4C, 0x15, 0x3D,
-      0xF2, 0x27, 0x5C, 0x9F, 0x80, 0x69, 0x27, 0x73 },
-    { 0x32, 0xEC, 0x01, 0xEC, 0x4A, 0x6D, 0xAC, 0x72,
-      0xC0, 0xAB, 0x96, 0xFB, 0x34, 0xC0, 0xB5, 0xD1 },
-    { 0xDA, 0x85, 0x3B, 0x0D, 0x3F, 0x88, 0xD9, 0x9B,
-      0x30, 0x28, 0x3A, 0x69, 0xE6, 0xDE, 0xD6, 0xBB },
-    { 0xAB, 0x4F, 0x49, 0x6B, 0xFB, 0x2A, 0x53, 0x0B,
-      0x21, 0x9F, 0xF3, 0x30, 0x31, 0xFE, 0x06, 0xB0 },
-    { 0x4E, 0x8D, 0xDF, 0xF3, 0x65, 0x02, 0x92, 0xAB,
-      0x5A, 0x41, 0x08, 0xC3, 0xAA, 0x47, 0x94, 0x0B },
-    { 0xDA, 0x33, 0xDE, 0xF2, 0xA4, 0x2D, 0xF1, 0x39,
-      0x75, 0x35, 0x28, 0x46, 0xC3, 0x03, 0x38, 0xCD },
-    { 0xD5, 0x97, 0x6F, 0x79, 0xD8, 0x3D, 0x3A, 0x0D,
-      0xC9, 0x80, 0x6C, 0x3C, 0x66, 0xF3, 0xEF, 0xD8 }
+static const unsigned char md2_test_sum[7][16] = {
+    {0x83, 0x50, 0xE5, 0xA3, 0xE2, 0x4C, 0x15, 0x3D,
+     0xF2, 0x27, 0x5C, 0x9F, 0x80, 0x69, 0x27, 0x73},
+    {0x32, 0xEC, 0x01, 0xEC, 0x4A, 0x6D, 0xAC, 0x72,
+     0xC0, 0xAB, 0x96, 0xFB, 0x34, 0xC0, 0xB5, 0xD1},
+    {0xDA, 0x85, 0x3B, 0x0D, 0x3F, 0x88, 0xD9, 0x9B,
+     0x30, 0x28, 0x3A, 0x69, 0xE6, 0xDE, 0xD6, 0xBB},
+    {0xAB, 0x4F, 0x49, 0x6B, 0xFB, 0x2A, 0x53, 0x0B,
+     0x21, 0x9F, 0xF3, 0x30, 0x31, 0xFE, 0x06, 0xB0},
+    {0x4E, 0x8D, 0xDF, 0xF3, 0x65, 0x02, 0x92, 0xAB,
+     0x5A, 0x41, 0x08, 0xC3, 0xAA, 0x47, 0x94, 0x0B},
+    {0xDA, 0x33, 0xDE, 0xF2, 0xA4, 0x2D, 0xF1, 0x39,
+     0x75, 0x35, 0x28, 0x46, 0xC3, 0x03, 0x38, 0xCD},
+    {0xD5, 0x97, 0x6F, 0x79, 0xD8, 0x3D, 0x3A, 0x0D,
+     0xC9, 0x80, 0x6C, 0x3C, 0x66, 0xF3, 0xEF, 0xD8}
 };
 
 /*
  * Checkup routine
  */
-int md2_self_test( int verbose )
+int md2_self_test (int verbose)
 {
     int i;
     unsigned char md2sum[16];
 
-    for( i = 0; i < 7; i++ )
+    for (i = 0; i < 7; i++)
     {
-        if( verbose != 0 )
-            printf( "  MD2 test #%d: ", i + 1 );
+        if (verbose != 0)
+            printf ("  MD2 test #%d: ", i + 1);
 
-        md2( (unsigned char *) md2_test_str[i],
-             strlen( md2_test_str[i] ), md2sum );
+        md2 ((unsigned char *) md2_test_str[i],
+             strlen (md2_test_str[i]), md2sum);
 
-        if( memcmp( md2sum, md2_test_sum[i], 16 ) != 0 )
+        if (memcmp (md2sum, md2_test_sum[i], 16) != 0)
         {
-            if( verbose != 0 )
-                printf( "failed\n" );
+            if (verbose != 0)
+                printf ("failed\n");
 
-            return( 1 );
+            return (1);
         }
 
-        if( verbose != 0 )
-            printf( "passed\n" );
+        if (verbose != 0)
+            printf ("passed\n");
     }
 
-    if( verbose != 0 )
-        printf( "\n" );
+    if (verbose != 0)
+        printf ("\n");
 
-    return( 0 );
+    return (0);
 }
 
 #endif

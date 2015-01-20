@@ -1,48 +1,44 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
-/*This file is prepared for Doxygen automatic documentation generation.*/
-/*! \file *********************************************************************
- *
- * \brief SD/MMC card command list.
- *
- * - Compiler:           IAR EWAVR32 and GNU GCC for AVR32
- * - Supported devices:  All AVR32 devices with an MCI module can be used.
- * - AppNote:
- *
- * \author               Atmel Corporation: http://www.atmel.com \n
- *                       Support and FAQ: http://support.atmel.no/
- *
- ******************************************************************************/
+/*
+ * This file is prepared for Doxygen automatic documentation generation.
+ */
+/*
+ * ! \file
+ * *********************************************************************
+ * \brief SD/MMC card command list. - Compiler: IAR EWAVR32 and GNU GCC for
+ * AVR32 - Supported devices: All AVR32 devices with an MCI module can be
+ * used. - AppNote: \author Atmel Corporation: http://www.atmel.com \n
+ * Support and FAQ: http://support.atmel.no/
+ * ****************************************************************************
+ */
 
-/* Copyright (c) 2009 Atmel Corporation. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an Atmel
- * AVR product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+/*
+ * Copyright (c) 2009 Atmel Corporation. All rights reserved. Redistribution 
+ * and use in source and binary forms, with or without modification, are
+ * permitted provided that the following conditions are met: 1.
+ * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer. 2. Redistributions
+ * in binary form must reproduce the above copyright notice, this list of
+ * conditions and the following disclaimer in the documentation and/or other
+ * materials provided with the distribution. 3. The name of Atmel may not be 
+ * used to endorse or promote products derived from this software without
+ * specific prior written permission. 4. This software may only be
+ * redistributed and used in connection with an Atmel AVR product. THIS
+ * SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
- *
+ * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
+ * DAMAGE 
  */
 
 #ifndef _SD_MMC_CMD_H_
@@ -52,7 +48,7 @@
 #include "compiler.h"
 #include "mci.h"
 
-//-- Class 0 & 1 commands: Basic commands and Read Stream commands
+// -- Class 0 & 1 commands: Basic commands and Read Stream commands
 #define SD_MMC_GO_IDLE_STATE_CMD                 (0 | MCI_TRCMD_NO | MCI_SPCMD_NONE )
 #define SD_MMC_INIT_STATE_CMD                    (0 | MCI_TRCMD_NO | MCI_SPCMD_INIT )
 #define SD_MMC_MMC_GO_IDLE_STATE_CMD             (0 | MCI_TRCMD_NO | MCI_SPCMD_NONE | MCI_OPDCMD)
@@ -77,41 +73,41 @@
 #define SD_MMC_SEND_STATUS_CMD                   (13| MCI_TRCMD_NO   | MCI_SPCMD_NONE  | MCI_RSPTYP_48 | MCI_MAXLAT )
 #define SD_MMC_GO_INACTIVE_STATE_CMD             (15| MCI_RSPTYP_NO )
 
-//*------------------------------------------------
-//* Class 2 commands: Block oriented Read commands
-//*------------------------------------------------
+// *------------------------------------------------
+// * Class 2 commands: Block oriented Read commands
+// *------------------------------------------------
 
 #define SD_MMC_SET_BLOCKLEN_CMD                  (16 | MCI_TRCMD_NO   | MCI_SPCMD_NONE | MCI_RSPTYP_48   | MCI_MAXLAT )
 #define SD_MMC_READ_SINGLE_BLOCK_CMD             (17 | MCI_SPCMD_NONE | MCI_RSPTYP_48  | MCI_TRCMD_START | MCI_TRTYP_BLOCK    | MCI_TRDIR | MCI_MAXLAT)
 #define SD_MMC_READ_MULTIPLE_BLOCK_CMD           (18 | MCI_SPCMD_NONE | MCI_RSPTYP_48  | MCI_TRCMD_START | MCI_TRTYP_MULTIPLE | MCI_TRDIR | MCI_MAXLAT)
 
-//*--------------------------------------------
-//* Class 3 commands: Sequential write commands
-//*--------------------------------------------
+// *--------------------------------------------
+// * Class 3 commands: Sequential write commands
+// *--------------------------------------------
 
-#define SD_MMC_MMC_WRITE_DAT_UNTIL_STOP_CMD      (20 | MCI_TRTYP_STREAM | MCI_SPCMD_NONE | MCI_RSPTYP_48 & ~(MCI_TRDIR) | MCI_TRCMD_START | MCI_MAXLAT )	// MMC
+#define SD_MMC_MMC_WRITE_DAT_UNTIL_STOP_CMD      (20 | MCI_TRTYP_STREAM | MCI_SPCMD_NONE | MCI_RSPTYP_48 & ~(MCI_TRDIR) | MCI_TRCMD_START | MCI_MAXLAT )    // MMC
 
-//*------------------------------------------------
-//* Class 4 commands: Block oriented write commands
-//*------------------------------------------------
+// *------------------------------------------------
+// * Class 4 commands: Block oriented write commands
+// *------------------------------------------------
 
 #define SD_MMC_WRITE_BLOCK_CMD                   (24 | MCI_SPCMD_NONE | MCI_RSPTYP_48 | MCI_TRCMD_START | (MCI_TRTYP_BLOCK    &  ~(MCI_TRDIR)) | MCI_MAXLAT)
 #define SD_MMC_WRITE_MULTIPLE_BLOCK_CMD          (25 | MCI_SPCMD_NONE | MCI_RSPTYP_48 | MCI_TRCMD_START | (MCI_TRTYP_MULTIPLE &  ~(MCI_TRDIR)) | MCI_MAXLAT)
 #define SD_MMC_PROGRAM_CSD_CMD                   (27 | MCI_RSPTYP_48 )
 
 
-//*----------------------------------------
-//* Class 6 commands: Group Write protect
-//*----------------------------------------
+// *----------------------------------------
+// * Class 6 commands: Group Write protect
+// *----------------------------------------
 
 #define SD_MMC_SET_WRITE_PROT_CMD                (28 | MCI_RSPTYP_48)
 #define SD_MMC_CLR_WRITE_PROT_CMD                (29 | MCI_RSPTYP_48)
 #define SD_MMC_SEND_WRITE_PROT_CMD               (30 | MCI_RSPTYP_48)
 
 
-//*----------------------------------------
-//* Class 5 commands: Erase commands
-//*----------------------------------------
+// *----------------------------------------
+// * Class 5 commands: Erase commands
+// *----------------------------------------
 
 #define SD_MMC_TAG_SECTOR_START_CMD              (32 | MCI_SPCMD_NONE | MCI_RSPTYP_48 | MCI_TRCMD_NO | MCI_MAXLAT)
 #define SD_MMC_TAG_SECTOR_END_CMD                (33 | MCI_SPCMD_NONE | MCI_RSPTYP_48 | MCI_TRCMD_NO | MCI_MAXLAT)
@@ -121,19 +117,21 @@
 #define SD_MMC_MMC_UNTAG_ERASE_GROUP_CMD         (37 | MCI_RSPTYP_48 )
 #define SD_MMC_ERASE_CMD                         (38 | MCI_SPCMD_NONE | MCI_RSPTYP_48 | MCI_TRCMD_NO | MCI_MAXLAT )
 
-//*----------------------------------------
-//* Class 7 commands: Lock commands
-//*----------------------------------------
+// *----------------------------------------
+// * Class 7 commands: Lock commands
+// *----------------------------------------
 
-#define SD_MMC_LOCK_UNLOCK                       (42 | MCI_SPCMD_NONE | MCI_RSPTYP_48 | MCI_TRCMD_NO | MCI_MAXLAT)  // no tested
+#define SD_MMC_LOCK_UNLOCK                       (42 | MCI_SPCMD_NONE | MCI_RSPTYP_48 | MCI_TRCMD_NO | MCI_MAXLAT)  // no 
+                                                                                                                    // tested
 
-//*-----------------------------------------------
+// *-----------------------------------------------
 // Class 8 commands: Application specific commands
-//*-----------------------------------------------
+// *-----------------------------------------------
 #define SD_MMC_SD_SEND_IF_COND_CMD               (8 | MCI_TRCMD_NO     | MCI_SPCMD_NONE | MCI_RSPTYP_48  | MCI_MAXLAT )
 
 #define SD_MMC_APP_CMD                           (55 | MCI_SPCMD_NONE | MCI_RSPTYP_48  | MCI_TRCMD_NO | MCI_MAXLAT)
-#define SD_MMC_GEN_CMD                           (56 | MCI_SPCMD_NONE | MCI_RSPTYP_48  | MCI_TRCMD_NO | MCI_MAXLAT) // no tested
+#define SD_MMC_GEN_CMD                           (56 | MCI_SPCMD_NONE | MCI_RSPTYP_48  | MCI_TRCMD_NO | MCI_MAXLAT) // no 
+                                                                                                                    // tested
 #define MMC_SWITCH_CMD                           (6  | MCI_SPCMD_NONE | MCI_RSPTYP_48B | MCI_TRCMD_NO | MCI_MAXLAT)
 #define SD_SWITCH_FUNC                           (6  | MCI_SPCMD_NONE | MCI_RSPTYP_48  | MCI_TRCMD_START | MCI_TRTYP_BLOCK | MCI_TRDIR | MCI_MAXLAT)
 #define SD_MMC_SDCARD_SET_BUS_WIDTH_CMD          (6  | MCI_SPCMD_NONE | MCI_RSPTYP_48  | MCI_TRCMD_NO | MCI_MAXLAT)
@@ -152,11 +150,11 @@
                                                   MCI_SDCARD_SET_CLR_CARD_DETECT_CMD +\
                                                   MCI_SDCARD_SEND_SCR_CMD)
 
-//*----------------------------------------
-//* Class 9 commands: IO Mode commands
-//*----------------------------------------
+// *----------------------------------------
+// * Class 9 commands: IO Mode commands
+// *----------------------------------------
 
 #define SD_MMC_FAST_IO_CMD                       (39 | MCI_SPCMD_NONE | MCI_RSPTYP_48 | MCI_MAXLAT)
 #define SD_MMC_GO_IRQ_STATE_CMD                  (40 | MCI_SPCMD_NONE | MCI_RSPTYP_48 | MCI_TRCMD_NO | MCI_MAXLAT)
 
-#endif  // _SD_MMC_CMD_H_
+#endif // _SD_MMC_CMD_H_

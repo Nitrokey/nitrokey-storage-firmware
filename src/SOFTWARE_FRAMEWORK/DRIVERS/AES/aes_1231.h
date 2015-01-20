@@ -29,10 +29,10 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Model        : UC3000
  * Revision     : $Revision: 74772 $
- * Checkin Date : $Date: 2010-05-14 06:51:12 +0200 (Fri, 14 May 2010) $ 
+ * Checkin Date : $Date: 2010-05-14 06:51:12 +0200 (Fri, 14 May 2010) $
  *
  ****************************************************************************/
 #ifndef AVR32_AES_1231_H_INCLUDED
@@ -44,25 +44,23 @@
 
 
 /*
- Note to user:
-
- The following defines are always generated:
- - Register offset: AVR32_AES_<register>
- - Bitfield mask:   AVR32_AES_<register>_<bitfield>
- - Bitfield offset: AVR32_AES_<register>_<bitfield>_OFFSET
- - Bitfield size:   AVR32_AES_<register>_<bitfield>_SIZE
- - Bitfield values: AVR32_AES_<register>_<bitfield>_<value name>
-
- The following defines are generated if they don't cause ambiguities,
- i.e. the name is unique, or all values with that name are the same.
- - Bitfield mask:   AVR32_AES_<bitfield>
- - Bitfield offset: AVR32_AES_<bitfield>_OFFSET
- - Bitfield size:   AVR32_AES_<bitfield>_SIZE
- - Bitfield values: AVR32_AES_<bitfield>_<value name>
- - Bitfield values: AVR32_AES_<value name>
-
- All defines are sorted alphabetically.
-*/
+ * Note to user:
+ * 
+ * The following defines are always generated: - Register offset:
+ * AVR32_AES_<register> - Bitfield mask: AVR32_AES_<register>_<bitfield> -
+ * Bitfield offset: AVR32_AES_<register>_<bitfield>_OFFSET - Bitfield size:
+ * AVR32_AES_<register>_<bitfield>_SIZE - Bitfield values:
+ * AVR32_AES_<register>_<bitfield>_<value name>
+ * 
+ * The following defines are generated if they don't cause ambiguities, i.e.
+ * the name is unique, or all values with that name are the same. - Bitfield
+ * mask: AVR32_AES_<bitfield> - Bitfield offset: AVR32_AES_<bitfield>_OFFSET
+ * - Bitfield size: AVR32_AES_<bitfield>_SIZE - Bitfield values:
+ * AVR32_AES_<bitfield>_<value name> - Bitfield values: AVR32_AES_<value
+ * name>
+ * 
+ * All defines are sorted alphabetically. 
+ */
 
 
 #define AVR32_AES_128_BITS                                 0x00000000
@@ -515,190 +513,208 @@
 #ifdef __AVR32_ABI_COMPILER__
 
 
-typedef struct avr32_aes_cr_t {
-    unsigned int                 :15;
-    unsigned int loadseed        : 1;
-    unsigned int                 : 7;
-    unsigned int swrst           : 1;
-    unsigned int                 : 7;
-    unsigned int start           : 1;
+typedef struct avr32_aes_cr_t
+{
+    unsigned int:15;
+    unsigned int loadseed:1;
+    unsigned int:7;
+    unsigned int swrst:1;
+    unsigned int:7;
+    unsigned int start:1;
 } avr32_aes_cr_t;
 
 
 
-typedef struct avr32_aes_mr_t {
-    unsigned int                 : 3;
-    unsigned int ctype           : 5;
-    unsigned int ckey            : 4;
-    unsigned int                 : 1;
-    unsigned int cfbs            : 3;
-    unsigned int lod             : 1;
-    unsigned int opmod           : 3;
-    unsigned int keysize         : 2;
-    unsigned int smod            : 2;
-    unsigned int procdly         : 4;
-    unsigned int                 : 3;
-    unsigned int cipher          : 1;
+typedef struct avr32_aes_mr_t
+{
+    unsigned int:3;
+    unsigned int ctype:5;
+    unsigned int ckey:4;
+    unsigned int:1;
+    unsigned int cfbs:3;
+    unsigned int lod:1;
+    unsigned int opmod:3;
+    unsigned int keysize:2;
+    unsigned int smod:2;
+    unsigned int procdly:4;
+    unsigned int:3;
+    unsigned int cipher:1;
 } avr32_aes_mr_t;
 
 
 
-typedef struct avr32_aes_ier_t {
-    unsigned int                 :23;
-    unsigned int urad            : 1;
-    unsigned int                 : 3;
-    unsigned int txbufe          : 1;
-    unsigned int rxbuff          : 1;
-    unsigned int endtx           : 1;
-    unsigned int endrx           : 1;
-    unsigned int datrdy          : 1;
+typedef struct avr32_aes_ier_t
+{
+    unsigned int:23;
+    unsigned int urad:1;
+    unsigned int:3;
+    unsigned int txbufe:1;
+    unsigned int rxbuff:1;
+    unsigned int endtx:1;
+    unsigned int endrx:1;
+    unsigned int datrdy:1;
 } avr32_aes_ier_t;
 
 
 
-typedef struct avr32_aes_idr_t {
-    unsigned int                 :23;
-    unsigned int urad            : 1;
-    unsigned int                 : 3;
-    unsigned int txbufe          : 1;
-    unsigned int rxbuff          : 1;
-    unsigned int endtx           : 1;
-    unsigned int endrx           : 1;
-    unsigned int datrdy          : 1;
+typedef struct avr32_aes_idr_t
+{
+    unsigned int:23;
+    unsigned int urad:1;
+    unsigned int:3;
+    unsigned int txbufe:1;
+    unsigned int rxbuff:1;
+    unsigned int endtx:1;
+    unsigned int endrx:1;
+    unsigned int datrdy:1;
 } avr32_aes_idr_t;
 
 
 
-typedef struct avr32_aes_imr_t {
-    unsigned int                 :23;
-    unsigned int urad            : 1;
-    unsigned int                 : 3;
-    unsigned int txbufe          : 1;
-    unsigned int rxbuff          : 1;
-    unsigned int endtx           : 1;
-    unsigned int endrx           : 1;
-    unsigned int datrdy          : 1;
+typedef struct avr32_aes_imr_t
+{
+    unsigned int:23;
+    unsigned int urad:1;
+    unsigned int:3;
+    unsigned int txbufe:1;
+    unsigned int rxbuff:1;
+    unsigned int endtx:1;
+    unsigned int endrx:1;
+    unsigned int datrdy:1;
 } avr32_aes_imr_t;
 
 
 
-typedef struct avr32_aes_isr_t {
-    unsigned int                 :16;
-    unsigned int urat            : 4;
-    unsigned int                 : 3;
-    unsigned int urad            : 1;
-    unsigned int                 : 3;
-    unsigned int txbufe          : 1;
-    unsigned int rxbuff          : 1;
-    unsigned int endtx           : 1;
-    unsigned int endrx           : 1;
-    unsigned int datrdy          : 1;
+typedef struct avr32_aes_isr_t
+{
+    unsigned int:16;
+    unsigned int urat:4;
+    unsigned int:3;
+    unsigned int urad:1;
+    unsigned int:3;
+    unsigned int txbufe:1;
+    unsigned int rxbuff:1;
+    unsigned int endtx:1;
+    unsigned int endrx:1;
+    unsigned int datrdy:1;
 } avr32_aes_isr_t;
 
 
 
-typedef struct avr32_aes_version_t {
-    unsigned int                 :13;
-    unsigned int variant         : 3;
-    unsigned int                 : 4;
-    unsigned int version         :12;
+typedef struct avr32_aes_version_t
+{
+    unsigned int:13;
+    unsigned int variant:3;
+    unsigned int:4;
+    unsigned int version:12;
 } avr32_aes_version_t;
 
 
 
-typedef struct avr32_aes_t {
-  union {
-          unsigned long                  cr        ;//0x0000
-          avr32_aes_cr_t                 CR        ;
-  };
-  union {
-          unsigned long                  mr        ;//0x0004
-          avr32_aes_mr_t                 MR        ;
-  };
-          unsigned int                   :32       ;//0x0008
-          unsigned int                   :32       ;//0x000c
-  union {
-          unsigned long                  ier       ;//0x0010
-          avr32_aes_ier_t                IER       ;
-  };
-  union {
-          unsigned long                  idr       ;//0x0014
-          avr32_aes_idr_t                IDR       ;
-  };
-  union {
-    const unsigned long                  imr       ;//0x0018
-    const avr32_aes_imr_t                IMR       ;
-  };
-  union {
-    const unsigned long                  isr       ;//0x001c
-    const avr32_aes_isr_t                ISR       ;
-  };
-          unsigned long                  keyw1r    ;//0x0020
-          unsigned long                  keyw2r    ;//0x0024
-          unsigned long                  keyw3r    ;//0x0028
-          unsigned long                  keyw4r    ;//0x002c
-          unsigned long                  keyw5r    ;//0x0030
-          unsigned long                  keyw6r    ;//0x0034
-          unsigned long                  keyw7r    ;//0x0038
-          unsigned long                  keyw8r    ;//0x003c
-          unsigned long                  idata1r   ;//0x0040
-          unsigned long                  idata2r   ;//0x0044
-          unsigned long                  idata3r   ;//0x0048
-          unsigned long                  idata4r   ;//0x004c
-    const unsigned long                  odata1r   ;//0x0050
-    const unsigned long                  odata2r   ;//0x0054
-    const unsigned long                  odata3r   ;//0x0058
-    const unsigned long                  odata4r   ;//0x005c
-          unsigned long                  iv1r      ;//0x0060
-          unsigned long                  iv2r      ;//0x0064
-          unsigned long                  iv3r      ;//0x0068
-          unsigned long                  iv4r      ;//0x006c
-          unsigned int                   :32       ;//0x0070
-          unsigned int                   :32       ;//0x0074
-          unsigned int                   :32       ;//0x0078
-          unsigned int                   :32       ;//0x007c
-          unsigned int                   :32       ;//0x0080
-          unsigned int                   :32       ;//0x0084
-          unsigned int                   :32       ;//0x0088
-          unsigned int                   :32       ;//0x008c
-          unsigned int                   :32       ;//0x0090
-          unsigned int                   :32       ;//0x0094
-          unsigned int                   :32       ;//0x0098
-          unsigned int                   :32       ;//0x009c
-          unsigned int                   :32       ;//0x00a0
-          unsigned int                   :32       ;//0x00a4
-          unsigned int                   :32       ;//0x00a8
-          unsigned int                   :32       ;//0x00ac
-          unsigned int                   :32       ;//0x00b0
-          unsigned int                   :32       ;//0x00b4
-          unsigned int                   :32       ;//0x00b8
-          unsigned int                   :32       ;//0x00bc
-          unsigned int                   :32       ;//0x00c0
-          unsigned int                   :32       ;//0x00c4
-          unsigned int                   :32       ;//0x00c8
-          unsigned int                   :32       ;//0x00cc
-          unsigned int                   :32       ;//0x00d0
-          unsigned int                   :32       ;//0x00d4
-          unsigned int                   :32       ;//0x00d8
-          unsigned int                   :32       ;//0x00dc
-          unsigned int                   :32       ;//0x00e0
-          unsigned int                   :32       ;//0x00e4
-          unsigned int                   :32       ;//0x00e8
-          unsigned int                   :32       ;//0x00ec
-          unsigned int                   :32       ;//0x00f0
-          unsigned int                   :32       ;//0x00f4
-          unsigned int                   :32       ;//0x00f8
-  union {
-    const unsigned long                  version   ;//0x00fc
-    const avr32_aes_version_t            VERSION   ;
-  };
+typedef struct avr32_aes_t
+{
+    union
+    {
+        unsigned long cr;   // 0x0000
+        avr32_aes_cr_t CR;
+    };
+    union
+    {
+        unsigned long mr;   // 0x0004
+        avr32_aes_mr_t MR;
+    };
+    unsigned int:32;    // 0x0008
+    unsigned int:32;    // 0x000c
+    union
+    {
+        unsigned long ier;  // 0x0010
+        avr32_aes_ier_t IER;
+    };
+    union
+    {
+        unsigned long idr;  // 0x0014
+        avr32_aes_idr_t IDR;
+    };
+    union
+    {
+        const unsigned long imr;    // 0x0018
+        const avr32_aes_imr_t IMR;
+    };
+    union
+    {
+        const unsigned long isr;    // 0x001c
+        const avr32_aes_isr_t ISR;
+    };
+    unsigned long keyw1r;   // 0x0020
+    unsigned long keyw2r;   // 0x0024
+    unsigned long keyw3r;   // 0x0028
+    unsigned long keyw4r;   // 0x002c
+    unsigned long keyw5r;   // 0x0030
+    unsigned long keyw6r;   // 0x0034
+    unsigned long keyw7r;   // 0x0038
+    unsigned long keyw8r;   // 0x003c
+    unsigned long idata1r;  // 0x0040
+    unsigned long idata2r;  // 0x0044
+    unsigned long idata3r;  // 0x0048
+    unsigned long idata4r;  // 0x004c
+    const unsigned long odata1r;    // 0x0050
+    const unsigned long odata2r;    // 0x0054
+    const unsigned long odata3r;    // 0x0058
+    const unsigned long odata4r;    // 0x005c
+    unsigned long iv1r; // 0x0060
+    unsigned long iv2r; // 0x0064
+    unsigned long iv3r; // 0x0068
+    unsigned long iv4r; // 0x006c
+    unsigned int:32;    // 0x0070
+    unsigned int:32;    // 0x0074
+    unsigned int:32;    // 0x0078
+    unsigned int:32;    // 0x007c
+    unsigned int:32;    // 0x0080
+    unsigned int:32;    // 0x0084
+    unsigned int:32;    // 0x0088
+    unsigned int:32;    // 0x008c
+    unsigned int:32;    // 0x0090
+    unsigned int:32;    // 0x0094
+    unsigned int:32;    // 0x0098
+    unsigned int:32;    // 0x009c
+    unsigned int:32;    // 0x00a0
+    unsigned int:32;    // 0x00a4
+    unsigned int:32;    // 0x00a8
+    unsigned int:32;    // 0x00ac
+    unsigned int:32;    // 0x00b0
+    unsigned int:32;    // 0x00b4
+    unsigned int:32;    // 0x00b8
+    unsigned int:32;    // 0x00bc
+    unsigned int:32;    // 0x00c0
+    unsigned int:32;    // 0x00c4
+    unsigned int:32;    // 0x00c8
+    unsigned int:32;    // 0x00cc
+    unsigned int:32;    // 0x00d0
+    unsigned int:32;    // 0x00d4
+    unsigned int:32;    // 0x00d8
+    unsigned int:32;    // 0x00dc
+    unsigned int:32;    // 0x00e0
+    unsigned int:32;    // 0x00e4
+    unsigned int:32;    // 0x00e8
+    unsigned int:32;    // 0x00ec
+    unsigned int:32;    // 0x00f0
+    unsigned int:32;    // 0x00f4
+    unsigned int:32;    // 0x00f8
+    union
+    {
+        const unsigned long version;    // 0x00fc
+        const avr32_aes_version_t VERSION;
+    };
 } avr32_aes_t;
 
 
 
-/*#ifdef __AVR32_ABI_COMPILER__*/
+/*
+ * #ifdef __AVR32_ABI_COMPILER__
+ */
 #endif
 
-/*#ifdef AVR32_AES_1231_H_INCLUDED*/
+/*
+ * #ifdef AVR32_AES_1231_H_INCLUDED
+ */
 #endif
-

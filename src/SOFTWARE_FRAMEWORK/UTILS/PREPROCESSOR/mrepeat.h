@@ -1,47 +1,44 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
-/*This file is prepared for Doxygen automatic documentation generation.*/
-/*! \file *********************************************************************
- *
- * \brief Preprocessor macro repeating utils.
- *
- * - Compiler:           IAR EWAVR32 and GNU GCC for AVR32
- * - Supported devices:  All AVR32 devices can be used.
- *
- * \author               Atmel Corporation: http://www.atmel.com \n
- *                       Support and FAQ: http://support.atmel.no/
- *
- ******************************************************************************/
+/*
+ * This file is prepared for Doxygen automatic documentation generation.
+ */
+/*
+ * ! \file
+ * *********************************************************************
+ * \brief Preprocessor macro repeating utils. - Compiler: IAR EWAVR32 and
+ * GNU GCC for AVR32 - Supported devices: All AVR32 devices can be used.
+ * \author Atmel Corporation: http://www.atmel.com \n Support and FAQ:
+ * http://support.atmel.no/
+ * ****************************************************************************
+ */
 
-/* Copyright (c) 2009 Atmel Corporation. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an Atmel
- * AVR product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+/*
+ * Copyright (c) 2009 Atmel Corporation. All rights reserved. Redistribution 
+ * and use in source and binary forms, with or without modification, are
+ * permitted provided that the following conditions are met: 1.
+ * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer. 2. Redistributions
+ * in binary form must reproduce the above copyright notice, this list of
+ * conditions and the following disclaimer in the documentation and/or other
+ * materials provided with the distribution. 3. The name of Atmel may not be 
+ * used to endorse or promote products derived from this software without
+ * specific prior written permission. 4. This software may only be
+ * redistributed and used in connection with an Atmel AVR product. THIS
+ * SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
- *
+ * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
+ * DAMAGE 
  */
 
 #ifndef _MREPEAT_H_
@@ -50,19 +47,17 @@
 #include "preprocessor.h"
 
 
-//! Maximal number of repetitions supported by MREPEAT.
+// ! Maximal number of repetitions supported by MREPEAT.
 #define MREPEAT_LIMIT   256
 
-/*! \brief Macro repeat.
- *
- * This macro represents a horizontal repetition construct.
- *
- * \param count  The number of repetitious calls to macro. Valid values range from 0 to MREPEAT_LIMIT.
- * \param macro  A binary operation of the form macro(n, data). This macro is expanded by MREPEAT with
- *               the current repetition number and the auxiliary data argument.
- * \param data   Auxiliary data passed to macro.
- *
- * \return       <tt>macro(0, data) macro(1, data) ... macro(count - 1, data)</tt>
+/*
+ * ! \brief Macro repeat. This macro represents a horizontal repetition
+ * construct. \param count The number of repetitious calls to macro. Valid
+ * values range from 0 to MREPEAT_LIMIT. \param macro A binary operation of
+ * the form macro(n, data). This macro is expanded by MREPEAT with the
+ * current repetition number and the auxiliary data argument. \param data
+ * Auxiliary data passed to macro. \return <tt>macro(0, data) macro(1, data) 
+ * ... macro(count - 1, data)</tt> 
  */
 #define MREPEAT(count, macro, data)         TPASTE2(MREPEAT, count)(macro, data)
 
@@ -325,4 +320,4 @@
 #define MREPEAT256(macro, data)       MREPEAT255(macro, data)   macro(255, data)
 
 
-#endif  // _MREPEAT_H_
+#endif // _MREPEAT_H_

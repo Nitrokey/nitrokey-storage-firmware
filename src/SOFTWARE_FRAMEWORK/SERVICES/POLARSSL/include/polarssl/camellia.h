@@ -1,4 +1,7 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /**
  * \file camellia.h
@@ -40,13 +43,14 @@ typedef UINT32 uint32_t;
  */
 typedef struct
 {
-    int nr;                     /*!<  number of rounds  */
-    uint32_t rk[68];            /*!<  CAMELLIA round keys    */
+    int nr; /* !< number of rounds */
+    uint32_t rk[68];    /* !< CAMELLIA round keys */
 }
 camellia_context;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -55,10 +59,11 @@ extern "C" {
  * \param ctx      CAMELLIA context to be initialized
  * \param key      encryption key
  * \param keysize  must be 128, 192 or 256
- * 
+ *
  * \return         0 if successful, or POLARSSL_ERR_CAMELLIA_INVALID_KEY_LENGTH
  */
-int camellia_setkey_enc( camellia_context *ctx, unsigned char *key, int keysize );
+    int camellia_setkey_enc (camellia_context * ctx, unsigned char *key,
+                             int keysize);
 
 /**
  * \brief          CAMELLIA key schedule (decryption)
@@ -66,10 +71,11 @@ int camellia_setkey_enc( camellia_context *ctx, unsigned char *key, int keysize 
  * \param ctx      CAMELLIA context to be initialized
  * \param key      decryption key
  * \param keysize  must be 128, 192 or 256
- * 
+ *
  * \return         0 if successful, or POLARSSL_ERR_CAMELLIA_INVALID_KEY_LENGTH
  */
-int camellia_setkey_dec( camellia_context *ctx, unsigned char *key, int keysize );
+    int camellia_setkey_dec (camellia_context * ctx, unsigned char *key,
+                             int keysize);
 
 /**
  * \brief          CAMELLIA-ECB block encryption/decryption
@@ -79,10 +85,10 @@ int camellia_setkey_dec( camellia_context *ctx, unsigned char *key, int keysize 
  * \param input    16-byte input block
  * \param output   16-byte output block
  */
-void camellia_crypt_ecb( camellia_context *ctx,
-                    int mode,
-                    unsigned char input[16],
-                    unsigned char output[16] );
+    void camellia_crypt_ecb (camellia_context * ctx,
+                             int mode,
+                             unsigned char input[16],
+                             unsigned char output[16]);
 
 /**
  * \brief          CAMELLIA-CBC buffer encryption/decryption
@@ -96,12 +102,11 @@ void camellia_crypt_ecb( camellia_context *ctx,
  * \param input    buffer holding the input data
  * \param output   buffer holding the output data
  */
-void camellia_crypt_cbc( camellia_context *ctx,
-                    int mode,
-                    int length,
-                    unsigned char iv[16],
-                    unsigned char *input,
-                    unsigned char *output );
+    void camellia_crypt_cbc (camellia_context * ctx,
+                             int mode,
+                             int length,
+                             unsigned char iv[16],
+                             unsigned char *input, unsigned char *output);
 
 /**
  * \brief          CAMELLIA-CFB128 buffer encryption/decryption
@@ -114,20 +119,19 @@ void camellia_crypt_cbc( camellia_context *ctx,
  * \param input    buffer holding the input data
  * \param output   buffer holding the output data
  */
-void camellia_crypt_cfb128( camellia_context *ctx,
-                       int mode,
-                       int length,
-                       int *iv_off,
-                       unsigned char iv[16],
-                       unsigned char *input,
-                       unsigned char *output );
+    void camellia_crypt_cfb128 (camellia_context * ctx,
+                                int mode,
+                                int length,
+                                int *iv_off,
+                                unsigned char iv[16],
+                                unsigned char *input, unsigned char *output);
 
 /**
  * \brief          Checkup routine
  *
  * \return         0 if successful, or 1 if the test failed
  */
-int camellia_self_test( int verbose );
+    int camellia_self_test (int verbose);
 
 #ifdef __cplusplus
 }

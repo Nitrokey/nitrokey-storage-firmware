@@ -1,4 +1,7 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /**
  * \file dhm.h
@@ -36,19 +39,20 @@
 
 typedef struct
 {
-    int len;    /*!<  size(P) in chars  */
-    mpi P;      /*!<  prime modulus     */
-    mpi G;      /*!<  generator         */
-    mpi X;      /*!<  secret value      */
-    mpi GX;     /*!<  self = G^X mod P  */
-    mpi GY;     /*!<  peer = G^Y mod P  */
-    mpi K;      /*!<  key = GY^X mod P  */
-    mpi RP;     /*!<  cached R^2 mod P  */
+    int len;    /* !< size(P) in chars */
+    mpi P;  /* !< prime modulus */
+    mpi G;  /* !< generator */
+    mpi X;  /* !< secret value */
+    mpi GX; /* !< self = G^X mod P */
+    mpi GY; /* !< peer = G^Y mod P */
+    mpi K;  /* !< key = GY^X mod P */
+    mpi RP; /* !< cached R^2 mod P */
 }
 dhm_context;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -60,9 +64,8 @@ extern "C" {
  *
  * \return         0 if successful, or an POLARSSL_ERR_DHM_XXX error code
  */
-int dhm_read_params( dhm_context *ctx,
-                     unsigned char **p,
-                     unsigned char *end );
+    int dhm_read_params (dhm_context * ctx,
+                         unsigned char **p, unsigned char *end);
 
 /**
  * \brief          Setup and write the ServerKeyExchange parameters
@@ -80,9 +83,9 @@ int dhm_read_params( dhm_context *ctx,
  *
  * \return         0 if successful, or an POLARSSL_ERR_DHM_XXX error code
  */
-int dhm_make_params( dhm_context *ctx, int s_size,
-                     unsigned char *output, int *olen,
-                     int (*f_rng)(void *), void *p_rng );
+    int dhm_make_params (dhm_context * ctx, int s_size,
+                         unsigned char *output, int *olen,
+                         int (*f_rng) (void *), void *p_rng);
 
 /**
  * \brief          Import the peer's public value G^Y
@@ -93,8 +96,7 @@ int dhm_make_params( dhm_context *ctx, int s_size,
  *
  * \return         0 if successful, or an POLARSSL_ERR_DHM_XXX error code
  */
-int dhm_read_public( dhm_context *ctx,
-                     unsigned char *input, int ilen );
+    int dhm_read_public (dhm_context * ctx, unsigned char *input, int ilen);
 
 /**
  * \brief          Create own private value X and export G^X
@@ -108,9 +110,9 @@ int dhm_read_public( dhm_context *ctx,
  *
  * \return         0 if successful, or an POLARSSL_ERR_DHM_XXX error code
  */
-int dhm_make_public( dhm_context *ctx, int s_size,
-                     unsigned char *output, int olen,
-                     int (*f_rng)(void *), void *p_rng );
+    int dhm_make_public (dhm_context * ctx, int s_size,
+                         unsigned char *output, int olen,
+                         int (*f_rng) (void *), void *p_rng);
 
 /**
  * \brief          Derive and export the shared secret (G^Y)^X mod P
@@ -121,20 +123,19 @@ int dhm_make_public( dhm_context *ctx, int s_size,
  *
  * \return         0 if successful, or an POLARSSL_ERR_DHM_XXX error code
  */
-int dhm_calc_secret( dhm_context *ctx,
-                     unsigned char *output, int *olen );
+    int dhm_calc_secret (dhm_context * ctx, unsigned char *output, int *olen);
 
-/*
- * \brief          Free the components of a DHM key
- */
-void dhm_free( dhm_context *ctx );
+    /*
+     * \brief          Free the components of a DHM key
+     */
+    void dhm_free (dhm_context * ctx);
 
 /**
  * \brief          Checkup routine
  *
  * \return         0 if successful, or 1 if the test failed
  */
-int dhm_self_test( int verbose );
+    int dhm_self_test (int verbose);
 
 #ifdef __cplusplus
 }

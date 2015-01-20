@@ -1,4 +1,7 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /**
  * \file debug.h
@@ -56,26 +59,27 @@
 #endif
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-char *debug_fmt( const char *format, ... );
+    char *debug_fmt (const char *format, ...);
 
-void debug_print_msg( ssl_context *ssl, int level,
-                      char *file, int line, char *text );
+    void debug_print_msg (ssl_context * ssl, int level,
+                          char *file, int line, char *text);
 
-void debug_print_ret( ssl_context *ssl, int level,
-                      char *file, int line, char *text, int ret );
+    void debug_print_ret (ssl_context * ssl, int level,
+                          char *file, int line, char *text, int ret);
 
-void debug_print_buf( ssl_context *ssl, int level,
-                      char *file, int line, char *text,
-                      unsigned char *buf, int len );
+    void debug_print_buf (ssl_context * ssl, int level,
+                          char *file, int line, char *text,
+                          unsigned char *buf, int len);
 
-void debug_print_mpi( ssl_context *ssl, int level,
-                      char *file, int line, char *text, mpi *X );
+    void debug_print_mpi (ssl_context * ssl, int level,
+                          char *file, int line, char *text, mpi * X);
 
-void debug_print_crt( ssl_context *ssl, int level,
-                      char *file, int line, char *text, x509_cert *crt );
+    void debug_print_crt (ssl_context * ssl, int level,
+                          char *file, int line, char *text, x509_cert * crt);
 
 #ifdef __cplusplus
 }

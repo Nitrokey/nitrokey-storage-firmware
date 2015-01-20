@@ -1,21 +1,21 @@
 /*
-* Author: Copyright (C) Rudolf Boeddeker  Date: 24.11.2010
-*
-* This file is part of Nitrokey
-*
-* Nitrokey  is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* Nitrokey is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Author: Copyright (C) Rudolf Boeddeker  Date: 24.11.2010
+ *
+ * This file is part of Nitrokey
+ *
+ * Nitrokey  is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Nitrokey is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 
 
@@ -94,13 +94,13 @@
 #define CCID_OFFSET_SET_PARAMS_DATA				   10
 
 
-#define USB_CCID_MAX_LENGTH                     CCID_MAX_XFER_LENGTH // 65
+#define USB_CCID_MAX_LENGTH                     CCID_MAX_XFER_LENGTH    // 65
 
 typedef struct
 {
-	char	 USB_data[CCID_MAX_XFER_LENGTH];
-	int 	 CCID_datalen;
-	char	 CCID_CMD_aborted;
+    char USB_data[CCID_MAX_XFER_LENGTH];
+    int CCID_datalen;
+    char CCID_CMD_aborted;
 } t_USB_CCID_data_st;
 
 
@@ -108,7 +108,7 @@ void USB_CCID_SetLockCounter (u32 Value_u32);
 void USB_CCID_DecLockCounter (void);
 u32 USB_CCID_GetLockCounter (void);
 
-void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst);
+void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st * USB_CCID_data_pst);
 u8 CCID_GetSlotStatus_u8 (void);
 u8 CCID_RestartSmartcard_u8 (void);
 u8 CCID_InternalSmartcardOff_u8 (void);

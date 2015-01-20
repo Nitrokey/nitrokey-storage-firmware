@@ -1,60 +1,54 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /*
-    FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
-
-    ***************************************************************************
-    *                                                                         *
-    * If you are:                                                             *
-    *                                                                         *
-    *    + New to FreeRTOS,                                                   *
-    *    + Wanting to learn FreeRTOS or multitasking in general quickly       *
-    *    + Looking for basic training,                                        *
-    *    + Wanting to improve your FreeRTOS skills and productivity           *
-    *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
-    *                                                                         *
-    *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
-    *                  http://www.FreeRTOS.org/Documentation                  *
-    *                                                                         *
-    * A pdf reference manual is also available.  Both are usually delivered   *
-    * to your inbox within 20 minutes to two hours when purchased between 8am *
-    * and 8pm GMT (although please allow up to 24 hours in case of            *
-    * exceptional circumstances).  Thank you for your support!                *
-    *                                                                         *
-    ***************************************************************************
-
-    This file is part of the FreeRTOS distribution.
-
-    FreeRTOS is free software; you can redistribute it and/or modify it under
-    the terms of the GNU General Public License (version 2) as published by the
-    Free Software Foundation AND MODIFIED BY the FreeRTOS exception.
-    ***NOTE*** The exception to the GPL is included to allow you to distribute
-    a combined work that includes FreeRTOS without being obliged to provide the
-    source code for proprietary components outside of the FreeRTOS kernel.
-    FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-    more details. You should have received a copy of the GNU General Public 
-    License and the FreeRTOS license exception along with FreeRTOS; if not it 
-    can be viewed here: http://www.freertos.org/a00114.html and also obtained 
-    by writing to Richard Barry, contact details for whom are available on the
-    FreeRTOS WEB site.
-
-    1 tab == 4 spaces!
-
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
-
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
-
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
-*/
+ * FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
+ * 
+ * ***************************************************************************
+ * * * * If you are: * * * * + New to FreeRTOS, * * + Wanting to learn FreeRTOS 
+ * or multitasking in general quickly * * + Looking for basic training, * * +
+ * Wanting to improve your FreeRTOS skills and productivity * * * * then take a 
+ * look at the FreeRTOS eBook * * * * "Using the FreeRTOS Real Time Kernel - a
+ * Practical Guide" * * http://www.FreeRTOS.org/Documentation * * * * A pdf
+ * reference manual is also available.  Both are usually delivered * * to your
+ * inbox within 20 minutes to two hours when purchased between 8am * * and 8pm
+ * GMT (although please allow up to 24 hours in case of * * exceptional
+ * circumstances).  Thank you for your support! * * *
+ * ***************************************************************************
+ * 
+ * This file is part of the FreeRTOS distribution.
+ * 
+ * FreeRTOS is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License (version 2) as published by the
+ * Free Software Foundation AND MODIFIED BY the FreeRTOS exception. ***NOTE***
+ * The exception to the GPL is included to allow you to distribute a combined
+ * work that includes FreeRTOS without being obliged to provide the source code 
+ * for proprietary components outside of the FreeRTOS kernel. FreeRTOS is
+ * distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License and the
+ * FreeRTOS license exception along with FreeRTOS; if not it can be viewed
+ * here: http://www.freertos.org/a00114.html and also obtained by writing to
+ * Richard Barry, contact details for whom are available on the FreeRTOS WEB
+ * site.
+ * 
+ * 1 tab == 4 spaces!
+ * 
+ * http://www.FreeRTOS.org - Documentation, latest information, license and
+ * contact details.
+ * 
+ * http://www.SafeRTOS.com - A version that is certified for use in safety
+ * critical systems.
+ * 
+ * http://www.OpenRTOS.com - Commercial support, development, porting,
+ * licensing and training services. 
+ */
 
 #ifndef INC_FREERTOS_H
-	#error "#include FreeRTOS.h" must appear in source files before "#include croutine.h"
+#error "#include FreeRTOS.h" must appear in source files before "#include croutine.h"
 #endif
 
 
@@ -66,26 +60,41 @@
 #include "list.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* Used to hide the implementation of the co-routine control block.  The
-control block structure however has to be included in the header due to
-the macro implementation of the co-routine functionality. */
-typedef void * xCoRoutineHandle;
+    /*
+     * Used to hide the implementation of the co-routine control block.  The
+     * control block structure however has to be included in the header due
+     * to the macro implementation of the co-routine functionality. 
+     */
+    typedef void *xCoRoutineHandle;
 
-/* Defines the prototype to which co-routine functions must conform. */
-typedef void (*crCOROUTINE_CODE)( xCoRoutineHandle, unsigned portBASE_TYPE );
+    /*
+     * Defines the prototype to which co-routine functions must conform. 
+     */
+    typedef void (*crCOROUTINE_CODE) (xCoRoutineHandle,
+                                      unsigned portBASE_TYPE);
 
-typedef struct corCoRoutineControlBlock
-{
-	crCOROUTINE_CODE 		pxCoRoutineFunction;
-	xListItem				xGenericListItem;	/*< List item used to place the CRCB in ready and blocked queues. */
-	xListItem				xEventListItem;		/*< List item used to place the CRCB in event lists. */
-	unsigned portBASE_TYPE 	uxPriority;			/*< The priority of the co-routine in relation to other co-routines. */
-	unsigned portBASE_TYPE 	uxIndex;			/*< Used to distinguish between co-routines when multiple co-routines use the same co-routine function. */
-	unsigned short 		uxState;			/*< Used internally by the co-routine implementation. */
-} corCRCB; /* Co-routine control block.  Note must be identical in size down to uxPriority with tskTCB. */
+    typedef struct corCoRoutineControlBlock
+    {
+        crCOROUTINE_CODE pxCoRoutineFunction;
+        xListItem xGenericListItem; /* < List item used to place the CRCB in
+                                     * ready and blocked queues. */
+        xListItem xEventListItem;   /* < List item used to place the CRCB in
+                                     * event lists. */
+        unsigned portBASE_TYPE uxPriority;  /* < The priority of the
+                                             * co-routine in relation to
+                                             * other co-routines. */
+        unsigned portBASE_TYPE uxIndex; /* < Used to distinguish between
+                                         * co-routines when multiple
+                                         * co-routines use the same
+                                         * co-routine function. */
+        unsigned short uxState; /* < Used internally by the co-routine
+                                 * implementation. */
+    } corCRCB;  /* Co-routine control block.  Note must be identical in size
+                 * down to uxPriority with tskTCB. */
 
 /**
  * croutine. h
@@ -146,7 +155,7 @@ typedef struct corCoRoutineControlBlock
  {
  unsigned char ucParameterToPass;
  xTaskHandle xHandle;
-		
+
      // Create two co-routines at priority 0.  The first is given index 0
      // so (from the code above) toggles LED 5 every 200 ticks.  The second
      // is given index 1 so toggles LED 6 every 400 ticks.
@@ -159,7 +168,9 @@ typedef struct corCoRoutineControlBlock
  * \defgroup xCoRoutineCreate xCoRoutineCreate
  * \ingroup Tasks
  */
-signed portBASE_TYPE xCoRoutineCreate( crCOROUTINE_CODE pxCoRoutineCode, unsigned portBASE_TYPE uxPriority, unsigned portBASE_TYPE uxIndex );
+    signed portBASE_TYPE xCoRoutineCreate (crCOROUTINE_CODE pxCoRoutineCode,
+                                           unsigned portBASE_TYPE uxPriority,
+                                           unsigned portBASE_TYPE uxIndex);
 
 
 /**
@@ -201,7 +212,7 @@ signed portBASE_TYPE xCoRoutineCreate( crCOROUTINE_CODE pxCoRoutineCode, unsigne
  * \defgroup vCoRoutineSchedule vCoRoutineSchedule
  * \ingroup Tasks
  */
-void vCoRoutineSchedule( void );
+    void vCoRoutineSchedule (void);
 
 /**
  * croutine. h
@@ -265,10 +276,10 @@ void vCoRoutineSchedule( void );
  */
 #define crEND() }
 
-/*
- * These macros are intended for internal use by the co-routine implementation
- * only.  The macros should not be used directly by application writers.
- */
+    /*
+     * These macros are intended for internal use by the co-routine implementation
+     * only.  The macros should not be used directly by application writers.
+     */
 #define crSET_STATE0( xHandle ) ( ( corCRCB * )xHandle)->uxState = (__LINE__ * 2); return; case (__LINE__ * 2):
 #define crSET_STATE1( xHandle ) ( ( corCRCB * )xHandle)->uxState = ((__LINE__ * 2)+1); return; case ((__LINE__ * 2)+1):
 
@@ -724,25 +735,27 @@ void vCoRoutineSchedule( void );
  */
 #define crQUEUE_RECEIVE_FROM_ISR( pxQueue, pvBuffer, pxCoRoutineWoken ) xQueueCRReceiveFromISR( pxQueue, pvBuffer, pxCoRoutineWoken )
 
-/*
- * This function is intended for internal use by the co-routine macros only.
- * The macro nature of the co-routine implementation requires that the
- * prototype appears here.  The function should not be used by application
- * writers.
- *
- * Removes the current co-routine from its ready list and places it in the
- * appropriate delayed list.
- */
-void vCoRoutineAddToDelayedList( portTickType xTicksToDelay, xList *pxEventList );
+    /*
+     * This function is intended for internal use by the co-routine macros only.
+     * The macro nature of the co-routine implementation requires that the
+     * prototype appears here.  The function should not be used by application
+     * writers.
+     *
+     * Removes the current co-routine from its ready list and places it in the
+     * appropriate delayed list.
+     */
+    void vCoRoutineAddToDelayedList (portTickType xTicksToDelay,
+                                     xList * pxEventList);
 
-/*
- * This function is intended for internal use by the queue implementation only.
- * The function should not be used by application writers.
- *
- * Removes the highest priority co-routine from the event list and places it in
- * the pending ready list.
- */
-signed portBASE_TYPE xCoRoutineRemoveFromEventList( const xList *pxEventList );
+    /*
+     * This function is intended for internal use by the queue implementation only.
+     * The function should not be used by application writers.
+     *
+     * Removes the highest priority co-routine from the event list and places it in
+     * the pending ready list.
+     */
+    signed portBASE_TYPE xCoRoutineRemoveFromEventList (const xList *
+                                                        pxEventList);
 
 #ifdef __cplusplus
 }

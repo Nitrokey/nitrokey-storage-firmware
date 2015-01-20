@@ -1,4 +1,7 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /**
  * \file bn_mul.h
@@ -730,7 +733,7 @@
 #define MULADDC_STOP                    \
 }
 
-#endif /* C (generic)  */
+#endif /* C (generic) */
 #endif /* C (longlong) */
 
 #endif /* bn_mul.h */

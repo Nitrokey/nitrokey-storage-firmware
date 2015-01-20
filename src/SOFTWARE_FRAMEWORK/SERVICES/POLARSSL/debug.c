@@ -1,4 +1,7 @@
-/* This source file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This source file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /*
  *  Debugging routines
@@ -40,166 +43,165 @@
 #define vsnprintf _vsnprintf
 #endif
 
-char *debug_fmt( const char *format, ... )
+char *debug_fmt (const char *format, ...)
 {
     va_list argp;
     static char str[512];
-    int maxlen = sizeof( str ) - 1;
+    int maxlen = sizeof (str) - 1;
 
-    va_start( argp, format );
-    vsnprintf( str, maxlen, format, argp );
-    va_end( argp );
+    va_start (argp, format);
+    vsnprintf (str, maxlen, format, argp);
+    va_end (argp);
 
     str[maxlen] = '\0';
-    return( str );
+    return (str);
 }
 
-void debug_print_msg( ssl_context *ssl, int level,
-                      char *file, int line, char *text )
+void debug_print_msg (ssl_context * ssl, int level,
+                      char *file, int line, char *text)
 {
     char str[512];
-    int maxlen = sizeof( str ) - 1;
+    int maxlen = sizeof (str) - 1;
 
-    if( ssl->f_dbg == NULL )
+    if (ssl->f_dbg == NULL)
         return;
 
-    snprintf( str, maxlen, "%s(%04d): %s\n", file, line, text );
+    snprintf (str, maxlen, "%s(%04d): %s\n", file, line, text);
     str[maxlen] = '\0';
-    ssl->f_dbg( ssl->p_dbg, level, str );
+    ssl->f_dbg (ssl->p_dbg, level, str);
 }
 
-void debug_print_ret( ssl_context *ssl, int level,
-                      char *file, int line, char *text, int ret )
+void debug_print_ret (ssl_context * ssl, int level,
+                      char *file, int line, char *text, int ret)
 {
     char str[512];
-    int maxlen = sizeof( str ) - 1;
+    int maxlen = sizeof (str) - 1;
 
-    if( ssl->f_dbg == NULL )
+    if (ssl->f_dbg == NULL)
         return;
 
-    snprintf( str, maxlen, "%s(%04d): %s() returned %d (0x%x)\n",
-              file, line, text, ret, ret );
+    snprintf (str, maxlen, "%s(%04d): %s() returned %d (0x%x)\n",
+              file, line, text, ret, ret);
 
     str[maxlen] = '\0';
-    ssl->f_dbg( ssl->p_dbg, level, str );
+    ssl->f_dbg (ssl->p_dbg, level, str);
 }
 
-void debug_print_buf( ssl_context *ssl, int level,
+void debug_print_buf (ssl_context * ssl, int level,
                       char *file, int line, char *text,
-                      unsigned char *buf, int len )
+                      unsigned char *buf, int len)
 {
     char str[512];
-    int i, maxlen = sizeof( str ) - 1;
+    int i, maxlen = sizeof (str) - 1;
 
-    if( ssl->f_dbg == NULL || len < 0 )
+    if (ssl->f_dbg == NULL || len < 0)
         return;
 
-    snprintf( str, maxlen, "%s(%04d): dumping '%s' (%d bytes)\n",
-              file, line, text, len );
+    snprintf (str, maxlen, "%s(%04d): dumping '%s' (%d bytes)\n",
+              file, line, text, len);
 
     str[maxlen] = '\0';
-    ssl->f_dbg( ssl->p_dbg, level, str );
+    ssl->f_dbg (ssl->p_dbg, level, str);
 
-    for( i = 0; i < len; i++ )
+    for (i = 0; i < len; i++)
     {
-        if( i >= 4096 )
+        if (i >= 4096)
             break;
 
-        if( i % 16 == 0 )
+        if (i % 16 == 0)
         {
-            if( i > 0 )
-                ssl->f_dbg( ssl->p_dbg, level, "\n" );
+            if (i > 0)
+                ssl->f_dbg (ssl->p_dbg, level, "\n");
 
-            snprintf( str, maxlen, "%s(%04d): %04x: ", file, line, i );
+            snprintf (str, maxlen, "%s(%04d): %04x: ", file, line, i);
 
             str[maxlen] = '\0';
-            ssl->f_dbg( ssl->p_dbg, level, str );
+            ssl->f_dbg (ssl->p_dbg, level, str);
         }
 
-        snprintf( str, maxlen, " %02x", (unsigned int) buf[i] );
+        snprintf (str, maxlen, " %02x", (unsigned int) buf[i]);
 
         str[maxlen] = '\0';
-        ssl->f_dbg( ssl->p_dbg, level, str );
+        ssl->f_dbg (ssl->p_dbg, level, str);
     }
 
-    if( len > 0 )
-        ssl->f_dbg( ssl->p_dbg, level, "\n" );
+    if (len > 0)
+        ssl->f_dbg (ssl->p_dbg, level, "\n");
 }
 
-void debug_print_mpi( ssl_context *ssl, int level,
-                      char *file, int line, char *text, mpi *X )
+void debug_print_mpi (ssl_context * ssl, int level,
+                      char *file, int line, char *text, mpi * X)
 {
     char str[512];
-    int i, j, k, n, maxlen = sizeof( str ) - 1;
+    int i, j, k, n, maxlen = sizeof (str) - 1;
 
-    if( ssl->f_dbg == NULL || X == NULL )
+    if (ssl->f_dbg == NULL || X == NULL)
         return;
 
-    for( n = X->n - 1; n >= 0; n-- )
-        if( X->p[n] != 0 )
+    for (n = X->n - 1; n >= 0; n--)
+        if (X->p[n] != 0)
             break;
 
-    snprintf( str, maxlen, "%s(%04d): value of '%s' (%d bits) is:\n",
-              file, line, text,(int) ((n + 1) * sizeof( t_int )) << 3 );
+    snprintf (str, maxlen, "%s(%04d): value of '%s' (%d bits) is:\n",
+              file, line, text, (int) ((n + 1) * sizeof (t_int)) << 3);
 
     str[maxlen] = '\0';
-    ssl->f_dbg( ssl->p_dbg, level, str );
+    ssl->f_dbg (ssl->p_dbg, level, str);
 
-    for( i = n, j = 0; i >= 0; i--, j++ )
+    for (i = n, j = 0; i >= 0; i--, j++)
     {
-        if( j % ( 16 / sizeof( t_int ) ) == 0 )
+        if (j % (16 / sizeof (t_int)) == 0)
         {
-            if( j > 0 )
-                ssl->f_dbg( ssl->p_dbg, level, "\n" );
+            if (j > 0)
+                ssl->f_dbg (ssl->p_dbg, level, "\n");
 
-            snprintf( str, maxlen, "%s(%04d): ", file, line );
+            snprintf (str, maxlen, "%s(%04d): ", file, line);
 
             str[maxlen] = '\0';
-            ssl->f_dbg( ssl->p_dbg, level, str );
+            ssl->f_dbg (ssl->p_dbg, level, str);
         }
 
-        for( k = sizeof( t_int ) - 1; k >= 0; k-- )
+        for (k = sizeof (t_int) - 1; k >= 0; k--)
         {
-            snprintf( str, maxlen, " %02x", (unsigned int)
-                      ( X->p[i] >> (k << 3) ) & 0xFF );
+            snprintf (str, maxlen, " %02x", (unsigned int)
+                      (X->p[i] >> (k << 3)) & 0xFF);
 
             str[maxlen] = '\0';
-            ssl->f_dbg( ssl->p_dbg, level, str );
+            ssl->f_dbg (ssl->p_dbg, level, str);
         }
     }
 
-    ssl->f_dbg( ssl->p_dbg, level, "\n" );
+    ssl->f_dbg (ssl->p_dbg, level, "\n");
 }
 
-void debug_print_crt( ssl_context *ssl, int level,
-                      char *file, int line, char *text, x509_cert *crt )
+void debug_print_crt (ssl_context * ssl, int level,
+                      char *file, int line, char *text, x509_cert * crt)
 {
     char str[1024], prefix[64];
-    int i = 0, maxlen = sizeof( prefix ) - 1;
+    int i = 0, maxlen = sizeof (prefix) - 1;
 
-    if( ssl->f_dbg == NULL || crt == NULL )
+    if (ssl->f_dbg == NULL || crt == NULL)
         return;
 
-    snprintf( prefix, maxlen, "%s(%04d): ", file, line );
+    snprintf (prefix, maxlen, "%s(%04d): ", file, line);
     prefix[maxlen] = '\0';
-    maxlen = sizeof( str ) - 1;
+    maxlen = sizeof (str) - 1;
 
-    while( crt != NULL && crt->next != NULL )
+    while (crt != NULL && crt->next != NULL)
     {
-        char buf[1024];
-        x509parse_cert_info( buf, sizeof( buf ) - 1, prefix, crt );
+    char buf[1024];
 
-        snprintf( str, maxlen, "%s(%04d): %s #%d:\n%s",
-                  file, line, text, ++i, buf );
+        x509parse_cert_info (buf, sizeof (buf) - 1, prefix, crt);
+
+        snprintf (str, maxlen, "%s(%04d): %s #%d:\n%s",
+                  file, line, text, ++i, buf);
 
         str[maxlen] = '\0';
-        ssl->f_dbg( ssl->p_dbg, level, str );
+        ssl->f_dbg (ssl->p_dbg, level, str);
 
-        debug_print_mpi( ssl, level, file, line,
-                         "crt->rsa.N", &crt->rsa.N );
+        debug_print_mpi (ssl, level, file, line, "crt->rsa.N", &crt->rsa.N);
 
-        debug_print_mpi( ssl, level, file, line,
-                         "crt->rsa.E", &crt->rsa.E );
+        debug_print_mpi (ssl, level, file, line, "crt->rsa.E", &crt->rsa.E);
 
         crt = crt->next;
     }

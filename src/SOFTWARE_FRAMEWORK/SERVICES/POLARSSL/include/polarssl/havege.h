@@ -1,4 +1,7 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /**
  * \file havege.h
@@ -39,7 +42,8 @@ typedef struct
 havege_state;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -47,7 +51,7 @@ extern "C" {
  *
  * \param hs       HAVEGE state to be initialized
  */
-void havege_init( havege_state *hs );
+    void havege_init (havege_state * hs);
 
 /**
  * \brief          HAVEGE rand function
@@ -56,7 +60,7 @@ void havege_init( havege_state *hs );
  *
  * \return         A random int
  */
-int havege_rand( void *p_rng );
+    int havege_rand (void *p_rng);
 
 #ifdef __cplusplus
 }

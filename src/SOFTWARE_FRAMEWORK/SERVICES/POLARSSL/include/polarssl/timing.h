@@ -1,4 +1,7 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /**
  * \file timing.h
@@ -35,15 +38,16 @@ struct hr_time
 };
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-extern volatile int alarmed;
+    extern volatile int alarmed;
 
 /**
  * \brief          Return the CPU cycle counter value
  */
-unsigned long hardclock( void );
+    unsigned long hardclock (void);
 
 /**
  * \brief          Return the elapsed time in milliseconds
@@ -51,23 +55,23 @@ unsigned long hardclock( void );
  * \param val      points to a timer structure
  * \param reset    if set to 1, the timer is restarted
  */
-unsigned long get_timer( struct hr_time *val, int reset );
+    unsigned long get_timer (struct hr_time *val, int reset);
 
 /**
  * \brief          Setup an alarm clock
  *
  * \param seconds  delay before the "alarmed" flag is set
  */
-void set_alarm( int seconds );
+    void set_alarm (int seconds);
 
 /**
  * \brief  Sleep for a certain amount of time
  *
  * \param  milliseconds Delay in milliseconds
  */
-void m_sleep( int milliseconds );
+    void m_sleep (int milliseconds);
 
-void set_time (time_t TimeInSec);
+    void set_time (time_t TimeInSec);
 
 #ifdef __cplusplus
 }

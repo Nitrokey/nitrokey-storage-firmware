@@ -1,4 +1,7 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
+/*
+ * This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0
+ * Release 
+ */
 
 /**
  * \file xtea.h
@@ -39,12 +42,13 @@ typedef UINT32 uint32_t;
  */
 typedef struct
 {
-    uint32_t k[4];       /*!< key */
+    uint32_t k[4];  /* !< key */
 }
 xtea_context;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -53,7 +57,7 @@ extern "C" {
  * \param ctx      XTEA context to be initialized
  * \param key      the secret key
  */
-void xtea_setup( xtea_context *ctx, unsigned char key[16] );
+    void xtea_setup (xtea_context * ctx, unsigned char key[16]);
 
 /**
  * \brief          XTEA cipher function
@@ -63,17 +67,16 @@ void xtea_setup( xtea_context *ctx, unsigned char key[16] );
  * \param input    8-byte input block
  * \param output   8-byte output block
  */
-void xtea_crypt_ecb( xtea_context *ctx,
-		 int mode,
-		 unsigned char input[8],
-		 unsigned char output[8] );
+    void xtea_crypt_ecb (xtea_context * ctx,
+                         int mode,
+                         unsigned char input[8], unsigned char output[8]);
 
-/*
- * \brief          Checkup routine
- *
- * \return         0 if successful, or 1 if the test failed
- */
-int xtea_self_test( int verbose );
+    /*
+     * \brief          Checkup routine
+     *
+     * \return         0 if successful, or 1 if the test failed
+     */
+    int xtea_self_test (int verbose);
 
 #ifdef __cplusplus
 }
