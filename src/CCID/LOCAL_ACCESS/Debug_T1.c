@@ -354,13 +354,14 @@ void Print_USB_to_CCID_T1_Data_I_Block (int nLenght,unsigned char *acStartBlockD
 void Print_T1_I_Block_Data (int nLenght,unsigned char *acBlockData)
 {
   int nStatusByte;
+  int n;
 
 //  CI_LocalPrintf ("          Length %d\r\n",acBlockData[2]);
 
   if (1 == ((acBlockData[1] >> 5) & 0x1))
   {
     CI_LocalPrintf ("          Folgedatenblock - %2d Bytes = ",acBlockData[2]);
-    AsciiHexPrint (acBlockData[2],&acBlockData[3]);
+    AsciiHexPrint (n,&acBlockData[3]);
   }
   else
   {
@@ -485,6 +486,63 @@ void Print_T1_R_Block_Data (int nLenght,unsigned char *acBlockData)
 
 /*******************************************************************************
 
+  Print_T1_S_Block_Data
+
+
+
+  Reviews
+  Date      Reviewer        Info
+
+
+*******************************************************************************/
+
+void Print_T1_S_Block_Data (int nLenght,unsigned char *acBlockData)
+{
+  int nPCBByte;
+
+  CI_LocalPrintf ("          ");
+  HexPrint (nLenght,acBlockData);
+  CI_LocalPrintf ("= ");
+
+  nPCBByte = acBlockData[1] & 0x3F;
+
+  switch (nPCBByte)
+  {
+    case 0x00 :
+      CI_LocalPrintf ("Resynch request");
+      break;
+    case 0x20 :
+      CI_LocalPrintf ("Resynch response");
+      break;
+    case 0x01 :
+      CI_LocalPrintf ("IFS request");
+      break;
+    case 0x21 :
+      CI_LocalPrintf ("IFS response");
+      break;
+    case 0x02 :
+      CI_LocalPrintf ("Abort request");
+      break;
+    case 0x22 :
+      CI_LocalPrintf ("Abort response");
+      break;
+    case 0x03 :
+      CI_LocalPrintf ("WTX request");
+      break;
+    case 0x23 :
+      CI_LocalPrintf ("WTX response");
+      break;
+    default :
+      CI_LocalPrintf ("PCB byte 0x%02x not found",nPCBByte);
+      break;
+  }
+
+  CI_LocalPrintf ("\r\n");
+}
+
+
+/*******************************************************************************
+
   LogStart_T1_Block
 
   Reviews
@@ -543,7 +601,7 @@ void LogEnd_T1_Block (int nLenght,unsigned char acEndBlockData[])
   {
     if (1 == ((acStartT1Block[1] >> 5) & 0x1))
     {
-      CI_LocalPrintf ("          Teilblock mit %2d Bytes\r\n",acStartT1Block[2]);
+      CI_LocalPrintf ("          chained block from %2d bytes\r\n",acStartT1Block[2]);
     }
 
     // Check block type
@@ -559,6 +617,7 @@ void LogEnd_T1_Block (int nLenght,unsigned char acEndBlockData[])
         break;
       case 3:   // S-Block
         CI_LocalPrintf ("          S-Block\r\n");
+        Print_T1_S_Block_Data (nStartT1BlockLenght,(unsigned char *)acStartT1Block);
         break;
     }
   }
@@ -591,7 +650,7 @@ void LogEnd_T1_Block (int nLenght,unsigned char acEndBlockData[])
 
       case 3:   // S-Block
         CI_LocalPrintf ("          S-Block\r\n");
-        Print_T1_I_Block_Data (nLenght,acEndBlockData);
+        Print_T1_S_Block_Data (nLenght,acEndBlockData);
         break;
     }
   }

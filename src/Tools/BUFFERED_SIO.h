@@ -39,7 +39,7 @@
 
 
 #ifndef STICK_20_SEND_DEBUGINFOS_VIA_HID
-  #define BUFFERED_SIO_TX_BUFFER_SIZE     2000
+  #define BUFFERED_SIO_TX_BUFFER_SIZE     5000
 #else
   #define BUFFERED_SIO_TX_BUFFER_SIZE     6000    // More buffer for slow HID communication
 #endif

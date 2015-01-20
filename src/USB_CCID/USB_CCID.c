@@ -631,18 +631,15 @@ u8 CCID_XfrBlock_u8 (t_USB_CCID_data_st *USB_CCID_data_pst,u16 *CCID_AnswerSize_
 {
 	s32 Ret_s32;
 	s32 XfrLenght_s32;
-//	u32 TickStart_u32;
 
+	XfrLenght_s32 = USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH] + USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH+1] * 256;
 
-	XfrLenght_s32 = USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH];
 /*
-TickStart_u32 =	xTaskGetTickCount();
-CI_LocalPrintf ("%7d : CCID_XfrBlock - Max len %3d - ",TickStart_u32,XfrLenght_s32);
-
+	CI_TickLocalPrintf ("CCID_XfrBlock - Max len %3d\n",XfrLenght_s32);
 Print_T1_Block (USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH],&USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA]);
 */
 #ifdef DEBUG_LOG_CCID_DETAIL
-	LogStart_T1_Block (USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH],(u8*)&USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA]);
+	LogStart_T1_Block (XfrLenght_s32,(u8*)&USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA]);
 #endif
 
 	Ret_s32 = ISO7816_T1_DirectXfr (&XfrLenght_s32,(u8*)&USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA],CCID_MAX_XFER_LENGTH);
@@ -852,15 +849,24 @@ u8 PC_to_RDR_XfrBlock_u8 (t_USB_CCID_data_st *USB_CCID_data_pst)
 
 // Check for size command
 	if ((0xC1 == USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+1]) &&
-		(0x01 == USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+2]) &&
-		(0xFE == USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+3]) &&
-		(0x3E == USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+4]))
+		  (0x01 == USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+2]) &&
+		  (0xFE == USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+3]) &&
+		  (0x3E == USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+4]))
 	{
+    CI_LocalPrintf ("Get S-Block IFS request\n");
+
 		USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+1] = 0xE1;
 		USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+2] = 0x01;
-		USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+3] = 0x20;
-		USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+4] = 0xC0;
+    USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+3] = 0x20;
+		USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+4] = ISO7816_XOR_String (4,&USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA]); // 0xC1;
 		CCID_AnswerBlockSize_u16 = 5;
+
+    UsbMessageLength_u32 = CCID_AnswerBlockSize_u16;
+    USB_CCID_data_pst->CCID_datalen                   = CCID_AnswerBlockSize_u16;
+    USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH]   = (u8)  UsbMessageLength_u32;
+    USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH+1] = (u8) (UsbMessageLength_u32 >> 8);
+    USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH+2] = 0x00;
+    USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH+3] = 0x00;
 		return (CCID_NO_ERROR);
 	}
 
@@ -1363,8 +1369,19 @@ void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst)
 	u8 LockFlag_u8;
 
 	USB_CCID_data_pst->CCID_datalen = USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH+1] * 256 +
+                                     USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH];
+
+/*
+	n = USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH+1] * 256 +
 									   USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH];
 
+	if (n != USB_CCID_data_pst->CCID_datalen - 10)     // 10 byte USB overhead
+	{
+    CI_LocalPrintf ("USB %3d != CCID len %d\n",USB_CCID_data_pst->CCID_datalen-10,n);
+	}
+
+  USB_CCID_data_pst->CCID_datalen = n;
+*/
 	n = USB_CCID_data_pst->USB_data[CCID_OFFSET_MESSAGE_TYPE];
 
   if (mci != &AVR32_MCI)      // To get sure that mci has the correct value
