@@ -219,13 +219,16 @@ static void USB_CCID_GetDataFromUSB (void)
 
 // Get all data from USB
 	USB_CCID_data_st.CCID_datalen = 0;
+
 	while (Is_usb_out_received(EP_CCID_OUT))
 	{
+    Usb_reset_endpoint_fifo_access(EP_CCID_OUT);
+
 	  USB_Datalen_s32 = Usb_byte_count (EP_CCID_OUT);
 	  USB_Log_st.CCID_WriteCalls_u32 ++;
 	  USB_Log_st.CCID_BytesWrite_u32 += USB_Datalen_s32;
 
-//    CI_LocalPrintf ("Get CCID USB block %3d byte - %3d\n",USB_Datalen_s32,USB_CCID_data_st.CCID_datalen);
+    CI_TickLocalPrintf ("Get CCID USB block %3d byte - %3d\n",USB_Datalen_s32,USB_CCID_data_st.CCID_datalen);
 
 	  if (CCID_MAX_XFER_LENGTH <= USB_Datalen_s32 + USB_CCID_data_st.CCID_datalen) // Check for oversize
 	  {
@@ -241,7 +244,7 @@ static void USB_CCID_GetDataFromUSB (void)
 	  }
 
 	  Usb_ack_out_received_free(EP_CCID_OUT);
-	  DelayMs (1);
+    DelayMs (1);
 	}
 
   LED_RedOn ();

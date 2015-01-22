@@ -393,7 +393,7 @@ const S_usb_user_configuration_descriptor usb_conf_desc_hs =
   0xA1,0xC5,0x01,0x00,              // dwMaxDataRate: 116129 bps (0x0001C5A1)
   0x00,                             // bNumDataRatesSupported => no manual setting
 
-  0xFE,0x00,0x00,0x00,              /* dwMaxIFSD: 254 */
+  0x30,0x00,0x00,0x00,              /* dwMaxIFSD: 48 */
   0x00,0x00,0x00,0x00,              /* dwSynchProtocols  */
   0x00,0x00,0x00,0x00,              /* dwMechanical: no special characteristics */
 
