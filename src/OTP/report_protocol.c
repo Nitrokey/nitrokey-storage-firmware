@@ -116,10 +116,11 @@ u8  temp_user_password[25];
 u8  tmp_user_password_set    =0;
 u32 authorized_user_crc      =0xFFFFFFFF;
 
+#define HID_STRING_LEN      50
 
 // For stick 2.0
 u8 HID_CmdGet_u8  = HTML_CMD_NOTHING;
-u8 HID_String_au8[50];
+u8 HID_String_au8[HID_STRING_LEN];
 
 HID_Stick20Status_est   HID_Stick20Status_st;
 

@@ -850,13 +850,14 @@ u8 GetCorrectMatrixTest  (void)
   16.08.13  RB              First review
 
 *******************************************************************************/
+#define MATRIX_PASSWORD_MAX_LEN   20
 
 u8 ConvertMatrixDataToPassword(u8 *MatrixData_au8)
 {
   u8 i;
   u8 n;
   u8 x,y;
-  u8 MatrixColumsUserPW_au8[20];
+  u8 MatrixColumsUserPW_au8[MATRIX_PASSWORD_MAX_LEN];
 
   if (FALSE == PWM_PasswordMatrix_Filled_u8)
   {
@@ -864,6 +865,11 @@ u8 ConvertMatrixDataToPassword(u8 *MatrixData_au8)
   }
 
   n = strlen ((char*)MatrixData_au8);
+
+  if ((MATRIX_PASSWORD_MAX_LEN - 1) <= n)   // Test for boundaries
+  {
+    return (FALSE);
+  }
 
   ReadMatrixColumsUserPWFromUserPage (MatrixColumsUserPW_au8);
 
