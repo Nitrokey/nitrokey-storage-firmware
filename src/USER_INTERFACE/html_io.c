@@ -739,7 +739,7 @@ void HID_ExcuteCmd (void)
   }
 
   HID_CmdGet_u8 = HTML_CMD_NOTHING;
-  memset (HID_String_au8,0,50);
+  memset (HID_String_au8,0,50);           // Clear input data, with possible sent passwords
 
 /*
     HID_SmartcardAccess_u8 = FALSE;

@@ -866,7 +866,7 @@ u8 ConvertMatrixDataToPassword(u8 *MatrixData_au8)
 
   n = strlen ((char*)MatrixData_au8);
 
-  if ((MATRIX_PASSWORD_MAX_LEN - 1) <= n)   // Test for boundaries
+  if ((MATRIX_PASSWORD_MAX_LEN - 1) <= n)   // Boundary check
   {
     return (FALSE);
   }

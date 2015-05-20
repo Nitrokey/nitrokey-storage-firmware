@@ -317,6 +317,9 @@ int LA_OpenPGP_V20_ResetRetryCounter (typeAPDU *tSC, unsigned char cPasswordLen,
     nRet = FALSE;
   }
 
+// Clear password in tAPDU RAM
+  memset (tSC->tAPDU.cData,0,cPasswordLen);
+
   return (nRet);
 }
 
@@ -379,6 +382,9 @@ int LA_OpenPGP_V20_Verify (typeAPDU *tSC, unsigned char cPW,unsigned char cPassw
   {
     nRet = FALSE;
   }
+
+// Clear password in tAPDU RAM
+  memset (tSC->tAPDU.cData,0,cPasswordLen);
 
 	return (nRet);
 }
@@ -604,6 +610,10 @@ int LA_OpenPGP_V20_Decipher (typeAPDU *tSC, int nSendLength,unsigned char *cSend
   tSC->tAPDU.nLe      = 0; // 2048; // nReceiveLength;
 
   nRet = ISO7816_SendAPDU_Le_Lc (tSC);
+
+// Clear tAPDU RAM
+  memset (tSC->tAPDU.cData,0,nSendLength+1);
+
   return (nRet);
 }
 
@@ -656,6 +666,9 @@ int LA_OpenPGP_V20_Put_AES_key (typeAPDU *tSC,unsigned char cKeyLen,unsigned cha
 
   nRet = ISO7816_SendAPDU_NoLe_Lc (tSC);
 
+// Clear tAPDU RAM
+  memset (tSC->tAPDU.cData,0,cKeyLen);
+
   return (nRet);
 }
 
@@ -704,6 +717,10 @@ int LA_OpenPGP_V20_AES_Enc (typeAPDU *tSC, int nSendLength,unsigned char *cSendD
   tSC->tAPDU.nLe      = 0;  // nReceiveLength;
 
   nRet = ISO7816_SendAPDU_Le_Lc (tSC);
+
+// Clear tAPDU RAM
+  memset (tSC->tAPDU.cData,0,nSendLength+1);
+
   return (nRet);
 }
 
@@ -807,6 +824,9 @@ int LA_OpenPGP_V20_ChangeUserPin (typeAPDU *tSC, int nSendLength,unsigned char *
     nRet = FALSE;
   }
 
+// Clear tAPDU RAM
+  memset (tSC->tAPDU.cData,0,nSendLength);
+
   return (nRet);
 }
 
@@ -849,6 +869,9 @@ int LA_OpenPGP_V20_ChangeAdminPin (typeAPDU *tSC, int nSendLength,unsigned char 
   {
     nRet = FALSE;
   }
+
+// Clear tAPDU RAM
+  memset (tSC->tAPDU.cData,0,nSendLength);
 
   return (nRet);
 }
@@ -961,6 +984,10 @@ int LA_OpenPGP_V20_Test_ChangeUserPin (unsigned char *pcOldPin,unsigned char *pc
   strcat (acPinString,(char *)pcNewPin);
 
   nRet = LA_OpenPGP_V20_ChangeUserPin (&tSC_OpenPGP_V20,n,(unsigned char *)acPinString);
+
+// Clear RAM
+  memset (acPinString,0,MAX_PIN_STRING);
+
   if (FALSE == nRet)
   {
     CI_LocalPrintf ("fail\n\r");
@@ -1002,6 +1029,10 @@ int LA_OpenPGP_V20_Test_ChangeAdminPin (unsigned char *pcOldPin,unsigned char *p
   strcat (acPinString,(char *)pcNewPin);
 
   nRet = LA_OpenPGP_V20_ChangeAdminPin (&tSC_OpenPGP_V20,n,(unsigned char *)acPinString);
+
+// Clear RAM
+  memset (acPinString,0,MAX_PIN_STRING);
+
   if (FALSE == nRet)
   {
     CI_LocalPrintf ("fail\n\r");
