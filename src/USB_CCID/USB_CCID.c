@@ -835,6 +835,11 @@ u8 PC_to_RDR_XfrBlock_u8 (t_USB_CCID_data_st *USB_CCID_data_pst)
 		return (CCID_ERROR_BAD_LENTGH);
 	}
 
+  if (CCID_MAX_XFER_LENGTH <= USB_CCID_data_pst->CCID_datalen)
+  {
+    return (CCID_ERROR_BAD_LENTGH);
+  }
+
 	if(TRUE == USB_CCID_data_pst->CCID_CMD_aborted)
 	{
 		return (CCID_ERROR_CMD_ABORTED);
@@ -1370,6 +1375,11 @@ void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st *USB_CCID_data_pst)
 
 	USB_CCID_data_pst->CCID_datalen = USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH+1] * 256 +
                                      USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH];
+
+	if (CCID_MAX_XFER_LENGTH <= USB_CCID_data_pst->CCID_datalen)
+	{
+	  return;        // Avoid overflow
+	}
 
 /*
 	n = USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH+1] * 256 +
