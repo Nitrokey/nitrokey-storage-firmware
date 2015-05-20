@@ -863,24 +863,7 @@ char *IBN_SdRetValueString (Ctrl_status Ret_e)
 
 void IBN_HTML_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned int Param_u32,unsigned char *String_pu8)
 {
-#ifdef HTML_ENABLE_HTML_INTERFACE
-  if (0 == nParamsGet_u8)
-  {
-    CI_LocalPrintf ("HTML test functions\r\n");
-    CI_LocalPrintf ("\r\n");
-    CI_LocalPrintf ("0   Write start file\r\n");
-    CI_LocalPrintf ("\r\n");
-    return;
-  }
-  switch (CMD_u8)
-  {
-    case 0 :
-      HTML_GenerateStartPage ();
-      break;
-  }
-#else
   CI_LocalPrintf ("HTML interface not active\r\n");
-#endif
 }
 
 /*******************************************************************************

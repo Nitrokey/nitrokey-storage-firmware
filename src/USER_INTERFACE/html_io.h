@@ -72,7 +72,6 @@
 #define HTML_CMD_CLEAR_LOCK_STICK_HARDWARE           29
 #define HTML_CMD_PRODUCTION_TEST                     30
 
-#define HTML_INPUTBUFFER_SIZE   64
 
 
 
@@ -96,11 +95,7 @@ extern typeStick20ProductionInfos_st Stick20ProductionInfos_st;
 void GetProductionInfos (typeStick20ProductionInfos_st *Infos_st);
 void LockDevice (void);
 
-void HTML_GenerateStartPage (void);
-
 u8 HTML_FileIO_Init_u8 (void);
-
-void HTML_CheckRamDisk (void);
 
 void HID_ExcuteCmd (void);
 

@@ -161,11 +161,6 @@ void IW_task(void *pvParameters)
   u32 LoopCount_u32 = 0;
   portTickType xLastWakeTime;
 
-// Init Ramdisk io
-#ifdef HTML_ENABLE_HTML_INTERFACE
-  HTML_FileIO_Init_u8 ();
-#endif
-
 // Check system configuration
   StartupCheck_u8 ();
 
@@ -197,9 +192,6 @@ void IW_task(void *pvParameters)
      LoopCount_u32++;
      if(0 == LoopCount_u32 % 10)          // Every 100 ms
      {
-#ifdef HTML_ENABLE_HTML_INTERFACE
-       HTML_CheckRamDisk ();
-#endif
        HID_ExcuteCmd ();
 
        MSD_AccessManager100ms ();         // Check MSD access

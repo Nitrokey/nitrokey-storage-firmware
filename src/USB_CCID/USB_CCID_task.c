@@ -228,7 +228,7 @@ static void USB_CCID_GetDataFromUSB (void)
 	  USB_Log_st.CCID_WriteCalls_u32 ++;
 	  USB_Log_st.CCID_BytesWrite_u32 += USB_Datalen_s32;
 
-    CI_TickLocalPrintf ("Get CCID USB block %3d byte - %3d\n",USB_Datalen_s32,USB_CCID_data_st.CCID_datalen);
+//    CI_TickLocalPrintf ("Get CCID USB block %3d byte - %3d\n",USB_Datalen_s32,USB_CCID_data_st.CCID_datalen);
 
 	  if (CCID_MAX_XFER_LENGTH <= USB_Datalen_s32 + USB_CCID_data_st.CCID_datalen) // Check for oversize
 	  {
