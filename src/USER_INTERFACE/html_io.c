@@ -292,13 +292,14 @@ void HID_ExcuteCmd (void)
 
     case HTML_CMD_ENABLE_FIRMWARE_UPDATE :
       CI_TickLocalPrintf ("Firmware update - ");
-
+/*
       if (TRUE == flashc_is_security_bit_active ())
       {
         CI_TickLocalPrintf ("Security bit is active. Update not enabled\r\n");
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_SECURITY_BIT_ACTIVE,0);
         break;
       }
+*/
       if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
       {
         CI_TickLocalPrintf ("good bye\r\n");

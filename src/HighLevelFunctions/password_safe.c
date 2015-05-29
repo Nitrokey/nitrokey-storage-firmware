@@ -163,7 +163,7 @@ u8 PWS_WriteSlot (u8 Slot_u8, typePasswordSafeSlot_st *Slot_st)
 #endif
 
 // Encrypt data (max 256 byte per encryption)
-  AES_StorageKeyEncryption (PWS_SLOT_LENGTH,(void*)Slot_st,AesKeyPointer_pu8, AES_PMODE_CIPHER);
+  AES_KeyEncryption (PWS_SLOT_LENGTH,(void*)Slot_st,AesKeyPointer_pu8, AES_PMODE_CIPHER,Slot_u8);
 
 #ifdef ENABLE_IBN_PWS_TESTS_ENCRYPTION
   CI_LocalPrintf ("PWS_WriteSlot encrypted  : ");
@@ -239,7 +239,7 @@ u8 PWS_EraseSlot (u8 Slot_u8)
 #endif
 
 // Encrypt data (max 256 byte per encryption)
-  AES_StorageKeyEncryption (PWS_SLOT_LENGTH,(void*)&Slot_st,AesKeyPointer_pu8, AES_PMODE_CIPHER);
+  AES_KeyEncryption (PWS_SLOT_LENGTH,(void*)&Slot_st,AesKeyPointer_pu8, AES_PMODE_CIPHER,Slot_u8);
 
 #ifdef ENABLE_IBN_PWS_TESTS_ENCRYPTION
   CI_LocalPrintf ("PWS_EraseSlot encrypted  : ");
@@ -303,7 +303,7 @@ u8 PWS_ReadSlot (u8 Slot_u8, typePasswordSafeSlot_st *Slot_st)
 #endif
 
 // Decrypt data (max 256 byte per encryption)
-  AES_StorageKeyEncryption (PWS_SLOT_LENGTH,(void*)Slot_st,AesKeyPointer_pu8, AES_PMODE_DECIPHER);
+  AES_KeyEncryption (PWS_SLOT_LENGTH,(void*)Slot_st,AesKeyPointer_pu8, AES_PMODE_DECIPHER,Slot_u8);
 
 #ifdef ENABLE_IBN_PWS_TESTS_ENCRYPTION
   CI_LocalPrintf ("PWS_ReadSlot decrypted  : ");

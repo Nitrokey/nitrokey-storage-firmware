@@ -243,6 +243,7 @@ extern __inline__ void aes_load_newseed(volatile avr32_aes_t *aes)
 
 // Todo: put function in the right file
 int AES_StorageKeyEncryption (unsigned int nLength, unsigned char *cData, unsigned char *cKeyData, unsigned char cMode);
+int AES_KeyEncryption (unsigned int nLength, unsigned char *cData, unsigned char *cKeyData, unsigned char cMode, unsigned int BlockNr_u32);
 
 void AES_SetNewStorageKey (unsigned char *pcKey);
 

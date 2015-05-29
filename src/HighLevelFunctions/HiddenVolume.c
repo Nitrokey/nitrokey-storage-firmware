@@ -179,7 +179,7 @@ u8 HV_ReadSlot_u8 (u8 SlotNr_u8,HiddenVolumeKeySlot_tst *SlotData_st,u8 *SlotKey
 // Read all slots data from flash
   memcpy (&DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE] ,(u8*)(HV_SALT_START_ADDRESS + HV_SALT_SIZE), HV_SLOT_SIZE * HV_SLOT_COUNT);
 // Decrypted data with slots key
-  AES_StorageKeyEncryption (HV_SLOT_COUNT * HV_SLOT_SIZE,&DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE], DecryptedHiddenVolumeSlotsKey_au8, AES_PMODE_DECIPHER);
+  AES_KeyEncryption (HV_SLOT_COUNT * HV_SLOT_SIZE,&DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE], DecryptedHiddenVolumeSlotsKey_au8, AES_PMODE_DECIPHER,SlotNr_u8);
 
 #ifdef DEBUG_KEYS
   CI_LocalPrintf ("Encrypted data :\r\n");
@@ -192,7 +192,7 @@ u8 HV_ReadSlot_u8 (u8 SlotNr_u8,HiddenVolumeKeySlot_tst *SlotData_st,u8 *SlotKey
   memcpy ((u8*)Buffer_au8,(u8*) (DecryptedHiddenVolumeSlotsData_au8 + HV_SALT_SIZE + SlotNr_u8 * HV_SLOT_SIZE),HV_SLOT_SIZE);
 
 // Decrypt slot data
-  AES_StorageKeyEncryption (HV_SLOT_SIZE, (u8*)Buffer_au8, SlotKey_pu8, AES_PMODE_DECIPHER);
+  AES_KeyEncryption (HV_SLOT_SIZE, (u8*)Buffer_au8, SlotKey_pu8, AES_PMODE_DECIPHER,SlotNr_u8);
 
   memcpy ((u8*)SlotData_st,Buffer_au8,sizeof (HiddenVolumeKeySlot_tst));
 
@@ -235,12 +235,20 @@ u8 HV_ReadSlot_u8 (u8 SlotNr_u8,HiddenVolumeKeySlot_tst *SlotData_st,u8 *SlotKey
 
 u8 HV_WriteSlot_u8 (u8 SlotNr_u8,HiddenVolumeKeySlot_tst *SlotData_st,u8 *SlotKey_pu8)
 {
-  u8 Buffer_au8[HV_SLOT_SIZE];
-  u8 HiddenVolumeSlotsKey_au8[AES_KEYSIZE_256_BIT];
+  u32 i;
+  u8  Buffer_au8[HV_SLOT_SIZE];
+//  u8  HiddenVolumeSlotsKey_au8[AES_KEYSIZE_256_BIT];
 
   if (FALSE == DecryptedHiddenVolumeSlotsActive_u8)
   {
     return (FALSE);       // Slot data is not in ram
+  }
+
+
+// Fill buffer with random numbers
+  for (i=0;i<HV_SLOT_SIZE;i++)
+  {
+    Buffer_au8[i] = rand () % 256;
   }
 
 // Set magic number
@@ -258,7 +266,7 @@ u8 HV_WriteSlot_u8 (u8 SlotNr_u8,HiddenVolumeKeySlot_tst *SlotData_st,u8 *SlotKe
 
   memcpy (Buffer_au8,(u8*)SlotData_st,sizeof (HiddenVolumeKeySlot_tst));
 // Encrypt slot data
-  AES_StorageKeyEncryption (HV_SLOT_SIZE, Buffer_au8, SlotKey_pu8, AES_PMODE_CIPHER);
+  AES_KeyEncryption (HV_SLOT_SIZE, Buffer_au8, SlotKey_pu8, AES_PMODE_CIPHER,SlotNr_u8);
 
 // Write encrypted slot data into ram
   memcpy ((u8*)(DecryptedHiddenVolumeSlotsData_au8 + HV_SALT_SIZE  + SlotNr_u8 * HV_SLOT_SIZE),Buffer_au8,HV_SLOT_SIZE);
@@ -270,7 +278,7 @@ u8 HV_WriteSlot_u8 (u8 SlotNr_u8,HiddenVolumeKeySlot_tst *SlotData_st,u8 *SlotKe
 #endif
 
 // Encrypt all slots data (max 256 byte per encryption)
-  AES_StorageKeyEncryption (HV_SLOT_COUNT * HV_SLOT_SIZE,&DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE], DecryptedHiddenVolumeSlotsKey_au8, AES_PMODE_CIPHER);
+  AES_KeyEncryption (HV_SLOT_COUNT * HV_SLOT_SIZE,&DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE], DecryptedHiddenVolumeSlotsKey_au8, AES_PMODE_CIPHER,SlotNr_u8);
 
 // Write ram data to flash
   flashc_memcpy ((u8*)(HV_SALT_START_ADDRESS+HV_SALT_SIZE),&DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE],HV_SLOT_SIZE * HV_SLOT_COUNT,TRUE);

@@ -950,7 +950,7 @@ void test_ram_aes_ram(unsigned short int u16BufferSize, unsigned int *pSrcBuf, u
 //! 2) Set the AES cryptographic key and init vector.
 //! 3) Start the process
 //! 4) Check the result on the first 16 Words.
-void AES_Encryption (unsigned short int u16BufferSize, unsigned int *pSrcBuf, unsigned int *pDstBuf, unsigned int *pKey)
+void AES_Encryption (unsigned short int u16BufferSize, unsigned int *pSrcBuf, unsigned int *pDstBuf, unsigned int *pKey, unsigned int *pLocalInitVector)
 {
 //  unsigned int    i;
 //  unsigned char   TestResult = TRUE;
@@ -1087,7 +1087,8 @@ void AES_Encryption (unsigned short int u16BufferSize, unsigned int *pSrcBuf, un
   aes_set_key(&AVR32_AES, pKey);
 
   // Set the initialization vector.
-  aes_set_initvector(&AVR32_AES, InitVector);
+//  aes_set_initvector(&AVR32_AES, InitVector);
+  aes_set_initvector(&AVR32_AES, pLocalInitVector);
 
   //*
   //* Start the process
@@ -1142,12 +1143,68 @@ int AES_StorageKeyEncryption (unsigned int nLength, unsigned char *cData, unsign
   // encryption is notified by the DMACA transfer complete interrupt. The output
   // is available in the OutputData[] buffer.
 
-  AesConf.CFBSize            = 0;                       // Don't-care because we're using the EBC mode.
+  AesConf.CFBSize            = 0;                       // Don't-care because we're using the ECB mode.
   AesConf.CounterMeasureMask = 0;                       // Disable all counter measures.
 
   aes_configure(&AVR32_AES, &AesConf);
 
-  AES_Encryption (nLength, (unsigned int *)InputData, (unsigned int *)OutputData, (unsigned int *) cKeyData);
+  AES_Encryption (nLength, (unsigned int *)InputData, (unsigned int *)OutputData, (unsigned int *) cKeyData, (unsigned int *)InitVector);
+
+  memcpy (cData,(void*)OutputData,nLength);
+
+  return (0);
+}
+
+/*******************************************************************************
+
+  AES_StorageKeyEncryption
+
+  Only 256 bit Keys // Max 256 byte
+
+*******************************************************************************/
+
+int AES_KeyEncryption (unsigned int nLength, unsigned char *cData, unsigned char *cKeyData, unsigned char cMode, unsigned int BlockNr_u32)
+{
+  int i;
+  aes_config_t      AesConf;        // AES config structure
+//  int               i;
+//****************************************************************************
+//               CIPHER IN DMA MODE: RAM -> AES -> RAM
+//  - 256bit cryptographic key
+//  - EBC cipher mode
+//  - No counter measures
+//****************************************************************************
+
+  memcpy(InputData, cData, nLength);
+
+  //====================
+  // Configure the AES.
+  //====================
+//  AesConf.ProcessingMode     = AES_PMODE_CIPHER;         // Cipher
+//  AesConf.ProcessingMode     = AES_PMODE_DECIPHER;         // Cipher
+  AesConf.ProcessingMode     = cMode;
+  AesConf.ProcessingDelay    = 0;                        // No delay: best performance
+  AesConf.StartMode          = AES_START_MODE_DMA;       // DMA mode
+  AesConf.KeySize            = AES_KEY_SIZE_256;         // 256bit cryptographic key
+  AesConf.OpMode             = AES_CBC_MODE;             // CBC cipher mode
+  AesConf.LodMode            = 0;                        // LODMODE == 0 : the end of the
+
+  // encryption is notified by the DMACA transfer complete interrupt. The output
+  // is available in the OutputData[] buffer.
+
+  AesConf.CFBSize            = 0;                       // Don't-care because we're using the CBC mode.
+  AesConf.CounterMeasureMask = 0;                       // Disable all counter measures.
+
+  aes_configure(&AVR32_AES, &AesConf);
+
+  // Set the initialization vector.
+  for (i=0;i<4;i++)
+  {
+    InitVectorSD[i] = BlockNr_u32;
+  }
+
+
+  AES_Encryption (nLength, (unsigned int *)InputData, (unsigned int *)OutputData, (unsigned int *) cKeyData, (unsigned int *)InitVectorSD);
 
   memcpy (cData,(void*)OutputData,nLength);
 
@@ -1168,13 +1225,15 @@ int AES_local_test (void)
   HexPrint (16,acInputData);
   CI_LocalPrintf ("\r\n");
 
-  AES_StorageKeyEncryption (32, acInputData, acKey, AES_PMODE_CIPHER);
+  AES_KeyEncryption (32, acInputData, acKey, AES_PMODE_CIPHER,0);
+//  AES_StorageKeyEncryption (32, acInputData, acKey, AES_PMODE_CIPHER);
 
   CI_LocalPrintf ("Verschlüsselter Key   : ");
   HexPrint (16,acInputData);
   CI_LocalPrintf ("\r\n");
 
-  AES_StorageKeyEncryption (32, acInputData, acKey, AES_PMODE_DECIPHER);
+  AES_KeyEncryption (32, acInputData, acKey, AES_PMODE_DECIPHER,0);
+//  AES_StorageKeyEncryption (32, acInputData, acKey, AES_PMODE_DECIPHER);
 
   CI_LocalPrintf ("Entschlüsselter Key   : ");
   HexPrint (16,acInputData);
