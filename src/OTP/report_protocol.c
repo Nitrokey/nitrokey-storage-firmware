@@ -571,23 +571,6 @@ u8 Stick20HIDSendMatrixData (u8 *output)
   return (TRUE);
 }
 
-
-/*******************************************************************************
-
-  parse_report_stick_20
-
-  Reviews
-  Date      Reviewer        Info
-
-  In USB context > don't use printf
-
-*******************************************************************************/
-
-u8 parse_report_stick_20 (u8 *report,u8 *output)
-{
-  return (TRUE);
-}
-
 /*******************************************************************************
 
   parse_report
@@ -604,7 +587,7 @@ u8 parse_report_stick_20 (u8 *report,u8 *output)
 
 *******************************************************************************/
 
-u8 parse_report(u8 *report,u8 *output)
+void parse_report(u8 *report,u8 *output)
 {
 	u8 cmd_type=report[CMD_TYPE_OFFSET];
 	u32 received_crc32;
@@ -1238,7 +1221,6 @@ u8 parse_report(u8 *report,u8 *output)
   CI_StringOut ("\n\r");
 #endif
 
-  return 0;
 }
 /*******************************************************************************
 
@@ -1255,7 +1237,7 @@ u8 parse_report(u8 *report,u8 *output)
 
 *******************************************************************************/
 
-u8 cmd_get_status(u8 *report,u8 *output)
+void cmd_get_status(u8 *report,u8 *output)
 {
 	output[OUTPUT_CMD_RESULT_OFFSET]    =FIRMWARE_VERSION&0xFF;
 	output[OUTPUT_CMD_RESULT_OFFSET+1]  =(FIRMWARE_VERSION>>8)&0xFF;
@@ -1281,8 +1263,6 @@ u8 cmd_get_status(u8 *report,u8 *output)
     }
     CI_StringOut ("\r\n");
   }
-
-	return 0;
 }
 
 /*******************************************************************************
@@ -1299,10 +1279,9 @@ u8 cmd_get_status(u8 *report,u8 *output)
 
 *******************************************************************************/
 
-u8 cmd_get_password_retry_count(u8 *report,u8 *output)
+void cmd_get_password_retry_count(u8 *report,u8 *output)
 {
   output[OUTPUT_CMD_RESULT_OFFSET] = StickConfiguration_st.AdminPwRetryCount;
-  return 0;
 }
 
 /*******************************************************************************
@@ -1359,7 +1338,8 @@ u8 cmd_write_to_slot(u8 *report,u8 *output)
 	memcpy(slot_tmp+1,report+CMD_WTS_SLOT_NAME_OFFSET,51);
 	memcpy(slot_name,report+CMD_WTS_SLOT_NAME_OFFSET,15);
 
-  if (slot_name[0] == 0){
+  if (slot_name[0] == 0)
+  {
       output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NO_NAME_ERROR;
       return 1;
   }
@@ -1401,6 +1381,7 @@ u8 cmd_write_to_slot(u8 *report,u8 *output)
 	}
 	else{
 		output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_WRONG_SLOT;
+    return 1;
 	}
 
 	return 0;
@@ -1441,6 +1422,7 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
 		else
 		{
 		  output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_SLOT_NOT_PROGRAMMED;
+		  return 1;
 		}
 	}
 	else if ((slot_no >= 0x20) && (slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS))   //TOTP slot
@@ -1461,6 +1443,7 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
 		else
 		{
 		  output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_SLOT_NOT_PROGRAMMED;
+      return 1;
 		}
 	}
 	else
@@ -1479,7 +1462,6 @@ u8 cmd_read_slot_name(u8 *report,u8 *output)
   16.08.13  RB              First review
 
 *******************************************************************************/
-
 
 u8 cmd_read_slot(u8 *report,u8 *output)
 {
@@ -1519,6 +1501,7 @@ u8 cmd_read_slot(u8 *report,u8 *output)
 		else
 		{
       output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_SLOT_NOT_PROGRAMMED;
+      return 1;
 		}
 	}
 	else if ((slot_no >= 0x20) && (slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS))     //TOTP slot
@@ -1535,11 +1518,13 @@ u8 cmd_read_slot(u8 *report,u8 *output)
 		else
 		{
 		  output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_SLOT_NOT_PROGRAMMED;
+      return 1;
 		}
 	}
 	else
 	{
 		output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_WRONG_SLOT;
+    return 1;
 	}
 
 	return 0;
@@ -1890,7 +1875,6 @@ u8 cmd_user_authenticate(u8 *report,u8 *output)
   {
       memcpy(temp_user_password,report+26,25);
       tmp_user_password_set=1;
-//      getAID();
       return 0;
   }
   else
@@ -2608,12 +2592,14 @@ u8 cmd_getFactoryReset (u8 *report,u8 *output)
   if (TRUE != Ret_u32)
   {
       output[OUTPUT_CMD_STATUS_OFFSET]=CMD_STATUS_WRONG_PASSWORD;
-      return 1; //wrong card password
+      return (FALSE);       //wrong card password
   }
 
   LA_OpenPGP_V20_ResetCard ();      // Factory reset smartcard
 
   EraseLocalFlashKeyValues_u32 ();  // Factory reset local flash
+
+  return (TRUE);
 }
 
 

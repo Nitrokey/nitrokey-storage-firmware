@@ -319,7 +319,7 @@ u32 BuildNewXorPattern_u32 (void)
 
 /*******************************************************************************
 
-  XorAesKey_u32
+  XorAesKey_v
 
   Changes
   Date      Author          Info
@@ -330,7 +330,7 @@ u32 BuildNewXorPattern_u32 (void)
 
 *******************************************************************************/
 
-u32 XorAesKey_u32 (u8 *AesKey_au8)
+void XorAesKey_v (u8 *AesKey_au8)
 {
   u8  XorKey_au8[AES_KEYSIZE_256_BIT];
   u32 i;
@@ -353,7 +353,7 @@ u32 XorAesKey_u32 (u8 *AesKey_au8)
   HexPrint (AES_KEYSIZE_256_BIT,AesKey_au8);
   CI_LocalPrintf ("\r\n");
 #endif
-  return (TRUE);
+
 }
 
 /*******************************************************************************
@@ -443,7 +443,7 @@ u32 DecryptKeyViaSmartcard_u32 (u8 *StorageKey_pu8)
     return (FALSE);
   }
 
-  XorAesKey_u32 (StorageKey_pu8);
+  XorAesKey_v (StorageKey_pu8);
 
 #ifdef LOCAL_DEBUG
 //  CI_LocalPrintf ("DecryptKeyViaSmartcard_u32: Decrypted key : ");

@@ -28,7 +28,7 @@
 
 #include <avr32/io.h>
 #include "compiler.h"
-#include "mass_storage_example.h"
+//#include "nitrokey.h"
 #include "board.h"
 #include "power_clocks_lib.h"
 #include "gpio.h"

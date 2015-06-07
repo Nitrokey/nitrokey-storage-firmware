@@ -2198,6 +2198,10 @@ const cid_t *GetSdCidInfo (void)
 
   CheckForNewSdCard
 
+  Return
+    TRUE  - New SD card found
+    FALSE - SD Card is not changed
+
   Changes
   Date      Author          Info
   08.02.14  RB              Implementation: Check for new SD card
@@ -2218,10 +2222,11 @@ unsigned char CheckForNewSdCard (void)
 
   if (NewSdID_u32 != OldSdID_u32)
   {
-    WriteNewSdCardFoundToFlash (&NewSdID_u32);
+    WriteNewSdCardFoundToFlash (&NewSdID_u32);    // Write new SD id into flash
+    return (TRUE);
   }
 
-  return (TRUE);
+  return (FALSE);
 }
 
 

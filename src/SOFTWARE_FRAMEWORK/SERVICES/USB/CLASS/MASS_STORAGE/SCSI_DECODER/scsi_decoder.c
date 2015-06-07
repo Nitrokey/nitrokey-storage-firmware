@@ -183,16 +183,7 @@ void Sbc_build_sense (U8 lun,U8 skey,U8 sasc,U8 sascq)
 
 /*******************************************************************************
 
-  parse_report
-
-  Changes
-  Date      Author          Info
-  01.04.14  RB              Creation of function
-
-  Reviews
-  Date      Reviewer        Info
-
-  In USB context > don't use printf
+  DebugScsiCommand
 
 *******************************************************************************/
 
