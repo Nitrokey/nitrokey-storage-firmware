@@ -161,6 +161,7 @@ void HID_ExcuteCmd (void)
   u8 *PasswordMatrix_pu8;
   u8  ret_u8;
   u64 timestamp;
+  u32 Len;
 //  u32 Ret_u32;
 
   Cmd_u8 = HID_CmdGet_u8;
@@ -181,7 +182,6 @@ void HID_ExcuteCmd (void)
   switch (Cmd_u8)
   {
     case HTML_CMD_ENABLE_AES_LUN :
-    case HTML_CMD_ENABLE_FIRMWARE_UPDATE :
     case HTML_CMD_ENABLE_HIDDEN_AES_LUN :
     case HTML_CMD_DISABLE_HIDDEN_AES_LUN :
     case HTML_CMD_EXPORT_BINARY :
@@ -292,15 +292,15 @@ void HID_ExcuteCmd (void)
 
     case HTML_CMD_ENABLE_FIRMWARE_UPDATE :
       CI_TickLocalPrintf ("Firmware update - ");
-/*
+
       if (TRUE == flashc_is_security_bit_active ())
       {
         CI_TickLocalPrintf ("Security bit is active. Update not enabled\r\n");
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_SECURITY_BIT_ACTIVE,0);
         break;
       }
-*/
-      if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
+
+      if (TRUE == CheckUpdatePin (&HID_String_au8[1],strlen (&HID_String_au8[1])))
       {
         CI_TickLocalPrintf ("good bye\r\n");
         DFU_EnableFirmwareUpdate ();
@@ -732,6 +732,33 @@ void HID_ExcuteCmd (void)
         Stick20HIDInitSendConfiguration (STICK20_SEND_PRODUCTION_TEST);
         UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
         break;
+
+      case HTML_CMD_CHANGE_UPDATE_PIN :
+        CI_TickLocalPrintf ("Get HTML_CMD_CHANGE_UPDATE_PIN\r\n");
+
+        Len = strlen (&HID_String_au8[1]);
+
+        if (TRUE == CheckUpdatePin (&HID_String_au8[1],Len))
+        {
+          Len = strlen (&HID_String_au8[1]);
+          if (TRUE == StoreNewUpdatePinHashInFlash (&HID_String_au8[16],Len))   // Start of new PW
+          {
+            CI_TickLocalPrintf ("Update PIN changed\r\n");
+            UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK,0);
+          }
+          else
+          {
+            CI_TickLocalPrintf ("*** worng password len ***\r\n");
+            UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
+          }
+        }
+        else
+        {
+          CI_TickLocalPrintf ("*** worng password ***\r\n");
+          UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD,0);
+        }
+        break;
+
 
     default:
       CI_TickLocalPrintf ("HID_ExcuteCmd: Get unknown command: %d \r\n",Cmd_u8);

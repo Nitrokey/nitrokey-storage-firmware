@@ -68,6 +68,8 @@ typeStick20Configuration_st StickConfiguration_st;
  142 - 145    ID of sc card (4 byte)
  146 - 177    XOR mask for sc tranfered keys (32 byte)
  178 - 209    Password safe key (32 byte)
+ 210 - 241    Update PIN  (32 byte)
+ 242 - 251    Update PIN SALT (10 byte)
 
 */
 
@@ -88,6 +90,10 @@ typeStick20Configuration_st StickConfiguration_st;
  Local declarations
 
 *******************************************************************************/
+
+#define LOCAL_DEBUG
+
+#define AES_KEYSIZE_256_BIT     32        // 32 * 8 = 256
 
 /*******************************************************************************
 
@@ -277,7 +283,7 @@ u8 InitStickConfigurationToUserPage_u8 (void)
   StickConfiguration_st.ReadWriteFlagCryptedVolume_u8   = READ_WRITE_ACTIVE;
   StickConfiguration_st.ReadWriteFlagHiddenVolume_u8    = READ_WRITE_ACTIVE;
   StickConfiguration_st.FirmwareLocked_u8               = 0;
-  StickConfiguration_st.ActiveSD_CardID_u32             = 0;               // todo: check endian
+  StickConfiguration_st.ActiveSD_CardID_u32             = 0;
   StickConfiguration_st.VersionInfo_au8[0]              = VERSION_MAJOR;
   StickConfiguration_st.VersionInfo_au8[1]              = VERSION_MINOR;
   StickConfiguration_st.VersionInfo_au8[2]              = 0;               // Build number not used
@@ -290,6 +296,9 @@ u8 InitStickConfigurationToUserPage_u8 (void)
   StickConfiguration_st.StickKeysNotInitiated_u8        = TRUE;
 
   WriteStickConfigurationToUserPage ();
+
+  InitUpdatePinHashInFlash ();
+
   return (TRUE);
 }
 
@@ -975,6 +984,87 @@ u8 ReadPasswordSafeKey (u8 *data)
 
 /*******************************************************************************
 
+  WriteUpdatePinHashToFlash
+
+  Changes
+  Date      Author          Info
+  20.06.15  RB              Implementation of write update pin to flash
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+WriteUpdatePinHashToFlash (u8 *PIN_Hash_pu8)
+{
+  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 210,PIN_Hash_pu8,32,TRUE);
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  ReadUpdatePinHashFromFlash
+
+  Changes
+  Date      Author          Info
+  20.06.15  RB              Implementation of read update pin from flash
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 ReadUpdatePinHashFromFlash (u8 *PIN_Hash_pu8)
+{
+  memcpy (PIN_Hash_pu8,(void*)(AVR32_FLASHC_USER_PAGE + 210),32);
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  WriteUpdatePinSaltToFlash
+
+  Changes
+  Date      Author          Info
+  20.06.15  RB              Implementation of write update pin salt to flash
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 WriteUpdatePinSaltToFlash (u8 *PIN_pu8)
+{
+  flashc_memcpy(AVR32_FLASHC_USER_PAGE + 242,PIN_pu8,10,TRUE);
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  ReadUpdatePinSaltFromFlash
+
+  Changes
+  Date      Author          Info
+  20.06.15  RB              Implementation of read update pin salt from flash
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 ReadUpdatePinSaltFromFlash (u8 *PIN_pu8)
+{
+  memcpy (PIN_pu8,(void*)(AVR32_FLASHC_USER_PAGE + 242),10);
+
+  return (TRUE);
+}
+
+
+/*******************************************************************************
+
   EraseLocalFlashKeyValues_u32
 
   Changes
@@ -1070,3 +1160,168 @@ u32 EraseLocalFlashKeyValues_u32 (void)
   return (TRUE);
 }
 
+/*******************************************************************************
+
+  CheckUpdatePin
+
+  Changes
+  Date      Reviewer        Info
+  20.06.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+void pbkdf2(u8 *output, const u8 *password, const u32 password_length, const u8 *salt, const u32 salt_length);
+
+#define UPDATE_PIN_MAX_SIZE   15
+
+#define UPDATE_PIN_SALT_SIZE 10
+
+u8 CheckUpdatePin (u8 *Password_pu8,u32 PasswordLen_u32)
+{
+  u8 output_au8[64];
+  u8 UpdatePinSalt_u8[UPDATE_PIN_SALT_SIZE];
+  u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
+
+  ReadUpdatePinSaltFromFlash (UpdatePinSalt_u8);
+
+#ifdef LOCAL_DEBUG
+  CI_LocalPrintf ("CheckUpdatePin\r\n");
+  CI_LocalPrintf ("Password_pu8 : Len %2d -%s-\r\n",PasswordLen_u32,Password_pu8);
+  CI_LocalPrintf ("Salt         : ");
+  HexPrint (UPDATE_PIN_SALT_SIZE,UpdatePinSalt_u8);
+  CI_LocalPrintf ("\r\n");
+#endif
+
+  if (UPDATE_PIN_MAX_SIZE <= PasswordLen_u32)
+  {
+    return (FALSE);
+  }
+
+
+#ifndef SAVE_FLASH_MEMORY_NO_PBKDF2
+  pbkdf2 (output_au8,Password_pu8,PasswordLen_u32,UpdatePinSalt_u8,UPDATE_PIN_SALT_SIZE);
+#else
+  CI_LocalPrintf ("*** WARNING low security for password pin ***\r\n");
+  memset (output_au8,0,AES_KEYSIZE_256_BIT);
+  memcpy (output_au8,Password_pu8,PasswordLen_u32)
+  // use the base key as the key
+#endif
+
+  ReadUpdatePinHashFromFlash (UpdatePinHash_u8);
+
+#ifdef LOCAL_DEBUG
+  CI_LocalPrintf ("Hashed PIN     : ");
+  HexPrint (AES_KEYSIZE_256_BIT,UpdatePinHash_u8);
+  CI_LocalPrintf ("\r\n");
+#endif
+
+  if (0 != memcmp (UpdatePinHash_u8,output_au8,AES_KEYSIZE_256_BIT))
+  {
+#ifdef LOCAL_DEBUG
+    CI_LocalPrintf ("Hashed PIN PW   : ");
+    HexPrint (AES_KEYSIZE_256_BIT,output_au8);
+    CI_LocalPrintf ("\r\n");
+    CI_LocalPrintf ("Wrong PIN\r\n");
+#endif
+    return (FALSE);
+  }
+
+#ifdef LOCAL_DEBUG
+  CI_LocalPrintf ("PIN OK\r\n");
+#endif
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  StoreNewUpdatePinHashInFlash
+
+  Changes
+  Date      Reviewer        Info
+  20.06.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 StoreNewUpdatePinHashInFlash (u8 *Password_pu8,u32 PasswordLen_u32)
+{
+  u8 output_au8[64];
+  u8 UpdatePinSalt_u8[UPDATE_PIN_SALT_SIZE];
+  u32 i;
+
+  if (UPDATE_PIN_MAX_SIZE <= PasswordLen_u32)
+  {
+    return (FALSE);
+  }
+
+// Generate new salt
+  for (i=0;i<UPDATE_PIN_SALT_SIZE;i++)
+  {
+    UpdatePinSalt_u8[i] = (u8)(rand () % 256);
+  }
+
+
+  WriteUpdatePinSaltToFlash (UpdatePinSalt_u8);
+
+#ifdef LOCAL_DEBUG
+  CI_LocalPrintf ("StoreNewUpdatePinHashInFlash\r\n");
+  CI_LocalPrintf ("Password_pu8 : Len %2d -%s-\r\n",PasswordLen_u32,Password_pu8);
+  CI_LocalPrintf ("Salt         : ");
+  HexPrint (UPDATE_PIN_SALT_SIZE,UpdatePinSalt_u8);
+  CI_LocalPrintf ("\r\n");
+#endif
+
+#ifndef SAVE_FLASH_MEMORY_NO_PBKDF2
+  pbkdf2 (output_au8,Password_pu8,PasswordLen_u32,UpdatePinSalt_u8,UPDATE_PIN_SALT_SIZE);
+#else
+  CI_LocalPrintf ("*** WARNING low security for password pin ***\r\n");
+  // use the base key as the key
+  memset (output_au8,0,AES_KEYSIZE_256_BIT);
+  memcpy (output_au8,Password_pu8,PasswordLen_u32)
+#endif
+
+  WriteUpdatePinHashToFlash (output_au8);
+
+  return (TRUE);
+}
+
+/*******************************************************************************
+
+  InitUpdatePinHashInFlash
+
+  Changes
+  Date      Reviewer        Info
+  21.06.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void InitUpdatePinHashInFlash (void)
+{
+  StoreNewUpdatePinHashInFlash ((u8*)"12345678",8);
+}
+
+/*******************************************************************************
+
+  TestUpdatePin
+
+  Changes
+  Date      Reviewer        Info
+  21.06.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void TestUpdatePin (void)
+{
+  CheckUpdatePin ((u8*)"12345678",8);
+  CheckUpdatePin ((u8*)"1234",4);
+}

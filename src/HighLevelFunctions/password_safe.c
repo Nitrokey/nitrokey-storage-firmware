@@ -860,6 +860,8 @@ void IBN_PWS_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned in
     CI_LocalPrintf ("3        Enable password safe access (PIN = 123456)\r\n");
     CI_LocalPrintf ("4        Build new key\r\n");
     CI_LocalPrintf ("5 [slot] Send password\r\n");
+    CI_LocalPrintf ("10       Init firmware password\r\n");
+    CI_LocalPrintf ("11       Test firmware password\r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }
@@ -913,6 +915,14 @@ void IBN_PWS_Tests (unsigned char nParamsGet_u8,unsigned char CMD_u8,unsigned in
     case 5 :
       PWS_SendData (Param_u32,PWS_SEND_PASSWORD);
       break;
+
+    case 10:
+      InitUpdatePinHashInFlash ();
+      break;
+    case 11:
+      TestUpdatePin ();
+      break;
+
   }
 }
 #endif

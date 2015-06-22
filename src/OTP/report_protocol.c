@@ -1146,6 +1146,15 @@ void parse_report(u8 *report,u8 *output)
           memcpy (HID_String_au8,&report[1],33);
           break;
 
+        case STICK20_CMD_CHANGE_UPDATE_PIN :
+          CI_StringOut ("Get STICK20_CMD_CHANGE_UPDATE_PIN\r\n");
+          StartStick20Command (STICK20_CMD_CHANGE_UPDATE_PIN);
+
+          // Transfer data to other context
+          HID_CmdGet_u8  = HTML_CMD_CHANGE_UPDATE_PIN;
+          memcpy (HID_String_au8,&report[1],33);
+          break;
+
 #ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
         case STICK20_CMD_SEND_DEBUG_DATA :
 //          CI_StringOut ("Get STICK20_CMD_SEND_DEBUG_DATA\r\n");
@@ -2598,6 +2607,8 @@ u8 cmd_getFactoryReset (u8 *report,u8 *output)
   LA_OpenPGP_V20_ResetCard ();      // Factory reset smartcard
 
   EraseLocalFlashKeyValues_u32 ();  // Factory reset local flash
+
+  InitUpdatePinHashInFlash ();
 
   return (TRUE);
 }

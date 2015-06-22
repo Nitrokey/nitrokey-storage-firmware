@@ -55,7 +55,8 @@ u32 EraseLocalFlashKeyValues_u32 (void);
 
 ***************************************************************************************/
 
-#define MAGIC_NUMBER_STICK20_CONFIG     0x1810    // Change when typeStick20Configuration_st is changed
+//#define MAGIC_NUMBER_STICK20_CONFIG     0x1810    // Change when typeStick20Configuration_st is changed
+#define MAGIC_NUMBER_STICK20_CONFIG     0x1832    // Changed: Newfirmware pin
 
 #define READ_WRITE_ACTIVE             0
 #define READ_ONLY_ACTIVE              1
@@ -118,4 +119,9 @@ u8 CheckForNewFirmwareVersion (void);
 
 u8 SetStickKeysNotInitatedToFlash (void);
 u8 ClearStickKeysNotInitatedToFlash (void);
+
+u8 StoreNewUpdatePinHashInFlash (u8 *Password_pu8,u32 PasswordLen_u32);
+u8 CheckUpdatePin (u8 *Password_pu8,u32 PasswordLen_u32);
+void InitUpdatePinHashInFlash (void);
+
 #endif /* FLASHSTORAGE_H_ */

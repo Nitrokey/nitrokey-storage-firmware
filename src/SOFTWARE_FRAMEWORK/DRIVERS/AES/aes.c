@@ -73,6 +73,7 @@
 // Counter measure key in the AES_MR register.
 #define AES_CKEY      0xE
 
+#define AES_KEYSIZE_256_BIT     32        // 32 * 8 = 256
 
 
 
@@ -137,12 +138,37 @@ void aes_set_key( volatile avr32_aes_t *aes, const unsigned int *pKey)
     *pTempo++ = *pKey++;
 }
 
+unsigned char ReadXorPatternFromFlash (unsigned char *XorPattern_pu8);
+
+#define INIT_VECTOR_KEYSIZE_128_BIT 16      // = 16 * 8 = 128
+
+void XorInitVector_v (unsigned char *InitVector_au8)
+{
+  static unsigned char XorKey_au8[AES_KEYSIZE_256_BIT];
+//  static unsigned char ReadFlag = FALSE;
+  unsigned int i;
+
+  ReadXorPatternFromFlash (XorKey_au8);
+/*
+  if (FALSE == ReadFlag)
+  {
+    ReadFlag = TRUE;
+  }
+*/
+  InitVector_au8[0] = (InitVector_au8[0] + XorKey_au8[31]) ^ XorKey_au8[0];
+  for (i=1;i<INIT_VECTOR_KEYSIZE_128_BIT;i++)
+  {
+    InitVector_au8[i] = (InitVector_au8[i] + XorKey_au8[i-1]) ^ XorKey_au8[i] + InitVector_au8[i-1];
+  }
+}
 
 void aes_set_initvector( volatile avr32_aes_t *aes, const unsigned int *pVector)
 {
   unsigned long int volatile *pTempo = &(aes->iv1r);
   int i;
   
+  XorInitVector_v ((unsigned char *)pVector);
+
   for(i=0; i<4; i++)
     *pTempo++ = *pVector++;
 }

@@ -72,6 +72,8 @@
 #define HTML_CMD_CLEAR_LOCK_STICK_HARDWARE           29
 #define HTML_CMD_PRODUCTION_TEST                     30
 
+#define HTML_CMD_CHANGE_UPDATE_PIN                   31
+
 
 
 
