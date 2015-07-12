@@ -117,7 +117,7 @@
 #include "intc.h"
 #include "usart.h"
 #include "aes.h"
-
+#include "xxHash.h"
 #include "tools.h"
 
 /* AES */
@@ -1155,6 +1155,22 @@ int AES_StorageKeyEncryption (unsigned int nLength, unsigned char *cData, unsign
   return (0);
 }
 
+#define AES_KEYSIZE_256_BIT     32        // 32 * 8 = 256
+
+void xxHashInitVector_v (unsigned int *InitVector_au32[4],unsigned int BlockNr)
+{
+  static unsigned char XorKey_au8[AES_KEYSIZE_256_BIT];
+  unsigned int i;
+
+  ReadXorPatternFromFlash (XorKey_au8);
+
+  for (i=1;i<4;i++)
+  {
+    InitVector_au32[i] = XXH_fast32(XorKey_au8,AES_KEYSIZE_256_BIT, BlockNr+i);
+  }
+}
+
+
 /*******************************************************************************
 
   AES_StorageKeyEncryption
@@ -1198,10 +1214,13 @@ int AES_KeyEncryption (unsigned int nLength, unsigned char *cData, unsigned char
   aes_configure(&AVR32_AES, &AesConf);
 
   // Set the initialization vector.
+/*
   for (i=0;i<4;i++)
   {
     InitVectorSD[i] = BlockNr_u32;
   }
+*/
+  xxHashInitVector_v (InitVectorSD,BlockNr_u32);
 
 
   AES_Encryption (nLength, (unsigned int *)InputData, (unsigned int *)OutputData, (unsigned int *) cKeyData, (unsigned int *)InitVectorSD);

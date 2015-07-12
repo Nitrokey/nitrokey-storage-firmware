@@ -167,7 +167,7 @@ void aes_set_initvector( volatile avr32_aes_t *aes, const unsigned int *pVector)
   unsigned long int volatile *pTempo = &(aes->iv1r);
   int i;
   
-  XorInitVector_v ((unsigned char *)pVector);
+//  XorInitVector_v ((unsigned char *)pVector);
 
   for(i=0; i<4; i++)
     *pTempo++ = *pVector++;

@@ -63,7 +63,8 @@
 #include "SD_Test.h"
 #include "LED_test.h"
 #include "aes.h"
-
+#include "fastHash.h"
+#include "xxHash.h"
 
 
 /*******************************************************************************
@@ -717,6 +718,9 @@ void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 
   u32         Runtime_u32;
   u32         Blockcount_u32;
   const cid_t *cid;
+  char Testdata[33] = "adkljhasldhjfuhsadkljhasldhjfuhs";
+  int i;
+  unsigned int n;
 
   if (0 == nParamsGet_u8)
   {
@@ -738,6 +742,8 @@ void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 
     CI_LocalPrintf ("15   SD card speed test\r\n");
     CI_LocalPrintf ("16 X SD high water mark 0 = show, 1 = clear\r\n");
     CI_LocalPrintf ("17 X Set new SD card found 0 = found, 1 = clear found\r\n");
+    CI_LocalPrintf ("19 n xxHashtest \r\n");
+    CI_LocalPrintf ("20 n xxHashtest \r\n");
     CI_LocalPrintf ("\r\n");
     return;
   }
@@ -944,6 +950,47 @@ void IBN_SD_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 
             usb_start_device ();
             break;
         }
+        break;
+
+      case 19 :
+        CI_LocalPrintf ("Running xxHash %d times\r\n",Param_u32);
+#ifdef TIME_MEASURING_ENABLE
+      TIME_MEASURING_Start (TIME_MEASURING_TIME_FOR_ALL);
+#endif
+        for (i=0;i<Param_u32;i++)
+        {
+          XXH_fast32(Testdata,32, i);
+        }
+#ifdef TIME_MEASURING_ENABLE
+      Runtime_u32 = TIME_MEASURING_Stop (TIME_MEASURING_TIME_FOR_ALL);
+#endif
+        for (i=0;i<Param_u32;i++)
+        {
+          n = XXH_fast32(Testdata,32, i);
+          CI_LocalPrintf ("0x%08x\r\n",n);
+        }
+        CI_LocalPrintf ("Function runtime %d usec\r\n",Runtime_u32/TIME_MEASURING_TICKS_IN_USEC);
+        break;
+
+      case 20 :
+
+        CI_LocalPrintf ("Running fastHash %d times\r\n",Param_u32);
+#ifdef TIME_MEASURING_ENABLE
+      TIME_MEASURING_Start (TIME_MEASURING_TIME_FOR_ALL);
+#endif
+        for (i=0;i<Param_u32;i++)
+        {
+          fasthash32(Testdata,32, i);
+        }
+#ifdef TIME_MEASURING_ENABLE
+      Runtime_u32 = TIME_MEASURING_Stop (TIME_MEASURING_TIME_FOR_ALL);
+#endif
+        for (i=0;i<Param_u32;i++)
+        {
+          n = fasthash32(Testdata,32, i);
+          CI_LocalPrintf ("0x%08x\r\n",n);
+        }
+        CI_LocalPrintf ("Function runtime %d usec\r\n",Runtime_u32/TIME_MEASURING_TICKS_IN_USEC);
         break;
   }
 }
