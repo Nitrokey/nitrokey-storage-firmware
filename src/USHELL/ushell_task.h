@@ -1,76 +1,46 @@
 /* This header file is part of the ATMEL AVR32-UC3-SoftwareFramework-1.6.0 Release */
 
-/*This file is prepared for Doxygen automatic documentation generation.*/
-/*! \file ******************************************************************
- *
- * \brief uShell command line interpreter.
- *
- * - Compiler:           IAR EWAVR32 and GNU GCC for AVR32
- * - Supported devices:  All AVR32 devices with a USB module can be used.
- * - AppNote:
- *
- * \author               Atmel Corporation: http://www.atmel.com \n
- *                       Support and FAQ: http://support.atmel.no/
- *
- ***************************************************************************/
+/* This file is prepared for Doxygen automatic documentation generation. */
+/* ! \file ****************************************************************** \brief uShell command line interpreter. - Compiler: IAR EWAVR32 and
+   GNU GCC for AVR32 - Supported devices: All AVR32 devices with a USB module can be used. - AppNote: \author Atmel Corporation:
+   http://www.atmel.com \n Support and FAQ: http://support.atmel.no/ ************************************************************************* */
 
-/* Copyright (c) 2009 Atmel Corporation. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an Atmel
- * AVR product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
- *
- */
+/* Copyright (c) 2009 Atmel Corporation. All rights reserved. Redistribution and use in source and binary forms, with or without modification, are
+   permitted provided that the following conditions are met: 1. Redistributions of source code must retain the above copyright notice, this list of
+   conditions and the following disclaimer. 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+   the following disclaimer in the documentation and/or other materials provided with the distribution. 3. The name of Atmel may not be used to
+   endorse or promote products derived from this software without specific prior written permission. 4. This software may only be redistributed and
+   used in connection with an Atmel AVR product. THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+   NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE EXPRESSLY AND SPECIFICALLY
+   DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE */
 
 #ifndef _USHELL_TASK_H_
 #define _USHELL_TASK_H_
 
 
-//_____ I N C L U D E S ____________________________________________________
+// _____ I N C L U D E S ____________________________________________________
 
 #include "fs_com.h"
 
-//_____ M A C R O S ________________________________________________________
+// _____ M A C R O S ________________________________________________________
 
 
-/*! \name Specific ASCII Values
- */
-//! @{
+/* ! \name Specific ASCII Values */
+// ! @{
 #define  ASCII_CR             '\r'
 #define  ASCII_LF             '\n'
 #define  ASCII_BKSPACE        '\b'
 #define  ASCII_ESCAPE         0x1B
 #define  ASCII_CTRL_Q         0x11
 #define  ASCII_CTRL_C         0x03
-//! @}
+// ! @}
 
 
-/*! \name Shell Commands
- */
-//! @{
+/* ! \name Shell Commands */
+// ! @{
 #define  CMD_NONE             0x00
 #define  CMD_NB_DRIVE         0x01
 #define  CMD_DF               0x02
@@ -98,13 +68,12 @@
 #define  CMD_LS_USB           0x18
 #define  CMD_USB_SUSPEND      0x19
 #define  CMD_USB_RESUME       0x1A
-//! @}
+// ! @}
 
 
 
-/*! \name String Values for Commands
- */
-//! @{
+/* ! \name String Values for Commands */
+// ! @{
 #define  STR_DISK             "disk"
 #define  STR_DF               "df"
 #define  STR_FORMAT           "format"
@@ -127,16 +96,15 @@
 #define  STR_MV               "mv"
 #define  STR_SYNC             "sync"
 #define  STR_PERFORM          "perf"
-                              
+
 #define  STR_LS_USB           "lsusb"
 #define  STR_USB_SUSPEND      "suspend"
 #define  STR_USB_RESUME       "resume"
-//! @}
+// ! @}
 
 
-/*! \name String Messages
- */
-//! @{
+/* ! \name String Messages */
+// ! @{
 #define  MSG_PROMPT           "$>"
 #define  MSG_WELCOME          "\x0C" \
                               "--------------------------\r\n" \
@@ -194,16 +162,16 @@
 #define  MSG_DEVICE_LOW_SPEED  "Device is low-speed\r\n"
 #define  MSG_DEVICE_HIGH_SPEED "Device is high-speed\r\n"
 #define  MSG_ER_PASTE         "Paste Fail\r\n"
-//! @}
+// ! @}
 
 
-//_____ D E C L A R A T I O N S ____________________________________________
+// _____ D E C L A R A T I O N S ____________________________________________
 
-extern void ushell_task_init(U32 pba_hz);
+extern void ushell_task_init (U32 pba_hz);
 #ifdef FREERTOS_USED
-extern void ushell_task(void *pvParameters);
+extern void ushell_task (void* pvParameters);
 #else
-extern void ushell_task(void);
+extern void ushell_task (void);
 #endif
 
-#endif  // _USHELL_TASK_H_
+#endif // _USHELL_TASK_H_

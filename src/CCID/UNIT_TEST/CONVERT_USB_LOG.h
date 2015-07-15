@@ -4,6 +4,6 @@
 #define CONVERT_USB_LOG_H
 
 
-int ConvertUsbLog (char *Filename_u8);
+int ConvertUsbLog (char* Filename_u8);
 
 #endif // CONVERT_USB_LOG_H

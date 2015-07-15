@@ -1,21 +1,21 @@
 /*
-* Author: Copyright (C) Rudolf Boeddeker  Date: 2012-08-18
-*
-* This file is part of Nitrokey
-*
-* Nitrokey  is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* Nitrokey is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Author: Copyright (C) Rudolf Boeddeker  Date: 2012-08-18
+ *
+ * This file is part of Nitrokey
+ *
+ * Nitrokey  is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Nitrokey is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /*
  * tools.c
@@ -39,14 +39,14 @@
 #include "CCID/USART/ISO7816_USART.h"
 
 #ifdef ISO7816_USE_TASK
-	#include "FreeRTOS.h"
-	#include "task.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #endif
 
 #include "global.h"
 
 #ifdef INTERPRETER_ENABLE
-  int CI_LocalPrintf (char *szFormat,...);
+int CI_LocalPrintf (char* szFormat, ...);
 #endif
 
 
@@ -56,13 +56,13 @@
 
 *******************************************************************************/
 
-#define TOOL_TEST_PIN     AVR32_PIN_PX10  // = UART2 - RX
+#define TOOL_TEST_PIN     AVR32_PIN_PX10    // = UART2 - RX
 
 
 // Delay1Ms_Counting
 
-//#define TOOLS_DELAY_1MS_COUNT   910 // at 12 MHz
-#define TOOLS_DELAY_1MS_COUNT   (4200) // At 60 MHz
+// #define TOOLS_DELAY_1MS_COUNT 910 // at 12 MHz
+#define TOOLS_DELAY_1MS_COUNT   (4200)  // At 60 MHz
 
 
 /*******************************************************************************
@@ -77,7 +77,7 @@
 
 *******************************************************************************/
 
-u32 getu32(u8 *array);
+u32 getu32 (u8 * array);
 
 /*******************************************************************************
 
@@ -97,11 +97,11 @@ u32 getu32(u8 *array);
 
 void Delay1Ms_Counting (void)
 {
-	register int i;
+    register int i;
 
-	for (i=0;i<TOOLS_DELAY_1MS_COUNT;i++)
-	{
-	}
+    for (i = 0; i < TOOLS_DELAY_1MS_COUNT; i++)
+    {
+    }
 }
 
 /*******************************************************************************
@@ -117,7 +117,7 @@ void Delay1Ms_Counting (void)
 #ifdef ISO7816_USE_TASK
 void Delay1Ms_Taskdelay (void)
 {
-	vTaskDelay(CCID_TASK_DELAY_1_MS_IN_TICKS);
+    vTaskDelay (CCID_TASK_DELAY_1_MS_IN_TICKS);
 }
 #endif // ISO7816_USE_TASK
 
@@ -134,9 +134,9 @@ void Delay1Ms_Taskdelay (void)
 void Delay1Ms (void)
 {
 #ifdef ISO7816_USE_TASK
-	Delay1Ms_Taskdelay ();
+    Delay1Ms_Taskdelay ();
 #else
-	Delay1Ms_Counting ();
+    Delay1Ms_Counting ();
 #endif // ISO7816_USE_TASK
 
 }
@@ -153,13 +153,14 @@ void Delay1Ms (void)
 
 void DelayMs (int nMs)
 {
-	int i;
+    int i;
 
-	for (i=0;i<nMs;i++)
-	{
-		Delay1Ms ();
-	}
+    for (i = 0; i < nMs; i++)
+    {
+        Delay1Ms ();
+    }
 }
+
 /*******************************************************************************
 
   DelayCounterTest
@@ -172,23 +173,24 @@ void DelayMs (int nMs)
 
 void DelayCounterTest (void)
 {
-	while (1)
-	{
-		ToolPinSet ();
-		ToolPinClr ();
-		ToolPinSet ();
-		ToolPinClr ();
-		DelayMs (10);
-		ToolPinSet ();
-		DelayMs (10);
-		ToolPinClr ();
-		DelayMs (10);
-		ToolPinSet ();
-		DelayMs (20);
-		ToolPinClr ();
-		DelayMs (20);
-	}
+    while (1)
+    {
+        ToolPinSet ();
+        ToolPinClr ();
+        ToolPinSet ();
+        ToolPinClr ();
+        DelayMs (10);
+        ToolPinSet ();
+        DelayMs (10);
+        ToolPinClr ();
+        DelayMs (10);
+        ToolPinSet ();
+        DelayMs (20);
+        ToolPinClr ();
+        DelayMs (20);
+    }
 }
+
 /*******************************************************************************
 
   ToolPinSet
@@ -202,7 +204,7 @@ void DelayCounterTest (void)
 void ToolPinSet (void)
 {
 #ifndef STICK_20_A_MUSTER_PROD
-	gpio_set_gpio_pin (TOOL_TEST_PIN);
+    gpio_set_gpio_pin (TOOL_TEST_PIN);
 #endif
 }
 
@@ -219,7 +221,7 @@ void ToolPinSet (void)
 void ToolPinClr (void)
 {
 #ifndef STICK_20_A_MUSTER_PROD
-	gpio_clr_gpio_pin (TOOL_TEST_PIN);
+    gpio_clr_gpio_pin (TOOL_TEST_PIN);
 #endif
 }
 
@@ -233,17 +235,18 @@ void ToolPinClr (void)
 
 *******************************************************************************/
 
-void HexPrint (int nNumberChars,unsigned char *sData)
+void HexPrint (int nNumberChars, unsigned char* sData)
 {
-  int i;
-  unsigned char c;
+    int i;
+    unsigned char c;
 
-  for (i=0;i<nNumberChars;i++)
-  {
-    c = sData[i];
-    CI_LocalPrintf ("%02x ",c);
-  }
+    for (i = 0; i < nNumberChars; i++)
+    {
+        c = sData[i];
+        CI_LocalPrintf ("%02x ", c);
+    }
 }
+
 /*******************************************************************************
 
   AsciiHexPrint
@@ -254,33 +257,34 @@ void HexPrint (int nNumberChars,unsigned char *sData)
 
 *******************************************************************************/
 
-void AsciiHexPrint (int nNumberChars,unsigned char sData[])
+void AsciiHexPrint (int nNumberChars, unsigned char sData[])
 {
-  int i;
-  unsigned char c;
+    int i;
+    unsigned char c;
 
 
-  CI_LocalPrintf ("\"");
-  for (i=0;i<nNumberChars;i++)
-  {
-    c = sData[i];
-    if (0 != isprint (sData[i]))
+    CI_LocalPrintf ("\"");
+    for (i = 0; i < nNumberChars; i++)
     {
-      CI_LocalPrintf ("%c",sData[i]);
+        c = sData[i];
+        if (0 != isprint (sData[i]))
+        {
+            CI_LocalPrintf ("%c", sData[i]);
+        }
+        else
+        {
+            CI_LocalPrintf (".");
+        }
     }
-    else
-    {
-      CI_LocalPrintf (".");
-    }
-  }
-  CI_LocalPrintf ("\" = ");
+    CI_LocalPrintf ("\" = ");
 
-  for (i=0;i<nNumberChars;i++)
-  {
-    c = sData[i];
-    CI_LocalPrintf ("%02x ",c);
-  }
+    for (i = 0; i < nNumberChars; i++)
+    {
+        c = sData[i];
+        CI_LocalPrintf ("%02x ", c);
+    }
 }
+
 /*******************************************************************************
 
   CRC 32 calculation
@@ -291,7 +295,7 @@ void AsciiHexPrint (int nNumberChars,unsigned char sData[])
 
 *******************************************************************************/
 
-#define CRC_POLYNOM_32_REV      0xEDB88320     /* CRC-32 polynomial, reverse */
+#define CRC_POLYNOM_32_REV      0xEDB88320  /* CRC-32 polynomial, reverse */
 static u32 CRC_Reg_u32 = 0xffffffff;
 
 /*******************************************************************************
@@ -306,8 +310,9 @@ static u32 CRC_Reg_u32 = 0xffffffff;
 
 void CRC_InitCRC32 (void)
 {
-  CRC_Reg_u32 = 0xffffffff;
+    CRC_Reg_u32 = 0xffffffff;
 }
+
 /*******************************************************************************
 
   CRC_CalcBlockCRC32_1
@@ -318,36 +323,36 @@ void CRC_InitCRC32 (void)
 
 *******************************************************************************/
 
-void CRC_CalcBlockCRC32_1 (u8 *Data_pu8, u32 Len_u32)
+void CRC_CalcBlockCRC32_1 (u8 * Data_pu8, u32 Len_u32)
 {
-  u32 n;
-  u32 i;
-  u32 k;
-  u8 output[4];
+u32 n;
+u32 i;
+u32 k;
+u8 output[4];
 
-  for (i=0;i < Len_u32; i++)
-  {
-    k = getu32((u8*)&Data_pu8[i*4]);
-    output[0] =  k      & 0xFF;
-    output[1] = (k>>8)  & 0xFF;
-    output[2] = (k>>16) & 0xFF;
-    output[3] = (k>>24) & 0xFF;
-
-    for (k=0;k<4;k++)
+    for (i = 0; i < Len_u32; i++)
     {
-      for (n=0;n<8;n++)
-      {
-        if ((CRC_Reg_u32 & 1) != ((output[k] >> n) & 1))
+        k = getu32 ((u8 *) & Data_pu8[i * 4]);
+        output[0] = k & 0xFF;
+        output[1] = (k >> 8) & 0xFF;
+        output[2] = (k >> 16) & 0xFF;
+        output[3] = (k >> 24) & 0xFF;
+
+        for (k = 0; k < 4; k++)
         {
-          CRC_Reg_u32 = (CRC_Reg_u32 >> 1) ^ CRC_POLYNOM_32_REV;
+            for (n = 0; n < 8; n++)
+            {
+                if ((CRC_Reg_u32 & 1) != ((output[k] >> n) & 1))
+                {
+                    CRC_Reg_u32 = (CRC_Reg_u32 >> 1) ^ CRC_POLYNOM_32_REV;
+                }
+                else
+                {
+                    CRC_Reg_u32 = CRC_Reg_u32 >> 1;
+                }
+            }
         }
-        else
-        {
-          CRC_Reg_u32 = CRC_Reg_u32 >> 1;
-        }
-      }
     }
-  }
 }
 
 /*******************************************************************************
@@ -360,26 +365,27 @@ void CRC_CalcBlockCRC32_1 (u8 *Data_pu8, u32 Len_u32)
 
 *******************************************************************************/
 
-void CRC_CalcBlockCRC32 (u8 *Data_pu8, u32 Len_u32)
+void CRC_CalcBlockCRC32 (u8 * Data_pu8, u32 Len_u32)
 {
-  u32 n;
-  u32 i;
+u32 n;
+u32 i;
 
-  for (i=0;i < Len_u32; i++)
-  {
-    for (n=0;n<8;n++)
+    for (i = 0; i < Len_u32; i++)
     {
-      if ((CRC_Reg_u32 & 1) != ((Data_pu8[i] >> n) & 1))
-      {
-        CRC_Reg_u32 = (CRC_Reg_u32 >> 1) ^ CRC_POLYNOM_32_REV;
-      }
-      else
-      {
-        CRC_Reg_u32 = CRC_Reg_u32 >> 1;
-      }
+        for (n = 0; n < 8; n++)
+        {
+            if ((CRC_Reg_u32 & 1) != ((Data_pu8[i] >> n) & 1))
+            {
+                CRC_Reg_u32 = (CRC_Reg_u32 >> 1) ^ CRC_POLYNOM_32_REV;
+            }
+            else
+            {
+                CRC_Reg_u32 = CRC_Reg_u32 >> 1;
+            }
+        }
     }
-  }
 }
+
 /*******************************************************************************
 
   CRC_GetCRC32
@@ -392,7 +398,7 @@ void CRC_CalcBlockCRC32 (u8 *Data_pu8, u32 Len_u32)
 
 u32 CRC_GetCRC32 (void)
 {
-  return (CRC_Reg_u32 ^ 0xFFFFFFFF);
+    return (CRC_Reg_u32 ^ 0xFFFFFFFF);
 }
 
 
@@ -406,20 +412,21 @@ u32 CRC_GetCRC32 (void)
 
 *******************************************************************************/
 
-u32 Crc32(u32 Crc, u32 Data)
+u32 Crc32 (u32 Crc, u32 Data)
 {
-    s32 i;
+s32 i;
 
     Crc = Crc ^ Data;
 
-    for(i=0; i<32; i++)
+    for (i = 0; i < 32; i++)
         if (Crc & 0x80000000)
-            Crc = (Crc << 1) ^ 0x04C11DB7; // Polynomial used in STM32
+            Crc = (Crc << 1) ^ 0x04C11DB7;  // Polynomial used in STM32
         else
             Crc = (Crc << 1);
 
-    return(Crc);
+    return (Crc);
 }
+
 /*******************************************************************************
 
   generateCRC_len
@@ -433,20 +440,20 @@ u32 Crc32(u32 Crc, u32 Data)
 #define REPORT_SIZE  64
 #define COMMAND_SIZE 59
 
-u32 generateCRC_len (u8 *data,u8 len)
+u32 generateCRC_len (u8 * data, u8 len)
 {
-//    u8 report[REPORT_SIZE+1];
-    u32 crc=0xffffffff;
-    u32 value;
-    s32 i;
+    // u8 report[REPORT_SIZE+1];
+u32 crc = 0xffffffff;
+u32 value;
+s32 i;
 
-//    memset(report,0,sizeof(report));
+    // memset(report,0,sizeof(report));
 
-    for (i=0;i<len;i++)
+    for (i = 0; i < len; i++)
     {
-//      value = ((u32 *)(data))[i];
-      value = getu32 (&data[i*4]);
-      crc=Crc32(crc,value);
+        // value = ((u32 *)(data))[i];
+        value = getu32 (&data[i * 4]);
+        crc = Crc32 (crc, value);
     }
 
     return (crc);
@@ -462,24 +469,25 @@ u32 generateCRC_len (u8 *data,u8 len)
 
 *******************************************************************************/
 
-u32 generateCRC(u8 *data)
+u32 generateCRC (u8 * data)
 {
-//    u8 report[REPORT_SIZE+1];
-    u32 crc=0xffffffff;
-    u32 value;
-    s32 i;
+    // u8 report[REPORT_SIZE+1];
+u32 crc = 0xffffffff;
+u32 value;
+s32 i;
 
-//    memset(report,0,sizeof(report));
+    // memset(report,0,sizeof(report));
 
-    for (i=0;i<15;i++)
+    for (i = 0; i < 15; i++)
     {
-//      value = ((u32 *)(data))[i];
-      value = getu32 (&data[i*4]);
-      crc=Crc32(crc,value);
+        // value = ((u32 *)(data))[i];
+        value = getu32 (&data[i * 4]);
+        crc = Crc32 (crc, value);
     }
 
     return (crc);
 }
+
 /*******************************************************************************
 
   generateCRC_org
@@ -490,21 +498,22 @@ u32 generateCRC(u8 *data)
 
 *******************************************************************************/
 
-u32 generateCRC_org(u8 commandType,u8 *data)
+u32 generateCRC_org (u8 commandType, u8 * data)
 {
-    u8 report[REPORT_SIZE+1];
-    u32 crc=0xffffffff;
-    s32 i;
+u8 report[REPORT_SIZE + 1];
+u32 crc = 0xffffffff;
+s32 i;
 
-    memset(report,0,sizeof(report));
+    memset (report, 0, sizeof (report));
     report[1] = commandType;
 
-    memcpy(&report[2],&data[0],COMMAND_SIZE);
+    memcpy (&report[2], &data[0], COMMAND_SIZE);
 
-    for (i=0;i<15;i++){
-        crc=Crc32(crc,((u32 *)(report+1))[i]);
+    for (i = 0; i < 15; i++)
+    {
+        crc = Crc32 (crc, ((u32 *) (report + 1))[i]);
     }
-    ((u32 *)(report+1))[15]=crc;
+    ((u32 *) (report + 1))[15] = crc;
 
     return (crc);
 }
@@ -522,47 +531,47 @@ u32 generateCRC_org(u8 commandType,u8 *data)
 
 *******************************************************************************/
 
-void atoi_reverse (u8 *String_pu8,u32 *Value_u32,u8 MaxChars_u8)
+void atoi_reverse (u8 * String_pu8, u32 * Value_u32, u8 MaxChars_u8)
 {
-    s32 i;
-    u8  Found_u8;
+s32 i;
+u8 Found_u8;
 
     *Value_u32 = 0;
-    i          = 0;
-    Found_u8   = FALSE;
+    i = 0;
+    Found_u8 = FALSE;
 
     if (0 == String_pu8[0])
     {
         return;
     }
 
-// Find end of string
-    for (i=0;i<MaxChars_u8;i++)
+    // Find end of string
+    for (i = 0; i < MaxChars_u8; i++)
     {
-      if (0 == String_pu8[i])
-      {
-        i--;
-        Found_u8 = TRUE;
-        break;
-      }
+        if (0 == String_pu8[i])
+        {
+            i--;
+            Found_u8 = TRUE;
+            break;
+        }
     }
 
     if (FALSE == Found_u8)
     {
-      i = MaxChars_u8;  // Set i to max length
+        i = MaxChars_u8;    // Set i to max length
     }
 
-// Get value
-    for (;i>=0;i--)
+    // Get value
+    for (; i >= 0; i--)
     {
         if (('0' <= String_pu8[i]) && ('9' >= String_pu8[i]))
         {
-          *Value_u32 *= 10;
-          *Value_u32 += String_pu8[i] - '0';
+            *Value_u32 *= 10;
+            *Value_u32 += String_pu8[i] - '0';
         }
         else
         {
-          return;
+            return;
         }
     }
 }
@@ -582,20 +591,21 @@ void atoi_reverse (u8 *String_pu8,u32 *Value_u32,u8 MaxChars_u8)
 
 *******************************************************************************/
 
-void itoa(u32 n, u8 *s)
+void itoa (u32 n, u8 * s)
 {
-    s32 i, sign;
+s32 i, sign;
 
     sign = n;
 
     i = 0;
-    do {
+    do
+    {
         s[i] = n % 10 + '0';
         i++;
     } while ((n /= 10) > 0);
 
     s[i] = '\0';
-    reverse(s);
+    reverse (s);
 }
 
 /*******************************************************************************
@@ -612,26 +622,27 @@ void itoa(u32 n, u8 *s)
 
 *******************************************************************************/
 
-void itoa_h (u32 n, u8 *s)
+void itoa_h (u32 n, u8 * s)
 {
-    s32 i;
+s32 i;
 
     i = 0;
-    do {
-      if (10 > n % 16 )
-      {
-        s[i] = n % 16 + '0';
-      }
-      else
-      {
-        s[i] = n % 16 - 10 + 'A';
+    do
+    {
+        if (10 > n % 16)
+        {
+            s[i] = n % 16 + '0';
+        }
+        else
+        {
+            s[i] = n % 16 - 10 + 'A';
 
-      }
-      i++;
+        }
+        i++;
     } while ((n /= 16) > 0);
 
     s[i] = '\0';
-    reverse(s);
+    reverse (s);
 }
 
 /*******************************************************************************
@@ -648,9 +659,9 @@ void itoa_h (u32 n, u8 *s)
 
 *******************************************************************************/
 
-void itoa_s(s32 n, u8 *s)
+void itoa_s (s32 n, u8 * s)
 {
-    s32 i, sign;
+s32 i, sign;
 
     sign = n;
 
@@ -660,7 +671,8 @@ void itoa_s(s32 n, u8 *s)
     }
 
     i = 0;
-    do {
+    do
+    {
         s[i] = n % 10 + '0';
         i++;
     } while ((n /= 10) > 0);
@@ -672,7 +684,7 @@ void itoa_s(s32 n, u8 *s)
     }
 
     s[i] = '\0';
-    reverse(s);
+    reverse (s);
 }
 
 /*******************************************************************************
@@ -689,16 +701,16 @@ void itoa_s(s32 n, u8 *s)
 
 *******************************************************************************/
 
-void reverse(char *s)
+void reverse (char* s)
 {
-    int  i,j;
+    int i, j;
     char c;
 
-    j = strlen(s) - 1;
+    j = strlen (s) - 1;
 
-    for (i=0;i<j;i++,j--)
+    for (i = 0; i < j; i++, j--)
     {
-        c    = s[i];
+        c = s[i];
         s[i] = s[j];
         s[j] = c;
     }
@@ -719,7 +731,7 @@ void reverse(char *s)
 
 u32 change_endian_u32 (u32 x)
 {
-    return (((x)<<24) | ((x)>>24) | (((x)& 0x0000ff00)<<8) | (((x)& 0x00ff0000)>>8));
+    return (((x) << 24) | ((x) >> 24) | (((x) & 0x0000ff00) << 8) | (((x) & 0x00ff0000) >> 8));
 }
 
 /*******************************************************************************
@@ -737,7 +749,7 @@ u32 change_endian_u32 (u32 x)
 
 u16 change_endian_u16 (u16 x)
 {
-    return ( (((x)& 0x00ff)<<8) | (((x)& 0xff00)>>8) );
+    return ((((x) & 0x00ff) << 8) | (((x) & 0xff00) >> 8));
 }
 
 /*******************************************************************************
@@ -755,8 +767,8 @@ u16 change_endian_u16 (u16 x)
 
 void UpdateMsdLastAccessTimer (u32 NewTime)
 {
-  USB_Log_st.MSD_LastReadAccess_u32  = NewTime;
-  USB_Log_st.MSD_LastWriteAccess_u32 = NewTime;
+    USB_Log_st.MSD_LastReadAccess_u32 = NewTime;
+    USB_Log_st.MSD_LastWriteAccess_u32 = NewTime;
 }
 
 /*******************************************************************************
@@ -774,23 +786,18 @@ void UpdateMsdLastAccessTimer (u32 NewTime)
 
 void MSD_AccessManager100ms (void)
 {
-  static u32 SaveLastReadAccess_u32 = 0;
-  static u32 SaveLastWriteAccess_u32 = 0;
-  u32 ReadDiffTime_u32;
-  u32 WriteDiffTime_u32;
+    static u32 SaveLastReadAccess_u32 = 0;
+    static u32 SaveLastWriteAccess_u32 = 0;
+    u32 ReadDiffTime_u32;
+    u32 WriteDiffTime_u32;
 
-  if (SaveLastReadAccess_u32 != USB_Log_st.MSD_LastReadAccess_u32)
-  {
-    ReadDiffTime_u32 = USB_Log_st.MSD_LastReadAccess_u32 - SaveLastReadAccess_u32;
-  }
-  if (SaveLastWriteAccess_u32 != USB_Log_st.MSD_LastWriteAccess_u32)
-  {
-    WriteDiffTime_u32 = USB_Log_st.MSD_LastReadAccess_u32 - SaveLastWriteAccess_u32;
-  }
+    if (SaveLastReadAccess_u32 != USB_Log_st.MSD_LastReadAccess_u32)
+    {
+        ReadDiffTime_u32 = USB_Log_st.MSD_LastReadAccess_u32 - SaveLastReadAccess_u32;
+    }
+    if (SaveLastWriteAccess_u32 != USB_Log_st.MSD_LastWriteAccess_u32)
+    {
+        WriteDiffTime_u32 = USB_Log_st.MSD_LastReadAccess_u32 - SaveLastWriteAccess_u32;
+    }
 
 }
-
-
-
-
-

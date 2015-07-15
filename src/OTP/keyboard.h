@@ -1,45 +1,43 @@
 /*
-* Author: Copyright (C) Andrzej Surowiec 2012
-*												
-*
-* This file is part of Nitrokey.
-*
-* Nitrokey is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* Nitrokey is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
-*/
-/*
-* This file contains modifications done by Rudolf Boeddeker
-* For the modifications applies:
-*
-* Author: Copyright (C) Rudolf Boeddeker  Date: 2013-08-16
-*
-* Nitrokey  is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* Nitrokey is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/* Keyboard usage values, see usb.org's HID-usage-tables document, chapter
- * 10 Keyboard/Keypad Page for more codes.
+ * Author: Copyright (C) Andrzej Surowiec 2012
+ *
+ *
+ * This file is part of Nitrokey.
+ *
+ * Nitrokey is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Nitrokey is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
  */
+/*
+ * This file contains modifications done by Rudolf Boeddeker
+ * For the modifications applies:
+ *
+ * Author: Copyright (C) Rudolf Boeddeker  Date: 2013-08-16
+ *
+ * Nitrokey  is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Nitrokey is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Keyboard usage values, see usb.org's HID-usage-tables document, chapter 10 Keyboard/Keypad Page for more codes. */
 #define MOD_CONTROL_LEFT    (1<<0)
 #define MOD_SHIFT_LEFT      (1<<1)
 #define MOD_ALT_LEFT        (1<<2)
@@ -117,11 +115,10 @@ extern volatile u8 numLockClicked;
 extern volatile u8 capsLockClicked;
 extern volatile u8 scrollLockClicked;
 
-void sendChar(u8 chr);
-void sendKeys(u8* buffer);
-void sendString(char* string, u8 len);
-void sendNumber(u32 number);
-void sendNumberN(u32 number,u8 len);
-void sendEnter(void);
+void sendChar (u8 chr);
+void sendKeys (u8 * buffer);
+void sendString (char* string, u8 len);
+void sendNumber (u32 number);
+void sendNumberN (u32 number, u8 len);
+void sendEnter (void);
 void sendTab (void);
-

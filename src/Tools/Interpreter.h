@@ -1,21 +1,21 @@
 /*
-* Author: Copyright (C) Rudolf Boeddeker  Date: 2012-08-18
-*
-* This file is part of Nitrokey
-*
-* Nitrokey  is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* Nitrokey is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Author: Copyright (C) Rudolf Boeddeker  Date: 2012-08-18
+ *
+ * This file is part of Nitrokey
+ *
+ * Nitrokey  is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Nitrokey is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 
 #ifndef INTERPRETER_HEADER
@@ -48,7 +48,7 @@
 #define CI_CMD_TASKSTATUS               2
 #define CI_CMD_RUNTIME_OVERVIEW         3
 #define CI_CMD_RUNTIME_SLOT             4
-#define CI_CMD_RUNTIME_INT_SLOT         5 
+#define CI_CMD_RUNTIME_INT_SLOT         5
 #define CI_CMD_FILE_ACCESS              6
 #define CI_CMD_MOUNT                    7
 #define CI_CMD_SHOW_LUNS                8
@@ -90,12 +90,12 @@
 #define CI_CMD_STATE_WAIT_FOR_CMD   2
 
 #ifdef INTERPRETER_ENABLE
-int CI_LocalPrintf (char *szFormat,...);
-int CI_TickLocalPrintf (char *szFormat,...);
+int CI_LocalPrintf (char* szFormat, ...);
+int CI_TickLocalPrintf (char* szFormat, ...);
 void CI_Print8BitValue (unsigned char cValue);
-int CI_StringOut (char *szText);
+int CI_StringOut (char* szText);
 s32 IDF_Debugtool (void);
-void IDF_task_init(void);
+void IDF_task_init (void);
 void IDF_PrintStartupInfo (void);
 #endif
 

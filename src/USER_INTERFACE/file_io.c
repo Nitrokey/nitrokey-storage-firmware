@@ -1,21 +1,21 @@
 /*
-* Author: Copyright (C) Rudolf Boeddeker  Date: 26.11.2012
-*
-* This file is part of Nitrokey
-*
-* Nitrokey  is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* Nitrokey is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Author: Copyright (C) Rudolf Boeddeker  Date: 26.11.2012
+ *
+ * This file is part of Nitrokey
+ *
+ * Nitrokey  is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Nitrokey is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /*
  * file_io.c
@@ -29,8 +29,8 @@
 #include "board.h"
 
 #ifdef FREERTOS_USED
-  #include "FreeRTOS.h"
-  #include "task.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #endif
 #include "string.h"
 #include "stdio.h"
@@ -68,10 +68,7 @@
 *******************************************************************************/
 
 /*
-#define HTML_FILEIO_LUN                   0    // RAM Disk
-#define SD_UNCRYPTED_FILEIO_LUN           1
-#define SD_CRYPTED_FILEIO_LUN             2
-*/
+   #define HTML_FILEIO_LUN 0 // RAM Disk #define SD_UNCRYPTED_FILEIO_LUN 1 #define SD_CRYPTED_FILEIO_LUN 2 */
 
 #define SD_UNCRYPTED_FILEIO_LUN           0
 #define SD_CRYPTED_FILEIO_LUN             1
@@ -88,7 +85,7 @@
 
 *******************************************************************************/
 
-void sd_mmc_mci_resources_init(void);
+void sd_mmc_mci_resources_init (void);
 
 /*******************************************************************************
 
@@ -110,28 +107,28 @@ void sd_mmc_mci_resources_init(void);
 u8 SD_UncryptedFileIO_Init_u8 (void)
 {
 
-  b_fsaccess_init ();
+    b_fsaccess_init ();
 
-// Mount SD drive
-  CI_LocalPrintf ("Mount uncrypted SD Card\r\n");
+    // Mount SD drive
+    CI_LocalPrintf ("Mount uncrypted SD Card\r\n");
 
-  if (FALSE == FAI_mount(SD_UNCRYPTED_FILEIO_LUN))
-  {
-    return (FALSE);
-  }
+    if (FALSE == FAI_mount (SD_UNCRYPTED_FILEIO_LUN))
+    {
+        return (FALSE);
+    }
 
-  FAI_UpdateContend (1);
-  vTaskDelay (100);
+    FAI_UpdateContend (1);
+    vTaskDelay (100);
 
-// Show free space
-//  CI_LocalPrintf ("\r\n\r\n");
-  FAI_free_space (1);
+    // Show free space
+    // CI_LocalPrintf ("\r\n\r\n");
+    FAI_free_space (1);
 
-// Show dirs
-  CI_LocalPrintf ("\r\nOld dir\r\n");
-  FAI_Dir (0);
+    // Show dirs
+    CI_LocalPrintf ("\r\nOld dir\r\n");
+    FAI_Dir (0);
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /*******************************************************************************
@@ -149,9 +146,9 @@ extern Ctrl_status sd_mmc_mci_unit_state_e;
 void FileIO_UpdateToHost_v (void)
 {
 #if LUN_2 == ENABLE
-  set_virtual_unit_busy ();               // Tell the host that the FAT has changed
+    set_virtual_unit_busy ();   // Tell the host that the FAT has changed
 #endif
-  sd_mmc_mci_unit_state_e = CTRL_BUSY;
+    sd_mmc_mci_unit_state_e = CTRL_BUSY;
 }
 
 /*******************************************************************************
@@ -164,24 +161,24 @@ void FileIO_UpdateToHost_v (void)
 
 *******************************************************************************/
 
-u8 FileIO_CdDir_u8 (u8 *Dir_pu8)
+u8 FileIO_CdDir_u8 (u8 * Dir_pu8)
 {
-// cd dir
-  CI_LocalPrintf ("cd to -%s-\r\n",Dir_pu8);
-  if (FALSE == FAI_cd((u8*)Dir_pu8))
-  {
-    // Make new dir if not present
-    CI_LocalPrintf ("make dir -%s-\r\n",Dir_pu8);
-    FAI_mkdir ((u8*)Dir_pu8);
-
-    CI_LocalPrintf ("cd to -%s-\r\n",Dir_pu8);
-    if (FALSE == FAI_cd((u8*)Dir_pu8))
+    // cd dir
+    CI_LocalPrintf ("cd to -%s-\r\n", Dir_pu8);
+    if (FALSE == FAI_cd ((u8 *) Dir_pu8))
     {
-      CI_LocalPrintf ("cd to -%s- fails\r\n",Dir_pu8);
-      return (FALSE);
+        // Make new dir if not present
+        CI_LocalPrintf ("make dir -%s-\r\n", Dir_pu8);
+        FAI_mkdir ((u8 *) Dir_pu8);
+
+        CI_LocalPrintf ("cd to -%s-\r\n", Dir_pu8);
+        if (FALSE == FAI_cd ((u8 *) Dir_pu8))
+        {
+            CI_LocalPrintf ("cd to -%s- fails\r\n", Dir_pu8);
+            return (FALSE);
+        }
     }
-  }
-  return (TRUE);
+    return (TRUE);
 }
 
 /*******************************************************************************
@@ -194,27 +191,27 @@ u8 FileIO_CdDir_u8 (u8 *Dir_pu8)
 
 *******************************************************************************/
 
-u8 FileIO_AppendText_u8 (u8 *Filename_pu8,u8 *Text_pu8)
+u8 FileIO_AppendText_u8 (u8 * Filename_pu8, u8 * Text_pu8)
 {
-  s32 FileID_s32;
-  s32 Ret_s32;
+s32 FileID_s32;
+s32 Ret_s32;
 
-  FileID_s32 = open ((char*)Filename_pu8,O_CREAT|O_APPEND);
-  if (0 > FileID_s32)
-  {
-    CI_LocalPrintf ("Error open %s - %d - %s\r\n",Filename_pu8,fs_g_status, IBN_FileSystemErrorText(fs_g_status));
-    return (FALSE);
-  }
+    FileID_s32 = open ((char *) Filename_pu8, O_CREAT | O_APPEND);
+    if (0 > FileID_s32)
+    {
+        CI_LocalPrintf ("Error open %s - %d - %s\r\n", Filename_pu8, fs_g_status, IBN_FileSystemErrorText (fs_g_status));
+        return (FALSE);
+    }
 
-  Ret_s32 = write (FileID_s32,Text_pu8,strlen ((char*)Text_pu8));
+    Ret_s32 = write (FileID_s32, Text_pu8, strlen ((char *) Text_pu8));
 
-  Ret_s32 = close (FileID_s32);
-  if (-1 == Ret_s32)
-  {
-    CI_LocalPrintf ("Close  = %d \r\n",Ret_s32);
-  }
+    Ret_s32 = close (FileID_s32);
+    if (-1 == Ret_s32)
+    {
+        CI_LocalPrintf ("Close  = %d \r\n", Ret_s32);
+    }
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /*******************************************************************************
@@ -227,27 +224,27 @@ u8 FileIO_AppendText_u8 (u8 *Filename_pu8,u8 *Text_pu8)
 
 *******************************************************************************/
 
-u8 FileIO_AppendBin_u8 (u8 *Filename_pu8,u8 *Bin_pu8,u16 Count_u16)
+u8 FileIO_AppendBin_u8 (u8 * Filename_pu8, u8 * Bin_pu8, u16 Count_u16)
 {
-  s32 FileID_s32;
-  s32 Ret_s32;
+s32 FileID_s32;
+s32 Ret_s32;
 
-  FileID_s32 = open ((char*)Filename_pu8,O_CREAT|O_APPEND);
-  if (0 > FileID_s32)
-  {
-    CI_LocalPrintf ("Error open %s - %d - %s\r\n",Filename_pu8,fs_g_status, IBN_FileSystemErrorText(fs_g_status));
-    return (FALSE);
-  }
+    FileID_s32 = open ((char *) Filename_pu8, O_CREAT | O_APPEND);
+    if (0 > FileID_s32)
+    {
+        CI_LocalPrintf ("Error open %s - %d - %s\r\n", Filename_pu8, fs_g_status, IBN_FileSystemErrorText (fs_g_status));
+        return (FALSE);
+    }
 
-  Ret_s32 = write (FileID_s32,Bin_pu8,Count_u16);
+    Ret_s32 = write (FileID_s32, Bin_pu8, Count_u16);
 
-  Ret_s32 = close (FileID_s32);
-  if (-1 == Ret_s32)
-  {
-    CI_LocalPrintf ("Close  = %d \r\n",Ret_s32);
-  }
+    Ret_s32 = close (FileID_s32);
+    if (-1 == Ret_s32)
+    {
+        CI_LocalPrintf ("Close  = %d \r\n", Ret_s32);
+    }
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /*******************************************************************************
@@ -263,47 +260,47 @@ u8 FileIO_AppendBin_u8 (u8 *Filename_pu8,u8 *Bin_pu8,u16 Count_u16)
 #define FILEIO_STATUS_DIR        "status"
 #define FILEIO_IMAGE_FILE        "firmware.bin"
 #define FILEIO_IMAGE_START       0x80000000
-#define FILEIO_IMAGE_SIZE        (498*512) // 0x3E400 // Don't save the hidden volume and OTP data area below - 0x40000 -        // 256 k
+#define FILEIO_IMAGE_SIZE        (498*512)  // 0x3E400 // Don't save the hidden volume and OTP data area below - 0x40000 - // 256 k
 #define FILEIO_IMAGE_BLOCKSIZE   4096
 
 u8 FileIO_SaveAppImage_u8 (void)
 {
-  u16 i;
-  s32 FileID_s32;
-  s32 Ret_s32;
+u16 i;
+s32 FileID_s32;
+s32 Ret_s32;
 
-// Init uncrypted file io
-  SD_UncryptedFileIO_Init_u8 ();
+    // Init uncrypted file io
+    SD_UncryptedFileIO_Init_u8 ();
 
-// Delete possible old file
-  FAI_DeleteFile ((u8*)FILEIO_IMAGE_FILE);
+    // Delete possible old file
+    FAI_DeleteFile ((u8 *) FILEIO_IMAGE_FILE);
 
-// Open File
-  FileID_s32 = open ((char*)FILEIO_IMAGE_FILE,O_CREAT|O_APPEND);
-  if (0 > FileID_s32)
-  {
-    CI_LocalPrintf ("Error open %s - %d - %s\r\n",FILEIO_IMAGE_FILE,fs_g_status, IBN_FileSystemErrorText(fs_g_status));
-    return (FALSE);
-  }
+    // Open File
+    FileID_s32 = open ((char *) FILEIO_IMAGE_FILE, O_CREAT | O_APPEND);
+    if (0 > FileID_s32)
+    {
+        CI_LocalPrintf ("Error open %s - %d - %s\r\n", FILEIO_IMAGE_FILE, fs_g_status, IBN_FileSystemErrorText (fs_g_status));
+        return (FALSE);
+    }
 
-// Write data
-  for (i=0;i<(FILEIO_IMAGE_SIZE/FILEIO_IMAGE_BLOCKSIZE);i++)
-  {
-    CI_LocalPrintf ("Write block = %3d\r\n",i);
-    Ret_s32 = write (FileID_s32,(u8*)(FILEIO_IMAGE_START + i * FILEIO_IMAGE_BLOCKSIZE),FILEIO_IMAGE_BLOCKSIZE);
-  }
+    // Write data
+    for (i = 0; i < (FILEIO_IMAGE_SIZE / FILEIO_IMAGE_BLOCKSIZE); i++)
+    {
+        CI_LocalPrintf ("Write block = %3d\r\n", i);
+        Ret_s32 = write (FileID_s32, (u8 *) (FILEIO_IMAGE_START + i * FILEIO_IMAGE_BLOCKSIZE), FILEIO_IMAGE_BLOCKSIZE);
+    }
 
-// Close file
-  Ret_s32 = close (FileID_s32);
-  if (-1 == Ret_s32)
-  {
-    CI_LocalPrintf ("Close  = %d \r\n",Ret_s32);
-  }
+    // Close file
+    Ret_s32 = close (FileID_s32);
+    if (-1 == Ret_s32)
+    {
+        CI_LocalPrintf ("Close  = %d \r\n", Ret_s32);
+    }
 
-// Flush and close the file
-  file_flush ();
+    // Flush and close the file
+    file_flush ();
 
-  return (TRUE);
+    return (TRUE);
 }
 
 
@@ -317,58 +314,30 @@ u8 FileIO_SaveAppImage_u8 (void)
 
 *******************************************************************************/
 /*
-#define FILEIO_STATUS_DIR        "status"
-#define FILEIO_IMAGE_FILE        "status\\app.bin"
-#define FILEIO_IMAGE_START       0x80000000
-#define FILEIO_IMAGE_SIZE        (498*512) // 0x3E400 // Don't save the hidden volume and OTP data area below - 0x40000 -        // 256 k
-#define FILEIO_IMAGE_BLOCKSIZE   4096
+   #define FILEIO_STATUS_DIR "status" #define FILEIO_IMAGE_FILE "status\\app.bin" #define FILEIO_IMAGE_START 0x80000000 #define FILEIO_IMAGE_SIZE
+   (498*512) // 0x3E400 // Don't save the hidden volume and OTP data area below - 0x40000 - // 256 k #define FILEIO_IMAGE_BLOCKSIZE 4096
 
-u8 FileIO_SaveAppImage_u8_old (void)
-{
-  u16 i;
-  s32 FileID_s32;
-  s32 Ret_s32;
+   u8 FileIO_SaveAppImage_u8_old (void) { u16 i; s32 FileID_s32; s32 Ret_s32;
 
-// Init uncrypted file io
-  SD_UncryptedFileIO_Init_u8 ();
+   // Init uncrypted file io SD_UncryptedFileIO_Init_u8 ();
 
-// Change dir
-  FileIO_CdDir_u8 ((u8*)FILEIO_STATUS_DIR);
+   // Change dir FileIO_CdDir_u8 ((u8*)FILEIO_STATUS_DIR);
 
-// Delete possible old file
-  FAI_DeleteFile ((u8*)FILEIO_IMAGE_FILE);
+   // Delete possible old file FAI_DeleteFile ((u8*)FILEIO_IMAGE_FILE);
 
-// Open File
-  FileID_s32 = open ((char*)FILEIO_IMAGE_FILE,O_CREAT|O_APPEND);
-  if (0 > FileID_s32)
-  {
-    CI_LocalPrintf ("Error open %s - %d - %s\r\n",FILEIO_IMAGE_FILE,fs_g_status, IBN_FileSystemErrorText(fs_g_status));
-    return (FALSE);
-  }
+   // Open File FileID_s32 = open ((char*)FILEIO_IMAGE_FILE,O_CREAT|O_APPEND); if (0 > FileID_s32) { CI_LocalPrintf ("Error open %s - %d -
+   %s\r\n",FILEIO_IMAGE_FILE,fs_g_status, IBN_FileSystemErrorText(fs_g_status)); return (FALSE); }
 
-// Write data
-  for (i=0;i<(FILEIO_IMAGE_SIZE/FILEIO_IMAGE_BLOCKSIZE);i++)
-  {
-    CI_LocalPrintf ("Write block = %3d\r\n",i);
-    Ret_s32 = write (FileID_s32,(u8*)(FILEIO_IMAGE_START + i * FILEIO_IMAGE_BLOCKSIZE),FILEIO_IMAGE_BLOCKSIZE);
-  }
+   // Write data for (i=0;i<(FILEIO_IMAGE_SIZE/FILEIO_IMAGE_BLOCKSIZE);i++) { CI_LocalPrintf ("Write block = %3d\r\n",i); Ret_s32 = write
+   (FileID_s32,(u8*)(FILEIO_IMAGE_START + i * FILEIO_IMAGE_BLOCKSIZE),FILEIO_IMAGE_BLOCKSIZE); }
 
-// Close file
-  Ret_s32 = close (FileID_s32);
-  if (-1 == Ret_s32)
-  {
-    CI_LocalPrintf ("Close  = %d \r\n",Ret_s32);
-  }
+   // Close file Ret_s32 = close (FileID_s32); if (-1 == Ret_s32) { CI_LocalPrintf ("Close = %d \r\n",Ret_s32); }
 
-// Flush and close the file
-  file_flush ();
+   // Flush and close the file file_flush ();
 
-// Inform host
-//  FileIO_UpdateToHost_v ();
+   // Inform host // FileIO_UpdateToHost_v ();
 
-  return (TRUE);
-}
-*/
+   return (TRUE); } */
 
 /*******************************************************************************
 
@@ -388,22 +357,22 @@ u8 FileIO_SaveAppImage_u8_old (void)
 u8 InitStatusFiles_u8 (void)
 {
 
-// Init uncrypted file io
-  SD_UncryptedFileIO_Init_u8 ();
+    // Init uncrypted file io
+    SD_UncryptedFileIO_Init_u8 ();
 
-// Change dir
-  FileIO_CdDir_u8 ((u8*)FILEIO_STATUS_DIR);
+    // Change dir
+    FileIO_CdDir_u8 ((u8 *) FILEIO_STATUS_DIR);
 
-// Write test
-  FileIO_AppendText_u8 ((u8*)FILEIO_STATUS_FILE,(u8*)FILEIO_STATUS_TEXT_START);
+    // Write test
+    FileIO_AppendText_u8 ((u8 *) FILEIO_STATUS_FILE, (u8 *) FILEIO_STATUS_TEXT_START);
 
-// Flush and close the file
-  file_flush ();
+    // Flush and close the file
+    file_flush ();
 
-// Inform host
-  FileIO_UpdateToHost_v ();
+    // Inform host
+    FileIO_UpdateToHost_v ();
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /*******************************************************************************
@@ -416,39 +385,39 @@ u8 InitStatusFiles_u8 (void)
 
 *******************************************************************************/
 
-void IBN_FileIo_Tests (u8 nParamsGet_u8,u8 CMD_u8,u32 Param_u32,u32 Param_1_u32,u32 Param_2_u32)
+void IBN_FileIo_Tests (u8 nParamsGet_u8, u8 CMD_u8, u32 Param_u32, u32 Param_1_u32, u32 Param_2_u32)
 {
 
-  if (0 == nParamsGet_u8)
-  {
-    CI_LocalPrintf ("File test functions\r\n");
-    CI_LocalPrintf ("0 Init SD interface\r\n");
-    CI_LocalPrintf ("1 Init status files\r\n");
-    CI_LocalPrintf ("2 Save app image\r\n");
-    CI_LocalPrintf ("\r\n");
-    return;
-  }
+    if (0 == nParamsGet_u8)
+    {
+        CI_LocalPrintf ("File test functions\r\n");
+        CI_LocalPrintf ("0 Init SD interface\r\n");
+        CI_LocalPrintf ("1 Init status files\r\n");
+        CI_LocalPrintf ("2 Save app image\r\n");
+        CI_LocalPrintf ("\r\n");
+        return;
+    }
 
-  switch (CMD_u8)
-  {
-    case 0 :
-      sd_mmc_mci_resources_init();
-      break;
+    switch (CMD_u8)
+    {
+        case 0:
+            sd_mmc_mci_resources_init ();
+            break;
 
-    case 1:
-      InitStatusFiles_u8 ();
-      break;
+        case 1:
+            InitStatusFiles_u8 ();
+            break;
 
-    case 2:
-      FileIO_SaveAppImage_u8 ();
-      break;
+        case 2:
+            FileIO_SaveAppImage_u8 ();
+            break;
 
-    case 3:
-      FileIO_CdDir_u8 ((u8*)FILEIO_STATUS_DIR);
-      break;
+        case 3:
+            FileIO_CdDir_u8 ((u8 *) FILEIO_STATUS_DIR);
+            break;
 
-    case 4:
-      FAI_mkdir ((u8*)FILEIO_STATUS_DIR);
-      break;
-  }
+        case 4:
+            FAI_mkdir ((u8 *) FILEIO_STATUS_DIR);
+            break;
+    }
 }

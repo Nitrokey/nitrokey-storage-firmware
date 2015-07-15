@@ -1,90 +1,56 @@
 /* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
 
-/*This file has been prepared for Doxygen automatic documentation generation.*/
-/*! \file *********************************************************************
- *
- * \brief FreeRTOS port header for AVR32 UC3.
- *
- * - Compiler:           GNU GCC for AVR32
- * - Supported devices:  All AVR32 devices can be used.
- * - AppNote:
- *
- * \author               Atmel Corporation: http://www.atmel.com \n
- *                       Support and FAQ: http://support.atmel.no/
- *
- *****************************************************************************/
+/* This file has been prepared for Doxygen automatic documentation generation. */
+/* ! \file ********************************************************************* \brief FreeRTOS port header for AVR32 UC3. - Compiler: GNU GCC for
+   AVR32 - Supported devices: All AVR32 devices can be used. - AppNote: \author Atmel Corporation: http://www.atmel.com \n Support and FAQ:
+   http://support.atmel.no/ *************************************************************************** */
 
 /*
-    FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
+   FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
 
-    ***************************************************************************
-    *                                                                         *
-    * If you are:                                                             *
-    *                                                                         *
-    *    + New to FreeRTOS,                                                   *
-    *    + Wanting to learn FreeRTOS or multitasking in general quickly       *
-    *    + Looking for basic training,                                        *
-    *    + Wanting to improve your FreeRTOS skills and productivity           *
-    *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
-    *                                                                         *
-    *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
-    *                  http://www.FreeRTOS.org/Documentation                  *
-    *                                                                         *
-    * A pdf reference manual is also available.  Both are usually delivered   *
-    * to your inbox within 20 minutes to two hours when purchased between 8am *
-    * and 8pm GMT (although please allow up to 24 hours in case of            *
-    * exceptional circumstances).  Thank you for your support!                *
-    *                                                                         *
-    ***************************************************************************
+   *************************************************************************** * * * If you are: * * * * + New to FreeRTOS, * * + Wanting to learn
+   FreeRTOS or multitasking in general quickly * * + Looking for basic training, * * + Wanting to improve your FreeRTOS skills and productivity * * *
+   * then take a look at the FreeRTOS eBook * * * * "Using the FreeRTOS Real Time Kernel - a Practical Guide" * *
+   http://www.FreeRTOS.org/Documentation * * * * A pdf reference manual is also available.  Both are usually delivered * * to your inbox within 20
+   minutes to two hours when purchased between 8am * * and 8pm GMT (although please allow up to 24 hours in case of * * exceptional circumstances).
+   Thank you for your support! * * * ***************************************************************************
 
-    This file is part of the FreeRTOS distribution.
+   This file is part of the FreeRTOS distribution.
 
-    FreeRTOS is free software; you can redistribute it and/or modify it under
-    the terms of the GNU General Public License (version 2) as published by the
-    Free Software Foundation AND MODIFIED BY the FreeRTOS exception.
-    ***NOTE*** The exception to the GPL is included to allow you to distribute
-    a combined work that includes FreeRTOS without being obliged to provide the
-    source code for proprietary components outside of the FreeRTOS kernel.
-    FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-    more details. You should have received a copy of the GNU General Public 
-    License and the FreeRTOS license exception along with FreeRTOS; if not it 
-    can be viewed here: http://www.freertos.org/a00114.html and also obtained 
-    by writing to Richard Barry, contact details for whom are available on the
-    FreeRTOS WEB site.
+   FreeRTOS is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License (version 2) as published by
+   the Free Software Foundation AND MODIFIED BY the FreeRTOS exception. ***NOTE*** The exception to the GPL is included to allow you to distribute a
+   combined work that includes FreeRTOS without being obliged to provide the source code for proprietary components outside of the FreeRTOS kernel.
+   FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public
+   License and the FreeRTOS license exception along with FreeRTOS; if not it can be viewed here: http://www.freertos.org/a00114.html and also
+   obtained by writing to Richard Barry, contact details for whom are available on the FreeRTOS WEB site.
 
-    1 tab == 4 spaces!
+   1 tab == 4 spaces!
 
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
+   http://www.FreeRTOS.org - Documentation, latest information, license and contact details.
 
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
+   http://www.SafeRTOS.com - A version that is certified for use in safety critical systems.
 
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
-*/
+   http://www.OpenRTOS.com - Commercial support, development, porting, licensing and training services. */
 /*
-* This file contains modifications done by Rudolf Boeddeker
-* For the modifications applies:
-*
-* Author: Copyright (C) Rudolf Boeddeker  Date: 2012-08-18
-*
-* Nitrokey  is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* Nitrokey is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * This file contains modifications done by Rudolf Boeddeker
+ * For the modifications applies:
+ *
+ * Author: Copyright (C) Rudolf Boeddeker  Date: 2012-08-18
+ *
+ * Nitrokey  is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Nitrokey is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 
 
@@ -100,18 +66,19 @@
  * These settings should not be altered.
  *-----------------------------------------------------------
  */
-    #include <avr32/uc3a3256s.h>
+#include <avr32/uc3a3256s.h>
 
 #include <avr32/io.h>
 #include "intc.h"
 #include "compiler.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 
-/* Type definitions. */
+    /* Type definitions. */
 #define portCHAR        char
 #define portFLOAT       float
 #define portDOUBLE      double
@@ -128,14 +95,14 @@ extern "C" {
 
 #if( configUSE_16_BIT_TICKS == 1 )
     typedef unsigned portSHORT portTickType;
-    #define portMAX_DELAY ( portTickType ) 0xffff
+#define portMAX_DELAY ( portTickType ) 0xffff
 #else
     typedef unsigned portLONG portTickType;
-    #define portMAX_DELAY ( portTickType ) 0xffffffff
+#define portMAX_DELAY ( portTickType ) 0xffffffff
 #endif
 /*-----------------------------------------------------------*/
 
-/* Architecture specifics. */
+    /* Architecture specifics. */
 #define portSTACK_GROWTH      ( -1 )
 #define portTICK_RATE_MS      ( ( portTickType ) 1000 / configTICK_RATE_HZ )
 #define portBYTE_ALIGNMENT    4
@@ -145,7 +112,7 @@ extern "C" {
 
 /*-----------------------------------------------------------*/
 
-/* INTC-specific. */
+    /* INTC-specific. */
 #define DISABLE_ALL_EXCEPTIONS()      Disable_global_exception()
 #define ENABLE_ALL_EXCEPTIONS()       Enable_global_exception()
 
@@ -156,19 +123,19 @@ extern "C" {
 #define ENABLE_INT_LEVEL(int_level)   Enable_interrupt_level(int_level)
 
 
-/*
- * Debug trace.
- * Activated if and only if configDBG is nonzero.
- * Prints a formatted string to stdout.
- * The current source file name and line number are output with a colon before
- * the formatted string.
- * A carriage return and a linefeed are appended to the output.
- * stdout is redirected to the USART configured by configDBG_USART.
- * The parameters are the same as for the standard printf function.
- * There is no return value.
- * SHALL NOT BE CALLED FROM WITHIN AN INTERRUPT as fputs and printf use malloc,
- * which is interrupt-unsafe with the current __malloc_lock and __malloc_unlock.
- */
+    /*
+     * Debug trace.
+     * Activated if and only if configDBG is nonzero.
+     * Prints a formatted string to stdout.
+     * The current source file name and line number are output with a colon before
+     * the formatted string.
+     * A carriage return and a linefeed are appended to the output.
+     * stdout is redirected to the USART configured by configDBG_USART.
+     * The parameters are the same as for the standard printf function.
+     * There is no return value.
+     * SHALL NOT BE CALLED FROM WITHIN AN INTERRUPT as fputs and printf use malloc,
+     * which is interrupt-unsafe with the current __malloc_lock and __malloc_unlock.
+     */
 #if configDBG
 #define portDBG_TRACE(...) \
 {\
@@ -181,28 +148,28 @@ extern "C" {
 #endif
 
 
-/* Critical section management. */
+    /* Critical section management. */
 #define portDISABLE_INTERRUPTS()  DISABLE_ALL_INTERRUPTS()
 #define portENABLE_INTERRUPTS()   ENABLE_ALL_INTERRUPTS()
 
 
-extern void vPortEnterCritical( void );
-extern void vPortExitCritical( void );
+    extern void vPortEnterCritical (void);
+    extern void vPortExitCritical (void);
 
 #define portENTER_CRITICAL()      vPortEnterCritical();
 #define portEXIT_CRITICAL()       vPortExitCritical();
 
 
-/* Added as there is no such function in FreeRTOS. */
-extern void *pvPortRealloc( void *pv, size_t xSize );
+    /* Added as there is no such function in FreeRTOS. */
+    extern void* pvPortRealloc (void* pv, size_t xSize);
 /*-----------------------------------------------------------*/
 
 
 /*=============================================================================================*/
 
-/*
- * Restore Context for cases other than INTi.
- */
+    /*
+     * Restore Context for cases other than INTi.
+     */
 #define portRESTORE_CONTEXT()                                                      \
 {                                                                                  \
   extern volatile unsigned portLONG ulCriticalNesting;                             \
@@ -243,43 +210,43 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
 }
 
 
-/*
- * portSAVE_CONTEXT_INT() and portRESTORE_CONTEXT_INT(): for AVR32_INTC_INT0..3 exceptions.
- * portSAVE_CONTEXT_SCALL() and portRESTORE_CONTEXT_SCALL(): for the scall exception.
- *
- * Had to make different versions because registers saved on the system stack
- * are not the same between AVR32_INTC_INT0..3 exceptions and the scall exception.
- */
+    /*
+     * portSAVE_CONTEXT_INT() and portRESTORE_CONTEXT_INT(): for AVR32_INTC_INT0..3 exceptions.
+     * portSAVE_CONTEXT_SCALL() and portRESTORE_CONTEXT_SCALL(): for the scall exception.
+     *
+     * Had to make different versions because registers saved on the system stack
+     * are not the same between AVR32_INTC_INT0..3 exceptions and the scall exception.
+     */
 
-// Task context stack layout:
-  // R8  (*)
-  // R9  (*)
-  // R10 (*)
-  // R11 (*)
-  // R12 (*)
-  // R14/LR (*)
-  // R15/PC (*)
-  // SR (*)
-  // R0
-  // R1
-  // R2
-  // R3
-  // R4
-  // R5
-  // R6
-  // R7
-  // ulCriticalNesting
-// (*) automatically done for AVR32_INTC_INT0..AVR32_INTC_INT3, but not for SCALL
+    // Task context stack layout:
+    // R8 (*)
+    // R9 (*)
+    // R10 (*)
+    // R11 (*)
+    // R12 (*)
+    // R14/LR (*)
+    // R15/PC (*)
+    // SR (*)
+    // R0
+    // R1
+    // R2
+    // R3
+    // R4
+    // R5
+    // R6
+    // R7
+    // ulCriticalNesting
+    // (*) automatically done for AVR32_INTC_INT0..AVR32_INTC_INT3, but not for SCALL
 
-/*
- * The ISR used for the scheduler tick depends on whether the cooperative or
- * the preemptive scheduler is being used.
- */
+    /*
+     * The ISR used for the scheduler tick depends on whether the cooperative or
+     * the preemptive scheduler is being used.
+     */
 #if configUSE_PREEMPTION == 0
 
-/*
- * portSAVE_CONTEXT_OS_INT() for OS Tick exception.
- */
+    /*
+     * portSAVE_CONTEXT_OS_INT() for OS Tick exception.
+     */
 #define portSAVE_CONTEXT_OS_INT()                                                       \
 {                                                                                       \
   /* Save R0..R7 */                                                                     \
@@ -289,9 +256,9 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
   /* there is also no context save. */                                                  \
 }
 
-/*
- * portRESTORE_CONTEXT_OS_INT() for Tick exception.
- */
+    /*
+     * portRESTORE_CONTEXT_OS_INT() for Tick exception.
+     */
 #define portRESTORE_CONTEXT_OS_INT()                                                    \
 {                                                                                       \
   __asm__ __volatile__ (                                                                \
@@ -306,9 +273,9 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
 
 #else
 
-/*
- * portSAVE_CONTEXT_OS_INT() for OS Tick exception.
- */
+    /*
+     * portSAVE_CONTEXT_OS_INT() for OS Tick exception.
+     */
 #define portSAVE_CONTEXT_OS_INT()                                                                           \
 {                                                                                                           \
   extern volatile unsigned portLONG ulCriticalNesting;                                                      \
@@ -358,9 +325,9 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
   );                                                                                                        \
 }
 
-/*
- * portRESTORE_CONTEXT_OS_INT() for Tick exception.
- */
+    /*
+     * portRESTORE_CONTEXT_OS_INT() for Tick exception.
+     */
 #define portRESTORE_CONTEXT_OS_INT()                                                                      \
 {                                                                                                         \
   extern volatile unsigned portLONG ulCriticalNesting;                                                    \
@@ -421,12 +388,12 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
 #endif
 
 
-/*
- * portSAVE_CONTEXT_SCALL() for SupervisorCALL exception.
- *
- * NOTE: taskYIELD()(== SCALL) MUST NOT be called in a mode > supervisor mode.
- *
- */
+    /*
+     * portSAVE_CONTEXT_SCALL() for SupervisorCALL exception.
+     *
+     * NOTE: taskYIELD()(== SCALL) MUST NOT be called in a mode > supervisor mode.
+     *
+     */
 #define portSAVE_CONTEXT_SCALL()                                                            \
 {                                                                                           \
   extern volatile unsigned portLONG ulCriticalNesting;                                      \
@@ -491,9 +458,9 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
   );                                                                                        \
 }
 
-/*
- * portRESTORE_CONTEXT() for SupervisorCALL exception.
- */
+    /*
+     * portRESTORE_CONTEXT() for SupervisorCALL exception.
+     */
 #define portRESTORE_CONTEXT_SCALL()                                                          \
 {                                                                                            \
   extern volatile unsigned portLONG ulCriticalNesting;                                       \
@@ -546,16 +513,16 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
 }
 
 
-/*
- * The ISR used depends on whether the cooperative or
- * the preemptive scheduler is being used.
- */
+    /*
+     * The ISR used depends on whether the cooperative or
+     * the preemptive scheduler is being used.
+     */
 #if configUSE_PREEMPTION == 0
 
-/*
- * ISR entry and exit macros.  These are only required if a task switch
- * is required from the ISR.
- */
+    /*
+     * ISR entry and exit macros.  These are only required if a task switch
+     * is required from the ISR.
+     */
 #define portENTER_SWITCHING_ISR()                                                            \
 {                                                                                            \
   /* Save R0..R7 */                                                                          \
@@ -565,9 +532,9 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
   /* there is also no context save. */                                                       \
 }
 
-/*
- * Input parameter: in R12, boolean. Perform a vTaskSwitchContext() if 1
- */
+    /*
+     * Input parameter: in R12, boolean. Perform a vTaskSwitchContext() if 1
+     */
 #define portEXIT_SWITCHING_ISR()                                                             \
 {                                                                                            \
   __asm__ __volatile__ (                                                                     \
@@ -582,10 +549,10 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
 
 #else
 
-/*
- * ISR entry and exit macros.  These are only required if a task switch
- * is required from the ISR.
- */
+    /*
+     * ISR entry and exit macros.  These are only required if a task switch
+     * is required from the ISR.
+     */
 #define portENTER_SWITCHING_ISR()                                                                           \
 {                                                                                                           \
   extern volatile unsigned portLONG ulCriticalNesting;                                                      \
@@ -631,9 +598,9 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
   );                                                                                                        \
 }
 
-/*
- * Input parameter: in R12, boolean. Perform a vTaskSwitchContext() if 1
- */
+    /*
+     * Input parameter: in R12, boolean. Perform a vTaskSwitchContext() if 1
+     */
 #define portEXIT_SWITCHING_ISR()                                                                            \
 {                                                                                                           \
   extern volatile unsigned portLONG ulCriticalNesting;                                                      \
@@ -702,7 +669,7 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
 
 #define portYIELD()                 {__asm__ __volatile__ ("scall");}
 
-/* Task function macros as described on the FreeRTOS.org WEB site. */
+    /* Task function macros as described on the FreeRTOS.org WEB site. */
 #define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void *pvParameters )
 #define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
 
@@ -710,4 +677,4 @@ extern void *pvPortRealloc( void *pv, size_t xSize );
 }
 #endif
 
-#endif /* PORTMACRO_H */
+#endif                          /* PORTMACRO_H */

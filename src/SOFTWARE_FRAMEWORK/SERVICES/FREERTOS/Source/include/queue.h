@@ -1,60 +1,35 @@
 /* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
 
 /*
-    FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
+   FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
 
-    ***************************************************************************
-    *                                                                         *
-    * If you are:                                                             *
-    *                                                                         *
-    *    + New to FreeRTOS,                                                   *
-    *    + Wanting to learn FreeRTOS or multitasking in general quickly       *
-    *    + Looking for basic training,                                        *
-    *    + Wanting to improve your FreeRTOS skills and productivity           *
-    *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
-    *                                                                         *
-    *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
-    *                  http://www.FreeRTOS.org/Documentation                  *
-    *                                                                         *
-    * A pdf reference manual is also available.  Both are usually delivered   *
-    * to your inbox within 20 minutes to two hours when purchased between 8am *
-    * and 8pm GMT (although please allow up to 24 hours in case of            *
-    * exceptional circumstances).  Thank you for your support!                *
-    *                                                                         *
-    ***************************************************************************
+   *************************************************************************** * * * If you are: * * * * + New to FreeRTOS, * * + Wanting to learn
+   FreeRTOS or multitasking in general quickly * * + Looking for basic training, * * + Wanting to improve your FreeRTOS skills and productivity * * *
+   * then take a look at the FreeRTOS eBook * * * * "Using the FreeRTOS Real Time Kernel - a Practical Guide" * *
+   http://www.FreeRTOS.org/Documentation * * * * A pdf reference manual is also available.  Both are usually delivered * * to your inbox within 20
+   minutes to two hours when purchased between 8am * * and 8pm GMT (although please allow up to 24 hours in case of * * exceptional circumstances).
+   Thank you for your support! * * * ***************************************************************************
 
-    This file is part of the FreeRTOS distribution.
+   This file is part of the FreeRTOS distribution.
 
-    FreeRTOS is free software; you can redistribute it and/or modify it under
-    the terms of the GNU General Public License (version 2) as published by the
-    Free Software Foundation AND MODIFIED BY the FreeRTOS exception.
-    ***NOTE*** The exception to the GPL is included to allow you to distribute
-    a combined work that includes FreeRTOS without being obliged to provide the
-    source code for proprietary components outside of the FreeRTOS kernel.
-    FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-    more details. You should have received a copy of the GNU General Public 
-    License and the FreeRTOS license exception along with FreeRTOS; if not it 
-    can be viewed here: http://www.freertos.org/a00114.html and also obtained 
-    by writing to Richard Barry, contact details for whom are available on the
-    FreeRTOS WEB site.
+   FreeRTOS is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License (version 2) as published by
+   the Free Software Foundation AND MODIFIED BY the FreeRTOS exception. ***NOTE*** The exception to the GPL is included to allow you to distribute a
+   combined work that includes FreeRTOS without being obliged to provide the source code for proprietary components outside of the FreeRTOS kernel.
+   FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public
+   License and the FreeRTOS license exception along with FreeRTOS; if not it can be viewed here: http://www.freertos.org/a00114.html and also
+   obtained by writing to Richard Barry, contact details for whom are available on the FreeRTOS WEB site.
 
-    1 tab == 4 spaces!
+   1 tab == 4 spaces!
 
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
+   http://www.FreeRTOS.org - Documentation, latest information, license and contact details.
 
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
+   http://www.SafeRTOS.com - A version that is certified for use in safety critical systems.
 
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
-*/
+   http://www.OpenRTOS.com - Commercial support, development, porting, licensing and training services. */
 
 #ifndef INC_FREERTOS_H
-	#error "#include FreeRTOS.h" must appear in source files before "#include queue.h"
+#error "#include FreeRTOS.h" must appear in source files before "#include queue.h"
 #endif
 
 
@@ -64,17 +39,18 @@
 #define QUEUE_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 
 #include "mpu_wrappers.h"
 
 
-typedef void * xQueueHandle;
+    typedef void* xQueueHandle;
 
 
-/* For internal use only. */
+    /* For internal use only. */
 #define	queueSEND_TO_BACK	( 0 )
 #define	queueSEND_TO_FRONT	( 1 )
 
@@ -135,7 +111,7 @@ typedef void * xQueueHandle;
  * \defgroup xQueueCreate xQueueCreate
  * \ingroup QueueManagement
  */
-xQueueHandle xQueueCreate( unsigned portBASE_TYPE uxQueueLength, unsigned portBASE_TYPE uxItemSize );
+    xQueueHandle xQueueCreate (unsigned portBASE_TYPE uxQueueLength, unsigned portBASE_TYPE uxItemSize);
 
 /**
  * queue. h
@@ -471,7 +447,8 @@ xQueueHandle xQueueCreate( unsigned portBASE_TYPE uxQueueLength, unsigned portBA
  * \defgroup xQueueSend xQueueSend
  * \ingroup QueueManagement
  */
-signed portBASE_TYPE xQueueGenericSend( xQueueHandle xQueue, const void * const pvItemToQueue, portTickType xTicksToWait, portBASE_TYPE xCopyPosition );
+    signed portBASE_TYPE xQueueGenericSend (xQueueHandle xQueue, const void* const pvItemToQueue, portTickType xTicksToWait,
+                                            portBASE_TYPE xCopyPosition);
 
 /**
  * queue. h
@@ -757,7 +734,7 @@ signed portBASE_TYPE xQueueGenericSend( xQueueHandle xQueue, const void * const 
  * \defgroup xQueueReceive xQueueReceive
  * \ingroup QueueManagement
  */
-signed portBASE_TYPE xQueueGenericReceive( xQueueHandle xQueue, void * const pvBuffer, portTickType xTicksToWait, portBASE_TYPE xJustPeek );
+    signed portBASE_TYPE xQueueGenericReceive (xQueueHandle xQueue, void* const pvBuffer, portTickType xTicksToWait, portBASE_TYPE xJustPeek);
 
 /**
  * queue. h
@@ -772,7 +749,7 @@ signed portBASE_TYPE xQueueGenericReceive( xQueueHandle xQueue, void * const pvB
  * \page uxQueueMessagesWaiting uxQueueMessagesWaiting
  * \ingroup QueueManagement
  */
-unsigned portBASE_TYPE uxQueueMessagesWaiting( const xQueueHandle xQueue );
+    unsigned portBASE_TYPE uxQueueMessagesWaiting (const xQueueHandle xQueue);
 
 /**
  * queue. h
@@ -786,7 +763,7 @@ unsigned portBASE_TYPE uxQueueMessagesWaiting( const xQueueHandle xQueue );
  * \page vQueueDelete vQueueDelete
  * \ingroup QueueManagement
  */
-void vQueueDelete( xQueueHandle xQueue );
+    void vQueueDelete (xQueueHandle xQueue);
 
 /**
  * queue. h
@@ -1079,7 +1056,8 @@ void vQueueDelete( xQueueHandle xQueue );
  * \defgroup xQueueSendFromISR xQueueSendFromISR
  * \ingroup QueueManagement
  */
-signed portBASE_TYPE xQueueGenericSendFromISR( xQueueHandle pxQueue, const void * const pvItemToQueue, signed portBASE_TYPE *pxHigherPriorityTaskWoken, portBASE_TYPE xCopyPosition );
+    signed portBASE_TYPE xQueueGenericSendFromISR (xQueueHandle pxQueue, const void* const pvItemToQueue,
+                                                   signed portBASE_TYPE * pxHigherPriorityTaskWoken, portBASE_TYPE xCopyPosition);
 
 /**
  * queue. h
@@ -1168,88 +1146,89 @@ signed portBASE_TYPE xQueueGenericSendFromISR( xQueueHandle pxQueue, const void 
  * \defgroup xQueueReceiveFromISR xQueueReceiveFromISR
  * \ingroup QueueManagement
  */
-signed portBASE_TYPE xQueueReceiveFromISR( xQueueHandle pxQueue, void * const pvBuffer, signed portBASE_TYPE *pxTaskWoken );
+    signed portBASE_TYPE xQueueReceiveFromISR (xQueueHandle pxQueue, void* const pvBuffer, signed portBASE_TYPE * pxTaskWoken);
 
-/*
- * Utilities to query queue that are safe to use from an ISR.  These utilities
- * should be used only from witin an ISR, or within a critical section.
- */
-signed portBASE_TYPE xQueueIsQueueEmptyFromISR( const xQueueHandle pxQueue );
-signed portBASE_TYPE xQueueIsQueueFullFromISR( const xQueueHandle pxQueue );
-unsigned portBASE_TYPE uxQueueMessagesWaitingFromISR( const xQueueHandle pxQueue );
+    /*
+     * Utilities to query queue that are safe to use from an ISR.  These utilities
+     * should be used only from witin an ISR, or within a critical section.
+     */
+    signed portBASE_TYPE xQueueIsQueueEmptyFromISR (const xQueueHandle pxQueue);
+    signed portBASE_TYPE xQueueIsQueueFullFromISR (const xQueueHandle pxQueue);
+    unsigned portBASE_TYPE uxQueueMessagesWaitingFromISR (const xQueueHandle pxQueue);
 
 
-/*
- * xQueueAltGenericSend() is an alternative version of xQueueGenericSend().
- * Likewise xQueueAltGenericReceive() is an alternative version of
- * xQueueGenericReceive().
- *
- * The source code that implements the alternative (Alt) API is much
- * simpler	because it executes everything from within a critical section.
- * This is	the approach taken by many other RTOSes, but FreeRTOS.org has the
- * preferred fully featured API too.  The fully featured API has more
- * complex	code that takes longer to execute, but makes much less use of
- * critical sections.  Therefore the alternative API sacrifices interrupt
- * responsiveness to gain execution speed, whereas the fully featured API
- * sacrifices execution speed to ensure better interrupt responsiveness.
- */
-signed portBASE_TYPE xQueueAltGenericSend( xQueueHandle pxQueue, const void * const pvItemToQueue, portTickType xTicksToWait, portBASE_TYPE xCopyPosition );
-signed portBASE_TYPE xQueueAltGenericReceive( xQueueHandle pxQueue, void * const pvBuffer, portTickType xTicksToWait, portBASE_TYPE xJustPeeking );
+    /*
+     * xQueueAltGenericSend() is an alternative version of xQueueGenericSend().
+     * Likewise xQueueAltGenericReceive() is an alternative version of
+     * xQueueGenericReceive().
+     *
+     * The source code that implements the alternative (Alt) API is much
+     * simpler  because it executes everything from within a critical section.
+     * This is  the approach taken by many other RTOSes, but FreeRTOS.org has the
+     * preferred fully featured API too.  The fully featured API has more
+     * complex  code that takes longer to execute, but makes much less use of
+     * critical sections.  Therefore the alternative API sacrifices interrupt
+     * responsiveness to gain execution speed, whereas the fully featured API
+     * sacrifices execution speed to ensure better interrupt responsiveness.
+     */
+    signed portBASE_TYPE xQueueAltGenericSend (xQueueHandle pxQueue, const void* const pvItemToQueue, portTickType xTicksToWait,
+                                               portBASE_TYPE xCopyPosition);
+    signed portBASE_TYPE xQueueAltGenericReceive (xQueueHandle pxQueue, void* const pvBuffer, portTickType xTicksToWait, portBASE_TYPE xJustPeeking);
 #define xQueueAltSendToFront( xQueue, pvItemToQueue, xTicksToWait ) xQueueAltGenericSend( xQueue, pvItemToQueue, xTicksToWait, queueSEND_TO_FRONT )
 #define xQueueAltSendToBack( xQueue, pvItemToQueue, xTicksToWait ) xQueueAltGenericSend( xQueue, pvItemToQueue, xTicksToWait, queueSEND_TO_BACK )
 #define xQueueAltReceive( xQueue, pvBuffer, xTicksToWait ) xQueueAltGenericReceive( xQueue, pvBuffer, xTicksToWait, pdFALSE )
 #define xQueueAltPeek( xQueue, pvBuffer, xTicksToWait ) xQueueAltGenericReceive( xQueue, pvBuffer, xTicksToWait, pdTRUE )
 
-/*
- * The functions defined above are for passing data to and from tasks.  The
- * functions below are the equivalents for passing data to and from
- * co-routines.
- *
- * These functions are called from the co-routine macro implementation and
- * should not be called directly from application code.  Instead use the macro
- * wrappers defined within croutine.h.
- */
-signed portBASE_TYPE xQueueCRSendFromISR( xQueueHandle pxQueue, const void *pvItemToQueue, signed portBASE_TYPE xCoRoutinePreviouslyWoken );
-signed portBASE_TYPE xQueueCRReceiveFromISR( xQueueHandle pxQueue, void *pvBuffer, signed portBASE_TYPE *pxTaskWoken );
-signed portBASE_TYPE xQueueCRSend( xQueueHandle pxQueue, const void *pvItemToQueue, portTickType xTicksToWait );
-signed portBASE_TYPE xQueueCRReceive( xQueueHandle pxQueue, void *pvBuffer, portTickType xTicksToWait );
+    /*
+     * The functions defined above are for passing data to and from tasks.  The
+     * functions below are the equivalents for passing data to and from
+     * co-routines.
+     *
+     * These functions are called from the co-routine macro implementation and
+     * should not be called directly from application code.  Instead use the macro
+     * wrappers defined within croutine.h.
+     */
+    signed portBASE_TYPE xQueueCRSendFromISR (xQueueHandle pxQueue, const void* pvItemToQueue, signed portBASE_TYPE xCoRoutinePreviouslyWoken);
+    signed portBASE_TYPE xQueueCRReceiveFromISR (xQueueHandle pxQueue, void* pvBuffer, signed portBASE_TYPE * pxTaskWoken);
+    signed portBASE_TYPE xQueueCRSend (xQueueHandle pxQueue, const void* pvItemToQueue, portTickType xTicksToWait);
+    signed portBASE_TYPE xQueueCRReceive (xQueueHandle pxQueue, void* pvBuffer, portTickType xTicksToWait);
 
-/*
- * For internal use only.  Use xSemaphoreCreateMutex() or
- * xSemaphoreCreateCounting() instead of calling these functions directly.
- */
-xQueueHandle xQueueCreateMutex( void );
-xQueueHandle xQueueCreateCountingSemaphore( unsigned portBASE_TYPE uxCountValue, unsigned portBASE_TYPE uxInitialCount );
+    /*
+     * For internal use only.  Use xSemaphoreCreateMutex() or
+     * xSemaphoreCreateCounting() instead of calling these functions directly.
+     */
+    xQueueHandle xQueueCreateMutex (void);
+    xQueueHandle xQueueCreateCountingSemaphore (unsigned portBASE_TYPE uxCountValue, unsigned portBASE_TYPE uxInitialCount);
 
-/*
- * For internal use only.  Use xSemaphoreTakeMutexRecursive() or
- * xSemaphoreGiveMutexRecursive() instead of calling these functions directly.
- */
-portBASE_TYPE xQueueTakeMutexRecursive( xQueueHandle xMutex, portTickType xBlockTime );
-portBASE_TYPE xQueueGiveMutexRecursive( xQueueHandle xMutex );
+    /*
+     * For internal use only.  Use xSemaphoreTakeMutexRecursive() or
+     * xSemaphoreGiveMutexRecursive() instead of calling these functions directly.
+     */
+    portBASE_TYPE xQueueTakeMutexRecursive (xQueueHandle xMutex, portTickType xBlockTime);
+    portBASE_TYPE xQueueGiveMutexRecursive (xQueueHandle xMutex);
 
-/*
- * The registry is provided as a means for kernel aware debuggers to
- * locate queues, semaphores and mutexes.  Call vQueueAddToRegistry() add
- * a queue, semaphore or mutex handle to the registry if you want the handle
- * to be available to a kernel aware debugger.  If you are not using a kernel
- * aware debugger then this function can be ignored.
- *
- * configQUEUE_REGISTRY_SIZE defines the maximum number of handles the
- * registry can hold.  configQUEUE_REGISTRY_SIZE must be greater than 0
- * within FreeRTOSConfig.h for the registry to be available.  Its value
- * does not effect the number of queues, semaphores and mutexes that can be
- * created - just the number that the registry can hold.
- *
- * @param xQueue The handle of the queue being added to the registry.  This
- * is the handle returned by a call to xQueueCreate().  Semaphore and mutex
- * handles can also be passed in here.
- *
- * @param pcName The name to be associated with the handle.  This is the
- * name that the kernel aware debugger will display.
- */
+    /*
+     * The registry is provided as a means for kernel aware debuggers to
+     * locate queues, semaphores and mutexes.  Call vQueueAddToRegistry() add
+     * a queue, semaphore or mutex handle to the registry if you want the handle
+     * to be available to a kernel aware debugger.  If you are not using a kernel
+     * aware debugger then this function can be ignored.
+     *
+     * configQUEUE_REGISTRY_SIZE defines the maximum number of handles the
+     * registry can hold.  configQUEUE_REGISTRY_SIZE must be greater than 0
+     * within FreeRTOSConfig.h for the registry to be available.  Its value
+     * does not effect the number of queues, semaphores and mutexes that can be
+     * created - just the number that the registry can hold.
+     *
+     * @param xQueue The handle of the queue being added to the registry.  This
+     * is the handle returned by a call to xQueueCreate().  Semaphore and mutex
+     * handles can also be passed in here.
+     *
+     * @param pcName The name to be associated with the handle.  This is the
+     * name that the kernel aware debugger will display.
+     */
 #if configQUEUE_REGISTRY_SIZE > 0
-	void vQueueAddToRegistry( xQueueHandle xQueue, signed char *pcName );
+    void vQueueAddToRegistry (xQueueHandle xQueue, signed char* pcName);
 #endif
 
 
@@ -1259,5 +1238,4 @@ portBASE_TYPE xQueueGiveMutexRecursive( xQueueHandle xMutex );
 }
 #endif
 
-#endif /* QUEUE_H */
-
+#endif                          /* QUEUE_H */

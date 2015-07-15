@@ -1,18 +1,9 @@
 /* This source file is part of the ATMEL AVR32-UC3-SoftwareFramework-1.6.0 Release */
 
-/*This file is prepared for Doxygen automatic documentation generation.*/
-/*! \file *********************************************************************
- *
- * \brief Main file of the USB mass-storage example.
- *
- * - Compiler:           IAR EWAVR32 and GNU GCC for AVR32
- * - Supported devices:  All AVR32 devices with a USB module can be used.
- * - AppNote:
- *
- * \author               Atmel Corporation: http://www.atmel.com \n
- *                       Support and FAQ: http://support.atmel.no/
- *
- ******************************************************************************/
+/* This file is prepared for Doxygen automatic documentation generation. */
+/* ! \file ********************************************************************* \brief Main file of the USB mass-storage example. - Compiler: IAR
+   EWAVR32 and GNU GCC for AVR32 - Supported devices: All AVR32 devices with a USB module can be used. - AppNote: \author Atmel Corporation:
+   http://www.atmel.com \n Support and FAQ: http://support.atmel.no/ **************************************************************************** */
 
 /*
  *
@@ -30,34 +21,34 @@
  */
 
 /*
-* This file contains modifications done by Rudolf Boeddeker
-* For the modifications applies:
-*
-* Author: Copyright (C) Rudolf Boeddeker  Date: 2012-08-18
-*
-* Nitrokey  is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* Nitrokey is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * This file contains modifications done by Rudolf Boeddeker
+ * For the modifications applies:
+ *
+ * Author: Copyright (C) Rudolf Boeddeker  Date: 2012-08-18
+ *
+ * Nitrokey  is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Nitrokey is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 
-//_____  I N C L U D E S ___________________________________________________
+// _____ I N C L U D E S ___________________________________________________
 
 #ifndef FREERTOS_USED
-  #if (defined __GNUC__)
-    #include "nlao_cpu.h"
-  #endif
+#if (defined __GNUC__)
+#include "nlao_cpu.h"
+#endif
 #else
-  #include <stdio.h>
+#include <stdio.h>
 #endif
 #include "compiler.h"
 #include "preprocessor.h"
@@ -69,28 +60,28 @@
 #include "gpio.h"
 #include "ctrl_access.h"
 #if (defined AT45DBX_MEM) && (AT45DBX_MEM == ENABLE)
-  #include "spi.h"
-  #include "conf_at45dbx.h"
+#include "spi.h"
+#include "conf_at45dbx.h"
 #endif
 #if (defined SD_MMC_SPI_MEM) && (SD_MMC_SPI_MEM == ENABLE)
-  #include "spi.h"
-  #include "conf_sd_mmc_spi.h"
+#include "spi.h"
+#include "conf_sd_mmc_spi.h"
 #endif
 #if ((defined SD_MMC_MCI_0_MEM) && (SD_MMC_MCI_0_MEM == ENABLE)) || ((defined SD_MMC_MCI_1_MEM) && (SD_MMC_MCI_1_MEM == ENABLE))
-  #include "mci.h"
-  #include "conf_sd_mmc_mci.h"
+#include "mci.h"
+#include "conf_sd_mmc_mci.h"
 #endif
 #ifdef FREERTOS_USED
-  #include "FreeRTOS.h"
-  #include "task.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #endif
 #include "conf_usb.h"
 #include "usb_task.h"
 #if USB_DEVICE_FEATURE == ENABLED
-  #include "device_mass_storage_task.h"
+#include "device_mass_storage_task.h"
 #endif
 #if USB_HOST_FEATURE == ENABLED
-  #include "host_mass_storage_task.h"
+#include "host_mass_storage_task.h"
 #endif
 #include "ushell_task.h"
 
@@ -107,7 +98,7 @@
 #include "INTERNAL_WORK/internal_work.h"
 
 #ifdef TIME_MEASURING_ENABLE
-	#include "Tools\TIME_MEASURING.h"
+#include "Tools\TIME_MEASURING.h"
 #endif
 
 #include "usart.h"
@@ -121,8 +112,8 @@
 
 *******************************************************************************/
 
-//#define FOSC0_STICK20           8000000                              //!< Osc0 frequency: Hz.
-//#define OSC0_STARTUP_STICK20    AVR32_PM_OSCCTRL0_STARTUP_2048_RCOSC  //!< Osc0 startup time: RCOsc periods.
+// #define FOSC0_STICK20 8000000 //!< Osc0 frequency: Hz.
+// #define OSC0_STARTUP_STICK20 AVR32_PM_OSCCTRL0_STARTUP_2048_RCOSC //!< Osc0 startup time: RCOsc periods.
 
 
 /*******************************************************************************
@@ -143,13 +134,11 @@
 
 *******************************************************************************/
 
-static pcl_freq_param_t pcl_freq_param =
-{
-  .cpu_f        = FCPU_HZ,
-  .pba_f        = FPBA_HZ,
-  .osc0_f       = FOSC0,
-  .osc0_startup = OSC0_STARTUP
-
+static pcl_freq_param_t pcl_freq_param = {
+    .cpu_f = FCPU_HZ,
+    .pba_f = FPBA_HZ,
+    .osc0_f = FOSC0,
+    .osc0_startup = OSC0_STARTUP
 };
 
 /*******************************************************************************
@@ -164,18 +153,18 @@ static pcl_freq_param_t pcl_freq_param =
 
 *******************************************************************************/
 
-void init_hmatrix(void)
+void init_hmatrix (void)
 {
-  union
-  {
-    unsigned long                 scfg;
-    avr32_hmatrix_scfg_t          SCFG;
-  } u_avr32_hmatrix_scfg;
+    union
+    {
+        unsigned long scfg;
+        avr32_hmatrix_scfg_t SCFG;
+    } u_avr32_hmatrix_scfg;
 
-  // For the internal-flash HMATRIX slave, use last master as default.
-  u_avr32_hmatrix_scfg.scfg = AVR32_HMATRIX.scfg[AVR32_HMATRIX_SLAVE_FLASH];
-  u_avr32_hmatrix_scfg.SCFG.defmstr_type = AVR32_HMATRIX_DEFMSTR_TYPE_LAST_DEFAULT;
-  AVR32_HMATRIX.scfg[AVR32_HMATRIX_SLAVE_FLASH] = u_avr32_hmatrix_scfg.scfg;
+    // For the internal-flash HMATRIX slave, use last master as default.
+    u_avr32_hmatrix_scfg.scfg = AVR32_HMATRIX.scfg[AVR32_HMATRIX_SLAVE_FLASH];
+    u_avr32_hmatrix_scfg.SCFG.defmstr_type = AVR32_HMATRIX_DEFMSTR_TYPE_LAST_DEFAULT;
+    AVR32_HMATRIX.scfg[AVR32_HMATRIX_SLAVE_FLASH] = u_avr32_hmatrix_scfg.scfg;
 }
 
 
@@ -193,71 +182,23 @@ void init_hmatrix(void)
 
 /*
 
-int Test_MCI_Pins (void)
-{
-  long i;
+   int Test_MCI_Pins (void) { long i;
 
-  for (i=0;i<100000000;i++)
-  {
-    if (0 == i % 2)
-    {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_CLK_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_CLK_PIN);
-    }
+   for (i=0;i<100000000;i++) { if (0 == i % 2) { gpio_set_gpio_pin (SD_SLOT_8BITS_CLK_PIN); } else { gpio_clr_gpio_pin (SD_SLOT_8BITS_CLK_PIN); }
 
-    if (0 == i % 4)
-    {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_CMD_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_CMD_PIN);
-    }
+   if (0 == i % 4) { gpio_set_gpio_pin (SD_SLOT_8BITS_CMD_PIN); } else { gpio_clr_gpio_pin (SD_SLOT_8BITS_CMD_PIN); }
 
-    if (0 == i % 8)
-    {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_DATA0_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA0_PIN);
-    }
+   if (0 == i % 8) { gpio_set_gpio_pin (SD_SLOT_8BITS_DATA0_PIN); } else { gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA0_PIN); }
 
-    if (0 == i % 16)
-    {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_DATA1_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA1_PIN);
-    }
+   if (0 == i % 16) { gpio_set_gpio_pin (SD_SLOT_8BITS_DATA1_PIN); } else { gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA1_PIN); }
 
-    if (0 == i % 32)
-    {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_DATA2_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA2_PIN);
-    }
+   if (0 == i % 32) { gpio_set_gpio_pin (SD_SLOT_8BITS_DATA2_PIN); } else { gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA2_PIN); }
 
-    if (0 == i % 64)
-    {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_DATA3_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA3_PIN);
-    }
+   if (0 == i % 64) { gpio_set_gpio_pin (SD_SLOT_8BITS_DATA3_PIN); } else { gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA3_PIN); }
 
-  }
+   }
 
-  return (true);
-}
-*/
+   return (true); } */
 /*******************************************************************************
 
   Test_LEDs_Pins
@@ -268,35 +209,15 @@ int Test_MCI_Pins (void)
 
 *******************************************************************************/
 /*
-int Test_LEDs_Pins (void)
-{
-  int i;
+   int Test_LEDs_Pins (void) { int i;
 
-  for (i=0;i<100000000;i++)
-  {
-    if (0 == i % 2)
-    {
-      gpio_set_gpio_pin (TOOL_LED_RED_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
-    }
+   for (i=0;i<100000000;i++) { if (0 == i % 2) { gpio_set_gpio_pin (TOOL_LED_RED_PIN); } else { gpio_clr_gpio_pin (TOOL_LED_RED_PIN); }
 
-    if (0 == i % 4)
-    {
-      gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
-    }
+   if (0 == i % 4) { gpio_set_gpio_pin (TOOL_LED_GREEN_PIN); } else { gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN); }
 
-  }
+   }
 
-  return (true);
-}
-*/
+   return (true); } */
 
 /*******************************************************************************
 
@@ -310,129 +231,124 @@ int Test_LEDs_Pins (void)
 
 int Test_ALL_Pins (void)
 {
-  long i;
+    long i;
 
-  for (i=0;i<100000000;i++)
-  {
-    if (0 == i % 2)
+    for (i = 0; i < 100000000; i++)
     {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_CLK_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_CLK_PIN);
-    }
+        if (0 == i % 2)
+        {
+            gpio_set_gpio_pin (SD_SLOT_8BITS_CLK_PIN);
+        }
+        else
+        {
+            gpio_clr_gpio_pin (SD_SLOT_8BITS_CLK_PIN);
+        }
 
-    if (0 == i % 4)
-    {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_CMD_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_CMD_PIN);
-    }
+        if (0 == i % 4)
+        {
+            gpio_set_gpio_pin (SD_SLOT_8BITS_CMD_PIN);
+        }
+        else
+        {
+            gpio_clr_gpio_pin (SD_SLOT_8BITS_CMD_PIN);
+        }
 
-    if (0 == i % 8)
-    {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_DATA0_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA0_PIN);
-    }
+        if (0 == i % 8)
+        {
+            gpio_set_gpio_pin (SD_SLOT_8BITS_DATA0_PIN);
+        }
+        else
+        {
+            gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA0_PIN);
+        }
 
-    if (0 == i % 16)
-    {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_DATA1_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA1_PIN);
-    }
+        if (0 == i % 16)
+        {
+            gpio_set_gpio_pin (SD_SLOT_8BITS_DATA1_PIN);
+        }
+        else
+        {
+            gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA1_PIN);
+        }
 
-    if (0 == i % 32)
-    {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_DATA2_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA2_PIN);
-    }
+        if (0 == i % 32)
+        {
+            gpio_set_gpio_pin (SD_SLOT_8BITS_DATA2_PIN);
+        }
+        else
+        {
+            gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA2_PIN);
+        }
 
-    if (0 == i % 64)
-    {
-      gpio_set_gpio_pin (SD_SLOT_8BITS_DATA3_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA3_PIN);
-    }
+        if (0 == i % 64)
+        {
+            gpio_set_gpio_pin (SD_SLOT_8BITS_DATA3_PIN);
+        }
+        else
+        {
+            gpio_clr_gpio_pin (SD_SLOT_8BITS_DATA3_PIN);
+        }
 
-   // gpio_set_gpio_pin (TOOL_LED_RED_PIN);
+        // gpio_set_gpio_pin (TOOL_LED_RED_PIN);
 
-    if (0 == i % 16)
-    {
-      gpio_set_gpio_pin (TOOL_LED_RED_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
-    }
-/**/
-/**/
-//    gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
+        if (0 == i % 16)
+        {
+            gpio_set_gpio_pin (TOOL_LED_RED_PIN);
+        }
+        else
+        {
+            gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
+        }
+         /**/ /**/
+            // gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
+            if (0 == i % 16)
+        {
+            gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
+        }
+        else
+        {
+            gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
+        }
+         /**/ if (0 == i % 256)
+        {
+            gpio_set_gpio_pin (ISO7816_RST_PIN);
+        }
+        else
+        {
+            gpio_clr_gpio_pin (ISO7816_RST_PIN);
+        }
 
-    if (0 == i % 16)
-    {
-      gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
-    }
-/**/
+        if (0 == i % 256)
+        {
+            gpio_set_gpio_pin (ISO7816_USART_TX_PIN);
+        }
+        else
+        {
+            gpio_clr_gpio_pin (ISO7816_USART_TX_PIN);
+        }
 
+        if (0 == i % 256)
+        {
+            gpio_set_gpio_pin (ISO7816_USART_CLK_PIN);
+        }
+        else
+        {
+            gpio_clr_gpio_pin (ISO7816_USART_CLK_PIN);
+        }
 
-    if (0 == i % 256)
-    {
-      gpio_set_gpio_pin (ISO7816_RST_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (ISO7816_RST_PIN);
-    }
-
-    if (0 == i % 256)
-    {
-      gpio_set_gpio_pin (ISO7816_USART_TX_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (ISO7816_USART_TX_PIN);
-    }
-
-    if (0 == i % 256)
-    {
-      gpio_set_gpio_pin (ISO7816_USART_CLK_PIN);
-    }
-    else
-    {
-      gpio_clr_gpio_pin (ISO7816_USART_CLK_PIN);
-    }
-
-    if (0 == i % 256)
-    {
-      SmartcardPowerOn ();
-    }
-    else
-    {
-      SmartcardPowerOff ();
-    }
+        if (0 == i % 256)
+        {
+            SmartcardPowerOn ();
+        }
+        else
+        {
+            SmartcardPowerOff ();
+        }
 
 
-  }
+    }
 
-  return (true);
+    return (true);
 }
 
 /*******************************************************************************
@@ -450,50 +366,47 @@ int Test_ALL_Pins (void)
 #define SD_SLOT_DATA0_STICK20                      AVR32_PIN_PA29
 
 
-void sd_mmc_mci_resources_init(void)
+void sd_mmc_mci_resources_init (void)
 {
-  static const gpio_map_t SD_MMC_MCI_GPIO_MAP =
-  {
-    {SD_SLOT_8BITS_CLK_PIN,   SD_SLOT_8BITS_CLK_FUNCTION  },  // SD CLK.
-    {SD_SLOT_8BITS_CMD_PIN,   SD_SLOT_8BITS_CMD_FUNCTION  },  // SD CMD.
-    {SD_SLOT_8BITS_DATA0_PIN, SD_SLOT_8BITS_DATA0_FUNCTION},  // SD DAT[0].
-    {SD_SLOT_8BITS_DATA1_PIN, SD_SLOT_8BITS_DATA1_FUNCTION},  // DATA Pin.
-    {SD_SLOT_8BITS_DATA2_PIN, SD_SLOT_8BITS_DATA2_FUNCTION},  // DATA Pin.
-    {SD_SLOT_8BITS_DATA3_PIN, SD_SLOT_8BITS_DATA3_FUNCTION},  // DATA Pin.
-    {SD_SLOT_8BITS_DATA4_PIN, SD_SLOT_8BITS_DATA4_FUNCTION},  // DATA Pin.
-    {SD_SLOT_8BITS_DATA5_PIN, SD_SLOT_8BITS_DATA5_FUNCTION},  // DATA Pin.
-    {SD_SLOT_8BITS_DATA6_PIN, SD_SLOT_8BITS_DATA6_FUNCTION},  // DATA Pin.
-    {SD_SLOT_8BITS_DATA7_PIN, SD_SLOT_8BITS_DATA7_FUNCTION}   // DATA Pin.
-  };
+    static const gpio_map_t SD_MMC_MCI_GPIO_MAP = {
+        {SD_SLOT_8BITS_CLK_PIN, SD_SLOT_8BITS_CLK_FUNCTION},    // SD CLK.
+        {SD_SLOT_8BITS_CMD_PIN, SD_SLOT_8BITS_CMD_FUNCTION},    // SD CMD.
+        {SD_SLOT_8BITS_DATA0_PIN, SD_SLOT_8BITS_DATA0_FUNCTION},    // SD DAT[0].
+        {SD_SLOT_8BITS_DATA1_PIN, SD_SLOT_8BITS_DATA1_FUNCTION},    // DATA Pin.
+        {SD_SLOT_8BITS_DATA2_PIN, SD_SLOT_8BITS_DATA2_FUNCTION},    // DATA Pin.
+        {SD_SLOT_8BITS_DATA3_PIN, SD_SLOT_8BITS_DATA3_FUNCTION},    // DATA Pin.
+        {SD_SLOT_8BITS_DATA4_PIN, SD_SLOT_8BITS_DATA4_FUNCTION},    // DATA Pin.
+        {SD_SLOT_8BITS_DATA5_PIN, SD_SLOT_8BITS_DATA5_FUNCTION},    // DATA Pin.
+        {SD_SLOT_8BITS_DATA6_PIN, SD_SLOT_8BITS_DATA6_FUNCTION},    // DATA Pin.
+        {SD_SLOT_8BITS_DATA7_PIN, SD_SLOT_8BITS_DATA7_FUNCTION} // DATA Pin.
+    };
 
-  // MCI options.
-  static const mci_options_t MCI_OPTIONS =
-  {
-    .card_speed = 400000,
-    .card_slot  = SD_SLOT_8BITS, // Default card initialization.
-  };
+    // MCI options.
+    static const mci_options_t MCI_OPTIONS = {
+        .card_speed = 400000,
+        .card_slot = SD_SLOT_8BITS, // Default card initialization.
+    };
 
-  // Assign I/Os to MCI.
-  gpio_enable_module(SD_MMC_MCI_GPIO_MAP,
-                     sizeof(SD_MMC_MCI_GPIO_MAP) / sizeof(SD_MMC_MCI_GPIO_MAP[0]));
+    // Assign I/Os to MCI.
+    gpio_enable_module (SD_MMC_MCI_GPIO_MAP, sizeof (SD_MMC_MCI_GPIO_MAP) / sizeof (SD_MMC_MCI_GPIO_MAP[0]));
 
 
-  // Enable pull-up for Card Detect.
-//  gpio_enable_pin_pull_up(SD_SLOT_8BITS_CARD_DETECT);
-  gpio_enable_pin_pull_up(SD_SLOT_8BITS_CARD_DETECT_STICK20);
+    // Enable pull-up for Card Detect.
+    // gpio_enable_pin_pull_up(SD_SLOT_8BITS_CARD_DETECT);
+    gpio_enable_pin_pull_up (SD_SLOT_8BITS_CARD_DETECT_STICK20);
 
-  // Enable pull-up for Write Protect.
-  gpio_enable_pin_pull_up(SD_SLOT_8BITS_WRITE_PROTECT);
-//
-// Für STICK20 microSD Sockel
-  gpio_enable_pin_pull_up(SD_SLOT_CMD_STICK20);
-  gpio_enable_pin_pull_up(SD_SLOT_DATA0_STICK20);
-//
-  // Initialize SD/MMC with MCI PB clock.
-  sd_mmc_mci_init(&MCI_OPTIONS, pcl_freq_param.pba_f, pcl_freq_param.cpu_f);
+    // Enable pull-up for Write Protect.
+    gpio_enable_pin_pull_up (SD_SLOT_8BITS_WRITE_PROTECT);
+    //
+    // Für STICK20 microSD Sockel
+    gpio_enable_pin_pull_up (SD_SLOT_CMD_STICK20);
+    gpio_enable_pin_pull_up (SD_SLOT_DATA0_STICK20);
+    //
+    // Initialize SD/MMC with MCI PB clock.
+    sd_mmc_mci_init (&MCI_OPTIONS, pcl_freq_param.pba_f, pcl_freq_param.cpu_f);
 }
 
-#endif  // SD_MMC_MCI_0_MEM == ENABLE || SD_MMC_MCI_1_MEM == ENABLE
+#endif // SD_MMC_MCI_0_MEM == ENABLE || SD_MMC_MCI_1_MEM == ENABLE
 
 /*******************************************************************************
 
@@ -513,43 +426,41 @@ void sd_mmc_mci_resources_init(void)
 
 int TestUart0 (void)
 {
-  int i;
-  int i1;
+    int i;
+    int i1;
 
-  static const gpio_map_t USART_GPIO_MAP =
-  {
-    {EXAMPLE_USART_RX_PIN, EXAMPLE_USART_RX_FUNCTION},
-    {EXAMPLE_USART_TX_PIN, EXAMPLE_USART_TX_FUNCTION}
-  };
+    static const gpio_map_t USART_GPIO_MAP = {
+        {EXAMPLE_USART_RX_PIN, EXAMPLE_USART_RX_FUNCTION},
+        {EXAMPLE_USART_TX_PIN, EXAMPLE_USART_TX_FUNCTION}
+    };
 
-  // USART options.
-  static const usart_options_t USART_OPTIONS =
-  {
-    .baudrate     = 57600,
-    .charlength   = 8,
-    .paritytype   = USART_NO_PARITY,
-    .stopbits     = USART_1_STOPBIT,
-    .channelmode  = USART_NORMAL_CHMODE
-  };
+    // USART options.
+    static const usart_options_t USART_OPTIONS = {
+        .baudrate = 57600,
+        .charlength = 8,
+        .paritytype = USART_NO_PARITY,
+        .stopbits = USART_1_STOPBIT,
+        .channelmode = USART_NORMAL_CHMODE
+    };
 
-// Switch main clock to external oscillator 0 (crystal).
-//  pm_switch_to_osc0(&AVR32_PM, FOSC0, OSC0_STARTUP);
+    // Switch main clock to external oscillator 0 (crystal).
+    // pm_switch_to_osc0(&AVR32_PM, FOSC0, OSC0_STARTUP);
 
-  // Assign GPIO to USART.
-  gpio_enable_module(USART_GPIO_MAP, sizeof(USART_GPIO_MAP) / sizeof(USART_GPIO_MAP[0]));
+    // Assign GPIO to USART.
+    gpio_enable_module (USART_GPIO_MAP, sizeof (USART_GPIO_MAP) / sizeof (USART_GPIO_MAP[0]));
 
-  // Initialize USART in RS232 mode.
-  usart_init_rs232(EXAMPLE_USART, &USART_OPTIONS, FPBA_HZ); // FOSC0);
+    // Initialize USART in RS232 mode.
+    usart_init_rs232 (EXAMPLE_USART, &USART_OPTIONS, FPBA_HZ);  // FOSC0);
 
-  //
-  for (i=0;i<10000;i++)
-  {
-	  usart_putchar (EXAMPLE_USART,'a');
-	  for (i1=0;i1<10000;i1++) ;
+    //
+    for (i = 0; i < 10000; i++)
+    {
+        usart_putchar (EXAMPLE_USART, 'a');
+        for (i1 = 0; i1 < 10000; i1++);
 
-  }
+    }
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /*******************************************************************************
@@ -568,23 +479,23 @@ int nnn = 0;
 void SmartCard_test (void)
 {
 
-// Enable pull-up TX/RX
-//gpio_enable_pin_pull_up(ISO7816_USART_TX_PIN);
+    // Enable pull-up TX/RX
+    // gpio_enable_pin_pull_up(ISO7816_USART_TX_PIN);
 
 
 
-//	DelayCounterTest ();
-Test_ISO7816_Usart_Pins ();
-//	   ISO7816_test ();
-// 	  ISO7816_ResetSC_test ();
-//	  ISO7816_InitSC ();
-//		  ISO7816_APDU_Test ();
- //	LA_OpenPGP_V20_Test ();
-//
-//	if (nnn == 0)
-	{
-//	 Simulation_USB_CCID ();
-	}
+    // DelayCounterTest ();
+    Test_ISO7816_Usart_Pins ();
+    // ISO7816_test ();
+    // ISO7816_ResetSC_test ();
+    // ISO7816_InitSC ();
+    // ISO7816_APDU_Test ();
+    // LA_OpenPGP_V20_Test ();
+    //
+    // if (nnn == 0)
+    {
+        // Simulation_USB_CCID ();
+    }
 }
 
 /*******************************************************************************
@@ -597,20 +508,20 @@ Test_ISO7816_Usart_Pins ();
 
 *******************************************************************************/
 
-void CCID_Test_task (void *pvParameters)
+void CCID_Test_task (void* pvParameters)
 {
-	portTickType xLastWakeTime;
+    portTickType xLastWakeTime;
 
 
-	xLastWakeTime = xTaskGetTickCount();
-//	while (1) ;
+    xLastWakeTime = xTaskGetTickCount ();
+    // while (1) ;
 
-	while (TRUE)
-	{
-		vTaskDelayUntil(&xLastWakeTime, configTSK_CCID_TEST_PERIOD);
+    while (TRUE)
+    {
+        vTaskDelayUntil (&xLastWakeTime, configTSK_CCID_TEST_PERIOD);
 
-		SmartCard_test ();
-	}
+        SmartCard_test ();
+    }
 }
 
 /*******************************************************************************
@@ -623,14 +534,9 @@ void CCID_Test_task (void *pvParameters)
 
 *******************************************************************************/
 
-void CCID_Test_task_init(void)
+void CCID_Test_task_init (void)
 {
-  xTaskCreate(CCID_Test_task,
-              configTSK_CCID_TEST_NAME,
-              configTSK_CCID_TEST_STACK_SIZE,
-              NULL,
-              configTSK_CCID_TEST_PRIORITY,
-              NULL);
+    xTaskCreate (CCID_Test_task, configTSK_CCID_TEST_NAME, configTSK_CCID_TEST_STACK_SIZE, NULL, configTSK_CCID_TEST_PRIORITY, NULL);
 }
 
 
@@ -648,120 +554,116 @@ void CCID_Test_task_init(void)
 // define _evba from exception.S
 extern void _evba;
 
-int main(void)
+int main (void)
 {
-	pcl_freq_param_t local_pcl_freq_param;
+    pcl_freq_param_t local_pcl_freq_param;
 
-/*
-	USART_Int_Test ();
+    /*
+       USART_Int_Test ();
 
-	return (0);
-*/
+       return (0); */
 
-  // Configure system clocks.
-  local_pcl_freq_param = pcl_freq_param;
+    // Configure system clocks.
+    local_pcl_freq_param = pcl_freq_param;
 
-	if (pcl_configure_clocks(&local_pcl_freq_param) != PASS)
-	{
-		return 42;
-	}
+    if (pcl_configure_clocks (&local_pcl_freq_param) != PASS)
+    {
+        return 42;
+    }
 
-  /* Load the Exception Vector Base Address in the corresponding system register. */
-  Set_system_register( AVR32_EVBA, ( int ) &_evba );
+    /* Load the Exception Vector Base Address in the corresponding system register. */
+    Set_system_register (AVR32_EVBA, (int) &_evba);
 
-  /* Enable exceptions. */
-  ENABLE_ALL_EXCEPTIONS();
+    /* Enable exceptions. */
+    ENABLE_ALL_EXCEPTIONS ();
 
-  /* Initialize interrupt handling. */
-  INTC_init_interrupts();
+    /* Initialize interrupt handling. */
+    INTC_init_interrupts ();
 
 #if ((defined SD_MMC_MCI_0_MEM) && (SD_MMC_MCI_0_MEM == ENABLE)) || ((defined SD_MMC_MCI_1_MEM) && (SD_MMC_MCI_1_MEM == ENABLE))
-  sd_mmc_mci_resources_init();
+    sd_mmc_mci_resources_init ();
 #endif
 
 
 #ifdef FREERTOS_USED
-  if (!ctrl_access_init())
-  {
-    return 42;
-  }
-#endif  // FREERTOS_USED
+    if (!ctrl_access_init ())
+    {
+        return 42;
+    }
+#endif // FREERTOS_USED
 
-// Init Hmatrix bus
-  init_hmatrix();
+    // Init Hmatrix bus
+    init_hmatrix ();
 
-// Initialize USB clock.
-  pcl_configure_usb_clock();
-
-
+    // Initialize USB clock.
+    pcl_configure_usb_clock ();
 
 
-/*
-  SmartCard_test ();
-  return 42;
 
-  Test_ALL_Pins ();
 
-  Test_MCI_Pins ();
+    /*
+       SmartCard_test (); return 42;
 
-	Test_LEDs_Pins ();
+       Test_ALL_Pins ();
 
-	TestUart0 ();
+       Test_MCI_Pins ();
 
-  while (1);
-  return (0);
-*/
+       Test_LEDs_Pins ();
+
+       TestUart0 ();
+
+       while (1); return (0); */
 
 #ifdef TIME_MEASURING_ENABLE
-  TIME_MEASURING_Init ();
+    TIME_MEASURING_Init ();
 #endif
 
 
-// For debugging
-  BUFFERED_SIO_Init ();
+    // For debugging
+    BUFFERED_SIO_Init ();
 
 #ifdef INTERPRETER_ENABLE
-  IDF_task_init();
+    IDF_task_init ();
 #endif
 
-// Internal work task - FAT Access
-  IW_task_init();
+    // Internal work task - FAT Access
+    IW_task_init ();
 
-// Initialize USB tasks.
-  usb_task_init();
+    // Initialize USB tasks.
+    usb_task_init ();
 
 
 
 
 #if USB_DEVICE_FEATURE == ENABLED
-  #ifdef  USB_MSD
-    device_mass_storage_task_init();
-  #endif // USB_MSD
+#ifdef  USB_MSD
+    device_mass_storage_task_init ();
+#endif // USB_MSD
 #endif
 
 
-//  CCID_Test_task_init ();
+    // CCID_Test_task_init ();
 #ifdef  USB_CCID
-  USB_CCID_task_init();
+    USB_CCID_task_init ();
 #endif
 
-/**/
-// Protect bootloader
-#ifdef STICK_20_A_MUSTER_PROD     //
-  flashc_set_bootloader_protected_size (0x2000);
-  flashc_lock_external_privileged_fetch (TRUE); // Disable external instruction fetch
+     /**/
+        // Protect bootloader
+#ifdef STICK_20_A_MUSTER_PROD   //
+        flashc_set_bootloader_protected_size (0x2000);
+    flashc_lock_external_privileged_fetch (TRUE);   // Disable external instruction fetch
 #endif
 
-//  DFU_FirmwareResetUserpage ();
+    // DFU_FirmwareResetUserpage ();
 
-  DFU_DisableFirmwareUpdate ();     // Stick always starts in application mode
+    DFU_DisableFirmwareUpdate ();   // Stick always starts in application mode
 
 
-//  ushell_task_init(pcl_freq_param.pba_f);
+    // ushell_task_init(pcl_freq_param.pba_f);
 
-// Start stick
-  vTaskStartScheduler();
+    // Start stick
+    vTaskStartScheduler ();
 
-// It never gets to this point
-  return 42;
+    // It never gets to this point
+    return 42;
 }

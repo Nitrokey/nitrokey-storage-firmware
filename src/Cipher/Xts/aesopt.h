@@ -1,95 +1,62 @@
 /*
- ---------------------------------------------------------------------------
- Copyright (c) 1998-2008, Brian Gladman, Worcester, UK. All rights reserved.
+   --------------------------------------------------------------------------- Copyright (c) 1998-2008, Brian Gladman, Worcester, UK. All rights
+   reserved.
 
- LICENSE TERMS
+   LICENSE TERMS
 
- The redistribution and use of this software (with or without changes)
- is allowed without the payment of fees or royalties provided that:
+   The redistribution and use of this software (with or without changes) is allowed without the payment of fees or royalties provided that:
 
-  1. source code distributions include the above copyright notice, this
-     list of conditions and the following disclaimer;
+   1. source code distributions include the above copyright notice, this list of conditions and the following disclaimer;
 
-  2. binary distributions include the above copyright notice, this list
-     of conditions and the following disclaimer in their documentation;
+   2. binary distributions include the above copyright notice, this list of conditions and the following disclaimer in their documentation;
 
-  3. the name of the copyright holder is not used to endorse products
-     built using this software without specific written permission.
+   3. the name of the copyright holder is not used to endorse products built using this software without specific written permission.
 
- DISCLAIMER
+   DISCLAIMER
 
- This software is provided 'as is' with no explicit or implied warranties
- in respect of its properties, including, but not limited to, correctness
- and/or fitness for purpose.
- ---------------------------------------------------------------------------
- Issue Date: 20/12/2007
+   This software is provided 'as is' with no explicit or implied warranties in respect of its properties, including, but not limited to, correctness
+   and/or fitness for purpose. --------------------------------------------------------------------------- Issue Date: 20/12/2007
 
- This file contains the compilation options for AES (Rijndael) and code
- that is common across encryption, key scheduling and table generation.
+   This file contains the compilation options for AES (Rijndael) and code that is common across encryption, key scheduling and table generation.
 
- OPERATION
+   OPERATION
 
- These source code files implement the AES algorithm Rijndael designed by
- Joan Daemen and Vincent Rijmen. This version is designed for the standard
- block size of 16 bytes and for key sizes of 128, 192 and 256 bits (16, 24
- and 32 bytes).
+   These source code files implement the AES algorithm Rijndael designed by Joan Daemen and Vincent Rijmen. This version is designed for the standard
+   block size of 16 bytes and for key sizes of 128, 192 and 256 bits (16, 24 and 32 bytes).
 
- This version is designed for flexibility and speed using operations on
- 32-bit words rather than operations on bytes.  It can be compiled with
- either big or little endian internal byte order but is faster when the
- native byte order for the processor is used.
+   This version is designed for flexibility and speed using operations on 32-bit words rather than operations on bytes.  It can be compiled with
+   either big or little endian internal byte order but is faster when the native byte order for the processor is used.
 
- THE CIPHER INTERFACE
+   THE CIPHER INTERFACE
 
- The cipher interface is implemented as an array of bytes in which lower
- AES bit sequence indexes map to higher numeric significance within bytes.
+   The cipher interface is implemented as an array of bytes in which lower AES bit sequence indexes map to higher numeric significance within bytes.
 
-  uint_8t                 (an unsigned  8-bit type)
-  uint_32t                (an unsigned 32-bit type)
-  struct aes_encrypt_ctx  (structure for the cipher encryption context)
-  struct aes_decrypt_ctx  (structure for the cipher decryption context)
-  AES_RETURN                the function return type
+   uint_8t (an unsigned 8-bit type) uint_32t (an unsigned 32-bit type) struct aes_encrypt_ctx (structure for the cipher encryption context) struct
+   aes_decrypt_ctx (structure for the cipher decryption context) AES_RETURN the function return type
 
-  C subroutine calls:
+   C subroutine calls:
 
-  AES_RETURN aes_encrypt_key128(const unsigned char *key, aes_encrypt_ctx cx[1]);
-  AES_RETURN aes_encrypt_key192(const unsigned char *key, aes_encrypt_ctx cx[1]);
-  AES_RETURN aes_encrypt_key256(const unsigned char *key, aes_encrypt_ctx cx[1]);
-  AES_RETURN aes_encrypt(const unsigned char *in, unsigned char *out,
-                                                  const aes_encrypt_ctx cx[1]);
+   AES_RETURN aes_encrypt_key128(const unsigned char *key, aes_encrypt_ctx cx[1]); AES_RETURN aes_encrypt_key192(const unsigned char *key,
+   aes_encrypt_ctx cx[1]); AES_RETURN aes_encrypt_key256(const unsigned char *key, aes_encrypt_ctx cx[1]); AES_RETURN aes_encrypt(const unsigned char
+   *in, unsigned char *out, const aes_encrypt_ctx cx[1]);
 
-  AES_RETURN aes_decrypt_key128(const unsigned char *key, aes_decrypt_ctx cx[1]);
-  AES_RETURN aes_decrypt_key192(const unsigned char *key, aes_decrypt_ctx cx[1]);
-  AES_RETURN aes_decrypt_key256(const unsigned char *key, aes_decrypt_ctx cx[1]);
-  AES_RETURN aes_decrypt(const unsigned char *in, unsigned char *out,
-                                                  const aes_decrypt_ctx cx[1]);
+   AES_RETURN aes_decrypt_key128(const unsigned char *key, aes_decrypt_ctx cx[1]); AES_RETURN aes_decrypt_key192(const unsigned char *key,
+   aes_decrypt_ctx cx[1]); AES_RETURN aes_decrypt_key256(const unsigned char *key, aes_decrypt_ctx cx[1]); AES_RETURN aes_decrypt(const unsigned char
+   *in, unsigned char *out, const aes_decrypt_ctx cx[1]);
 
- IMPORTANT NOTE: If you are using this C interface with dynamic tables make sure that
- you call aes_init() before AES is used so that the tables are initialised.
+   IMPORTANT NOTE: If you are using this C interface with dynamic tables make sure that you call aes_init() before AES is used so that the tables are
+   initialised.
 
- C++ aes class subroutines:
+   C++ aes class subroutines:
 
-     Class AESencrypt  for encryption
+   Class AESencrypt for encryption
 
-      Construtors:
-          AESencrypt(void)
-          AESencrypt(const unsigned char *key) - 128 bit key
-      Members:
-          AES_RETURN key128(const unsigned char *key)
-          AES_RETURN key192(const unsigned char *key)
-          AES_RETURN key256(const unsigned char *key)
-          AES_RETURN encrypt(const unsigned char *in, unsigned char *out) const
+   Construtors: AESencrypt(void) AESencrypt(const unsigned char *key) - 128 bit key Members: AES_RETURN key128(const unsigned char *key) AES_RETURN
+   key192(const unsigned char *key) AES_RETURN key256(const unsigned char *key) AES_RETURN encrypt(const unsigned char *in, unsigned char *out) const
 
-      Class AESdecrypt  for encryption
-      Construtors:
-          AESdecrypt(void)
-          AESdecrypt(const unsigned char *key) - 128 bit key
-      Members:
-          AES_RETURN key128(const unsigned char *key)
-          AES_RETURN key192(const unsigned char *key)
-          AES_RETURN key256(const unsigned char *key)
-          AES_RETURN decrypt(const unsigned char *in, unsigned char *out) const
-*/
+   Class AESdecrypt for encryption Construtors: AESdecrypt(void) AESdecrypt(const unsigned char *key) - 128 bit key Members: AES_RETURN key128(const
+   unsigned char *key) AES_RETURN key192(const unsigned char *key) AES_RETURN key256(const unsigned char *key) AES_RETURN decrypt(const unsigned char
+   *in, unsigned char *out) const */
 
 #if !defined( _AESOPT_H )
 #define _AESOPT_H
@@ -100,18 +67,15 @@
 #include "aes.h"
 #endif
 
-/*  PLATFORM SPECIFIC INCLUDES */
+/* PLATFORM SPECIFIC INCLUDES */
 
 #include "brg_endian.h"
 
-/*  CONFIGURATION - THE USE OF DEFINES
+/* CONFIGURATION - THE USE OF DEFINES
 
-    Later in this section there are a number of defines that control the
-    operation of the code.  In each section, the purpose of each define is
-    explained so that the relevant form can be included or excluded by
-    setting either 1's or 0's respectively on the branches of the related
-    #if clauses.  The following local defines should not be changed.
-*/
+   Later in this section there are a number of defines that control the operation of the code.  In each section, the purpose of each define is
+   explained so that the relevant form can be included or excluded by setting either 1's or 0's respectively on the branches of the related #if
+   clauses.  The following local defines should not be changed. */
 
 #define ENCRYPTION_IN_C     1
 #define DECRYPTION_IN_C     2
@@ -125,38 +89,25 @@
 #define PARTIAL             1
 #define FULL                2
 
-/*  --- START OF USER CONFIGURED OPTIONS --- */
+/* --- START OF USER CONFIGURED OPTIONS --- */
 
-/*  1. BYTE ORDER WITHIN 32 BIT WORDS
+/* 1. BYTE ORDER WITHIN 32 BIT WORDS
 
-    The fundamental data processing units in Rijndael are 8-bit bytes. The
-    input, output and key input are all enumerated arrays of bytes in which
-    bytes are numbered starting at zero and increasing to one less than the
-    number of bytes in the array in question. This enumeration is only used
-    for naming bytes and does not imply any adjacency or order relationship
-    from one byte to another. When these inputs and outputs are considered
-    as bit sequences, bits 8*n to 8*n+7 of the bit sequence are mapped to
-    byte[n] with bit 8n+i in the sequence mapped to bit 7-i within the byte.
-    In this implementation bits are numbered from 0 to 7 starting at the
-    numerically least significant end of each byte (bit n represents 2^n).
+   The fundamental data processing units in Rijndael are 8-bit bytes. The input, output and key input are all enumerated arrays of bytes in which
+   bytes are numbered starting at zero and increasing to one less than the number of bytes in the array in question. This enumeration is only used
+   for naming bytes and does not imply any adjacency or order relationship from one byte to another. When these inputs and outputs are considered as
+   bit sequences, bits 8*n to 8*n+7 of the bit sequence are mapped to byte[n] with bit 8n+i in the sequence mapped to bit 7-i within the byte. In
+   this implementation bits are numbered from 0 to 7 starting at the numerically least significant end of each byte (bit n represents 2^n).
 
-    However, Rijndael can be implemented more efficiently using 32-bit
-    words by packing bytes into words so that bytes 4*n to 4*n+3 are placed
-    into word[n]. While in principle these bytes can be assembled into words
-    in any positions, this implementation only supports the two formats in
-    which bytes in adjacent positions within words also have adjacent byte
-    numbers. This order is called big-endian if the lowest numbered bytes
-    in words have the highest numeric significance and little-endian if the
-    opposite applies.
+   However, Rijndael can be implemented more efficiently using 32-bit words by packing bytes into words so that bytes 4*n to 4*n+3 are placed into
+   word[n]. While in principle these bytes can be assembled into words in any positions, this implementation only supports the two formats in which
+   bytes in adjacent positions within words also have adjacent byte numbers. This order is called big-endian if the lowest numbered bytes in words
+   have the highest numeric significance and little-endian if the opposite applies.
 
-    This code can work in either order irrespective of the order used by the
-    machine on which it runs. Normally the internal byte order will be set
-    to the order of the processor on which the code is to be run but this
-    define can be used to reverse this in special situations
+   This code can work in either order irrespective of the order used by the machine on which it runs. Normally the internal byte order will be set to
+   the order of the processor on which the code is to be run but this define can be used to reverse this in special situations
 
-    WARNING: Assembler code versions rely on PLATFORM_BYTE_ORDER being set.
-    This define will hence be redefined later (in section 4) if necessary
-*/
+   WARNING: Assembler code versions rely on PLATFORM_BYTE_ORDER being set. This define will hence be redefined later (in section 4) if necessary */
 
 #if 1
 #  define ALGORITHM_BYTE_ORDER PLATFORM_BYTE_ORDER
@@ -168,59 +119,34 @@
 #  error The algorithm byte order is not defined
 #endif
 
-/*  2. VIA ACE SUPPORT
+/* 2. VIA ACE SUPPORT
 
-    Define this option if support for the VIA ACE is required. This uses
-    inline assembler instructions and is only implemented for the Microsoft,
-    Intel and GCC compilers.  If VIA ACE is known to be present, then defining
-    ASSUME_VIA_ACE_PRESENT will remove the ordinary encryption/decryption
-    code.  If USE_VIA_ACE_IF_PRESENT is defined then VIA ACE will be used if
-    it is detected (both present and enabled) but the normal AES code will
-    also be present.
+   Define this option if support for the VIA ACE is required. This uses inline assembler instructions and is only implemented for the Microsoft,
+   Intel and GCC compilers.  If VIA ACE is known to be present, then defining ASSUME_VIA_ACE_PRESENT will remove the ordinary encryption/decryption
+   code.  If USE_VIA_ACE_IF_PRESENT is defined then VIA ACE will be used if it is detected (both present and enabled) but the normal AES code will
+   also be present.
 
-    When VIA ACE is to be used, all AES encryption contexts MUST be 16 byte
-    aligned; other input/output buffers do not need to be 16 byte aligned
-    but there are very large performance gains if this can be arranged.
-    VIA ACE also requires the decryption key schedule to be in reverse
-    order (which later checks below ensure).
-*/
+   When VIA ACE is to be used, all AES encryption contexts MUST be 16 byte aligned; other input/output buffers do not need to be 16 byte aligned but
+   there are very large performance gains if this can be arranged. VIA ACE also requires the decryption key schedule to be in reverse order (which
+   later checks below ensure). */
 /*
-#if 1 && !defined( USE_VIA_ACE_IF_PRESENT )
-#  define USE_VIA_ACE_IF_PRESENT
-#endif
+   #if 1 && !defined( USE_VIA_ACE_IF_PRESENT ) # define USE_VIA_ACE_IF_PRESENT #endif
 
-#if 0 && !defined( ASSUME_VIA_ACE_PRESENT )
-#  define ASSUME_VIA_ACE_PRESENT
-#  endif
+   #if 0 && !defined( ASSUME_VIA_ACE_PRESENT ) # define ASSUME_VIA_ACE_PRESENT # endif
 
-#if defined ( _WIN64 ) || defined( _WIN32_WCE ) || \
-                    defined( _MSC_VER ) && ( _MSC_VER <= 800 )
-#  if defined( USE_VIA_ACE_IF_PRESENT )
-#    undef USE_VIA_ACE_IF_PRESENT
-#  endif
-#  if defined( ASSUME_VIA_ACE_PRESENT )
-#    undef ASSUME_VIA_ACE_PRESENT
-#  endif
-#endif
-*/
-/*  3. ASSEMBLER SUPPORT
+   #if defined ( _WIN64 ) || defined( _WIN32_WCE ) || \ defined( _MSC_VER ) && ( _MSC_VER <= 800 ) # if defined( USE_VIA_ACE_IF_PRESENT ) # undef
+   USE_VIA_ACE_IF_PRESENT # endif # if defined( ASSUME_VIA_ACE_PRESENT ) # undef ASSUME_VIA_ACE_PRESENT # endif #endif */
+/* 3. ASSEMBLER SUPPORT
 
-    This define (which can be on the command line) enables the use of the
-    assembler code routines for encryption, decryption and key scheduling
-    as follows:
+   This define (which can be on the command line) enables the use of the assembler code routines for encryption, decryption and key scheduling as
+   follows:
 
-    ASM_X86_V1C uses the assembler (aes_x86_v1.asm) with large tables for
-                encryption and decryption and but with key scheduling in C
-    ASM_X86_V2  uses assembler (aes_x86_v2.asm) with compressed tables for
-                encryption, decryption and key scheduling
-    ASM_X86_V2C uses assembler (aes_x86_v2.asm) with compressed tables for
-                encryption and decryption and but with key scheduling in C
-    ASM_AMD64_C uses assembler (aes_amd64.asm) with compressed tables for
-                encryption and decryption and but with key scheduling in C
+   ASM_X86_V1C uses the assembler (aes_x86_v1.asm) with large tables for encryption and decryption and but with key scheduling in C ASM_X86_V2 uses
+   assembler (aes_x86_v2.asm) with compressed tables for encryption, decryption and key scheduling ASM_X86_V2C uses assembler (aes_x86_v2.asm) with
+   compressed tables for encryption and decryption and but with key scheduling in C ASM_AMD64_C uses assembler (aes_amd64.asm) with compressed tables
+   for encryption and decryption and but with key scheduling in C
 
-    Change one 'if 0' below to 'if 1' to select the version or define
-    as a compilation option.
-*/
+   Change one 'if 0' below to 'if 1' to select the version or define as a compilation option. */
 
 #if 0 && !defined( ASM_X86_V1C )
 #  define ASM_X86_V1C
@@ -237,37 +163,25 @@
 #  error Assembler code is only available for x86 and AMD64 systems
 #endif
 
-/*  4. FAST INPUT/OUTPUT OPERATIONS.
+/* 4. FAST INPUT/OUTPUT OPERATIONS.
 
-    On some machines it is possible to improve speed by transferring the
-    bytes in the input and output arrays to and from the internal 32-bit
-    variables by addressing these arrays as if they are arrays of 32-bit
-    words.  On some machines this will always be possible but there may
-    be a large performance penalty if the byte arrays are not aligned on
-    the normal word boundaries. On other machines this technique will
-    lead to memory access errors when such 32-bit word accesses are not
-    properly aligned. The option SAFE_IO avoids such problems but will
-    often be slower on those machines that support misaligned access
-    (especially so if care is taken to align the input  and output byte
-    arrays on 32-bit word boundaries). If SAFE_IO is not defined it is
-    assumed that access to byte arrays as if they are arrays of 32-bit
-    words will not cause problems when such accesses are misaligned.
-*/
+   On some machines it is possible to improve speed by transferring the bytes in the input and output arrays to and from the internal 32-bit
+   variables by addressing these arrays as if they are arrays of 32-bit words.  On some machines this will always be possible but there may be a
+   large performance penalty if the byte arrays are not aligned on the normal word boundaries. On other machines this technique will lead to memory
+   access errors when such 32-bit word accesses are not properly aligned. The option SAFE_IO avoids such problems but will often be slower on those
+   machines that support misaligned access (especially so if care is taken to align the input and output byte arrays on 32-bit word boundaries). If
+   SAFE_IO is not defined it is assumed that access to byte arrays as if they are arrays of 32-bit words will not cause problems when such accesses
+   are misaligned. */
 #if 1 && !defined( _MSC_VER )
 #  define SAFE_IO
 #endif
 
-/*  5. LOOP UNROLLING
+/* 5. LOOP UNROLLING
 
-    The code for encryption and decrytpion cycles through a number of rounds
-    that can be implemented either in a loop or by expanding the code into a
-    long sequence of instructions, the latter producing a larger program but
-    one that will often be much faster. The latter is called loop unrolling.
-    There are also potential speed advantages in expanding two iterations in
-    a loop with half the number of iterations, which is called partial loop
-    unrolling.  The following options allow partial or full loop unrolling
-    to be set independently for encryption and decryption
-*/
+   The code for encryption and decrytpion cycles through a number of rounds that can be implemented either in a loop or by expanding the code into a
+   long sequence of instructions, the latter producing a larger program but one that will often be much faster. The latter is called loop unrolling.
+   There are also potential speed advantages in expanding two iterations in a loop with half the number of iterations, which is called partial loop
+   unrolling.  The following options allow partial or full loop unrolling to be set independently for encryption and decryption */
 #if 1
 #  define ENC_UNROLL  FULL
 #elif 0
@@ -284,79 +198,59 @@
 #  define DEC_UNROLL  NONE
 #endif
 
-/*  6. FAST FINITE FIELD OPERATIONS
+/* 6. FAST FINITE FIELD OPERATIONS
 
-    If this section is included, tables are used to provide faster finite
-    field arithmetic (this has no effect if FIXED_TABLES is defined).
-*/
+   If this section is included, tables are used to provide faster finite field arithmetic (this has no effect if FIXED_TABLES is defined). */
 #if 1
 #  define FF_TABLES
 #endif
 
-/*  7. INTERNAL STATE VARIABLE FORMAT
+/* 7. INTERNAL STATE VARIABLE FORMAT
 
-    The internal state of Rijndael is stored in a number of local 32-bit
-    word varaibles which can be defined either as an array or as individual
-    names variables. Include this section if you want to store these local
-    varaibles in arrays. Otherwise individual local variables will be used.
-*/
+   The internal state of Rijndael is stored in a number of local 32-bit word varaibles which can be defined either as an array or as individual names
+   variables. Include this section if you want to store these local varaibles in arrays. Otherwise individual local variables will be used. */
 #if 1
 #  define ARRAYS
 #endif
 
-/*  8. FIXED OR DYNAMIC TABLES
+/* 8. FIXED OR DYNAMIC TABLES
 
-    When this section is included the tables used by the code are compiled
-    statically into the binary file.  Otherwise the subroutine aes_init()
-    must be called to compute them before the code is first used.
-*/
+   When this section is included the tables used by the code are compiled statically into the binary file.  Otherwise the subroutine aes_init() must
+   be called to compute them before the code is first used. */
 #if 1 && !(defined( _MSC_VER ) && ( _MSC_VER <= 800 ))
 #  define FIXED_TABLES
 #endif
 
-/*  9. MASKING OR CASTING FROM LONGER VALUES TO BYTES
+/* 9. MASKING OR CASTING FROM LONGER VALUES TO BYTES
 
-    In some systems it is better to mask longer values to extract bytes 
-    rather than using a cast. This option allows this choice.
-*/
+   In some systems it is better to mask longer values to extract bytes rather than using a cast. This option allows this choice. */
 #if 0
 #  define to_byte(x)  ((uint_8t)(x))
 #else
 #  define to_byte(x)  ((x) & 0xff)
 #endif
 
-/*  10. TABLE ALIGNMENT
+/* 10. TABLE ALIGNMENT
 
-    On some sytsems speed will be improved by aligning the AES large lookup
-    tables on particular boundaries. This define should be set to a power of
-    two giving the desired alignment. It can be left undefined if alignment
-    is not needed.  This option is specific to the Microsft VC++ compiler -
-    it seems to sometimes cause trouble for the VC++ version 6 compiler.
-*/
+   On some sytsems speed will be improved by aligning the AES large lookup tables on particular boundaries. This define should be set to a power of
+   two giving the desired alignment. It can be left undefined if alignment is not needed.  This option is specific to the Microsft VC++ compiler - it
+   seems to sometimes cause trouble for the VC++ version 6 compiler. */
 
 #if 1 && defined( _MSC_VER ) && ( _MSC_VER >= 1300 )
 #  define TABLE_ALIGN 32
 #endif
 
-/*  11. TABLE OPTIONS
+/* 11. TABLE OPTIONS
 
-    This cipher proceeds by repeating in a number of cycles known as 'rounds'
-    which are implemented by a round function which can optionally be speeded
-    up using tables.  The basic tables are each 256 32-bit words, with either
-    one or four tables being required for each round function depending on
-    how much speed is required. The encryption and decryption round functions
-    are different and the last encryption and decrytpion round functions are
-    different again making four different round functions in all.
+   This cipher proceeds by repeating in a number of cycles known as 'rounds' which are implemented by a round function which can optionally be
+   speeded up using tables.  The basic tables are each 256 32-bit words, with either one or four tables being required for each round function
+   depending on how much speed is required. The encryption and decryption round functions are different and the last encryption and decrytpion round
+   functions are different again making four different round functions in all.
 
-    This means that:
-      1. Normal encryption and decryption rounds can each use either 0, 1
-         or 4 tables and table spaces of 0, 1024 or 4096 bytes each.
-      2. The last encryption and decryption rounds can also use either 0, 1
-         or 4 tables and table spaces of 0, 1024 or 4096 bytes each.
+   This means that: 1. Normal encryption and decryption rounds can each use either 0, 1 or 4 tables and table spaces of 0, 1024 or 4096 bytes each.
+   2. The last encryption and decryption rounds can also use either 0, 1 or 4 tables and table spaces of 0, 1024 or 4096 bytes each.
 
-    Include or exclude the appropriate definitions below to set the number
-    of tables used by this implementation.
-*/
+   Include or exclude the appropriate definitions below to set the number of tables used by this implementation. */
 
 #if 1   /* set tables for the normal encryption round */
 #  define ENC_ROUND   FOUR_TABLES
@@ -390,10 +284,8 @@
 #  define LAST_DEC_ROUND  NO_TABLES
 #endif
 
-/*  The decryption key schedule can be speeded up with tables in the same
-    way that the round functions can.  Include or exclude the following
-    defines to set this requirement.
-*/
+/* The decryption key schedule can be speeded up with tables in the same way that the round functions can.  Include or exclude the following defines
+   to set this requirement. */
 #if 1
 #  define KEY_SCHED   FOUR_TABLES
 #elif 0
@@ -402,7 +294,7 @@
 #  define KEY_SCHED   NO_TABLES
 #endif
 
-/*  ---- END OF USER CONFIGURED OPTIONS ---- */
+/* ---- END OF USER CONFIGURED OPTIONS ---- */
 
 /* VIA ACE support is only available for VC++ and GCC */
 
@@ -431,16 +323,10 @@
 #  define ALGORITHM_BYTE_ORDER PLATFORM_BYTE_ORDER
 #endif
 
-/* In this implementation the columns of the state array are each held in
-   32-bit words. The state array can be held in various ways: in an array
-   of words, in a number of individual word variables or in a number of
-   processor registers. The following define maps a variable name x and
-   a column number c to the way the state array variable is to be held.
-   The first define below maps the state into an array x[c] whereas the
-   second form maps the state into a number of individual variables x0,
-   x1, etc.  Another form could map individual state colums to machine
-   register names.
-*/
+/* In this implementation the columns of the state array are each held in 32-bit words. The state array can be held in various ways: in an array of
+   words, in a number of individual word variables or in a number of processor registers. The following define maps a variable name x and a column
+   number c to the way the state array variable is to be held. The first define below maps the state into an array x[c] whereas the second form maps
+   the state into a number of individual variables x0, x1, etc.  Another form could map individual state colums to machine register names. */
 
 #if defined( ARRAYS )
 #  define s(x,c) x[c]
@@ -448,11 +334,8 @@
 #  define s(x,c) x##c
 #endif
 
-/*  This implementation provides subroutines for encryption, decryption
-    and for setting the three key lengths (separately) for encryption
-    and decryption. Since not all functions are needed, masks are set
-    up here to determine which will be implemented in C
-*/
+/* This implementation provides subroutines for encryption, decryption and for setting the three key lengths (separately) for encryption and
+   decryption. Since not all functions are needed, masks are set up here to determine which will be implemented in C */
 
 #if !defined( AES_ENCRYPT )
 #  define EFUNCS_IN_C   0
@@ -519,16 +402,10 @@
 #  define aes_sw32(x) ((brot((x),8) & 0x00ff00ff) | (brot((x),24) & 0xff00ff00))
 #endif
 
-/*  upr(x,n):  rotates bytes within words by n positions, moving bytes to
-               higher index positions with wrap around into low positions
-    ups(x,n):  moves bytes by n positions to higher index positions in
-               words but without wrap around
-    bval(x,n): extracts a byte from a word
+/* upr(x,n): rotates bytes within words by n positions, moving bytes to higher index positions with wrap around into low positions ups(x,n): moves
+   bytes by n positions to higher index positions in words but without wrap around bval(x,n): extracts a byte from a word
 
-    WARNING:   The definitions given here are intended only for use with
-               unsigned variables and with shift counts that are compile
-               time constants
-*/
+   WARNING: The definitions given here are intended only for use with unsigned variables and with shift counts that are compile time constants */
 
 #if ( ALGORITHM_BYTE_ORDER == IS_LITTLE_ENDIAN )
 #  define upr(x,n)      (((uint_32t)(x) << (8 * (n))) | ((uint_32t)(x) >> (32 - 8 * (n))))
@@ -570,16 +447,13 @@
 #define m2  0x7f7f7f7f
 #define gf_mulx(x)  ((((x) & m2) << 1) ^ ((((x) & m1) >> 7) * BPOLY))
 
-/* The following defines provide alternative definitions of gf_mulx that might
-   give improved performance if a fast 32-bit multiply is not available. Note
-   that a temporary variable u needs to be defined where gf_mulx is used.
+/* The following defines provide alternative definitions of gf_mulx that might give improved performance if a fast 32-bit multiply is not available.
+   Note that a temporary variable u needs to be defined where gf_mulx is used.
 
-#define gf_mulx(x) (u = (x) & m1, u |= (u >> 1), ((x) & m2) << 1) ^ ((u >> 3) | (u >> 6))
-#define m4  (0x01010101 * BPOLY)
-#define gf_mulx(x) (u = (x) & m1, ((x) & m2) << 1) ^ ((u - (u >> 7)) & m4)
-*/
+   #define gf_mulx(x) (u = (x) & m1, u |= (u >> 1), ((x) & m2) << 1) ^ ((u >> 3) | (u >> 6)) #define m4 (0x01010101 * BPOLY) #define gf_mulx(x) (u =
+   (x) & m1, ((x) & m2) << 1) ^ ((u - (u >> 7)) & m4) */
 
-/* Work out which tables are needed for the different options   */
+/* Work out which tables are needed for the different options */
 
 #if defined( ASM_X86_V1C )
 #  if defined( ENC_ROUND )
@@ -658,7 +532,7 @@
 #  endif
 #endif
 
-/* generic definitions of Rijndael macros that use tables    */
+/* generic definitions of Rijndael macros that use tables */
 
 #define no_table(x,box,vf,rf,c) bytes2word( \
     box[bval(vf(x,0,c),rf(0,c))], \
@@ -685,7 +559,7 @@
 /* perform forward and inverse column mix operation on four bytes in long word x in */
 /* parallel. NOTE: x must be a simple variable, NOT an expression in these macros.  */
 
-#if defined( FM4_SET )      /* not currently used */
+#if defined( FM4_SET )  /* not currently used */
 #  define fwd_mcol(x)       four_tables(x,t_use(f,m),vf1,rf1,0)
 #elif defined( FM1_SET )    /* not currently used */
 #  define fwd_mcol(x)       one_table(x,upr,t_use(f,m),vf1,rf1,0)

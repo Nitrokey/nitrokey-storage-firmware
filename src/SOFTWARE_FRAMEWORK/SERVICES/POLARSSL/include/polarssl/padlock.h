@@ -41,7 +41,8 @@
 #define PADLOCK_ALIGN16(x) (unsigned long *) (16 + ((long) x & ~15))
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -51,7 +52,7 @@ extern "C" {
  *
  * \return         1 if CPU has support for the feature, 0 otherwise
  */
-int padlock_supports( int feature );
+    int padlock_supports (int feature);
 
 /**
  * \brief          PadLock AES-ECB block en(de)cryption
@@ -63,10 +64,7 @@ int padlock_supports( int feature );
  *
  * \return         0 if success, 1 if operation failed
  */
-int padlock_xcryptecb( aes_context *ctx,
-                       int mode,
-                       unsigned char input[16],
-                       unsigned char output[16] );
+    int padlock_xcryptecb (aes_context * ctx, int mode, unsigned char input[16], unsigned char output[16]);
 
 /**
  * \brief          PadLock AES-CBC buffer en(de)cryption
@@ -80,17 +78,12 @@ int padlock_xcryptecb( aes_context *ctx,
  *
  * \return         0 if success, 1 if operation failed
  */
-int padlock_xcryptcbc( aes_context *ctx,
-                       int mode,
-                       int length,
-                       unsigned char iv[16],
-                       unsigned char *input,
-                       unsigned char *output );
+    int padlock_xcryptcbc (aes_context * ctx, int mode, int length, unsigned char iv[16], unsigned char* input, unsigned char* output);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* HAVE_X86  */
+#endif                          /* HAVE_X86 */
 
-#endif /* padlock.h */
+#endif                          /* padlock.h */

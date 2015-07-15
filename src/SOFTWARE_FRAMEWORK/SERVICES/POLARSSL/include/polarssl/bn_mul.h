@@ -730,7 +730,7 @@
 #define MULADDC_STOP                    \
 }
 
-#endif /* C (generic)  */
+#endif /* C (generic) */
 #endif /* C (longlong) */
 
 #endif /* bn_mul.h */

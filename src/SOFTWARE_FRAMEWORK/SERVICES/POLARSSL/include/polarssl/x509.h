@@ -132,7 +132,7 @@ typedef struct _x509_buf
 {
     int tag;
     int len;
-    unsigned char *p;
+    unsigned char* p;
 }
 x509_buf;
 
@@ -140,7 +140,7 @@ typedef struct _x509_name
 {
     x509_buf oid;
     x509_buf val;
-    struct _x509_name *next;
+    struct _x509_name* next;
 }
 x509_name;
 
@@ -182,7 +182,7 @@ typedef struct _x509_cert
     x509_buf sig_oid2;
     x509_buf sig;
 
-    struct _x509_cert *next; 
+    struct _x509_cert* next;
 }
 x509_cert;
 
@@ -196,7 +196,7 @@ typedef struct _x509_crl_entry
 
     x509_buf entry_ext;
 
-    struct _x509_crl_entry *next;
+    struct _x509_crl_entry* next;
 }
 x509_crl_entry;
 
@@ -222,7 +222,7 @@ typedef struct _x509_crl
     x509_buf sig_oid2;
     x509_buf sig;
 
-    struct _x509_crl *next; 
+    struct _x509_crl* next;
 }
 x509_crl;
 
@@ -231,9 +231,9 @@ x509_crl;
  */
 typedef struct _x509_node
 {
-    unsigned char *data;
-    unsigned char *p;
-    unsigned char *end;
+    unsigned char* data;
+    unsigned char* p;
+    unsigned char* end;
 
     size_t len;
 }
@@ -258,7 +258,8 @@ typedef struct _x509_raw
 x509_raw;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -271,7 +272,7 @@ extern "C" {
  *
  * \return         0 if successful, or a specific X509 error code
  */
-int x509parse_crt( x509_cert *chain, unsigned char *buf, int buflen );
+    int x509parse_crt (x509_cert * chain, unsigned char* buf, int buflen);
 
 /**
  * \brief          Load one or more certificates and add them
@@ -282,7 +283,7 @@ int x509parse_crt( x509_cert *chain, unsigned char *buf, int buflen );
  *
  * \return         0 if successful, or a specific X509 error code
  */
-int x509parse_crtfile( x509_cert *chain, char *path );
+    int x509parse_crtfile (x509_cert * chain, char* path);
 
 /**
  * \brief          Parse one or more CRLs and add them
@@ -294,7 +295,7 @@ int x509parse_crtfile( x509_cert *chain, char *path );
  *
  * \return         0 if successful, or a specific X509 error code
  */
-int x509parse_crl( x509_crl *chain, unsigned char *buf, int buflen );
+    int x509parse_crl (x509_crl * chain, unsigned char* buf, int buflen);
 
 /**
  * \brief          Load one or more CRLs and add them
@@ -305,7 +306,7 @@ int x509parse_crl( x509_crl *chain, unsigned char *buf, int buflen );
  *
  * \return         0 if successful, or a specific X509 error code
  */
-int x509parse_crlfile( x509_crl *chain, char *path );
+    int x509parse_crlfile (x509_crl * chain, char* path);
 
 /**
  * \brief          Parse a private RSA key
@@ -318,9 +319,7 @@ int x509parse_crlfile( x509_crl *chain, char *path );
  *
  * \return         0 if successful, or a specific X509 error code
  */
-int x509parse_key( rsa_context *rsa,
-                   unsigned char *buf, int buflen,
-                   unsigned char *pwd, int pwdlen );
+    int x509parse_key (rsa_context * rsa, unsigned char* buf, int buflen, unsigned char* pwd, int pwdlen);
 
 /**
  * \brief          Load and parse a private RSA key
@@ -331,7 +330,7 @@ int x509parse_key( rsa_context *rsa,
  *
  * \return         0 if successful, or a specific X509 error code
  */
-int x509parse_keyfile( rsa_context *rsa, char *path, char *password );
+    int x509parse_keyfile (rsa_context * rsa, char* path, char* password);
 
 /**
  * \brief          Store the certificate DN in printable form into buf;
@@ -344,7 +343,7 @@ int x509parse_keyfile( rsa_context *rsa, char *path, char *password );
  * \return         The amount of data written to the buffer, or -1 in
  *                 case of an error.
  */
-int x509parse_dn_gets( char *buf, size_t size, x509_name *dn );
+    int x509parse_dn_gets (char* buf, size_t size, x509_name * dn);
 
 /**
  * \brief          Returns an informational string about the
@@ -358,7 +357,7 @@ int x509parse_dn_gets( char *buf, size_t size, x509_name *dn );
  * \return         The amount of data written to the buffer, or -1 in
  *                 case of an error.
  */
-int x509parse_cert_info( char *buf, size_t size, char *prefix, x509_cert *crt );
+    int x509parse_cert_info (char* buf, size_t size, char* prefix, x509_cert * crt);
 
 /**
  * \brief          Returns an informational string about the
@@ -372,7 +371,7 @@ int x509parse_cert_info( char *buf, size_t size, char *prefix, x509_cert *crt );
  * \return         The amount of data written to the buffer, or -1 in
  *                 case of an error.
  */
-int x509parse_crl_info( char *buf, size_t size, char *prefix, x509_crl *crl );
+    int x509parse_crl_info (char* buf, size_t size, char* prefix, x509_crl * crl);
 
 /**
  * \brief          Check a given x509_time against the system time and check
@@ -383,7 +382,7 @@ int x509parse_crl_info( char *buf, size_t size, char *prefix, x509_crl *crl );
  * \return         Return 0 if the x509_time is still valid,
  *                 or 1 otherwise.
  */
-int x509parse_time_expired( x509_time *time );
+    int x509parse_time_expired (x509_time * time);
 
 /**
  * \brief          Verify the certificate signature
@@ -405,34 +404,31 @@ int x509parse_time_expired( x509_time *time );
  *
  * \note           TODO: add two arguments, depth and crl
  */
-int x509parse_verify( x509_cert *crt,
-                      x509_cert *trust_ca,
-                      x509_crl *ca_crl,
-                      char *cn, int *flags );
+    int x509parse_verify (x509_cert * crt, x509_cert * trust_ca, x509_crl * ca_crl, char* cn, int* flags);
 
 /**
  * \brief          Unallocate all certificate data
  *
  * \param crt      Certificate chain to free
  */
-void x509_free( x509_cert *crt );
+    void x509_free (x509_cert * crt);
 
 /**
  * \brief          Unallocate all CRL data
  *
  * \param crl      CRL chain to free
  */
-void x509_crl_free( x509_crl *crl );
+    void x509_crl_free (x509_crl * crl);
 
 /**
  * \brief          Checkup routine
  *
  * \return         0 if successful, or 1 if the test failed
  */
-int x509_self_test( int verbose );
+    int x509_self_test (int verbose);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* x509.h */
+#endif                          /* x509.h */

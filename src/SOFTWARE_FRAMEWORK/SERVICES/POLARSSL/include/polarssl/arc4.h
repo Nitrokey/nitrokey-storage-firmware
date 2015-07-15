@@ -30,14 +30,15 @@
  */
 typedef struct
 {
-    int x;                      /*!< permutation index */
-    int y;                      /*!< permutation index */
-    unsigned char m[256];       /*!< permutation table */
+    int x;                      /* !< permutation index */
+    int y;                      /* !< permutation index */
+    unsigned char m[256];       /* !< permutation table */
 }
 arc4_context;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -47,7 +48,7 @@ extern "C" {
  * \param key      the secret key
  * \param keylen   length of the key
  */
-void arc4_setup( arc4_context *ctx, unsigned char *key, int keylen );
+    void arc4_setup (arc4_context * ctx, unsigned char* key, int keylen);
 
 /**
  * \brief          ARC4 cipher function
@@ -56,17 +57,17 @@ void arc4_setup( arc4_context *ctx, unsigned char *key, int keylen );
  * \param buf      buffer to be processed
  * \param buflen   amount of data in buf
  */
-void arc4_crypt( arc4_context *ctx, unsigned char *buf, int buflen );
+    void arc4_crypt (arc4_context * ctx, unsigned char* buf, int buflen);
 
-/*
- * \brief          Checkup routine
- *
- * \return         0 if successful, or 1 if the test failed
- */
-int arc4_self_test( int verbose );
+    /*
+     * \brief          Checkup routine
+     *
+     * \return         0 if successful, or 1 if the test failed
+     */
+    int arc4_self_test (int verbose);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* arc4.h */
+#endif                          /* arc4.h */

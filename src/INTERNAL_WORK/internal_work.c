@@ -1,21 +1,21 @@
 /*
-* Author: Copyright (C) Rudolf Boeddeker  Date: 10.04.2012
-*
-* This file is part of Nitrokey
-*
-* Nitrokey  is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* Nitrokey is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Author: Copyright (C) Rudolf Boeddeker  Date: 10.04.2012
+ *
+ * This file is part of Nitrokey
+ *
+ * Nitrokey  is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * Nitrokey is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Nitrokey. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 
 /*
@@ -30,8 +30,8 @@
 #include "board.h"
 
 #ifdef FREERTOS_USED
-  #include "FreeRTOS.h"
-  #include "task.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #endif
 #include "string.h"
 
@@ -63,11 +63,11 @@
 
 
 #ifndef STICK_20_A_MUSTER_PROD
-  #define INTERPRETER_ENABLE     // Disable for PROD Version
+#define INTERPRETER_ENABLE  // Disable for PROD Version
 #endif
 
 #ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
-  #define INTERPRETER_ENABLE     // Enable also for PROD Version
+#define INTERPRETER_ENABLE  // Enable also for PROD Version
 #endif
 
 
@@ -77,15 +77,15 @@
 
 *******************************************************************************/
 #ifdef INTERPRETER_ENABLE
-  #define DEBUG_IW_IO
+#define DEBUG_IW_IO
 #endif
 
 #ifdef DEBUG_IW_IO
-  int CI_LocalPrintf (char *szFormat,...);
-  int CI_TickLocalPrintf (char *szFormat,...);
+int CI_LocalPrintf (char* szFormat, ...);
+int CI_TickLocalPrintf (char* szFormat, ...);
 #else
-  #define CI_LocalPrintf(...)
-  #define CI_TickLocalPrintf(...)
+#define CI_LocalPrintf(...)
+#define CI_TickLocalPrintf(...)
 #endif
 
 /*******************************************************************************
@@ -116,13 +116,13 @@
 
 *******************************************************************************/
 
-u32 IW_SendToSC_PW1 (u8 *PW_pu8)
+u32 IW_SendToSC_PW1 (u8 * PW_pu8)
 {
-  if (0 == strlen ((const char*)PW_pu8))
-  {
-    return (FALSE);
-  }
-  return (LA_SC_SendVerify (1,PW_pu8));
+    if (0 == strlen ((const char *) PW_pu8))
+    {
+        return (FALSE);
+    }
+    return (LA_SC_SendVerify (1, PW_pu8));
 }
 
 /*******************************************************************************
@@ -135,13 +135,13 @@ u32 IW_SendToSC_PW1 (u8 *PW_pu8)
 
 *******************************************************************************/
 
-u32 IW_SendToSC_PW3 (u8 *PW_pu8)
+u32 IW_SendToSC_PW3 (u8 * PW_pu8)
 {
-  if (0 == strlen ((const char*)PW_pu8))
-  {
-    return (FALSE);
-  }
-  return (LA_SC_SendVerify (3,PW_pu8));
+    if (0 == strlen ((const char *) PW_pu8))
+    {
+        return (FALSE);
+    }
+    return (LA_SC_SendVerify (3, PW_pu8));
 }
 
 
@@ -156,53 +156,53 @@ u32 IW_SendToSC_PW3 (u8 *PW_pu8)
 
 *******************************************************************************/
 
-void IW_task(void *pvParameters)
+void IW_task (void* pvParameters)
 {
-  u32 LoopCount_u32 = 0;
-  portTickType xLastWakeTime;
+    u32 LoopCount_u32 = 0;
+    portTickType xLastWakeTime;
 
-// Check system configuration
-  StartupCheck_u8 ();
+    // Check system configuration
+    StartupCheck_u8 ();
 
-  xLastWakeTime = xTaskGetTickCount();
+    xLastWakeTime = xTaskGetTickCount ();
 
 #ifdef INTERPRETER_ENABLE
-//  IDF_PrintStartupInfo ();
+    // IDF_PrintStartupInfo ();
 #endif
 
-  while (TRUE)
-  {
+    while (TRUE)
+    {
 #ifdef TIME_MEASURING_ENABLE
-   TIME_MEASURING_Start (TIME_MEASURING_TIMER_KEY_10MS);
+        TIME_MEASURING_Start (TIME_MEASURING_TIMER_KEY_10MS);
 #endif
 
-// Check the OTP HID io
-    OTP_main ();
-
-#ifdef TIME_MEASURING_ENABLE
-   TIME_MEASURING_Stop (TIME_MEASURING_TIMER_KEY_10MS);
-#endif
-
-    vTaskDelayUntil(&xLastWakeTime, configTSK_IW_TEST_PERIOD);
+        // Check the OTP HID io
+        OTP_main ();
 
 #ifdef TIME_MEASURING_ENABLE
-   TIME_MEASURING_Start (TIME_MEASURING_TIMER_IW_10MS);
+        TIME_MEASURING_Stop (TIME_MEASURING_TIMER_KEY_10MS);
 #endif
 
-     LoopCount_u32++;
-     if(0 == LoopCount_u32 % 10)          // Every 100 ms
-     {
-       HID_ExcuteCmd ();
-
-       MSD_AccessManager100ms ();         // Check MSD access
-     }
-
-     LED_Manager10ms_v ();                // Call LED manager every 10 ms
+        vTaskDelayUntil (&xLastWakeTime, configTSK_IW_TEST_PERIOD);
 
 #ifdef TIME_MEASURING_ENABLE
-   TIME_MEASURING_Stop (TIME_MEASURING_TIMER_IW_10MS);
+        TIME_MEASURING_Start (TIME_MEASURING_TIMER_IW_10MS);
 #endif
-  }
+
+        LoopCount_u32++;
+        if (0 == LoopCount_u32 % 10)    // Every 100 ms
+        {
+            HID_ExcuteCmd ();
+
+            MSD_AccessManager100ms ();  // Check MSD access
+        }
+
+        LED_Manager10ms_v ();   // Call LED manager every 10 ms
+
+#ifdef TIME_MEASURING_ENABLE
+        TIME_MEASURING_Stop (TIME_MEASURING_TIMER_IW_10MS);
+#endif
+    }
 }
 
 
@@ -216,14 +216,7 @@ void IW_task(void *pvParameters)
 
 *******************************************************************************/
 
-void IW_task_init(void)
+void IW_task_init (void)
 {
-  xTaskCreate(IW_task,
-          configTSK_IW_TEST_NAME,
-          configTSK_IW_TEST_STACK_SIZE,
-          NULL,
-          configTSK_IW_TEST_PRIORITY,
-          NULL);
+    xTaskCreate (IW_task, configTSK_IW_TEST_NAME, configTSK_IW_TEST_STACK_SIZE, NULL, configTSK_IW_TEST_PRIORITY, NULL);
 }
-
-
