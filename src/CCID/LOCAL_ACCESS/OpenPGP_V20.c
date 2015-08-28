@@ -1444,8 +1444,7 @@ u32 GetRandomNumber_u32 (u32 Size_u32, u8 * Data_pu8)
 {
 u32 Ret_u32;
 u32 i;
-time_t now;
-static u8 FlasgTimeIsSet_u8 = FALSE;
+static u8 FlagTimeIsSet_u8 = FALSE;
 
     // Size ok ?
     if (ISO7816_APDU_MAX_RESPONSE_LEN <= Size_u32)
@@ -1459,11 +1458,10 @@ static u8 FlasgTimeIsSet_u8 = FALSE;
 
 #ifdef GENERATE_RANDOM_NUMBER_WITH_2ND_SOURCE
     // Paranoia: if the random number is not really random, xor it with another random number from a second source
-    if (FALSE == FlasgTimeIsSet_u8)
+    if (FALSE == FlagTimeIsSet_u8)
     {
-        time (&now);    // Get the local time
-        srand (now + Data_pu8[0]);  // Init the local random generator
-        FlasgTimeIsSet_u8 = TRUE;
+        srand (Data_pu8[0] + Data_pu8[1]<<8 + Data_pu8[2]<<16 + Data_pu8[3]<<24);  // Init the local random generator
+        FlagTimeIsSet_u8 = TRUE;
     }
 
     for (i = 0; i < Size_u32; i++)
