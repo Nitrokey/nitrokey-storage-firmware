@@ -53,7 +53,7 @@
 
 #if USB_DEVICE_FEATURE == ENABLED
 #include <stdio.h>
-
+#include "string.h"
 #include "board.h"
 #include "print_funcs.h"
 
@@ -211,8 +211,11 @@ static void USB_CCID_GetDataFromUSB (void)
 
     LED_RedOn ();
 
+    USB_Datalen_s32 = USB_CCID_data_st.CCID_datalen;
+
     USB_to_CRD_DispatchUSBMessage_v (&USB_CCID_data_st);
 
+    memset (USB_CCID_data_st.USB_data,0,USB_Datalen_s32);
     LED_RedOff ();
 
     // Usb_ack_out_received_free(EP_CCID_OUT);

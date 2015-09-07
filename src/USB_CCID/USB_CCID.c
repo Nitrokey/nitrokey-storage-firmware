@@ -1349,9 +1349,9 @@ extern volatile avr32_mci_t* mci;
 
 void USB_to_CRD_DispatchUSBMessage_v (t_USB_CCID_data_st * USB_CCID_data_pst)
 {
-u8 ErrorCode_u8 = CCID_NO_ERROR;
-u8 n;
-u8 LockFlag_u8;
+  u8 ErrorCode_u8 = CCID_NO_ERROR;
+  u8 n;
+  u8 LockFlag_u8;
 
     USB_CCID_data_pst->CCID_datalen = USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH + 1] * 256 + USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH];
 
@@ -1360,13 +1360,6 @@ u8 LockFlag_u8;
         return; // Avoid overflow
     }
 
-    /*
-       n = USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH+1] * 256 + USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH];
-
-       if (n != USB_CCID_data_pst->CCID_datalen - 10) // 10 byte USB overhead { CI_LocalPrintf ("USB %3d != CCID len
-       %d\n",USB_CCID_data_pst->CCID_datalen-10,n); }
-
-       USB_CCID_data_pst->CCID_datalen = n; */
     n = USB_CCID_data_pst->USB_data[CCID_OFFSET_MESSAGE_TYPE];
 
     if (mci != &AVR32_MCI)  // To get sure that mci has the correct value
