@@ -1811,6 +1811,8 @@ u8 cSecVersion_u8;
     }
 
     memset (card_password, 0, 26);  // RB : Clear password ram
+    memset (temp_password, 0, 25);  // RB : Clear password ram
+    tmp_password_set = 0;
 
     if (res == 0)
     {
@@ -1849,12 +1851,14 @@ u8 cSecVersion_u8;
 
 u8 cmd_user_authenticate (u8 * report, u8 * output)
 {
-u8 res = 1;
-u8 user_password[26];
-u32 Ret_u32;
+    u8 res = 1;
+    u8 user_password[26];
+    u32 Ret_u32;
 
     memset (user_password, 0, 26);
+    memset (temp_user_password, 0, 25);
     memcpy (user_password, report + 1, 25);
+    tmp_user_password_set = 0;
 
     Ret_u32 = LA_OpenPGP_V20_Test_SendUserPW2 ((unsigned char *) user_password);
     if (TRUE == Ret_u32)
