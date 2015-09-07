@@ -30,8 +30,6 @@
 
 
 // Userinterface commands
-#define HTML_CMD_STARTBYTE_OF_PAYLOAD               3
-
 #define HTML_CMD_NOTHING                            0
 #define HTML_CMD_ENABLE_AES_LUN                     1
 #define HTML_CMD_DISABLE_AES_LUN                    2
