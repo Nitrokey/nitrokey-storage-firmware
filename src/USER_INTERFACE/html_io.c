@@ -547,7 +547,6 @@ void HID_ExcuteCmd (void)
 
         case HTML_CMD_WRITE_STATUS_DATA:
             CI_TickLocalPrintf ("Get HTML_CMD_WRITE_STATUS_DATA\r\n");
-            // GetStickStatusFromHID ((HID_Stick20AccessStatus_est*)HID_String_au8); // Changed
             UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
             break;
 
