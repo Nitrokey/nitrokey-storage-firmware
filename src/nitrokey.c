@@ -650,8 +650,11 @@ int main (void)
      /**/
         // Protect bootloader
 #ifdef STICK_20_A_MUSTER_PROD   //
-        flashc_set_bootloader_protected_size (0x2000);
-    flashc_lock_external_privileged_fetch (TRUE);   // Disable external instruction fetch
+    if (0x2000 > flashc_get_bootloader_protected_size ())
+    {
+      flashc_set_bootloader_protected_size (0x2000);
+    }
+    flashc_lock_external_privileged_fetch (TRUE);     // Disable external instruction fetch
 #endif
 
     // DFU_FirmwareResetUserpage ();

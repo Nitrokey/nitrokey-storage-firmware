@@ -701,6 +701,7 @@ void HID_ExcuteCmd (void)
             if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
             {
                 CI_TickLocalPrintf ("Lock firmware\r\n");
+                flashc_set_bootloader_protected_size (0x10000);   // Set bootloader protection to the max protection value, to lock the first 56k of the application
                 flashc_activate_security_bit ();    // Debugging disabled, only chip erase works (bootloader is save) , AES storage keys and setup
                                                     // are erased
                 UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
