@@ -116,6 +116,7 @@ u32 authorized_crc = 0xFFFFFFFF;
 u8 temp_user_password[25];
 u8 tmp_user_password_set = 0;
 u32 authorized_user_crc = 0xFFFFFFFF;
+u32 authorized_user_crc_set=0;
 
 #define HID_STRING_LEN      50
 
@@ -693,8 +694,11 @@ u8 text[10];
 
             case CMD_GET_CODE:
                 CI_StringOut ("Get CMD_GET_CODE\r\n");
-                if ((calculated_crc32 == authorized_user_crc) || (*((u8 *) (SLOTS_ADDRESS + GLOBAL_CONFIG_OFFSET + 3)) != 1))
+                if( ((1 == authorized_user_crc_set) && (calculated_crc32 == authorized_user_crc)) ||
+                              (*((u8 *) (SLOTS_ADDRESS + GLOBAL_CONFIG_OFFSET + 3)) != 1))
                 {
+                    authorized_user_crc     = 0xFFFFFFFF;
+                    authorized_user_crc_set = 0;
                     cmd_get_code (report, output);
                 }
                 else
@@ -1988,7 +1992,8 @@ u8 cmd_user_authorize (u8 * report, u8 * output)
     {
         if (memcmp (report + 5, temp_user_password, 25) == 0)
         {
-            authorized_user_crc = getu32 (report + 1);
+            authorized_user_crc     = getu32 (report + 1);
+            authorized_user_crc_set = 1;
             return 0;
         }
         else
