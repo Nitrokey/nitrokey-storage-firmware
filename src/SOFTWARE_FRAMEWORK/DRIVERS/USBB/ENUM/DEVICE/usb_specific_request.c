@@ -94,6 +94,7 @@ static void hid_get_descriptor (U8 size_of_report, const U8 * p_usb_hid_report);
 #endif
 
 u8 Stick20HIDSendMatrixData (u8 * output);
+u8 Stick20HIDSendProductionInfos (u8 * output);
 extern u8 Stick20HIDSendConfigurationState_u8;
 
 #define STICK20_SEND_STATUS_IDLE     0
@@ -219,7 +220,6 @@ u8* Keyboard_GetReport_Feature (u16 Length)
         // u32 i;
 
         memcpy ((void *) HID_GetReport_Value, HID_GetReport_Value_tmp, KEYBOARD_FEATURE_COUNT);
-        // HID_GetReport_Value[0] = OTP_device_status; // Todo RB usage of OTP_device_status
 
         // Send password matrix ?
         if (0 != Stick20HIDSendMatrixState_u8)
@@ -563,14 +563,13 @@ U8 text[20];
                     case HID_REPORT_DESCRIPTOR:
                         CI_StringOut ("Get GET_HID_REPORT_DESCRIPTOR - Size = ");   // ,sizeof(usb_hid_report_descriptor_keyboard));
                         itoa (sizeof (usb_hid_report_descriptor_keyboard), text);
-                        CI_StringOut (text);
+                        CI_StringOut ((char*)text);
                         CI_StringOut ("\r\n");
                         hid_get_descriptor (sizeof (usb_hid_report_descriptor_keyboard), usb_hid_report_descriptor_keyboard);
                         return TRUE;
 
                     case HID_PHYSICAL_DESCRIPTOR:
                         CI_StringOut ("Get GET_HID_PHYSICAL_DESCRIPTOR\r\n");
-                        // TODO
                         break;
                     default:
                         CI_StringOut ("Get GET_DESCRIPTOR unknown\r\n");
@@ -610,7 +609,7 @@ U8 text[20];
                 switch (wValue_msb)
                 {
                     case HID_REPORT_INPUT:
-                        CI_StringOut ("Get HID_SET_REPORT_INPUT\r\n");  // TODO
+                        CI_StringOut ("Get HID_SET_REPORT_INPUT\r\n");
                         break;
 
 
@@ -619,27 +618,11 @@ U8 text[20];
                         // CI_StringOut ("A");
                         Keyboard_SetReport_Output ();
                         CI_StringOut ("Get HID_SET_REPORT_OUTPUT - DONE\r\n");
-                        /*
-                           { s32 USB_Datalen_s32 = Usb_byte_count (EP_CONTROL); u32 data = 0;
-
-                           CI_StringOut ("Get HID_SET_REPORT_OUTPUT\r\n"); // CI_StringOut ("A");
-
-                           data = Usb_read_endpoint_data(EP_CONTROL, 32); USB_Datalen_s32 = Usb_byte_count (EP_CONTROL);
-
-                           Usb_ack_setup_received_free(); while (!Is_usb_control_out_received()); Usb_ack_control_out_received_free(); }
-                           Usb_ack_control_in_ready_send(); while (!Is_usb_control_in_ready());
-
-                         */
-                        /*
-                           if (OTP_device_status==STATUS_RECEIVED_REPORT) { OTP_device_status=STATUS_BUSY;
-                           parse_report(HID_SetReport_Value_tmp,HID_GetReport_Value_tmp); OTP_device_status=STATUS_READY; } */
-                        // CI_StringOut ("B");
-
                         return TRUE;
 
                     case HID_REPORT_FEATURE:
                         // CI_StringOut ("Get HID_SET_REPORT_FEATURE\r\n");
-                        Keyboard_SetReport_Feature (0); // RB Length todo
+                        Keyboard_SetReport_Feature (0);
                         break;
                     default:
                         CI_StringOut ("Get HID_GET_REPORT unknown\r\n");
@@ -651,10 +634,10 @@ U8 text[20];
 
                 CI_StringOut ("Get HID_SET_IDLE - report ");
                 itoa (wValue_lsb, text);
-                CI_StringOut (text);
+                CI_StringOut ((char*)text);
                 CI_StringOut (" - duration ");
                 itoa (wValue_msb, text);
-                CI_StringOut (text);
+                CI_StringOut ((char*)text);
                 CI_StringOut ("\r\n");
                 // CI_StringOut ("C");
                 usb_hid_set_idle (wValue_lsb, wValue_msb);
@@ -663,7 +646,6 @@ U8 text[20];
             case HID_SET_PROTOCOL:
                 CI_StringOut ("Get HID_SET_REPORT\r\n");
                 // CI_StringOut ("D");
-                // TODO
                 break;
         }
     }
@@ -697,7 +679,6 @@ U8 text[20];
 
                 // HID
             case HID_GET_REPORT:
-                // TODO
                 switch (wValue_msb)
                 {
                     case HID_REPORT_FEATURE:
@@ -708,8 +689,7 @@ U8 text[20];
                     case HID_REPORT_INPUT:
                         CI_StringOut ("Get HID_GET_REPORT_INPUT\r\n");
                         {
-U8 b_usb_report[10];
-
+                            U8 b_usb_report[10];
                             b_usb_report[0] = 0;
                             hid_get_descriptor (1, b_usb_report);
                         }
@@ -729,7 +709,6 @@ U8 b_usb_report[10];
                  */
             case HID_GET_PROTOCOL:
                 CI_StringOut ("Get HID_GET_PROTOCOL\r\n");
-                // TODO
                 break;
         }
 
@@ -803,7 +782,7 @@ void USB_KB_SendDataToUSB (void)
     {
         if (!Is_usb_endpoint_enabled (EP_KB_IN))
         {
-            i = 0;  // todo USB Reset
+            i = 0;  // USB Reset ?
         }
     }
 

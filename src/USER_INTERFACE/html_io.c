@@ -52,6 +52,7 @@
 #include "CCID/USART/ISO7816_ADPU.h"
 #include "CCID/USART/ISO7816_Prot_T1.h"
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
+#include "USB_CCID\\USB_CCID.h"
 
 #include "mci.h"
 #include "conf_sd_mmc_mci.h"

@@ -1249,9 +1249,9 @@ void IDF_task (void* pvParameters)
     u32 LoopCount_u32 = 0;
     portTickType xLastWakeTime;
     u32 sd_LastAccessedBlockReadMin_u32 = 0;
-    u32 sd_LastAccessedBlockReadMax_u32 = 4000000000;
+    u32 sd_LastAccessedBlockReadMax_u32 = 4000000000LL;
     u32 sd_LastAccessedBlockWriteMin_u32 = 0;
-    u32 sd_LastAccessedBlockWriteMax_u32 = 4000000000;
+    u32 sd_LastAccessedBlockWriteMax_u32 = 4000000000LL;
 
     xLastWakeTime = xTaskGetTickCount ();
     // while (1) ;

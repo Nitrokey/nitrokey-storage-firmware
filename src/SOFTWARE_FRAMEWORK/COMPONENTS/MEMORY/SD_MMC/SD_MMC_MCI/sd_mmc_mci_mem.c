@@ -393,23 +393,10 @@ Bool sd_mmc_mci_removal_1 (void)    // Uncrypted partition
 
 Ctrl_status sd_mmc_mci_usb_read_10 (U8 slot, U32 addr, U16 nb_sector)
 {
-unsigned int c0, c1;            // Performance evaluation variables
-unsigned int i;
+    unsigned int c0, c1;            // Performance evaluation variables
+
 
     c0 = Get_system_register (AVR32_COUNT);
-    /*
-       for (i=0;i<nb_sector;i++) { Sd_mmc_mci_access_signal_on();
-
-       if( !sd_mmc_mci_mem_check(slot) ) { Sd_mmc_mci_access_signal_off(); return CTRL_NO_PRESENT; }
-
-       if( !sd_mmc_mci_dma_read_open(slot, addr+i, NULL, 1) ) return CTRL_FAIL;
-
-       if( !sd_mmc_mci_read_multiple_sector(slot, 1, addr+i) ) return CTRL_FAIL;
-
-       if( !sd_mmc_mci_read_close(slot) ) return CTRL_FAIL;
-
-       Sd_mmc_mci_access_signal_off(); } */
-
 
     Sd_mmc_mci_access_signal_on ();
 
@@ -441,6 +428,7 @@ unsigned int i;
     /*
        // AES Test if (STICK20_AES_BUFFER_SIZE >= nb_sector*SD_MMC_SECTOR_SIZE) { STICK20_ram_aes_ram(nb_sector*SD_MMC_SECTOR_SIZE,(unsigned int
        *)addr, pSTICK20_AES_BUFFER); } else { CI_LocalPrintf("AES Size to big: "); print_ulong(DMACA_AES_EVAL_USART, nb_sector*SD_MMC_SECTOR_SIZE); } */
+
     return CTRL_GOOD;
 }
 
@@ -536,25 +524,12 @@ void sd_mmc_mci_read_multiple_sector_callback (const void* psector)
 
 Ctrl_status sd_mmc_mci_usb_write_10 (U8 slot, U32 addr, U16 nb_sector)
 {
-unsigned int c0, c1;            // Performance evaluation variables
-unsigned int i;
+    unsigned int c0, c1;            // Performance evaluation variables
+
 
     c0 = Get_system_register (AVR32_COUNT);
 
     LED_RedGreenOn ();
-
-    /*
-       for (i=0;i<nb_sector;i++) { Sd_mmc_mci_access_signal_on();
-
-       if( !sd_mmc_mci_mem_check(slot) ) { Sd_mmc_mci_access_signal_off(); return CTRL_NO_PRESENT; }
-
-       if( !sd_mmc_mci_dma_write_open(slot, addr+i, NULL, 1) ) return CTRL_FAIL;
-
-       if( !sd_mmc_mci_write_multiple_sector(slot, 1,addr+i) ) return CTRL_FAIL;
-
-       if( !sd_mmc_mci_write_close(slot) ) return CTRL_FAIL;
-
-       Sd_mmc_mci_access_signal_off(); } */
 
     Sd_mmc_mci_access_signal_on ();
 

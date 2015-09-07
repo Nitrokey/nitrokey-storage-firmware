@@ -125,7 +125,7 @@ void XorInitVector_v (unsigned char* InitVector_au8)
     InitVector_au8[0] = (InitVector_au8[0] + XorKey_au8[31]) ^ XorKey_au8[0];
     for (i = 1; i < INIT_VECTOR_KEYSIZE_128_BIT; i++)
     {
-        InitVector_au8[i] = (InitVector_au8[i] + XorKey_au8[i - 1]) ^ XorKey_au8[i] + InitVector_au8[i - 1];
+        InitVector_au8[i] = ((InitVector_au8[i] + XorKey_au8[i - 1]) ^ XorKey_au8[i]) + InitVector_au8[i - 1];
     }
 }
 

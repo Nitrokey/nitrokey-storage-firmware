@@ -673,7 +673,6 @@ u32* p;
 
 u32 get_time_value (void)
 {
-int i, flag = 0;
 u32 time = 0;
 
     time = get_flash_time_value ();
@@ -813,7 +812,6 @@ u8 increment_counter_page (u32 addr)
 {
 u16 i;
 u8 n;
-u8 dummy_u8;
 u16 dummy_u16;
 u32 dummy_u32;
 u8* ptr;

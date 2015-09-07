@@ -44,6 +44,7 @@
 #include "ISO7816_ADPU.h"
 #include "ISO7816_Prot_T1.h"
 #include "LED_test.h"
+#include "USB_CCID\\USB_CCID.h"
 
 
 

@@ -866,7 +866,7 @@ u8 SC_ErrorCode_u8;
         USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA + 1] = 0xE1;
         USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA + 2] = 0x01;
         USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA + 3] = 0x20;
-        USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA + 4] = ISO7816_XOR_String (4, &USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA]); // 0xC1;
+        USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA + 4] = ISO7816_XOR_String (4, (unsigned char*)&USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA]); // 0xC1;
         CCID_AnswerBlockSize_u16 = 5;
 
         UsbMessageLength_u32 = CCID_AnswerBlockSize_u16;

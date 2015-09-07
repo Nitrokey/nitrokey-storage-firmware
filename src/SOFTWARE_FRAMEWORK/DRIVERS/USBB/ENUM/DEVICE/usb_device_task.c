@@ -38,6 +38,8 @@
 #include "usb_device_task.h"
 
 
+void USB_CCID_SetLockCounter (unsigned int Value_u32);
+
 // _____ M A C R O S ________________________________________________________
 
 

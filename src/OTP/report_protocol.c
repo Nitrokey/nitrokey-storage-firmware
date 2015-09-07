@@ -1655,11 +1655,12 @@ u8 is_programmed = *((u8 *) (hotp_slots[slot_no]));
         slot_no = slot_no & 0x0F;
 u8 is_programmed = *((u8 *) (totp_slots[slot_no]));
 
+/* Improvement for future, check USB timestamp against local timestamp
         if (FALSE == CheckSystemtime ((u32) timestamp))
         {
 
         }
-
+*/
         if (is_programmed == 0x01)
         {
             result = get_code_from_totp_slot (slot_no, timestamp / (u64) interval);

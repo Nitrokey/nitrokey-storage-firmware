@@ -57,6 +57,8 @@
 #include "scsi_decoder.h"
 #include "device_mass_storage_task.h"
 
+unsigned char FAI_InitLun (unsigned char Lun_u8);
+
 // _____ M A C R O S ________________________________________________________
 
 

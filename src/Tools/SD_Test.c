@@ -41,6 +41,11 @@
 #include "fsaccess.h"
 #include "ctrl_access.h"
 
+#include "usb_task.h"
+#include "usb_descriptors.h"
+#include "usb_standard_request.h"
+#include "usb_device_task.h"
+
 #include "conf_sd_mmc_mci.h"
 #include "sd_mmc_mci.h"
 #include "sd_mmc_mci_mem.h"
@@ -57,6 +62,7 @@
 #include "CCID/USART/ISO7816_Prot_T1.h"
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 #include "USB_CCID/USB_CCID.h"
+#include "HighLevelFunctions\FlashStorage.h"
 
 #include "OTP\report_protocol.h"
 
