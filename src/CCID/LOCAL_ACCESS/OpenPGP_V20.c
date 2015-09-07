@@ -417,7 +417,7 @@ int LA_OpenPGP_V20_GetChallenge (typeAPDU * tSC, int nReceiveLength, unsigned ch
     nRet = ISO7816_SendAPDU_Le_NoLc (tSC);
 
     n = tSC->nReceiveDataLen;
-    if (n < nReceiveLength)
+    if (n > nReceiveLength)
     {
         n = nReceiveLength;
     }
@@ -1442,9 +1442,10 @@ int LA_OpenPGP_V20_Test_ResetRetryCounter (unsigned char* pcPW)
 
 u32 GetRandomNumber_u32 (u32 Size_u32, u8 * Data_pu8)
 {
-u32 Ret_u32;
-u32 i;
-static u8 FlagTimeIsSet_u8 = FALSE;
+  u32 Ret_u32;
+  u32 i;
+  u8  RandomChars[4];
+  static u8 FlagTimeIsSet_u8 = FALSE;
 
     // Size ok ?
     if (ISO7816_APDU_MAX_RESPONSE_LEN <= Size_u32)
@@ -1460,7 +1461,10 @@ static u8 FlagTimeIsSet_u8 = FALSE;
     // Paranoia: if the random number is not really random, xor it with another random number from a second source
     if (FALSE == FlagTimeIsSet_u8)
     {
-        srand (Data_pu8[0] + (Data_pu8[1]<<8) + (Data_pu8[2]<<16) + (Data_pu8[3]<<24));  // Init the local random generator
+        // Get a random number from smartcard
+        Ret_u32 = LA_OpenPGP_V20_GetChallenge (&tSC_OpenPGP_V20, 4, RandomChars);
+
+        srand (RandomChars[0] + (RandomChars[1]<<8) + (RandomChars[2]<<16) + (RandomChars[3]<<24));  // Init the local random generator
         FlagTimeIsSet_u8 = TRUE;
     }
 
@@ -1973,7 +1977,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned i
             ISO7816_SC_StartupTest (Param_u32);
             break;
         case 15:
-            Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus (LocalString_au8);
+            Ret_u32 = LA_OpenPGP_V20_GetPasswordstatus ((char*)LocalString_au8);
             if (TRUE == Ret_u32)
             {
                 CI_LocalPrintf ("Password status -");
