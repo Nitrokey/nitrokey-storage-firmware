@@ -1460,7 +1460,7 @@ static u8 FlagTimeIsSet_u8 = FALSE;
     // Paranoia: if the random number is not really random, xor it with another random number from a second source
     if (FALSE == FlagTimeIsSet_u8)
     {
-        srand (Data_pu8[0] + Data_pu8[1]<<8 + Data_pu8[2]<<16 + Data_pu8[3]<<24);  // Init the local random generator
+        srand (Data_pu8[0] + (Data_pu8[1]<<8) + (Data_pu8[2]<<16) + (Data_pu8[3]<<24));  // Init the local random generator
         FlagTimeIsSet_u8 = TRUE;
     }
 
@@ -1664,8 +1664,6 @@ int LA_OpenPGP_V20_Test (void)
 
 u32 LA_SC_StartSmartcard (void)
 {
-u32 Ret_u32;
-
     // LA_RestartSmartcard_u8 ();
 
     // Check for smartcard on
@@ -1858,7 +1856,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned i
             }
             break;
         case 1:
-            sprintf (LocalString_au8, "%d", Param_u32);
+            sprintf ((char*)LocalString_au8, "%d", Param_u32);
             // strcpy (LocalString_au8,String_pu8);
             CI_LocalPrintf ("Send password -%s-\r\n", LocalString_au8);
 
@@ -1871,7 +1869,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned i
             }
             break;
         case 2:
-            sprintf (LocalString_au8, "%d", Param_u32);
+            sprintf ((char*)LocalString_au8, "%d", Param_u32);
             // strcpy (LocalString_au8,String_pu8);
             CI_LocalPrintf ("Send password -%s-\r\n", LocalString_au8);
             Ret_u32 = LA_OpenPGP_V20_Test_SendUserPW2 (LocalString_au8);
@@ -1884,7 +1882,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned i
             break;
 
         case 3:
-            sprintf (LocalString_au8, "%d", Param_u32);
+            sprintf ((char*)LocalString_au8, "%d", Param_u32);
             // sprintf (cBuffer,"%d",Param_u32);
             Ret_u32 = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20, 3, strlen ((char *) LocalString_au8), LocalString_au8);
             // Ret_u32 = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20,3,8,(unsigned char*)"12345678");
@@ -2065,7 +2063,7 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned i
 
             break;
         case 19:
-            sprintf (LocalString_au8, "%d", Param_u32);
+            sprintf ((char*)LocalString_au8, "%d", Param_u32);
             CI_LocalPrintf ("Reset user pw counter with password -%s-\r\n", LocalString_au8);
             Ret_u32 = LA_OpenPGP_V20_Test_ResetRetryCounter (LocalString_au8);
             break;

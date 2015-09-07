@@ -851,9 +851,9 @@ time_t now;
             time (&now);
             ctime_r (&now, (char *) Time_u8);
             CI_LocalPrintf ("Actual time       : %s", Time_u8);
-            ctime_r (&USB_Log_st.MSD_LastReadAccess_u32, (char *) Time_u8);
+            ctime_r ((time_t *)&USB_Log_st.MSD_LastReadAccess_u32, (char *) Time_u8);
             CI_LocalPrintf ("Last read access  : %s", Time_u8);
-            ctime_r (&USB_Log_st.MSD_LastWriteAccess_u32, (char *) Time_u8);
+            ctime_r ((time_t *)&USB_Log_st.MSD_LastWriteAccess_u32, (char *) Time_u8);
             CI_LocalPrintf ("Last write access : %s", Time_u8);
 
             CI_LocalPrintf ("\r\nCCID\r\n");

@@ -43,6 +43,7 @@
 #include "HiddenVolume.h"
 #include "OTP\\hotp.h"
 #include "password_safe.h"
+#include "DFU_test.h"
 
 typeStick20Configuration_st StickConfiguration_st;
 
@@ -981,7 +982,7 @@ u8 ReadPasswordSafeKey (u8 * data)
 
 *******************************************************************************/
 
-WriteUpdatePinHashToFlash (u8 * PIN_Hash_pu8)
+u8 WriteUpdatePinHashToFlash (u8 * PIN_Hash_pu8)
 {
     flashc_memcpy (AVR32_FLASHC_USER_PAGE + 210, PIN_Hash_pu8, 32, TRUE);
 
@@ -1234,9 +1235,9 @@ u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
 
 u8 StoreNewUpdatePinHashInFlash (u8 * Password_pu8, u32 PasswordLen_u32)
 {
-u8 output_au8[64];
-u8 UpdatePinSalt_u8[UPDATE_PIN_SALT_SIZE];
-u32 i;
+  u8 output_au8[64];
+  u8 UpdatePinSalt_u8[UPDATE_PIN_SALT_SIZE];
+  u32 i;
 
     if (UPDATE_PIN_MAX_SIZE <= PasswordLen_u32)
     {
@@ -1268,7 +1269,7 @@ u32 i;
     memset (output_au8, 0, AES_KEYSIZE_256_BIT);
     memcpy (output_au8, Password_pu8, PasswordLen_u32)
 #endif
-        WriteUpdatePinHashToFlash (output_au8);
+    WriteUpdatePinHashToFlash (output_au8);
 
     return (TRUE);
 }

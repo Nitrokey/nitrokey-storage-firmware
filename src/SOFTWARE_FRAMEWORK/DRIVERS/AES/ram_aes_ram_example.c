@@ -63,6 +63,7 @@
 #include "aes.h"
 #include "xxHash.h"
 #include "tools.h"
+#include "HighLevelFunctions/FlashStorage.h"
 
 /* AES */
 #define AVR32_AES_ADDRESS                  0xFFFD0000
@@ -1066,7 +1067,7 @@ void xxHashInitVector_v (unsigned int* InitVector_au32[4], unsigned int BlockNr)
 
     for (i = 1; i < 4; i++)
     {
-        InitVector_au32[i] = XXH_fast32 (XorKey_au8, AES_KEYSIZE_256_BIT, BlockNr + i);
+        InitVector_au32[i] = XXH_fast32 ((void*)XorKey_au8, AES_KEYSIZE_256_BIT, BlockNr + i);
     }
 }
 
@@ -1081,7 +1082,6 @@ void xxHashInitVector_v (unsigned int* InitVector_au32[4], unsigned int BlockNr)
 
 int AES_KeyEncryption (unsigned int nLength, unsigned char* cData, unsigned char* cKeyData, unsigned char cMode, unsigned int BlockNr_u32)
 {
-    int i;
     aes_config_t AesConf;       // AES config structure
     // int i;
     // ****************************************************************************

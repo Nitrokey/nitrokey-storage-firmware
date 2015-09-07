@@ -59,5 +59,7 @@ int LA_OpenPGP_V20_Test_ChangeAdminPin (unsigned char* pcOldPin, unsigned char* 
 u32 GetRandomNumber_u32 (u32 Size_u32, u8 * Data_pu8);
 
 u8 LA_RestartSmartcard_u8 (void);
+int LA_OpenPGP_V20_ResetCard (void);
+int LA_OpenPGP_V20_Test_ResetRetryCounter (unsigned char* pcPW);
 
 #endif /* CCID_OPENPGP_V20_H_ */

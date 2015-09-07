@@ -131,5 +131,6 @@ u8 PWS_DisableKey (void);
 u8 PWS_GetDecryptedPasswordSafeKey (u8 ** Key_pu8);
 u8 PWS_SendData (u8 Slot_u8, u8 Kind_u8);
 u8 PWS_CheckPasswordSafeKey_u8 (void);
+u32 BuildPasswordSafeKey_u32 (void);
 
 #endif /* PASSWORD_SAFE_H_ */

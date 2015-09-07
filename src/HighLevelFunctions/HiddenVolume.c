@@ -1116,7 +1116,7 @@ void pbkdf2 (u8 * out, const u8 * password, const u32 password_length, const u8 
     for (i = 0; i < num_iterations; i++)
     {
 
-        sha4_hmac (password, password_length, u, u_length, hmac_result, FALSE);
+        sha4_hmac ((unsigned char*)password, password_length, u, u_length, hmac_result, FALSE);
 
         memcpy (u, hmac_result, sizeof (u));
 

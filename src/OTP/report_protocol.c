@@ -47,6 +47,7 @@
 #include "report_protocol.h"
 #include "string.h"
 #include "time.h"
+#include "stdlib.h"
 
 #include "polarssl/timing.h"
 #include "CCID/USART/ISO7816_ADPU.h"
@@ -1341,7 +1342,7 @@ u64 counter;
         // u64 counter = getu64 (report+CMD_WTS_COUNTER_OFFSET);
         // u64 counter = atoi (report+CMD_WTS_COUNTER_OFFSET);
 
-        Counter_u32 = atoi (&report[CMD_WTS_COUNTER_OFFSET]);
+        Counter_u32 = atoi ((char *)&report[CMD_WTS_COUNTER_OFFSET]);
         counter = Counter_u32;
         {
 u8 text[20];
@@ -1992,6 +1993,7 @@ u8 cmd_user_authorize (u8 * report, u8 * output)
             return 1;
         }
     }
+    return 1;
 }
 
 

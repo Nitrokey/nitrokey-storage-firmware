@@ -39,6 +39,9 @@
 
 #include "OTP/report_protocol.h"
 #include "FlashStorage.h"
+#include "CCID\\USART\\ISO7816_USART.h"
+#include "CCID\\USART\\ISO7816_ADPU.h"
+#include "USB_CCID\\USB_CCID.h"
 
 #include "MatrixPassword.h"
 
@@ -765,14 +768,13 @@ u16 i;
 
 u8 MatrixTest1 (void)
 {
-u8 Ret_u8;
-u16 i;
-u16 n;
-u8 n1;
-u8 Foundcolumn_u8;
-u8 PasswordChar_u8;
-u8 PasswordLine_u8;
-u8 AddLine_u8;
+  u16 i;
+  u16 n;
+  u8 n1;
+  u8 Foundcolumn_u8;
+  u8 PasswordChar_u8;
+  u8 PasswordLine_u8;
+  u8 AddLine_u8;
 
 
     PasswordChar_u8 = 0;
@@ -864,10 +866,10 @@ u16 n;
 
 u8 ConvertMatrixDataToPassword (u8 * MatrixData_au8)
 {
-u8 i;
-u8 n;
-u8 x, y;
-u8 MatrixColumsUserPW_au8[MATRIX_PASSWORD_MAX_LEN];
+  u8 i;
+  u8 n;
+  u8 x, y;
+  u8 MatrixColumsUserPW_au8[MATRIX_PASSWORD_MAX_LEN];
 
     if (FALSE == PWM_PasswordMatrix_Filled_u8)
     {
@@ -876,7 +878,7 @@ u8 MatrixColumsUserPW_au8[MATRIX_PASSWORD_MAX_LEN];
 
     n = strlen ((char *) MatrixData_au8);
 
-    if ((MATRIX_PASSWORD_MAX_LEN - 1) <= n) // Boundary check
+    if (MATRIX_PASSWORD_MAX_LEN < n) // Boundary check
     {
         return (FALSE);
     }

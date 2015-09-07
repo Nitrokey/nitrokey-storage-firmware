@@ -513,8 +513,6 @@ extern U32 Check_Sd_mmc_mci_access_signal_on (void);
 
 void SD_WriteBlocksRandom (u32 Block_u32, u32 Count_u32, u8 CryptionFlag_u8)
 {
-u16 i;
-
     CI_TickLocalPrintf ("Build SD start block -");
 
     SD_GetRandomBlock (RandomBuffer_au8);
@@ -849,7 +847,7 @@ u32 Blockcount_u32;
 u64 min;
 u64 max;
 
-                sd_mmc_mci_read_capacity (SD_SLOT, (u32 *) & Blockcount_u32);
+                sd_mmc_mci_read_capacity (SD_SLOT, (U32 *) & Blockcount_u32);
                 CI_LocalPrintf ("SD high water mark\r\n");
 min = (u64) sd_MaxAccessedBlockReadMin_u32* (u64) 100 / (u64) Blockcount_u32;
 max = (u64) sd_MaxAccessedBlockReadMax_u32* (u64) 100 / (u64) Blockcount_u32;
@@ -865,7 +863,7 @@ max = (u64) sd_MaxAccessedBlockWriteMax_u32* (u64) 100 / (u64) Blockcount_u32;
             {
 u32 Blockcount_u32;
 
-                sd_mmc_mci_read_capacity (SD_SLOT, (u32 *) & Blockcount_u32);
+                sd_mmc_mci_read_capacity (SD_SLOT, (U32 *) & Blockcount_u32);
                 sd_MaxAccessedBlockWriteMin_u32 = 0;
                 sd_MaxAccessedBlockWriteMax_u32 = Blockcount_u32;
                 sd_MaxAccessedBlockReadMin_u32 = 0;

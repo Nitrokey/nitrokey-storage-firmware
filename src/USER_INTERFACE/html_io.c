@@ -295,7 +295,7 @@ void HID_ExcuteCmd (void)
                 break;
             }
 
-            if (TRUE == CheckUpdatePin (&HID_String_au8[1], strlen (&HID_String_au8[1])))
+            if (TRUE == CheckUpdatePin (&HID_String_au8[1], strlen ((char*)&HID_String_au8[1])))
             {
                 CI_TickLocalPrintf ("good bye\r\n");
                 DFU_EnableFirmwareUpdate ();
@@ -721,11 +721,11 @@ void HID_ExcuteCmd (void)
         case HTML_CMD_CHANGE_UPDATE_PIN:
             CI_TickLocalPrintf ("Get HTML_CMD_CHANGE_UPDATE_PIN\r\n");
 
-            Len = strlen (&HID_String_au8[1]);
+            Len = strlen ((char*)&HID_String_au8[1]);
 
             if (TRUE == CheckUpdatePin (&HID_String_au8[1], Len))
             {
-                Len = strlen (&HID_String_au8[1]);
+                Len = strlen ((char*)&HID_String_au8[1]);
                 if (TRUE == StoreNewUpdatePinHashInFlash (&HID_String_au8[16], Len))    // Start of new PW
                 {
                     CI_TickLocalPrintf ("Update PIN changed\r\n");
