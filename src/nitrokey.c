@@ -753,10 +753,9 @@ int main (void)
      /**/
         // Protect bootloader
 #ifdef STICK_20_A_MUSTER_PROD   //
-    if (0x2000 > flashc_get_bootloader_protected_size ())
-    {
-      flashc_set_bootloader_protected_size (0x2000);
-    }
+    flashc_set_bootloader_protected_size (0x2000);
+    flashc_activate_security_bit ();    // Debugging disabled, only chip erase works (bootloader is save) , AES storage keys and setup
+                                        // are erased
     flashc_lock_external_privileged_fetch (TRUE);     // Disable external instruction fetch
 #endif
 
