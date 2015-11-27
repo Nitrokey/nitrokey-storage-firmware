@@ -44,6 +44,10 @@
 #include "OTP\\hotp.h"
 #include "password_safe.h"
 #include "DFU_test.h"
+#include "CCID/USART/ISO7816_USART.h"
+#include "CCID/USART/ISO7816_ADPU.h"
+#include "CCID/USART/ISO7816_Prot_T1.h"
+#include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 
 typeStick20Configuration_st StickConfiguration_st;
 
@@ -402,25 +406,6 @@ cid_t* cid;
     {
         Status_st->FirmwareLocked_u8 = TRUE;
     }
-}
-
-/*******************************************************************************
-
-  GetStickStatusFromHID
-
-  Reviews
-  Date      Reviewer        Info
-  16.08.13  RB              First review
-
-*******************************************************************************/
-
-void GetStickStatusFromHID (typeStick20Configuration_st * Status_st)
-{
-    /*
-       HID_Stick20AccessStatus_st->MatrixPasswordUserActiv_u8 = FALSE; HID_Stick20AccessStatus_st->MatrixPasswordAdminActiv_u8 = FALSE;
-       HID_Stick20AccessStatus_st->ActivPasswordStatus_u8 = FALSE; HID_Stick20AccessStatus_st->VolumeStatus_u8 = FALSE;
-
-       sd_mmc_mci_read_capacity_0(&HID_Stick20AccessStatus_st->SD_BlockSize_u32); */
 }
 
 /*******************************************************************************
@@ -1237,7 +1222,6 @@ u8 StoreNewUpdatePinHashInFlash (u8 * Password_pu8, u32 PasswordLen_u32)
 {
   u8 output_au8[64];
   u8 UpdatePinSalt_u8[UPDATE_PIN_SALT_SIZE];
-  u32 i;
 
     if (UPDATE_PIN_MAX_SIZE <= PasswordLen_u32)
     {
@@ -1245,11 +1229,7 @@ u8 StoreNewUpdatePinHashInFlash (u8 * Password_pu8, u32 PasswordLen_u32)
     }
 
     // Generate new salt
-    for (i = 0; i < UPDATE_PIN_SALT_SIZE; i++)
-    {
-        UpdatePinSalt_u8[i] = (u8) (rand () % 256);
-    }
-
+    GetRandomNumber_u32 (UPDATE_PIN_SALT_SIZE,UpdatePinSalt_u8);
 
     WriteUpdatePinSaltToFlash (UpdatePinSalt_u8);
 

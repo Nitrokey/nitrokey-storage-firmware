@@ -539,6 +539,112 @@ void CCID_Test_task_init (void)
     xTaskCreate (CCID_Test_task, configTSK_CCID_TEST_NAME, configTSK_CCID_TEST_STACK_SIZE, NULL, configTSK_CCID_TEST_PRIORITY, NULL);
 }
 
+/*******************************************************************************
+
+  pm_bod33_get_level
+
+*******************************************************************************/
+
+unsigned long pm_bod33_get_level (void)
+{
+    volatile avr32_pm_t * pm;
+
+    pm = &AVR32_PM;
+    return (pm->bod33 & AVR32_PM_BOD33_LEVEL_MASK) >> AVR32_PM_BOD33_LEVEL_OFFSET;
+}
+
+/*******************************************************************************
+
+  pm_bod33_set_level
+
+*******************************************************************************/
+
+#define AVR32_PM_BOD33_LEVEL_306_VOLT    3
+
+void pm_bod33_set_level (int Level)
+{
+    volatile avr32_pm_t * pm;
+    u32 Value;
+
+    pm = &AVR32_PM;
+
+    Value  = pm->bod33;
+
+    Value &= ~AVR32_PM_BOD33_LEVEL_MASK;
+    Value |= Level & AVR32_PM_BOD33_LEVEL_MASK;
+
+// Write with disabling write protection
+    Value = 0x00FFFFFF & Value;
+    Value = 0x55000000 | Value;
+
+    pm->bod33 = Value;
+
+    Value = 0x00FFFFFF & Value;
+    Value = 0xAA000000 | Value;
+
+    pm->bod33 = Value;
+}
+
+/*******************************************************************************
+
+  pm_bod33_ResetEnable
+
+*******************************************************************************/
+
+void pm_bod33_ResetEnable (void)
+{
+    volatile avr32_pm_t * pm;
+    u32 Value;
+
+    pm = &AVR32_PM;
+
+    Value  = pm->bod33;
+    Value &= ~AVR32_PM_BOD33_CTRL_MASK;
+    Value |= 1 << AVR32_PM_BOD33_CTRL_OFFSET;
+
+// Write with disabling write protection
+    Value = 0x00FFFFFF & Value;
+    Value = 0x55000000 | Value;
+
+    pm->bod33 = Value;
+
+    Value = 0x00FFFFFF & Value;
+    Value = 0xAA000000 | Value;
+
+    pm->bod33 = Value;
+
+    Value  = pm->bod33;
+}
+
+/*******************************************************************************
+
+  pm_bod33_ResetDisable
+
+*******************************************************************************/
+
+void pm_bod33_ResetDisable (void)
+{
+    volatile avr32_pm_t * pm;
+    u32 Value;
+
+    pm = &AVR32_PM;
+
+    Value  = pm->bod33;
+    Value &= ~AVR32_PM_BOD33_CTRL_MASK;
+    Value |= 0 << AVR32_PM_BOD33_CTRL_OFFSET;
+
+// Write with disabling write protection
+    Value = 0x00FFFFFF & Value;
+    Value = 0x55000000 | Value;
+
+    pm->bod33 = Value;
+
+    Value = 0x00FFFFFF & Value;
+    Value = 0xAA000000 | Value;
+
+    pm->bod33 = Value;
+}
+
 
 
 /*******************************************************************************
@@ -598,9 +704,6 @@ int main (void)
     // Initialize USB clock.
     pcl_configure_usb_clock ();
 
-
-
-
     /*
        SmartCard_test (); return 42;
 
@@ -650,14 +753,20 @@ int main (void)
      /**/
         // Protect bootloader
 #ifdef STICK_20_A_MUSTER_PROD   //
-        flashc_set_bootloader_protected_size (0x2000);
-    flashc_lock_external_privileged_fetch (TRUE);   // Disable external instruction fetch
+    flashc_set_bootloader_protected_size (0x2000);
+    flashc_activate_security_bit ();    // Debugging disabled, only chip erase works (bootloader is save) , AES storage keys and setup
+                                        // are erased
+    flashc_lock_external_privileged_fetch (TRUE);     // Disable external instruction fetch
 #endif
 
     // DFU_FirmwareResetUserpage ();
 
     DFU_DisableFirmwareUpdate ();   // Stick always starts in application mode
 
+    // Set BOD33 detection reset to 3.06 Volt
+    pm_bod33_ResetDisable ();
+    pm_bod33_set_level (AVR32_PM_BOD33_LEVEL_306_VOLT);
+    pm_bod33_ResetEnable ();
 
     // ushell_task_init(pcl_freq_param.pba_f);
 
