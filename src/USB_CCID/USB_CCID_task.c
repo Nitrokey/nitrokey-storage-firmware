@@ -175,6 +175,7 @@ static void USB_CCID_GetDataFromUSB (void)
 {
     int i;
     int USB_Datalen_s32;
+
     // Bool cbw_error;
 
     Usb_reset_endpoint_fifo_access (EP_CCID_OUT);
@@ -211,11 +212,11 @@ static void USB_CCID_GetDataFromUSB (void)
 
     LED_RedOn ();
 
-    USB_Datalen_s32 = USB_CCID_data_st.CCID_datalen;
+//    USB_CCID_Datalen_s32 = USB_CCID_data_st.CCID_datalen;
 
     USB_to_CRD_DispatchUSBMessage_v (&USB_CCID_data_st);
 
-    memset (USB_CCID_data_st.USB_data,0,USB_Datalen_s32);
+//    memset (USB_CCID_data_st.USB_data,0,USB_Datalen_s32);
     LED_RedOff ();
 
     // Usb_ack_out_received_free(EP_CCID_OUT);
@@ -373,6 +374,12 @@ void USB_CCID_task (void* pvParameters)
             TIME_MEASURING_Start (TIME_MEASURING_TIME_CCID_USB_SEND);
 #endif
             USB_CCID_SendDataToUSB ();
+
+            USB_to_CRD_DispatchUSBMessage_v (&USB_CCID_data_st);
+
+// Clear buffer after transmission
+            memset (USB_CCID_data_st.USB_data,0,CCID_MAX_XFER_LENGTH);
+
 #ifdef TIME_MEASURING_ENABLE
             TIME_MEASURING_Stop (TIME_MEASURING_TIME_CCID_USB_SEND);
 #endif

@@ -298,7 +298,7 @@
   Usb_unicode('t'),\
   Usb_unicode('r'),\
   Usb_unicode('o'),\
-  Usb_unicode('K'),\
+  Usb_unicode('k'),\
   Usb_unicode('e'),\
   Usb_unicode('y'),\
 }
@@ -315,7 +315,7 @@
   Usb_unicode('t'),\
   Usb_unicode('r'),\
   Usb_unicode('o'),\
-  Usb_unicode('K'),\
+  Usb_unicode('k'),\
   Usb_unicode('e'),\
   Usb_unicode('y'),\
   Usb_unicode(' '),\
