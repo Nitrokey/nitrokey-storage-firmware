@@ -355,7 +355,7 @@ const S_usb_user_configuration_descriptor usb_conf_desc_hs = {
      0xA1, 0xC5, 0x01, 0x00,    // dwMaxDataRate: 116129 bps (0x0001C5A1)
      0x00,  // bNumDataRatesSupported => no manual setting
 
-     0x30, 0x00, 0x00, 0x00,    /* dwMaxIFSD: 48 */
+     0x05, 0x01, 0x00, 0x00,    /* dwMaxIFSD: 261 */
      0x00, 0x00, 0x00, 0x00,    /* dwSynchProtocols */
      0x00, 0x00, 0x00, 0x00,    /* dwMechanical: no special characteristics */
 
@@ -370,7 +370,8 @@ const S_usb_user_configuration_descriptor usb_conf_desc_hs = {
      // 00010000h TPDU level exchanges with CCID
 
      // 0x24,0x00,0x00,0x00, /* dwMaxCCIDMessageLength : Maximun block size + header*/
-     0x0F, 0x01, 0x00, 0x00,    /* dwMaxCCIDMessageLength : Maximun block size + header */
+//     0x30,0x00,0x00,0x00, /* dwMaxCCIDMessageLength : Maximun block size + header*/
+     0x0F, 0x01, 0x00, 0x00,    /* dwMaxCCIDMessageLength : 271 Maximun block size + header */
      /* 261 + 10 */
 
      0x00,  /* bClassGetResponse */

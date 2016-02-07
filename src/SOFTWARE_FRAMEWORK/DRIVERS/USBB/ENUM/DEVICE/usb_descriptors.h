@@ -217,25 +217,25 @@
 #define EP_SIZE_3_FS            EP_OUT_LENGTH_3_FS
 #define EP_OUT_LENGTH_3_HS      16  // 64
 #define EP_SIZE_3_HS            EP_OUT_LENGTH_3_HS
-#define EP_INTERVAL_3           0x10    // 0x18 //! ???? Interrupt polling interval from host
+#define EP_INTERVAL_3           0x10    // Interrupt polling interval from host
 
             // USB Endpoint 4 descriptor - CCID OUT
 #define ENDPOINT_NB_4           EP_CCID_OUT
 #define EP_ATTRIBUTES_4         TYPE_BULK
 #define EP_OUT_LENGTH_4_FS      64
 #define EP_SIZE_4_FS            EP_OUT_LENGTH_4_FS
-#define EP_OUT_LENGTH_4_HS      64  // 512
+#define EP_OUT_LENGTH_4_HS      64
 #define EP_SIZE_4_HS            EP_OUT_LENGTH_4_HS
-#define EP_INTERVAL_4           0x00    // ! ???? Interrupt polling interval from host
+#define EP_INTERVAL_4           0x00    // Interrupt polling interval from host
 
             // USB Endpoint 5 descriptor - CCID IN
 #define ENDPOINT_NB_5           (EP_CCID_IN | MSK_EP_DIR)
 #define EP_ATTRIBUTES_5         TYPE_BULK
 #define EP_OUT_LENGTH_5_FS      64
 #define EP_SIZE_5_FS            EP_OUT_LENGTH_5_FS
-#define EP_OUT_LENGTH_5_HS      64  // 512
+#define EP_OUT_LENGTH_5_HS      64
 #define EP_SIZE_5_HS            EP_OUT_LENGTH_5_HS
-#define EP_INTERVAL_5           0x00    // ! ???? Interrupt polling interval from host
+#define EP_INTERVAL_5           0x00    // Interrupt polling interval from host
 
 #endif // USB_CCID
 

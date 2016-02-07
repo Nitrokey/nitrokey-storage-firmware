@@ -175,10 +175,25 @@ static void USB_CCID_GetDataFromUSB (void)
 {
     int i;
     int USB_Datalen_s32;
+    void* ptrData;
 
-    // Bool cbw_error;
+//    Usb_reset_endpoint_fifo_access (EP_CCID_OUT);
 
-    Usb_reset_endpoint_fifo_access (EP_CCID_OUT);
+
+    USB_CCID_data_st.CCID_datalen = 0;
+
+    USB_Datalen_s32 = Usb_byte_count (EP_CCID_OUT);
+    if (CCID_MAX_XFER_LENGTH <= USB_Datalen_s32 + USB_CCID_data_st.CCID_datalen)    // Check for oversize
+    {
+        CI_LocalPrintf ("*** CCID buffer to small %d ***\n", CCID_MAX_XFER_LENGTH);
+        Usb_ack_out_received_free (EP_CCID_OUT);
+        return;
+    }
+
+    if (Is_usb_overflow (EP_CCID_OUT))
+    {
+      CI_TickLocalPrintf ("CCID USB EP_CCID_OUT buffer overflow\n");
+    }
 
     // Get all data from USB
     USB_CCID_data_st.CCID_datalen = 0;
@@ -207,9 +222,10 @@ static void USB_CCID_GetDataFromUSB (void)
         }
 
         Usb_ack_out_received_free (EP_CCID_OUT);
-        DelayMs (1);
-    }
+//        DelayMs (1);
 
+    }
+/**/
     LED_RedOn ();
 
 //    USB_CCID_Datalen_s32 = USB_CCID_data_st.CCID_datalen;
@@ -324,6 +340,10 @@ void USB_CCID_task (void* pvParameters)
     portTickType xLastWakeTime;
 
     ISO7816_InitSC ();
+
+//    Usb_enable_stall_handshake (EP_CCID_OUT);
+//    Usb_ack_setup_received_free ();
+
     /*
        CI_LocalPrintf ("USB_CCID : USB CCID raise IN ready - %d\n",xTaskGetTickCount()); */
     // Start CCID interface
