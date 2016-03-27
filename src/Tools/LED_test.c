@@ -370,6 +370,11 @@ void LED_Manager10ms_v (void)
         }
     }
 
+    if (0 != ISO7816_GetLockCounter())
+    {
+      StateRedLedFlashing_u8 = LED_ON;
+    }
+
     // Flash controller
     FlashCounter_u8++;
     if (LED_ON == StateRedLedFlashing_u8)

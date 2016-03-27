@@ -480,11 +480,11 @@ void usb_user_endpoint_init (U8 conf_nb)
         (void) Usb_configure_endpoint (EP_MS_OUT, EP_ATTRIBUTES_2, DIRECTION_OUT, EP_SIZE_2_HS, DOUBLE_BANK);
 #endif // USB_MSD
 #ifdef USB_CCID
-        (void) Usb_configure_endpoint (EP_CCID_INT, EP_ATTRIBUTES_3, DIRECTION_IN, EP_SIZE_3_HS, SINGLE_BANK);
-
-//     (void) Usb_configure_endpoint (EP_CCID_OUT, EP_ATTRIBUTES_4, DIRECTION_OUT, EP_SIZE_4_HS, SINGLE_BANK);
+// Warning USB endpoint memory had to be at the correct boundary
+        //  (void) Usb_configure_endpoint (EP_CCID_OUT, EP_ATTRIBUTES_4, DIRECTION_OUT, EP_SIZE_4_HS, SINGLE_BANK);
          (void) Usb_configure_endpoint (EP_CCID_OUT, EP_ATTRIBUTES_4, DIRECTION_OUT, 128, SINGLE_BANK); // To avoid overflow - not 64
 
+        (void) Usb_configure_endpoint (EP_CCID_INT, EP_ATTRIBUTES_3, DIRECTION_IN, EP_SIZE_3_HS, SINGLE_BANK);
         (void) Usb_configure_endpoint (EP_CCID_IN, EP_ATTRIBUTES_5, DIRECTION_IN, EP_SIZE_5_HS, SINGLE_BANK);
 #endif // USB_CCID
 #ifdef USB_KB

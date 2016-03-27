@@ -207,8 +207,8 @@ u8 WriteStickConfigurationToUserPage (void)
     // Set actual firmware version
     StickConfiguration_st.VersionInfo_au8[0] = VERSION_MAJOR;
     StickConfiguration_st.VersionInfo_au8[1] = VERSION_MINOR;
-    StickConfiguration_st.VersionInfo_au8[2] = 0;   // Build number not used
-    StickConfiguration_st.VersionInfo_au8[3] = 0;   // Build number not used
+    StickConfiguration_st.VersionInfo_au8[2] = 0;
+    StickConfiguration_st.VersionInfo_au8[3] = INTERNAL_VERSION_NR;   // Internal version nr
 
     flashc_memcpy (AVR32_FLASHC_USER_PAGE + 72, &StickConfiguration_st, 30, TRUE);
     return (TRUE);
@@ -245,7 +245,7 @@ u32 ActiveSmartCardID_u32;
     StickConfiguration_st.VersionInfo_au8[0] = VERSION_MAJOR;
     StickConfiguration_st.VersionInfo_au8[1] = VERSION_MINOR;
     StickConfiguration_st.VersionInfo_au8[2] = 0;   // Build number not used
-    StickConfiguration_st.VersionInfo_au8[3] = 0;   // Build number not used
+    StickConfiguration_st.VersionInfo_au8[3] = INTERNAL_VERSION_NR;   // Internal version nr
 
     // Restore dynamic data
     StickConfiguration_st.UserPwRetryCount = UserPwRetryCount;
@@ -283,7 +283,7 @@ u8 InitStickConfigurationToUserPage_u8 (void)
     StickConfiguration_st.VersionInfo_au8[0] = VERSION_MAJOR;
     StickConfiguration_st.VersionInfo_au8[1] = VERSION_MINOR;
     StickConfiguration_st.VersionInfo_au8[2] = 0;   // Build number not used
-    StickConfiguration_st.VersionInfo_au8[3] = 0;   // Build number not used
+    StickConfiguration_st.VersionInfo_au8[3] = INTERNAL_VERSION_NR;   // Internal version nr
     StickConfiguration_st.NewSDCardFound_u8 = 0;
     StickConfiguration_st.SDFillWithRandomChars_u8 = FALSE;
     StickConfiguration_st.VolumeActiceFlag_u8 = 0;
@@ -1180,10 +1180,10 @@ u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
     memcpy (output_au8, Password_pu8, PasswordLen_u32)
         // use the base key as the key
 #endif
-        ReadUpdatePinHashFromFlash (UpdatePinHash_u8);
+    ReadUpdatePinHashFromFlash (UpdatePinHash_u8);
 
 #ifdef LOCAL_DEBUG
-    CI_LocalPrintf ("Hashed PIN     : ");
+    CI_LocalPrintf ("Hashed PIN   : ");
     HexPrint (AES_KEYSIZE_256_BIT, UpdatePinHash_u8);
     CI_LocalPrintf ("\r\n");
 #endif
@@ -1191,7 +1191,7 @@ u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
     if (0 != memcmp (UpdatePinHash_u8, output_au8, AES_KEYSIZE_256_BIT))
     {
 #ifdef LOCAL_DEBUG
-        CI_LocalPrintf ("Hashed PIN PW   : ");
+        CI_LocalPrintf ("Hashed PIN PW : ");
         HexPrint (AES_KEYSIZE_256_BIT, output_au8);
         CI_LocalPrintf ("\r\n");
         CI_LocalPrintf ("Wrong PIN\r\n");
@@ -1202,6 +1202,7 @@ u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
 #ifdef LOCAL_DEBUG
     CI_LocalPrintf ("PIN OK\r\n");
 #endif
+    DelayMs (100);
     return (TRUE);
 }
 

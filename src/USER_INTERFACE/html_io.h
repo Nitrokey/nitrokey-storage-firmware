@@ -78,18 +78,20 @@
 /* Look for 4 byte alignment of 32 bit values */
 typedef struct
 {
-    u8 FirmwareVersion_au8[4];  // 4 byte // 4
-    u32 CPU_CardID_u32;         // 4 byte // 8
-    u32 SmartCardID_u32;        // 4 byte // 12
-    u32 SD_CardID_u32;          // 4 byte // 16
-    u8 SC_UserPwRetryCount;     // User password retry count 1 byte // 17
-    u8 SC_AdminPwRetryCount;    // Admin password retry count 1 byte // 18
-    u8 SD_Card_ManufacturingYear_u8;    // 1 byte // 19
-    u8 SD_Card_ManufacturingMonth_u8;   // 1 byte // 20
-    u16 SD_Card_OEM_u16;        // 2 byte // 22
-    u16 SD_WriteSpeed_u16;      // in kbyte / sec 2 byte // 24
-    u8 SD_Card_Manufacturer_u8; // 1 byte // 25
-} typeStick20ProductionInfos_st;    // Sum 25 byte (Max 25 Byte) // not packed
+    u8  FirmwareVersion_au8[2];  // 2 byte // 2
+    u8  FirmwareVersionInternal_u8;      // 1 byte // 3
+    u8  SD_Card_Size_u8;         // 1 byte // 4  in GB
+    u32 CPU_CardID_u32;          // 4 byte // 8
+    u32 SmartCardID_u32;         // 4 byte // 12
+    u32 SD_CardID_u32;           // 4 byte // 16
+    u8  SC_UserPwRetryCount;     // User password retry count 1 byte // 17
+    u8  SC_AdminPwRetryCount;    // Admin password retry count 1 byte // 18
+    u8  SD_Card_ManufacturingYear_u8;    // 1 byte // 19
+    u8  SD_Card_ManufacturingMonth_u8;   // 1 byte // 20
+    u16 SD_Card_OEM_u16;         // 2 byte // 22
+    u16 SD_WriteSpeed_u16;       // in kbyte / sec 2 byte // 24
+    u8  SD_Card_Manufacturer_u8; // 1 byte // 25
+} typeStick20ProductionInfos_st; // Sum 25 byte (Max 25 Byte) // not packed
 
 extern typeStick20ProductionInfos_st Stick20ProductionInfos_st;
 

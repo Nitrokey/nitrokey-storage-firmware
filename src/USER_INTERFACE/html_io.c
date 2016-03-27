@@ -288,14 +288,14 @@ void HID_ExcuteCmd (void)
 
         case HTML_CMD_ENABLE_FIRMWARE_UPDATE:
             CI_TickLocalPrintf ("Firmware update - ");
-/*
+
             if (TRUE == flashc_is_security_bit_active ())
             {
-                CI_TickLocalPrintf ("Security bit is active. Update not enabled\r\n");
+                CI_TickLocalPrintf ("Security bit is active. No Update\r\n");
                 UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_SECURITY_BIT_ACTIVE, 0);
                 break;
             }
-*/
+
             if (TRUE == CheckUpdatePin (&HID_String_au8[1], strlen ((char*)&HID_String_au8[1])))
             {
                 CI_TickLocalPrintf ("good bye\r\n");
@@ -841,14 +841,14 @@ volatile u32* id_data = (u32 *) 0x80800204; // Place of 120 bit CPU ID
 u32 i;
 u32 CPU_ID_u32;
 cid_t* cid;
+u32 Blockcount_u32;
 
     // Clear data field
     memset ((void *) Infos_st, 0, sizeof (Infos_st));
 
-    Infos_st->FirmwareVersion_au8[0] = VERSION_MAJOR;
-    Infos_st->FirmwareVersion_au8[1] = VERSION_MINOR;
-    Infos_st->FirmwareVersion_au8[2] = 0;   // Build number not used
-    Infos_st->FirmwareVersion_au8[3] = 0;   // Build number not used
+    Infos_st->FirmwareVersion_au8[0]     = VERSION_MAJOR;
+    Infos_st->FirmwareVersion_au8[1]     = VERSION_MINOR;
+    Infos_st->FirmwareVersionInternal_u8 = INTERNAL_VERSION_NR;
 
     // Get smartcard infos
     GetSmartCardStatus (&SC_Status_st);
@@ -879,6 +879,10 @@ cid_t* cid;
     }
     Infos_st->CPU_CardID_u32 = CPU_ID_u32;
 
+    // Init SD - read capacity
+    sd_mmc_mci_read_capacity (SD_SLOT, (unsigned long int *) &Blockcount_u32);
+
+    Infos_st->SD_Card_Size_u8 = Blockcount_u32 / 2 / 1024 / 1024 + 1;   // in GB
 
     // Save smartcard infos
     Infos_st->SC_UserPwRetryCount = SC_Status_st.UserPwRetryCount;
@@ -896,6 +900,7 @@ cid_t* cid;
 
     // Get SD card speed
     Infos_st->SD_WriteSpeed_u16 = SD_SpeedTest ();
+
 }
 
 /*******************************************************************************

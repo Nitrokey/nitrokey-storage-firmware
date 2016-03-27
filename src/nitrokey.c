@@ -750,18 +750,19 @@ int main (void)
     USB_CCID_task_init ();
 #endif
 
+    DFU_DisableFirmwareUpdate ();   // Stick always starts in application mode
+
      /**/
         // Protect bootloader
 #ifdef STICK_20_A_MUSTER_PROD   //
-    flashc_set_bootloader_protected_size (0x2000);
-    flashc_activate_security_bit ();    // Debugging disabled, only chip erase works (bootloader is save) , AES storage keys and setup
+        flashc_set_bootloader_protected_size (0x2000);
+//        flashc_activate_security_bit ();    // Debugging disabled, only chip erase works (bootloader is save) , AES storage keys and setup
                                         // are erased
-    flashc_lock_external_privileged_fetch (TRUE);     // Disable external instruction fetch
+        flashc_lock_external_privileged_fetch (TRUE);     // Disable external instruction fetch
 #endif
 
     // DFU_FirmwareResetUserpage ();
 
-    DFU_DisableFirmwareUpdate ();   // Stick always starts in application mode
 
     // Set BOD33 detection reset to 3.06 Volt
     pm_bod33_ResetDisable ();

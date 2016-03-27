@@ -84,7 +84,7 @@
 #define MSD_FS_PID                            0x2309    // For debugging
 
 #define CCID_HS_PID                           0x230A
-#define CCID_KB_HS_PID                        0x4108    // Stick 1.4 // 0x230A // CCID + KB interface
+#define CCID_KB_HS_PID                        0x4109    // Stick 1.4 // 0x230A // CCID + KB interface
 
 #define MSD_CCID_HS_PID                       0x220D
 #define MSD_CCID_FS_PID                       0x220D    // For debugging
