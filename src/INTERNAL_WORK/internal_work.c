@@ -197,7 +197,7 @@ void IW_task (void* pvParameters)
             MSD_AccessManager100ms ();  // Check MSD access
         }
 
-        LED_Manager10ms_v ();   // Call LED manager every 10 ms
+//        LED_Manager10ms_v ();   // Call LED manager every 10 ms
 
 #ifdef TIME_MEASURING_ENABLE
         TIME_MEASURING_Stop (TIME_MEASURING_TIMER_IW_10MS);

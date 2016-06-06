@@ -288,14 +288,14 @@ void HID_ExcuteCmd (void)
 
         case HTML_CMD_ENABLE_FIRMWARE_UPDATE:
             CI_TickLocalPrintf ("Firmware update - ");
-
+/*
             if (TRUE == flashc_is_security_bit_active ())
             {
                 CI_TickLocalPrintf ("Security bit is active. No Update\r\n");
                 UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_SECURITY_BIT_ACTIVE, 0);
                 break;
             }
-
+*/
             if (TRUE == CheckUpdatePin (&HID_String_au8[1], strlen ((char*)&HID_String_au8[1])))
             {
                 CI_TickLocalPrintf ("good bye\r\n");
@@ -318,10 +318,10 @@ void HID_ExcuteCmd (void)
                 UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_BUSY_PROGRESSBAR, 0);
 
                 // Disable all SD card access via USB
-                SetSdUncryptedCardEnableState (FALSE);  // look for >> sd_mmc_mci_test_unit_only_local_access = hard disabel
-                SetSdEncryptedCardEnableState (FALSE);
-                SetSdEncryptedHiddenState (FALSE);
-                vTaskDelay (3000);
+//                SetSdUncryptedCardEnableState (FALSE);  // look for >> sd_mmc_mci_test_unit_only_local_access = hard disabel
+//                SetSdEncryptedCardEnableState (FALSE);
+//                SetSdEncryptedHiddenState (FALSE);
+//                vTaskDelay (3000);
 
                 AES_SetNewStorageKey ((u8 *) AES_DummyKey_au8); // Set dummy key
 
@@ -333,7 +333,7 @@ void HID_ExcuteCmd (void)
                 SetSdCardFilledWithRandomsToFlash ();
 
                 // Enable uncrypted SD card access via USB
-                SetSdUncryptedCardEnableState (TRUE);
+//                SetSdUncryptedCardEnableState (TRUE);
                 // SetSdUncryptedCardReadWriteEnableState (READ_WRITE_ACTIVE);
 
                 UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_BUSY_PROGRESSBAR, 100);

@@ -337,6 +337,7 @@ void USB_CCID_task_init (void)
 void USB_CCID_task (void* pvParameters)
 {
     unsigned char Startup_b = TRUE;
+    unsigned char Counter;
     portTickType xLastWakeTime;
 
     ISO7816_InitSC ();
@@ -364,10 +365,18 @@ void USB_CCID_task (void* pvParameters)
 
 
     xLastWakeTime = xTaskGetTickCount ();
+    Counter = 0;
 
     while (TRUE)
     {
         vTaskDelayUntil (&xLastWakeTime, configTSK_USB_CCID_PERIOD);
+
+        Counter++;
+        if (10 < Counter)
+        {
+          LED_Manager10ms_v ();   // Call LED manager every 10 ms
+          Counter = 0;
+        }
 
         // First, check the device enumeration state
         if (!Is_device_enumerated ())
