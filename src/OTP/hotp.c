@@ -1055,11 +1055,11 @@ u32 dummy_u32;
 
 void erase_counter (u8 slot)
 {
-    LED_GreenOff ();
+    LED_GreenOn ();
 
     flashc_erase_page (hotp_slot_counters[slot], TRUE); // clear hole page
 
-    LED_GreenOn ();
+    LED_GreenOff ();
 
 }
 
