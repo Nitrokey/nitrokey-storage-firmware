@@ -1191,7 +1191,7 @@ u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
     if (0 != memcmp (UpdatePinHash_u8, output_au8, AES_KEYSIZE_256_BIT))
     {
 #ifdef LOCAL_DEBUG
-        CI_LocalPrintf ("Hashed PIN PW : ");
+        CI_LocalPrintf ("Hashed PIN PW: ");
         HexPrint (AES_KEYSIZE_256_BIT, output_au8);
         CI_LocalPrintf ("\r\n");
         CI_LocalPrintf ("Wrong PIN\r\n");
@@ -1251,6 +1251,12 @@ u8 StoreNewUpdatePinHashInFlash (u8 * Password_pu8, u32 PasswordLen_u32)
     memcpy (output_au8, Password_pu8, PasswordLen_u32)
 #endif
     WriteUpdatePinHashToFlash (output_au8);
+
+#ifdef LOCAL_DEBUG
+    CI_LocalPrintf ("Hashed PIN   : ");
+    HexPrint (AES_KEYSIZE_256_BIT, output_au8);
+    CI_LocalPrintf ("\r\n");
+#endif
 
     return (TRUE);
 }

@@ -299,9 +299,10 @@ void HID_ExcuteCmd (void)
             if (TRUE == CheckUpdatePin (&HID_String_au8[1], strlen ((char*)&HID_String_au8[1])))
             {
                 CI_TickLocalPrintf ("good bye\r\n");
+                UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
+                DelayMs (500);        // Wait to send answer to host
                 DFU_EnableFirmwareUpdate ();
                 DFU_ResetCPU ();
-                UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
             }
             else
             {
