@@ -385,9 +385,15 @@ Bool scsi_decode_command (void)
 
     if (TRUE == sd_mmc_mci_test_unit_only_local_access)
     {
-        CI_StringOut ("SCSI: no external access\r\n");
-        sbc_lun_status_is_not_present ();
-        return (TRUE);
+      switch (g_scsi_command[0])
+      {
+        case SBC_CMD_READ_10:       // 0x28 - Mandatory.
+        case SBC_CMD_WRITE_10:      // 0x2A - Optional.
+        case SBC_CMD_VERIFY_10:     // 0x2F - Optional.
+          CI_StringOut ("SCSI: no external access\r\n");
+          sbc_lun_status_is_not_present ();
+          return (FALSE);
+      }
     }
 
     // Log LUN activity
