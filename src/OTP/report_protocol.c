@@ -54,6 +54,7 @@
 #include "CCID/USART/ISO7816_Prot_T1.h"
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 #include "USB_CCID/USB_CCID.h"
+#include "Tools/DFU_test.h"
 
 #include "BUFFERED_SIO.h"
 #include "Interpreter.h"
@@ -849,6 +850,11 @@ u8 text[10];
                 CI_StringOut ("Get CMD_FACTORY_RESET\r\n");
                 cmd_getFactoryReset (report, output);
                 break;
+            case CMD_RESET_STICK :
+                CI_StringOut ("Get CMD_RESET_STICK\r\n");
+                cmd_getResetStick (report, output);
+                break;
+
 
             default:
                 if ((STICK20_CMD_START_VALUE > cmd_type) || (STICK20_CMD_END_VALUE < cmd_type))
@@ -2604,6 +2610,41 @@ u32 Ret_u32;
     EraseLocalFlashKeyValues_u32 ();    // Factory reset local flash
 
     InitUpdatePinHashInFlash ();
+
+    return (TRUE);
+}
+
+/*******************************************************************************
+
+  cmd_getResetStick
+
+  Changes
+  Date      Reviewer        Info
+  13.06.16  RB              Creation of function
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 cmd_getResetStick (u8 * report, u8 * output)
+{
+    u8 user_password[26];
+    u32 Ret_u32;
+
+    memset (user_password, 0, 26);
+    memcpy (user_password, report + 1, 25);
+
+    Ret_u32 = LA_OpenPGP_V20_Test_SendUserPW2 ((unsigned char *) user_password);
+    if (TRUE != Ret_u32)
+    {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_PASSWORD;
+        return (FALSE); // wrong card password
+    }
+
+    DelayMs (500);
+
+    DFU_ResetCPU ();
 
     return (TRUE);
 }

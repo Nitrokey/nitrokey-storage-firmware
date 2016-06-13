@@ -72,6 +72,7 @@
 #define CMD_PW_SAFE_INIT_KEY              0x68
 #define CMD_PW_SAFE_SEND_DATA             0x69
 #define CMD_SD_CARD_HIGH_WATERMARK        0x70
+#define CMD_RESET_STICK                   0x71
 
 #define STICK20_CMD_START_VALUE                         0x20
 #define STICK20_CMD_END_VALUE                           0x60
@@ -321,6 +322,7 @@ u8 cmd_set_time (u8 * report, u8 * output);
 u8 cmd_test_counter (u8 * report, u8 * output);
 u8 cmd_test_time (u8 * report, u8 * output);
 u8 cmd_getFactoryReset (u8 * report, u8 * output);
+u8 cmd_getResetStick (u8 * report, u8 * output);
 
 u8 cmd_getPasswordCount (u8 * report, u8 * output);
 u8 cmd_getPasswordSafeStatus (u8 * report, u8 * output);

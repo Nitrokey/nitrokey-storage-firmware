@@ -36,6 +36,7 @@
 #include "CCID/USART/ISO7816_Prot_T1.h"
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 #include "USB_CCID/USB_CCID.h"
+#include "Tools/DFU_test.h"
 
 /*******************************************************************************
 
@@ -2097,6 +2098,11 @@ void IBN_SC_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned i
     unsigned char cSec;
             LA_OpenPGP_V20_Test_GetAID (&cMain, &cSec);
         }
+            break;
+
+        case 98:
+            DelayMs (500);
+            DFU_ResetCPU ();
             break;
 
         case 99:
