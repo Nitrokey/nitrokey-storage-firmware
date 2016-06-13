@@ -426,13 +426,22 @@ void HID_ExcuteCmd (void)
 
         case HTML_CMD_GENERATE_NEW_KEYS:
         {
-    u8 CmdOk_u8 = TRUE;
+            u8 CmdOk_u8 = TRUE;
+            u8 SdCardFilledWithRandoms_u8;
+            u8 StickKeysNotInitiated_u8;
+
+
+            // Save old state
+            SdCardFilledWithRandoms_u8 = StickConfiguration_st.SDFillWithRandomChars_u8;
+            StickKeysNotInitiated_u8   = StickConfiguration_st.StickKeysNotInitiated_u8;
+
             CI_TickLocalPrintf ("Generate new keys\r\n");
             if (TRUE == BuildStorageKeys_u32 ((u8 *) & HID_String_au8[1]))
             {
                 SetSdEncryptedCardEnableState (FALSE);
                 SetSdEncryptedHiddenState (FALSE);
                 memset (StorageKey_pu8, 0, 32);
+
                 AES_SetNewStorageKey ((u8 *) AES_DummyKey_au8); // Set dummy key
             }
             else
@@ -440,16 +449,31 @@ void HID_ExcuteCmd (void)
                 CmdOk_u8 = FALSE;
             }
 
-            CI_TickLocalPrintf ("Generate new keys for hidden volume slots\r\n");
-            if (FALSE == InitHiddenSlots ())
+            if (TRUE == SdCardFilledWithRandoms_u8)     // Restore old state
             {
-                CmdOk_u8 = FALSE;
+              SetSdCardFilledWithRandomsToFlash ();
+            }
+            if (TRUE == StickKeysNotInitiated_u8)     // Restore old state
+            {
+              ClearStickKeysNotInitatedToFlash ();
             }
 
-            CI_TickLocalPrintf ("Generate new keys for password safe store\r\n");
-            if (FALSE == BuildPasswordSafeKey_u32 ())
+            if (TRUE == CmdOk_u8)
             {
-                CmdOk_u8 = FALSE;
+              CI_TickLocalPrintf ("Generate new keys for hidden volume slots\r\n");
+              if (FALSE == InitHiddenSlots ())
+              {
+                  CmdOk_u8 = FALSE;
+              }
+            }
+
+            if (TRUE == CmdOk_u8)
+            {
+              CI_TickLocalPrintf ("Generate new keys for password safe store\r\n");
+              if (FALSE == BuildPasswordSafeKey_u32 ())
+              {
+                  CmdOk_u8 = FALSE;
+              }
             }
 
             if (TRUE == CmdOk_u8)
