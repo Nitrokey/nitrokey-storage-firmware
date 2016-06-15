@@ -240,10 +240,13 @@ void HexPrint (int nNumberChars, unsigned char* sData)
     int i;
     unsigned char c;
 
+    DelayMs (10);
+
     for (i = 0; i < nNumberChars; i++)
     {
         c = sData[i];
         CI_LocalPrintf ("%02x ", c);
+        DelayMs (1);
     }
 }
 

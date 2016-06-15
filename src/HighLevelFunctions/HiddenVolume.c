@@ -52,10 +52,11 @@
 
 *******************************************************************************/
 
-// #define LOCAL_DEBUG
+//#define LOCAL_DEBUG
 
 // #define TEST_PBKDF2 // Check test vectors for PBKDF2, last test fails: password is over 500 byte long
-#define DEBUG_KEYS  //
+//#define DEBUG_KEYS  //
+//#define DEBUG_SLOTDATA
 
 #ifdef LOCAL_DEBUG
 #else
@@ -85,6 +86,8 @@
 
 *******************************************************************************/
 extern U32 gSdEndOfCard_u32;
+extern int sd_mmc_mci_test_unit_only_local_access;
+
 void SetHiddenVolumeSizes_u32 (U32 StartBlock_u32, U32 EndBlock_u32);
 
 /*******************************************************************************
@@ -144,6 +147,83 @@ u8 HV_PrintSlotData_u8 (u8 SlotNr_u8, HiddenVolumeKeySlot_tst * SlotData_st)
 
 /*******************************************************************************
 
+  HV_PrintDecryptedHiddenVolumeSlotsData_u8
+
+  Changes
+  Date      Reviewer        Info
+  15.06.16  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 HV_PrintDecryptedHiddenVolumeSlotsData_u8 (void)
+{
+#ifdef LOCAL_DEBUG
+  u8 i;
+  CI_LocalPrintf ("DecryptedHiddenVolumeSlotsData_au8\r\n");
+
+  CI_LocalPrintf ("HVS key : ");
+  HexPrint (AES_KEYSIZE_256_BIT, DecryptedHiddenVolumeSlotsKey_au8);
+  CI_LocalPrintf ("\r\n");
+
+  CI_LocalPrintf ("Salt    : ");
+  HexPrint (HV_SALT_SIZE, &DecryptedHiddenVolumeSlotsData_au8[0]);
+  CI_LocalPrintf ("\r\n");
+
+  for (i=0;i<HV_SLOT_COUNT;i++)
+  {
+    CI_LocalPrintf ("Slot %d : ",i);
+    HexPrint (HV_SLOT_SIZE, &DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE+i*HV_SLOT_SIZE]);
+    CI_LocalPrintf ("\r\n");
+  }
+#endif
+
+    return (TRUE);
+}
+
+
+/*******************************************************************************
+
+  HV_PrintEncryptedHiddenVolumeSlotsData_u8
+
+  Changes
+  Date      Reviewer        Info
+  15.06.16  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 HV_PrintEncryptedHiddenVolumeSlotsData_u8 (void)
+{
+#ifdef LOCAL_DEBUG
+  u8 i;
+  CI_LocalPrintf ("EncryptedHiddenVolumeSlotsData_au8\r\n");
+
+  CI_LocalPrintf ("HVS key : ");
+  HexPrint (AES_KEYSIZE_256_BIT, DecryptedHiddenVolumeSlotsKey_au8);
+  CI_LocalPrintf ("\r\n");
+
+  CI_LocalPrintf ("Salt    : ");
+  HexPrint (HV_SALT_SIZE, (u8 *) (HV_SALT_START_ADDRESS));
+  CI_LocalPrintf ("\r\n");
+
+  for (i=0;i<HV_SLOT_COUNT;i++)
+  {
+    CI_LocalPrintf ("Slot %d : ",i);
+    HexPrint (HV_SLOT_SIZE, (u8 *) (HV_SALT_START_ADDRESS + HV_SALT_SIZE) + HV_SLOT_SIZE * i);
+    CI_LocalPrintf ("\r\n");
+  }
+#endif
+
+    return (TRUE);
+}
+
+/*******************************************************************************
+
   HV_ReadSlot_u8
 
   Changes
@@ -154,21 +234,23 @@ u8 HV_PrintSlotData_u8 (u8 SlotNr_u8, HiddenVolumeKeySlot_tst * SlotData_st)
   Date      Reviewer        Info
 
 *******************************************************************************/
-
-u8 HV_ReadSlot_u8 (u8 SlotNr_u8, HiddenVolumeKeySlot_tst * SlotData_st, u8 * SlotKey_pu8)
-{
-u32 Crc32_u32;
 #if (defined __GNUC__) && (defined __AVR32__)
     __attribute__ ((__aligned__ (4)))
 #elif (defined __ICCAVR32__)
 #pragma data_alignment = 4
 #endif
-u8 Buffer_au8[HV_SLOT_SIZE];
+    u8 HV_Buffer_au8[HV_SLOT_SIZE];
+
+u8 HV_ReadSlot_u8 (u8 SlotNr_u8, HiddenVolumeKeySlot_tst * SlotData_st, u8 * SlotKey_pu8)
+{
+    u32 Crc32_u32;
 
     if (FALSE == DecryptedHiddenVolumeSlotsActive_u8)
     {
         return (FALSE); // Slot key is not in ram
     }
+
+//    sd_mmc_mci_test_unit_only_local_access = TRUE;
 
 #ifdef DEBUG_KEYS
     CI_LocalPrintf ("HV_ReadSlot_u8 %d\r\n", SlotNr_u8);
@@ -176,13 +258,26 @@ u8 Buffer_au8[HV_SLOT_SIZE];
     CI_LocalPrintf ("Slot key       :\r\n");
     HexPrint (32, SlotKey_pu8);
     CI_LocalPrintf ("\r\n");
+
+    CI_LocalPrintf ("Decrypted slots key : ");
+    HexPrint (AES_KEYSIZE_256_BIT, DecryptedHiddenVolumeSlotsKey_au8);
+    CI_LocalPrintf ("\r\n");
+#endif
+
+    DecryptedHiddenVolumeSlotsActive_u8 = FALSE;
+    DecryptedHiddenVolumeSlotsData ();
+
+#ifdef DEBUG_SLOTDATA
+    HV_PrintEncryptedHiddenVolumeSlotsData_u8 ();
+    HV_PrintDecryptedHiddenVolumeSlotsData_u8 ();
 #endif
 
     // Read all slots data from flash
     memcpy (&DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE], (u8 *) (HV_SALT_START_ADDRESS + HV_SALT_SIZE), HV_SLOT_SIZE * HV_SLOT_COUNT);
     // Decrypted data with slots key
-    AES_KeyEncryption (HV_SLOT_COUNT * HV_SLOT_SIZE, &DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE], DecryptedHiddenVolumeSlotsKey_au8,
-                       AES_PMODE_DECIPHER, SlotNr_u8);
+
+    AES_StorageKeyEncryption (HV_SLOT_COUNT * HV_SLOT_SIZE, &DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE], DecryptedHiddenVolumeSlotsKey_au8,
+                       AES_PMODE_DECIPHER);
 
 #ifdef DEBUG_KEYS
     CI_LocalPrintf ("Encrypted data :\r\n");
@@ -190,23 +285,24 @@ u8 Buffer_au8[HV_SLOT_SIZE];
     CI_LocalPrintf ("\r\n");
 #endif
 
-
     // Read encrypted slot data from ram
-    memcpy ((u8 *) Buffer_au8, (u8 *) (DecryptedHiddenVolumeSlotsData_au8 + HV_SALT_SIZE + SlotNr_u8 * HV_SLOT_SIZE), HV_SLOT_SIZE);
+    memcpy ((u8 *) HV_Buffer_au8, (u8 *) (DecryptedHiddenVolumeSlotsData_au8 + HV_SALT_SIZE + SlotNr_u8 * HV_SLOT_SIZE), HV_SLOT_SIZE);
 
     // Decrypt slot data
-    AES_KeyEncryption (HV_SLOT_SIZE, (u8 *) Buffer_au8, SlotKey_pu8, AES_PMODE_DECIPHER, SlotNr_u8);
+    AES_KeyEncryption (HV_SLOT_SIZE, (u8 *) HV_Buffer_au8, SlotKey_pu8, AES_PMODE_DECIPHER,SlotNr_u8);
 
-    memcpy ((u8 *) SlotData_st, Buffer_au8, sizeof (HiddenVolumeKeySlot_tst));
+    memcpy ((u8 *) SlotData_st, HV_Buffer_au8, sizeof (HiddenVolumeKeySlot_tst));
 
 #ifdef DEBUG_KEYS
     CI_LocalPrintf ("Decrypted data :\r\n");
-    HexPrint (sizeof (HiddenVolumeKeySlot_tst), SlotData_st);
+    HexPrint (sizeof (HiddenVolumeKeySlot_tst), (unsigned char*)SlotData_st);
     CI_LocalPrintf ("\r\n");
 #endif
 
     /*
        // Check magic number if (HV_MAGIC_NUMBER_SLOT_ENTRY != SlotData_st->MagicNumber_u32) { return (FALSE); } */
+
+//    sd_mmc_mci_test_unit_only_local_access = FALSE;
 
     // Check CRC
     Crc32_u32 = generateCRC_len ((u8 *) SlotData_st, (sizeof (HiddenVolumeKeySlot_tst) / 4) - 1);
@@ -233,24 +329,32 @@ u8 Buffer_au8[HV_SLOT_SIZE];
 
 u8 HV_WriteSlot_u8 (u8 SlotNr_u8, HiddenVolumeKeySlot_tst * SlotData_st, u8 * SlotKey_pu8)
 {
-u32 i;
-u8 Buffer_au8[HV_SLOT_SIZE];
-    // u8 HiddenVolumeSlotsKey_au8[AES_KEYSIZE_256_BIT];
+    u32 i;
 
     if (FALSE == DecryptedHiddenVolumeSlotsActive_u8)
     {
         return (FALSE); // Slot data is not in ram
     }
 
+//    sd_mmc_mci_test_unit_only_local_access = TRUE;
 
     // Fill buffer with random numbers
     for (i = 0; i < HV_SLOT_SIZE; i++)
     {
-        Buffer_au8[i] = rand () % 256;
+      HV_Buffer_au8[i] = rand () % 256;
     }
 
     // Set magic number
     // SlotData_st->MagicNumber_u32 = HV_MAGIC_NUMBER_SLOT_ENTRY;
+
+    DecryptedHiddenVolumeSlotsActive_u8 = FALSE;
+    DecryptedHiddenVolumeSlotsData ();
+
+#ifdef DEBUG_SLOTDATA
+    CI_LocalPrintf ("\r\nOld\r\n");
+    HV_PrintEncryptedHiddenVolumeSlotsData_u8 ();
+    HV_PrintDecryptedHiddenVolumeSlotsData_u8 ();
+#endif
 
     // Set CRC32
     SlotData_st->Crc_u32 = generateCRC_len ((u8 *) SlotData_st, (sizeof (HiddenVolumeKeySlot_tst) / 4) - 1);    // -1 for CRC variable
@@ -258,16 +362,17 @@ u8 Buffer_au8[HV_SLOT_SIZE];
 #ifdef DEBUG_KEYS
     CI_LocalPrintf ("HV_WriteSlot_u8 %d - CRC 0x%08x\r\n", SlotNr_u8, SlotData_st->Crc_u32);
     CI_LocalPrintf ("Decrypted data :\r\n");
-    HexPrint (sizeof (HiddenVolumeKeySlot_tst), SlotData_st);
+    HexPrint (sizeof (HiddenVolumeKeySlot_tst), (unsigned char*)SlotData_st);
     CI_LocalPrintf ("\r\n");
 #endif
 
-    memcpy (Buffer_au8, (u8 *) SlotData_st, sizeof (HiddenVolumeKeySlot_tst));
+    memcpy (HV_Buffer_au8, (u8 *) SlotData_st, sizeof (HiddenVolumeKeySlot_tst));
+
     // Encrypt slot data
-    AES_KeyEncryption (HV_SLOT_SIZE, Buffer_au8, SlotKey_pu8, AES_PMODE_CIPHER, SlotNr_u8);
+    AES_KeyEncryption (HV_SLOT_SIZE, HV_Buffer_au8, SlotKey_pu8, AES_PMODE_CIPHER, SlotNr_u8);
 
     // Write encrypted slot data into ram
-    memcpy ((u8 *) (DecryptedHiddenVolumeSlotsData_au8 + HV_SALT_SIZE + SlotNr_u8 * HV_SLOT_SIZE), Buffer_au8, HV_SLOT_SIZE);
+    memcpy ((u8 *) (DecryptedHiddenVolumeSlotsData_au8 + HV_SALT_SIZE + SlotNr_u8 * HV_SLOT_SIZE), HV_Buffer_au8, HV_SLOT_SIZE);
 
 #ifdef DEBUG_KEYS
     CI_LocalPrintf ("Encrypted data :\r\n");
@@ -275,14 +380,23 @@ u8 Buffer_au8[HV_SLOT_SIZE];
     CI_LocalPrintf ("\r\n");
 #endif
 
+#ifdef DEBUG_SLOTDATA
+    CI_LocalPrintf ("New\r\n");
+    HV_PrintDecryptedHiddenVolumeSlotsData_u8 ();
+    CI_LocalPrintf ("\r\n");
+#endif
     // Encrypt all slots data (max 256 byte per encryption)
-    AES_KeyEncryption (HV_SLOT_COUNT * HV_SLOT_SIZE, &DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE], DecryptedHiddenVolumeSlotsKey_au8,
-                       AES_PMODE_CIPHER, SlotNr_u8);
+    AES_StorageKeyEncryption (HV_SLOT_COUNT * HV_SLOT_SIZE, &DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE], DecryptedHiddenVolumeSlotsKey_au8,
+                       AES_PMODE_CIPHER);
 
     // Write ram data to flash
     flashc_memcpy ((u8 *) (HV_SALT_START_ADDRESS + HV_SALT_SIZE), &DecryptedHiddenVolumeSlotsData_au8[HV_SALT_SIZE], HV_SLOT_SIZE * HV_SLOT_COUNT,
                    TRUE);
+#ifdef DEBUG_SLOTDATA
+    HV_PrintEncryptedHiddenVolumeSlotsData_u8 ();
+#endif
 
+//    sd_mmc_mci_test_unit_only_local_access = FALSE;
 
 
     return (TRUE);
@@ -1014,6 +1128,9 @@ void IBN_HV_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned i
 
             HV_WriteSlot_u8 (Param_u32, &SlotData_st, HiddenVolumeSlotKey_u8);
 
+            break;
+        case 9 :
+            HV_PrintDecryptedHiddenVolumeSlotsData_u8 ();
             break;
 
     }
