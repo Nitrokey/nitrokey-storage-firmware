@@ -883,34 +883,43 @@ u32 Blockcount_u32;
     Infos_st->FirmwareVersion_au8[1]     = VERSION_MINOR;
     Infos_st->FirmwareVersionInternal_u8 = INTERNAL_VERSION_NR;
 
-    // Get smartcard infos
-    GetSmartCardStatus (&SC_Status_st);
-
-    // Run the check only if the initial pw is aktive
-    if (3 == SC_Status_st.UserPwRetryCount)
+    if (TRUE == WriteTestEnabled)
     {
-        if (FALSE == LA_OpenPGP_V20_Test_SendUserPW2 ((unsigned char *) "123456"))
-        {
-            CI_TickLocalPrintf ("GetProductionInfos: Intial password is not activ\r\n");
-            Infos_st->SC_AdminPwRetryCount = 99;    // Marker for wrong pw
-            return;
-        }
+      // Get smartcard infos
+      GetSmartCardStatus (&SC_Status_st);
+
+      // Run the check only if the initial pw is aktive
+      if (3 == SC_Status_st.UserPwRetryCount)
+      {
+          if (FALSE == LA_OpenPGP_V20_Test_SendUserPW2 ((unsigned char *) "123456"))
+          {
+              CI_TickLocalPrintf ("GetProductionInfos: Intial password is not activ\r\n");
+              Infos_st->SC_AdminPwRetryCount = 99;    // Marker for wrong pw
+              return;
+          }
+      }
+      else
+      {
+          CI_TickLocalPrintf ("GetProductionInfos: Password retry count is not 3 : %d\r\n", SC_Status_st.UserPwRetryCount);
+          Infos_st->SC_AdminPwRetryCount = 88;    // Marker for wrong pw retry count
+          return;
+      }
+    }
+
+    if (TRUE == WriteTestEnabled)
+    {
+      // Get XORed CPU ID
+      CPU_ID_u32 = 0;
+      for (i = 0; i < 4; i++)
+      {
+          CPU_ID_u32 ^= id_data[i];
+      }
+      Infos_st->CPU_CardID_u32 = CPU_ID_u32;
     }
     else
     {
-        CI_TickLocalPrintf ("GetProductionInfos: Password retry count is not 3 : %d\r\n", SC_Status_st.UserPwRetryCount);
-        Infos_st->SC_AdminPwRetryCount = 88;    // Marker for wrong pw retry count
-        return;
+      Infos_st->CPU_CardID_u32 = 0;
     }
-
-
-    // Get XORed CPU ID
-    CPU_ID_u32 = 0;
-    for (i = 0; i < 4; i++)
-    {
-        CPU_ID_u32 ^= id_data[i];
-    }
-    Infos_st->CPU_CardID_u32 = CPU_ID_u32;
 
     // Init SD - read capacity
     sd_mmc_mci_read_capacity (SD_SLOT, (unsigned long int *) &Blockcount_u32);
@@ -918,9 +927,18 @@ u32 Blockcount_u32;
     Infos_st->SD_Card_Size_u8 = Blockcount_u32 / 2 / 1024 / 1024 + 1;   // in GB
 
     // Save smartcard infos
-    Infos_st->SC_UserPwRetryCount = SC_Status_st.UserPwRetryCount;
-    Infos_st->SC_AdminPwRetryCount = SC_Status_st.AdminPwRetryCount;
-    Infos_st->SmartCardID_u32 = SC_Status_st.ActiveSmartCardID_u32;
+    if (TRUE == WriteTestEnabled)
+    {
+      Infos_st->SC_UserPwRetryCount = SC_Status_st.UserPwRetryCount;
+      Infos_st->SC_AdminPwRetryCount = SC_Status_st.AdminPwRetryCount;
+      Infos_st->SmartCardID_u32 = SC_Status_st.ActiveSmartCardID_u32;
+    }
+    else
+    {
+      Infos_st->SC_UserPwRetryCount  = 0;
+      Infos_st->SC_AdminPwRetryCount = 0;
+      Infos_st->SmartCardID_u32      = 0;
+    }
 
     // Get SD card infos
     cid = (cid_t *) GetSdCidInfo ();
