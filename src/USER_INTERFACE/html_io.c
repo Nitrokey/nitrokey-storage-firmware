@@ -739,10 +739,18 @@ void HID_ExcuteCmd (void)
 
         case HTML_CMD_PRODUCTION_TEST:
             CI_TickLocalPrintf ("Get HTML_CMD_PRODUCTION_TEST\r\n");
-            GetProductionInfos (&Stick20ProductionInfos_st);
+            GetProductionInfos (&Stick20ProductionInfos_st,FALSE);
             Stick20HIDInitSendConfiguration (STICK20_SEND_PRODUCTION_TEST);
             UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
             break;
+
+        case HTML_CMD_PRODUCTION_TEST_WITH_WRITE_TEST:
+            CI_TickLocalPrintf ("Get HTML_CMD_PRODUCTION_TEST_WITH_WRITE_TEST\r\n");
+            GetProductionInfos (&Stick20ProductionInfos_st,TRUE);
+            Stick20HIDInitSendConfiguration (STICK20_SEND_PRODUCTION_TEST);
+            UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
+            break;
+
 
         case HTML_CMD_CHANGE_UPDATE_PIN:
             CI_TickLocalPrintf ("Get HTML_CMD_CHANGE_UPDATE_PIN\r\n");
@@ -859,7 +867,7 @@ u32 Ret_u32 = FALSE;
 
 *******************************************************************************/
 
-void GetProductionInfos (typeStick20ProductionInfos_st * Infos_st)
+void GetProductionInfos (typeStick20ProductionInfos_st * Infos_st,u8 WriteTestEnabled)
 {
 typeStick20Configuration_st SC_Status_st;
 volatile u32* id_data = (u32 *) 0x80800204; // Place of 120 bit CPU ID
@@ -924,7 +932,14 @@ u32 Blockcount_u32;
     Infos_st->SD_Card_Manufacturer_u8 = cid->mid;
 
     // Get SD card speed
-    Infos_st->SD_WriteSpeed_u16 = SD_SpeedTest ();
+    if (TRUE == WriteTestEnabled)
+    {
+      Infos_st->SD_WriteSpeed_u16 = SD_SpeedTest ();
+    }
+    else
+    {
+      Infos_st->SD_WriteSpeed_u16 = 0;
+    }
 
 }
 

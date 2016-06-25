@@ -71,7 +71,7 @@
 #define HTML_CMD_PRODUCTION_TEST                     30
 
 #define HTML_CMD_CHANGE_UPDATE_PIN                   31
-
+#define HTML_CMD_PRODUCTION_TEST_WITH_WRITE_TEST     32
 
 
 
@@ -95,7 +95,7 @@ typedef struct
 
 extern typeStick20ProductionInfos_st Stick20ProductionInfos_st;
 
-void GetProductionInfos (typeStick20ProductionInfos_st * Infos_st);
+void GetProductionInfos (typeStick20ProductionInfos_st * Infos_st,u8 WriteTestEnabled);
 void LockDevice (void);
 
 u8 HTML_FileIO_Init_u8 (void);

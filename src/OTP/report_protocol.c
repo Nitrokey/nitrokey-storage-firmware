@@ -97,6 +97,7 @@
  External declarations
 
 *******************************************************************************/
+u8 sd_mmc_mci_read_capacity (u8 slot, u32 * u32_nb_sector);
 
 /*******************************************************************************
 
@@ -213,10 +214,13 @@ u32 calculated_crc32;
 
 *******************************************************************************/
 
+//extern volatile long xTickCount;
+
 u8 Stick20HIDSendConfigurationState_u8 = STICK20_SEND_STATUS_IDLE;
 
 u8 Stick20HIDInitSendConfiguration (u8 state_u8)
 {
+//  { u8 text_au8[20]; itoa (xTickCount/2,text_au8); CI_StringOut ((char*)text_au8); }
     CI_StringOut ("Send HID data\r\n");
 
     Stick20HIDSendConfigurationState_u8 = state_u8;
@@ -1139,6 +1143,16 @@ u8 text[10];
                     HID_CmdGet_u8 = HTML_CMD_PRODUCTION_TEST;
                     memcpy (HID_String_au8, &report[1], 33);
                     break;
+
+                case STICK20_CMD_PRODUCTION_TEST_WITH_WRITE_TEST:
+                    CI_StringOut ("Get HTML_CMD_PRODUCTION_TEST_WITH_WRITE_TEST\r\n");
+                    StartStick20Command (HTML_CMD_PRODUCTION_TEST_WITH_WRITE_TEST);
+                    // Transfer data to other context
+                    HID_CmdGet_u8 = HTML_CMD_PRODUCTION_TEST_WITH_WRITE_TEST;
+                    memcpy (HID_String_au8, &report[1], 33);
+                    break;
+
+
 
                 case STICK20_CMD_CHANGE_UPDATE_PIN:
                     CI_StringOut ("Get STICK20_CMD_CHANGE_UPDATE_PIN\r\n");

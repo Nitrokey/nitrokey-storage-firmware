@@ -94,6 +94,7 @@
 *******************************************************************************/
 
 void sd_mmc_mci_resources_init (void);
+void usb_device_task_delete (void);
 
 extern U8 sector_buf_0[SD_MMC_SECTOR_SIZE];
 extern U8 sector_buf_1[SD_MMC_SECTOR_SIZE];
@@ -110,6 +111,45 @@ extern U8 sector_buf_1[SD_MMC_SECTOR_SIZE];
 *******************************************************************************/
 
 U32 SD_ProgressInPercent = 0;
+
+
+/*******************************************************************************
+
+  SD_ReadSDBlock
+
+  Reviews
+  Date      Reviewer        Info
+  16.08.13  RB              First review
+
+*******************************************************************************/
+
+u8 SD_ReadSDBlock (u32 Block_u32,u8 *Data)
+{
+    sd_mmc_mci_test_unit_ready (SD_SLOT);
+
+    if (!sd_mmc_mci_mem_check (SD_SLOT))
+    {
+        CI_TickLocalPrintf ("SD card not ready\r\n");
+        return (FALSE);
+    }
+
+    if (!sd_mmc_mci_dma_read_open (SD_SLOT, Block_u32, NULL, 1))
+    {
+        CI_TickLocalPrintf ("SD block open fails\r\n");
+        return (FALSE);
+    }
+
+    dma_mci_2_ram (Data, SD_MMC_SECTOR_SIZE, Block_u32);
+    /*
+       if( !sd_mmc_mci_read_multiple_sector(SD_SLOT, 1, sector_buf_0) ) { CI_TickLocalPrintf ("SD block read fails\r\n"); return; } */
+    if (!sd_mmc_mci_read_close (SD_SLOT))
+    {
+        CI_TickLocalPrintf ("SD block close fails\r\n");
+        return (FALSE);
+    }
+    return (TRUE);
+}
+
 
 /*******************************************************************************
 
@@ -138,24 +178,7 @@ u16 i;
         return;
     }
 
-    sd_mmc_mci_test_unit_ready (SD_SLOT);
-
-    if (!sd_mmc_mci_mem_check (SD_SLOT))
-    {
-        CI_TickLocalPrintf ("SD card not ready\r\n");
-        return;
-    }
-
-    if (!sd_mmc_mci_dma_read_open (SD_SLOT, Block_u32, NULL, 1))
-    {
-        CI_TickLocalPrintf ("SD block open fails\r\n");
-        return;
-    }
-
-    dma_mci_2_ram (&sector_buf_0, SD_MMC_SECTOR_SIZE, Block_u32);
-    /*
-       if( !sd_mmc_mci_read_multiple_sector(SD_SLOT, 1, sector_buf_0) ) { CI_TickLocalPrintf ("SD block read fails\r\n"); return; } */
-    if (!sd_mmc_mci_read_close (SD_SLOT))
+    if (FALSE == SD_ReadSDBlock (Block_u32,sector_buf_0))
     {
         CI_TickLocalPrintf ("SD block close fails\r\n");
         return;
@@ -599,7 +622,7 @@ u32 Blockcount_u32;
 
   SD_SpeedTest
 
-  Write 1 MB data
+  Write 10 MB data
 
   *** Warning : Destroy data on SD card ***
 
@@ -684,6 +707,108 @@ u8 Ret_u8;
 
 /*******************************************************************************
 
+  SD_SpeedReadTest
+
+  Read 10 MB data
+
+
+  Changes
+  Date      Author          Info
+  07.07.14  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u16 SD_SpeedReadTest (void)
+{
+    // u32 Blockcount_u32;
+u64 Runtime_u64;
+u32 i;
+u16 SpeedInKBPerSec_u16;
+u8 Ret_u8;
+
+    CI_LocalPrintf ("SD_SpeedReadTest SD: blocks from %d. %d blocks\r\n", SD_SPEED_TEST_START_BLOCK, SD_SPEED_TEST_BLOCK_COUNT);
+    Runtime_u64 = 1000;
+
+    SetSdUncryptedCardEnableState (FALSE);  // Disable access
+    SetSdEncryptedCardEnableState (FALSE);
+    // Lock SD card for local access
+    sd_mmc_mci_test_unit_only_local_access = TRUE;
+    vTaskDelay (1000);
+
+    // Wait until no access
+    while (TRUE == Check_Sd_mmc_mci_access_signal_on ())
+    {
+    }
+
+    /*
+       #ifdef TIME_MEASURING_ENABLE Runtime_u64 = TIME_MEASURING_GetTime (); #endif Ret_u8 = SD_WriteMultipleBlocks
+       (RandomBuffer_au8,SD_SPEED_TEST_START_BLOCK,SD_SPEED_TEST_BLOCK_COUNT); // First access could be slower than normal #ifdef
+       TIME_MEASURING_ENABLE Runtime_u64 = TIME_MEASURING_GetTime () - Runtime_u64; SpeedInKBPerSec_u16 =
+       (u16)((float)((u64)SD_SPEED_TEST_BLOCK_COUNT*(u64)SD_MMC_SECTOR_SIZE) /(float)(Runtime_u64/(u64)TIME_MEASURING_TICKS_IN_USEC)*1000.0 );
+       CI_LocalPrintf ("SD runtime %ld msec = %6.0f kb/sec = %d
+       kb/sec\n\r",(u32L),(float)((u/(u64)TIME_MEASURING_TICKS_IN_USEC/(u64)1000L),(float)((u64)SD_SPEED_TEST_BLOCK_COUNT*(u64)SD_MMC_SECTOR_SIZE)
+       /(float)(Runtime_u64/(u64)TIME_MEASURING_TICKS_IN_USEC)*1000.0,SpeedInKBPerSec_u16 ); #endif
+
+       vTaskDelay (100); // Wait until no access while (TRUE == Check_Sd_mmc_mci_access_signal_on ()) { } */
+
+#ifdef TIME_MEASURING_ENABLE
+    Runtime_u64 = TIME_MEASURING_GetTime ();
+#endif
+
+    for (i=0;i<SD_SPEED_TEST_BLOCK_COUNT;i++)
+    {
+      if (FALSE == SD_ReadSDBlock (SD_SPEED_TEST_START_BLOCK+i,RandomBuffer_au8))
+      {
+          Ret_u8 = FALSE;
+          break;
+      }
+    }
+
+    if (FALSE == Ret_u8)    // Try again
+    {
+#ifdef TIME_MEASURING_ENABLE
+        Runtime_u64 = TIME_MEASURING_GetTime ();
+#endif
+        for (i=0;i<SD_SPEED_TEST_BLOCK_COUNT;i++)
+        {
+          if (FALSE == SD_ReadSDBlock (SD_SPEED_TEST_START_BLOCK+i,RandomBuffer_au8))
+          {
+              Ret_u8 = FALSE;
+              break;
+          }
+        }
+    }
+
+#ifdef TIME_MEASURING_ENABLE
+    Runtime_u64 = TIME_MEASURING_GetTime () - Runtime_u64;
+    SpeedInKBPerSec_u16 =
+        (u16) ((float) ((u64) SD_SPEED_TEST_BLOCK_COUNT * (u64) SD_MMC_SECTOR_SIZE) / (float) (Runtime_u64 / (u64) TIME_MEASURING_TICKS_IN_USEC) *
+               1000.0);
+    CI_LocalPrintf ("SD read runtime %ld msec = %6.0f kb/sec = %d kb/sec\n\r", (u32) (Runtime_u64 / (u64) TIME_MEASURING_TICKS_IN_USEC / (u64) 1000L),
+                    (float) ((u64) SD_SPEED_TEST_BLOCK_COUNT * (u64) SD_MMC_SECTOR_SIZE) / (float) (Runtime_u64 /
+                                                                                                    (u64) TIME_MEASURING_TICKS_IN_USEC) * 1000.0,
+                    SpeedInKBPerSec_u16);
+#endif
+
+    if (FALSE == Ret_u8)
+    {
+        SpeedInKBPerSec_u16 = 0;
+    }
+
+    sd_mmc_mci_test_unit_only_local_access = FALSE;
+    SetSdEncryptedCardEnableState (TRUE);
+    SetSdUncryptedCardEnableState (FALSE);  // Enable access
+
+    return (SpeedInKBPerSec_u16);
+}
+
+
+
+/*******************************************************************************
+
   IBN_SD_Tests
 
   Reviews
@@ -738,6 +863,7 @@ unsigned int n;
         CI_LocalPrintf ("17 X Set new SD card found 0 = found, 1 = clear found\r\n");
         CI_LocalPrintf ("19 n xxHashtest \r\n");
         CI_LocalPrintf ("20 n xxHashtest \r\n");
+        CI_LocalPrintf ("21   SD Readtest \r\n");
         CI_LocalPrintf ("\r\n");
         return;
     }
@@ -967,5 +1093,9 @@ u32 Blockcount_u32;
             }
             CI_LocalPrintf ("Function runtime %d usec\r\n", Runtime_u32 / TIME_MEASURING_TICKS_IN_USEC);
             break;
+        case 21:
+            SD_SpeedReadTest ();
+            break;
+
     }
 }
