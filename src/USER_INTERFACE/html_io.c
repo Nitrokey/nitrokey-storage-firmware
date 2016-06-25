@@ -435,7 +435,7 @@ void HID_ExcuteCmd (void)
             SdCardFilledWithRandoms_u8 = StickConfiguration_st.SDFillWithRandomChars_u8;
             StickKeysNotInitiated_u8   = StickConfiguration_st.StickKeysNotInitiated_u8;
 
-            CI_TickLocalPrintf ("Generate new keys\r\n");
+            CI_TickLocalPrintf ("Generate new keys Old State KNI %d, SDF %d\r\n",StickKeysNotInitiated_u8,SdCardFilledWithRandoms_u8);
             if (TRUE == BuildStorageKeys_u32 ((u8 *) & HID_String_au8[1]))
             {
                 SetSdEncryptedCardEnableState (FALSE);
@@ -453,7 +453,7 @@ void HID_ExcuteCmd (void)
             {
               SetSdCardFilledWithRandomsToFlash ();
             }
-            if (TRUE == StickKeysNotInitiated_u8)     // Restore old state
+            if (FALSE == StickKeysNotInitiated_u8)     // Restore old state
             {
               ClearStickKeysNotInitatedToFlash ();
             }
