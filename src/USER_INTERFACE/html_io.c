@@ -759,7 +759,7 @@ void HID_ExcuteCmd (void)
 
             if (TRUE == CheckUpdatePin (&HID_String_au8[1], Len))
             {
-                Len = strlen ((char*)&HID_String_au8[1]);
+                Len = strlen ((char*)&HID_String_au8[16]);
                 if (TRUE == StoreNewUpdatePinHashInFlash (&HID_String_au8[16], Len))    // Start of new PW
                 {
                     CI_TickLocalPrintf ("Update PIN changed\r\n");
@@ -906,20 +906,13 @@ u32 Blockcount_u32;
       }
     }
 
-    if (TRUE == WriteTestEnabled)
+    // Get XORed CPU ID
+    CPU_ID_u32 = 0;
+    for (i = 0; i < 4; i++)
     {
-      // Get XORed CPU ID
-      CPU_ID_u32 = 0;
-      for (i = 0; i < 4; i++)
-      {
           CPU_ID_u32 ^= id_data[i];
-      }
-      Infos_st->CPU_CardID_u32 = CPU_ID_u32;
     }
-    else
-    {
-      Infos_st->CPU_CardID_u32 = 0;
-    }
+    Infos_st->CPU_CardID_u32 = CPU_ID_u32;
 
     // Init SD - read capacity
     sd_mmc_mci_read_capacity (SD_SLOT, (unsigned long int *) &Blockcount_u32);
