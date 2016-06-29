@@ -856,7 +856,7 @@ u8 text[10];
                 break;
             case CMD_RESET_STICK :
                 CI_StringOut ("Get CMD_RESET_STICK\r\n");
-                cmd_getResetStick (report, output);
+//                cmd_getResetStick (report, output);
                 break;
 
 
@@ -1160,7 +1160,7 @@ u8 text[10];
 
                     // Transfer data to other context
                     HID_CmdGet_u8 = HTML_CMD_CHANGE_UPDATE_PIN;
-                    memcpy (HID_String_au8, &report[1], 33);
+                    memcpy (HID_String_au8, &report[1], HID_STRING_LEN);
                     break;
 
 #ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
@@ -2623,7 +2623,7 @@ u32 Ret_u32;
 
     EraseLocalFlashKeyValues_u32 ();    // Factory reset local flash
 
-    InitUpdatePinHashInFlash ();
+//    InitUpdatePinHashInFlash ();
 
     return (TRUE);
 }

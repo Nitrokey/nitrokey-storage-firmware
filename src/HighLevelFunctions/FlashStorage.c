@@ -90,6 +90,8 @@ typeStick20Configuration_st StickConfiguration_st;
 #define LOCAL_DEBUG
 
 #define AES_KEYSIZE_256_BIT     32  // 32 * 8 = 256
+#define UPDATE_PIN_MAX_SIZE     20
+#define UPDATE_PIN_SALT_SIZE    10
 
 /*******************************************************************************
 
@@ -1058,8 +1060,16 @@ u8 EraseStoreData_au8[256];
 
 u32 EraseLocalFlashKeyValues_u32 (void)
 {
-u32 i;
-u32 i1;
+    u32 i;
+    u32 i1;
+
+    // Save data for  firmware password
+    u8 UpdatePinSalt_u8[UPDATE_PIN_SALT_SIZE];
+    u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
+
+    ReadUpdatePinSaltFromFlash (UpdatePinSalt_u8);
+    ReadUpdatePinHashFromFlash (UpdatePinHash_u8);
+
 
     // Clear user page
     for (i1 = 0; i1 < 5; i1++)
@@ -1129,6 +1139,10 @@ u32 i1;
         flashc_erase_page (HV_FLASH_START_PAGE + i, TRUE);
     }
 
+// Save update pin data
+    WriteUpdatePinSaltToFlash (UpdatePinSalt_u8);
+    WriteUpdatePinHashToFlash (UpdatePinHash_u8);
+
     return (TRUE);
 }
 
@@ -1146,15 +1160,11 @@ u32 i1;
 *******************************************************************************/
 void pbkdf2 (u8 * output, const u8 * password, const u32 password_length, const u8 * salt, const u32 salt_length);
 
-#define UPDATE_PIN_MAX_SIZE   15
-
-#define UPDATE_PIN_SALT_SIZE 10
-
 u8 CheckUpdatePin (u8 * Password_pu8, u32 PasswordLen_u32)
 {
-u8 output_au8[64];
-u8 UpdatePinSalt_u8[UPDATE_PIN_SALT_SIZE];
-u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
+    u8 output_au8[64];
+    u8 UpdatePinSalt_u8[UPDATE_PIN_SALT_SIZE];
+    u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
 
     ReadUpdatePinSaltFromFlash (UpdatePinSalt_u8);
 
@@ -1166,7 +1176,7 @@ u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
     CI_LocalPrintf ("\r\n");
 #endif
 
-    if (UPDATE_PIN_MAX_SIZE <= PasswordLen_u32)
+    if (UPDATE_PIN_MAX_SIZE < PasswordLen_u32)
     {
         return (FALSE);
     }
@@ -1224,7 +1234,7 @@ u8 StoreNewUpdatePinHashInFlash (u8 * Password_pu8, u32 PasswordLen_u32)
   u8 output_au8[64];
   u8 UpdatePinSalt_u8[UPDATE_PIN_SALT_SIZE];
 
-    if (UPDATE_PIN_MAX_SIZE <= PasswordLen_u32)
+    if (UPDATE_PIN_MAX_SIZE < PasswordLen_u32)
     {
         return (FALSE);
     }

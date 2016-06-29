@@ -759,8 +759,8 @@ void HID_ExcuteCmd (void)
 
             if (TRUE == CheckUpdatePin (&HID_String_au8[1], Len))
             {
-                Len = strlen ((char*)&HID_String_au8[16]);
-                if (TRUE == StoreNewUpdatePinHashInFlash (&HID_String_au8[16], Len))    // Start of new PW
+                Len = strlen ((char*)&HID_String_au8[22]);
+                if (TRUE == StoreNewUpdatePinHashInFlash (&HID_String_au8[22], Len))    // Start of new PW
                 {
                     CI_TickLocalPrintf ("Update PIN changed\r\n");
                     UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
