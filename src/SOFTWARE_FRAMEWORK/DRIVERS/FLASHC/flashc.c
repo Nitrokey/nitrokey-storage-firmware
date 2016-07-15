@@ -850,6 +850,8 @@ volatile void* flashc_memcpy (volatile void* dst, const void* src, size_t nbytes
     unsigned int error_status = 0;
     unsigned int i, j;
 
+    flashc_default_wait_until_ready ();
+
     // Reformat arguments.
     flash_array_end.u8ptr = AVR32_FLASH + flashc_get_flash_size ();
     dest.u8ptr = dst;

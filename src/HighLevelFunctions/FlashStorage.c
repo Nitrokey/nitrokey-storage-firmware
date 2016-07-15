@@ -1081,7 +1081,8 @@ u32 EraseLocalFlashKeyValues_u32 (void)
         flashc_memcpy ((void *) AVR32_FLASHC_USER_PAGE, EraseStoreData_au8, 256, TRUE);
     }
 
-    flashc_erase_user_page (TRUE);
+//    flashc_erase_user_page (TRUE);
+    DFU_FirmwareResetUserpage ();
 
     // Set default values
     InitStickConfigurationToUserPage_u8 ();
@@ -1162,11 +1163,28 @@ void pbkdf2 (u8 * output, const u8 * password, const u32 password_length, const 
 
 u8 CheckUpdatePin (u8 * Password_pu8, u32 PasswordLen_u32)
 {
+    u8 i;
+    u8 UpdateSaltInit;
     u8 output_au8[64];
     u8 UpdatePinSalt_u8[UPDATE_PIN_SALT_SIZE];
     u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
 
     ReadUpdatePinSaltFromFlash (UpdatePinSalt_u8);
+
+// To avoid bug when a update pin is not initiated after firmware flash
+    UpdateSaltInit = FALSE;
+    for (i=0;i<UPDATE_PIN_SALT_SIZE;i++)
+    {
+      if (0xFF != UpdatePinSalt_u8[i])
+      {
+        UpdateSaltInit = TRUE;
+      }
+    }
+    if (FALSE == UpdateSaltInit)
+    {
+      StoreNewUpdatePinHashInFlash ((u8 *) "12345678", 8);    // Init the update pin with the default
+      ReadUpdatePinSaltFromFlash (UpdatePinSalt_u8);
+    }
 
 #ifdef LOCAL_DEBUG
     CI_LocalPrintf ("CheckUpdatePin\r\n");
@@ -1215,6 +1233,40 @@ u8 CheckUpdatePin (u8 * Password_pu8, u32 PasswordLen_u32)
     DelayMs (100);
     return (TRUE);
 }
+
+/*******************************************************************************
+
+  ShowUpdatePinUserPageData
+
+  Changes
+  Date      Reviewer        Info
+  15.07.16  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+void ShowUpdatePinUserPageData (void)
+{
+#ifdef LOCAL_DEBUG
+    u8 UpdatePinSalt_u8[UPDATE_PIN_SALT_SIZE];
+    u8 UpdatePinHash_u8[AES_KEYSIZE_256_BIT];
+
+    ReadUpdatePinSaltFromFlash (UpdatePinSalt_u8);
+
+    CI_LocalPrintf ("ShowUpdatePin - UserPageData\r\n");
+    CI_LocalPrintf ("Salt         : ");
+    HexPrint (UPDATE_PIN_SALT_SIZE, UpdatePinSalt_u8);
+    CI_LocalPrintf ("\r\n");
+
+    ReadUpdatePinHashFromFlash (UpdatePinHash_u8);
+    CI_LocalPrintf ("Hashed PIN   : ");
+    HexPrint (AES_KEYSIZE_256_BIT, UpdatePinHash_u8);
+    CI_LocalPrintf ("\r\n");
+#endif
+}
+
 
 /*******************************************************************************
 

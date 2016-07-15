@@ -2623,7 +2623,7 @@ u32 Ret_u32;
 
     EraseLocalFlashKeyValues_u32 ();    // Factory reset local flash
 
-//    InitUpdatePinHashInFlash ();
+    InitUpdatePinHashInFlash ();
 
     return (TRUE);
 }

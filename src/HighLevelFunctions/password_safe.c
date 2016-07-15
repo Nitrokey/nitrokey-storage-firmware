@@ -858,6 +858,9 @@ void IBN_PWS_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
         CI_LocalPrintf ("5 [slot] Send password\r\n");
         CI_LocalPrintf ("10       Init firmware password\r\n");
         CI_LocalPrintf ("11       Test firmware password\r\n");
+        CI_LocalPrintf ("12       Show firmware password user page data\r\n");
+        CI_LocalPrintf ("13       Clear user page data for DFU active\r\n");
+        CI_LocalPrintf ("14       Clear user page data - no DFU data\r\n");
         CI_LocalPrintf ("\r\n");
         return;
     }
@@ -917,6 +920,15 @@ void IBN_PWS_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
             break;
         case 11:
             TestUpdatePin ();
+            break;
+        case 12:
+            ShowUpdatePinUserPageData ();
+            break;
+        case 13 :
+            DFU_FirmwareResetUserpage ();
+            break;
+        case 14 :
+            flashc_erase_user_page (TRUE);
             break;
 
     }

@@ -119,5 +119,6 @@ u8 ClearStickKeysNotInitatedToFlash (void);
 u8 StoreNewUpdatePinHashInFlash (u8 * Password_pu8, u32 PasswordLen_u32);
 u8 CheckUpdatePin (u8 * Password_pu8, u32 PasswordLen_u32);
 void InitUpdatePinHashInFlash (void);
+void ShowUpdatePinUserPageData (void);
 
 #endif /* FLASHSTORAGE_H_ */
