@@ -56,7 +56,7 @@ u32 EraseLocalFlashKeyValues_u32 (void);
 ***************************************************************************************/
 
 // #define MAGIC_NUMBER_STICK20_CONFIG 0x1810 // Change when typeStick20Configuration_st is changed
-#define MAGIC_NUMBER_STICK20_CONFIG     0x1832  // Changed: Newfirmware pin
+#define MAGIC_NUMBER_STICK20_CONFIG     0x1833  // Changed: Overwrite setup before V0.40, cause firmware password fail after flash a new stick
 
 #define READ_WRITE_ACTIVE             0
 #define READ_ONLY_ACTIVE              1

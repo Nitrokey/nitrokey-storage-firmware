@@ -24,7 +24,7 @@
 // #include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0 // 255 = debug version
-#define VERSION_MINOR 39    // 0 = development
+#define VERSION_MINOR 40    // 0 = development
 
 #define INTERNAL_VERSION_NR 0
 
