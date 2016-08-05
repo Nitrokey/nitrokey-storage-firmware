@@ -367,8 +367,25 @@ void USB_CCID_DebugCmdStart (t_USB_CCID_data_st * USB_CCID_data_pst)
         case PC_TO_RDR_SET_DATA_RATE_AND_CLOCK_FREQUENCY:
             CI_TickLocalPrintf ("USB_CCID - SET_DATA_RATE_AND_CLOCK_FREQUENCY\r\n");
             break;
+
+        case RDR_TO_PC_DATA_BLOCK:
+              CI_TickLocalPrintf ("USB_CCID - *** RDR_TO_PC_DATA_BLOCK\r\n");
+              break;
+        case RDR_TO_PC_SLOT_STATUS:
+              CI_TickLocalPrintf ("USB_CCID - *** RDR_TO_PC_SLOT_STATUS\r\n");
+              break;
+        case RDR_TO_PC_PARAMETERS:
+              CI_TickLocalPrintf ("USB_CCID - *** RDR_TO_PC_PARAMETERS\r\n");
+              break;
+        case RDR_TO_PC_ESCAPE:
+              CI_TickLocalPrintf ("USB_CCID - *** RDR_TO_PC_ESCAPE\r\n");
+              break;
+        case RDR_TO_PC_DATA_RATE_AND_CLOCK_FREQUNCY:
+              CI_TickLocalPrintf ("USB_CCID - *** RDR_TO_PC_DATA_RATE_AND_CLOCK_FREQUNCY\r\n");
+              break;
+
         default:
-            CI_TickLocalPrintf ("USB_CCID - *** UNKNOWN ***\r\n");
+            CI_TickLocalPrintf ("USB_CCID - *** UNKNOWN *** 0x%02x\r\n",USB_CCID_data_pst->USB_data[CCID_OFFSET_MESSAGE_TYPE]);
             break;
     }
 }
@@ -690,6 +707,7 @@ u8 CCID_CheckAbortRequest_u8 (void)
 
 u8 RDR_to_PC_DataBlock_u8 (t_USB_CCID_data_st * USB_CCID_data_pst)
 {
+  CI_TickLocalPrintf ("Send RDR_TO_PC_DATA_BLOCK\r\n");
 
     USB_CCID_data_pst->USB_data[CCID_OFFSET_MESSAGE_TYPE] = RDR_TO_PC_DATA_BLOCK;
     return (TRUE);

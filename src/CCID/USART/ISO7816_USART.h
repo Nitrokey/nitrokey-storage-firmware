@@ -34,7 +34,7 @@
 
 
 /* Delay timeout for ISO7816 transfers */
-#define ISO7816_CHAR_DELAY_TIME_FIRST_MS         30000  // ca. 1000 ms normal - generate 3072 bit key > 20 sec
+#define ISO7816_CHAR_DELAY_TIME_FIRST_MS         60000  // ca. 1000 ms normal - generate 3072 bit key > 20 sec - generate 4096 bit key > 43 sec
 #define ISO7816_CHAR_DELAY_TIME_MS                   5  // ca.  5 ms
 
 #define ISO7816_CHAR_DELAY_TIME_FIRST_CHAR_PTS    1000  // ca. 1000 ms - Delay for PTS answer

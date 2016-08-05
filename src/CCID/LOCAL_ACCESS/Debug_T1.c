@@ -577,8 +577,8 @@ void LogEnd_T1_Block (int nLenght, unsigned char acEndBlockData[])
 
     nUSB_To_CCID_EndTime = xTaskGetTickCount ();
 
-    CI_LocalPrintf ("%7d : Send T1 block - Comand len %3d - ", nUSB_To_CCID_StartTime, nStartT1BlockLenght);
-    CI_LocalPrintf (" Answer len %3d - %5d ms\n", nLenght, nUSB_To_CCID_EndTime - nUSB_To_CCID_StartTime);
+    CI_LocalPrintf ("%7d : Send T1 block - Comand len %3d - ", nUSB_To_CCID_StartTime/2, nStartT1BlockLenght);
+    CI_LocalPrintf (" Answer len %3d - %5d ms\n", nLenght, (nUSB_To_CCID_EndTime - nUSB_To_CCID_StartTime)/2);
 
     CI_LocalPrintf ("Command - ");
 
