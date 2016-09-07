@@ -326,9 +326,9 @@ void HID_ExcuteCmd (void)
 
                 AES_SetNewStorageKey ((u8 *) AES_DummyKey_au8); // Set dummy key
 
-                /*
-                   if (STICK20_FILL_SD_CARD_WITH_RANDOM_CHARS_ALL_VOL == HID_String_au8[0]) { SD_SecureEraseHoleCard (); } else {
-                   SD_SecureEraseCryptedVolume (); } */
+
+//                   if (STICK20_FILL_SD_CARD_WITH_RANDOM_CHARS_ALL_VOL == HID_String_au8[0]) { SD_SecureEraseHoleCard (); } else {
+//                   SD_SecureEraseCryptedVolume (); }
                 SD_SecureEraseCryptedVolume ();
 
                 SetSdCardFilledWithRandomsToFlash ();
@@ -341,6 +341,9 @@ void HID_ExcuteCmd (void)
                 vTaskDelay (500);
                 UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
                 vTaskDelay (500);
+
+//                usb_restart ();     // Restart USB
+
                 // DFU_ResetCPU (); // Reboot to get correct volume data
             }
             else

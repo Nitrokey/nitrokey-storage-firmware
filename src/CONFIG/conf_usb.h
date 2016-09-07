@@ -257,6 +257,7 @@ extern void host_suspend_action (void);
 
 extern void usb_sof_action (void);
 extern void usb_suspend_action (void);
+extern void usb_restart (void);
 
 #endif // USB_DEVICE_FEATURE == ENABLED
 

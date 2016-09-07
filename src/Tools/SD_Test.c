@@ -861,6 +861,7 @@ unsigned int n;
         CI_LocalPrintf ("15   SD card speed test\r\n");
         CI_LocalPrintf ("16 X SD high water mark 0 = show, 1 = clear\r\n");
         CI_LocalPrintf ("17 X Set new SD card found 0 = found, 1 = clear found\r\n");
+        CI_LocalPrintf ("18   USB tests\r\n");
         CI_LocalPrintf ("19 n xxHashtest \r\n");
         CI_LocalPrintf ("20 n xxHashtest \r\n");
         CI_LocalPrintf ("21   SD Readtest \r\n");
@@ -1045,10 +1046,7 @@ u32 Blockcount_u32;
                     usb_device_task_init ();
                     break;
                 case 9:
-                    usb_start_device ();
-                    break;
-                case 10:
-                    usb_start_device ();
+                    usb_restart ();     // Restart USB
                     break;
             }
             break;

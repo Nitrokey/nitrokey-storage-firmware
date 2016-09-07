@@ -78,7 +78,7 @@
 #include "task.h"
 #include "TOOLS\\TIME_MEASURING.h"
 #include "LED_test.h"
-
+#include "HighLevelFunctions/FlashStorage.h"
 
 
 /*******************************************************************************
@@ -175,7 +175,7 @@ static void USB_CCID_GetDataFromUSB (void)
 {
     int i;
     int USB_Datalen_s32;
-    void* ptrData;
+//    void* ptrData;
 
 //    Usb_reset_endpoint_fifo_access (EP_CCID_OUT);
 
@@ -343,6 +343,12 @@ void USB_CCID_task (void* pvParameters)
     portTickType xLastWakeTime;
 
     ISO7816_InitSC ();
+
+    // If configuration not found then init it
+    if (FALSE == ReadStickConfigurationFromUserPage ())
+    {
+        InitStickConfigurationToUserPage_u8 ();
+    }
 
 //    Usb_enable_stall_handshake (EP_CCID_OUT);
 //    Usb_ack_setup_received_free ();

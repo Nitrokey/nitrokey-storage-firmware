@@ -614,6 +614,29 @@ static void usb_general_interrupt (void)
 #endif
 }
 
+#if USB_DEVICE_FEATURE == ENABLED
+
+#define USB_RESTART_DELAY_1_MS_IN_TICKS    1000 * (configTICK_RATE_HZ/1000)
+
+void usb_restart (void)
+{
+  Usb_unfreeze_clock ();
+  Usb_detach ();
+  usb_connected = FALSE;
+  usb_configuration_nb = 0;
+  Usb_send_event (EVT_USB_UNPOWERED);
+  Usb_vbus_off_action ();
+
+  vTaskDelay (USB_RESTART_DELAY_1_MS_IN_TICKS);
+
+  #ifdef FREERTOS_USED
+    // Release the semaphore in order to start a new device/host task
+    taskENTER_CRITICAL ();
+    xSemaphoreGive (usb_tsk_semphr);
+    taskEXIT_CRITICAL ();
+  #endif
+}
+#endif
 
 #if USB_DEVICE_FEATURE == ENABLED
 void usb_suspend_action (void)

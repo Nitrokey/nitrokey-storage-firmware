@@ -57,6 +57,8 @@
 #include "scsi_decoder.h"
 #include "device_mass_storage_task.h"
 
+
+unsigned char ReadStickConfigurationFromUserPage (void);
 unsigned char FAI_InitLun (unsigned char Lun_u8);
 
 // _____ M A C R O S ________________________________________________________
@@ -139,11 +141,21 @@ void device_mass_storage_task (void)
 {
     unsigned int TickDelayToRestart = MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE;
     int ErrorFound;
+    int i;
     unsigned long long ActualTime_u64;
     static unsigned int LoopCounter_u32 = 0;
 
 #ifdef FREERTOS_USED
     portTickType xLastWakeTime;
+
+    for (i=0;i<2000;i++)
+    {
+      if (TRUE == ReadStickConfigurationFromUserPage ())
+      {
+         break;
+      }
+      vTaskDelay (2);         // Wait max 2000 * 1 ms
+    }
 
     FAI_InitLun (0);
 
