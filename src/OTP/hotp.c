@@ -1085,6 +1085,8 @@ void write_to_slot (u8 * data, u16 offset, u16 len)
 {
 u16 dummy_u16;
 u8* secret;
+u8  i;
+u8  Found;
 
     LED_GreenOn ();
 
@@ -1098,7 +1100,20 @@ u8* page = (u8 *) SLOTS_ADDRESS;
 
     // check if the secret from the tool is empty and if it is use the old secret
     secret = (u8 *) (data + SECRET_OFFSET);
-    if (secret[0] == 0)
+
+    // Check if the secret from the tool is empty and if it is use the old secret
+    // Secret could begin with 0x00, so checking the whole secret before keeping the old one in mandatory
+    Found = FALSE;
+    for (i=0;i<20;i++)
+    {
+      if (0 != secret[i])
+      {
+        Found = TRUE;
+        break;
+      }
+    }
+
+    if (FALSE == Found)
     {
         memcpy (data + SECRET_OFFSET, page_buffer + offset + SECRET_OFFSET, 20);
     }
