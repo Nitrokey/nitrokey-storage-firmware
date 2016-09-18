@@ -380,7 +380,7 @@ void USB_CCID_task (void* pvParameters)
         vTaskDelayUntil (&xLastWakeTime, configTSK_USB_CCID_PERIOD);
 
         Counter++;
-        if (10 < Counter)
+        if (20 < Counter)
         {
           LED_Manager10ms_v ();   // Call LED manager every 10 ms
           Counter = 0;

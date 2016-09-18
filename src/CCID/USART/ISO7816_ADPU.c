@@ -188,7 +188,7 @@ u8 ISO7816_IsSmartcardUsable (void)
 
 void ISO7816_SetLockCounter (u32 Value_u32)
 {
-int LockActive_u32;
+  int LockActive_u32;
 
 #ifdef DEBUG_ISO7816_IO_DETAIL
     {
@@ -225,6 +225,7 @@ u8 Text[20];
         ISO7816_ClearRx ();
     }
 
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 /*******************************************************************************
