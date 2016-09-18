@@ -141,6 +141,7 @@ void LED_GreenToggle (void)
         // gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
         LED_GreenToggleFlag_u8 = LED_OFF;
     }
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 /*******************************************************************************
@@ -161,6 +162,7 @@ void LED_GreenOff (void)
 {
     // gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN);
     LED_GreenToggleFlag_u8 = LED_OFF;
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 /*******************************************************************************
@@ -177,6 +179,7 @@ void LED_GreenOn (void)
 {
     // gpio_set_gpio_pin (TOOL_LED_GREEN_PIN);
     LED_GreenToggleFlag_u8 = LED_ON;
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 /*******************************************************************************
@@ -205,6 +208,7 @@ void LED_RedToggle (void)
         // gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
         LED_RedToggleFlag_u8 = LED_OFF;
     }
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 /*******************************************************************************
@@ -225,6 +229,7 @@ void LED_RedOff (void)
 {
     // gpio_clr_gpio_pin (TOOL_LED_RED_PIN);
     LED_RedToggleFlag_u8 = LED_OFF;
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 /*******************************************************************************
@@ -245,6 +250,8 @@ void LED_RedOn (void)
 {
     // gpio_set_gpio_pin (TOOL_LED_RED_PIN);
     LED_RedToggleFlag_u8 = LED_ON;
+
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 /*******************************************************************************
@@ -276,6 +283,7 @@ void LED_RedGreenToggle (void)
            (TOOL_LED_GREEN_PIN); } */
         LED_RedGreenToggleFlag_u8 = LED_OFF;
     }
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 /*******************************************************************************
@@ -298,6 +306,7 @@ void LED_RedGreenOff (void)
        if (LED_OFF == LED_GreenToggleFlag_u8) { gpio_clr_gpio_pin (TOOL_LED_GREEN_PIN); } if (LED_OFF == LED_RedToggleFlag_u8) { gpio_clr_gpio_pin
        (TOOL_LED_RED_PIN); } */
     LED_RedGreenToggleFlag_u8 = LED_OFF;
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 
@@ -316,6 +325,7 @@ void LED_RedGreenOn (void)
     /*
        gpio_set_gpio_pin (TOOL_LED_RED_PIN); gpio_set_gpio_pin (TOOL_LED_GREEN_PIN); */
     LED_RedGreenToggleFlag_u8 = LED_ON;
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 
