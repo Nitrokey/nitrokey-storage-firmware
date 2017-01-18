@@ -69,13 +69,11 @@
 
 #if UC3A3
 // #define USB_HIGH_SPEED_SUPPORT DISABLED
-#define USB_HIGH_SPEED_SUPPORT         ENABLED
+  #define USB_HIGH_SPEED_SUPPORT         ENABLED
 
-#define USB_MSD // For MSD
-#define USB_CCID    // For smartcard interface
-#define USB_KB  // For keyboard interface
-
-
+  #define USB_MSD // For MSD
+  #define USB_CCID    // For smartcard interface
+  #define USB_KB  // For keyboard interface
 
 #else
 #    define USB_HIGH_SPEED_SUPPORT         DISABLED

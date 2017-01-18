@@ -24,7 +24,7 @@
 // #include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0 // 255 = debug version
-#define VERSION_MINOR 43    // 0 = development
+#define VERSION_MINOR 44    // 0 = development
 
 #define INTERNAL_VERSION_NR 0
 
@@ -87,7 +87,7 @@
   Defines for debugging
 
 ******************************************************************************/
-// #define DEBUG_LOG_CCID_DETAIL // Shows details of smartcard io + set CCID_T1_DebugLevel = 3;
+//#define DEBUG_LOG_CCID_DETAIL // Shows details of smartcard io + set CCID_T1_DebugLevel = 3;
 // #define DEBUG_USB_CCID_IO_DETAIL // Shows details of CCID USB transfers
 
 // #define MMC_DEBUG_PRINT // Shows details of SD card actions

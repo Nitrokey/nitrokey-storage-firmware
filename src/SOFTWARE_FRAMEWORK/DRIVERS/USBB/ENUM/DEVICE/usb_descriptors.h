@@ -224,7 +224,7 @@
 #define EP_ATTRIBUTES_4         TYPE_BULK
 #define EP_OUT_LENGTH_4_FS      64
 #define EP_SIZE_4_FS            EP_OUT_LENGTH_4_FS
-#define EP_OUT_LENGTH_4_HS      64
+#define EP_OUT_LENGTH_4_HS      512
 #define EP_SIZE_4_HS            EP_OUT_LENGTH_4_HS
 #define EP_INTERVAL_4           0x00    // Interrupt polling interval from host
 
@@ -233,7 +233,7 @@
 #define EP_ATTRIBUTES_5         TYPE_BULK
 #define EP_OUT_LENGTH_5_FS      64
 #define EP_SIZE_5_FS            EP_OUT_LENGTH_5_FS
-#define EP_OUT_LENGTH_5_HS      64
+#define EP_OUT_LENGTH_5_HS      512
 #define EP_SIZE_5_HS            EP_OUT_LENGTH_5_HS
 #define EP_INTERVAL_5           0x00    // Interrupt polling interval from host
 

@@ -475,14 +475,14 @@ void usb_user_endpoint_init (U8 conf_nb)
     if (!Is_usb_full_speed_mode ())
     {
 #ifdef USB_MSD
-        (void) Usb_configure_endpoint (EP_MS_IN, EP_ATTRIBUTES_1, DIRECTION_IN, EP_SIZE_1_HS, DOUBLE_BANK);
+        (void) Usb_configure_endpoint (EP_MS_IN, EP_ATTRIBUTES_1, DIRECTION_IN, EP_SIZE_1_HS, SINGLE_BANK);
 
-        (void) Usb_configure_endpoint (EP_MS_OUT, EP_ATTRIBUTES_2, DIRECTION_OUT, EP_SIZE_2_HS, DOUBLE_BANK);
+        (void) Usb_configure_endpoint (EP_MS_OUT, EP_ATTRIBUTES_2, DIRECTION_OUT, EP_SIZE_2_HS, SINGLE_BANK);
 #endif // USB_MSD
 #ifdef USB_CCID
 // Warning USB endpoint memory had to be at the correct boundary
-        //  (void) Usb_configure_endpoint (EP_CCID_OUT, EP_ATTRIBUTES_4, DIRECTION_OUT, EP_SIZE_4_HS, SINGLE_BANK);
-         (void) Usb_configure_endpoint (EP_CCID_OUT, EP_ATTRIBUTES_4, DIRECTION_OUT, 128, SINGLE_BANK); // To avoid overflow - not 64
+        (void) Usb_configure_endpoint (EP_CCID_OUT, EP_ATTRIBUTES_4, DIRECTION_OUT, EP_SIZE_4_HS, SINGLE_BANK);
+//        (void) Usb_configure_endpoint (EP_CCID_OUT, EP_ATTRIBUTES_4, DIRECTION_OUT, 128, SINGLE_BANK); // To avoid overflow - not 64
 
         (void) Usb_configure_endpoint (EP_CCID_INT, EP_ATTRIBUTES_3, DIRECTION_IN, EP_SIZE_3_HS, SINGLE_BANK);
         (void) Usb_configure_endpoint (EP_CCID_IN, EP_ATTRIBUTES_5, DIRECTION_IN, EP_SIZE_5_HS, SINGLE_BANK);
@@ -495,15 +495,15 @@ void usb_user_endpoint_init (U8 conf_nb)
 #endif
 
 #ifdef USB_MSD
-    (void) Usb_configure_endpoint (EP_MS_IN, EP_ATTRIBUTES_1, DIRECTION_IN, EP_SIZE_1_FS, DOUBLE_BANK);
+    (void) Usb_configure_endpoint (EP_MS_IN, EP_ATTRIBUTES_1, DIRECTION_IN, EP_SIZE_1_FS, SINGLE_BANK);
 
-    (void) Usb_configure_endpoint (EP_MS_OUT, EP_ATTRIBUTES_2, DIRECTION_OUT, EP_SIZE_2_FS, DOUBLE_BANK);
+    (void) Usb_configure_endpoint (EP_MS_OUT, EP_ATTRIBUTES_2, DIRECTION_OUT, EP_SIZE_2_FS, SINGLE_BANK);
 #endif // USB_MSD
 
 #ifdef USB_CCID
     (void) Usb_configure_endpoint (EP_CCID_INT, EP_ATTRIBUTES_3, DIRECTION_IN, EP_SIZE_3_FS, SINGLE_BANK);
 
-    (void) Usb_configure_endpoint (EP_CCID_OUT, EP_ATTRIBUTES_4, DIRECTION_OUT, 128, SINGLE_BANK); // To avoid overflow - not 64
+    (void) Usb_configure_endpoint (EP_CCID_OUT, EP_ATTRIBUTES_4, DIRECTION_OUT, EP_SIZE_4_FS, SINGLE_BANK); // To avoid overflow - not 64
 
     (void) Usb_configure_endpoint (EP_CCID_IN, EP_ATTRIBUTES_5, DIRECTION_IN, EP_SIZE_5_FS, SINGLE_BANK);
 #endif // USB_CCID
