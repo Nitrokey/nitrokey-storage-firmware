@@ -1058,14 +1058,14 @@ int AES_StorageKeyEncryption (unsigned int nLength, unsigned char* cData, unsign
 
 #define AES_KEYSIZE_256_BIT     32  // 32 * 8 = 256
 
-void xxHashInitVector_v (unsigned int* InitVector_au32[4], unsigned int BlockNr)
+void xxHashInitVector_v (unsigned int* InitVector_au32, unsigned int BlockNr)
 {
     static unsigned char XorKey_au8[AES_KEYSIZE_256_BIT];
     unsigned int i;
 
     ReadXorPatternFromFlash (XorKey_au8);
 
-    for (i = 1; i < 4; i++)
+    for (i = 0; i < 4; i++)
     {
         InitVector_au32[i] = XXH_fast32 ((void*)XorKey_au8, AES_KEYSIZE_256_BIT, BlockNr + i);
     }
