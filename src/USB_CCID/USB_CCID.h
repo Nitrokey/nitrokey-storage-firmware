@@ -26,7 +26,7 @@
 #define FALSE           0
 
 
-#define CCID_MAX_XFER_LENGTH 	270
+#define CCID_MAX_XFER_LENGTH 	271
 
 
 #define CCID_NO_ERROR 			       	0
