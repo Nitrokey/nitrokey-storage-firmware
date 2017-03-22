@@ -45,14 +45,14 @@
 #include "tools.h"
 #include "Interpreter.h"
 #include "BUFFERED_SIO.h"
-#include "..\FILE_IO\FileAccessInterface.h"
+#include "FILE_IO/FileAccessInterface.h"
 #include "TIME_MEASURING.h"
 
 #include "CCID/USART/ISO7816_USART.h"
 #include "CCID/USART/ISO7816_ADPU.h"
 #include "CCID/USART/ISO7816_Prot_T1.h"
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
-#include "USB_CCID\\USB_CCID.h"
+#include "USB_CCID/USB_CCID.h"
 
 #include "mci.h"
 #include "conf_sd_mmc_mci.h"
@@ -67,18 +67,18 @@
 #include "Inbetriebnahme.h"
 #include "html_io.h"
 #include "INTERNAL_WORK/internal_work.h"
-#include "HighLevelFunctions\HandleAesStorageKey.h"
+#include "HighLevelFunctions/HandleAesStorageKey.h"
 #include "DFU_test.h"
 #include "SD_Test.h"
 #include "file_io.h"
-#include "OTP\report_protocol.h"
-#include "..\HighLevelFunctions\MatrixPassword.h"
-#include "..\HighLevelFunctions\HiddenVolume.h"
+#include "OTP/report_protocol.h"
+#include "HighLevelFunctions/MatrixPassword.h"
+#include "HighLevelFunctions/HiddenVolume.h"
 
 
-#include "..\HighLevelFunctions\FlashStorage.h"
-#include "..\HighLevelFunctions\HiddenVolume.h"
-#include "..\HighLevelFunctions\password_safe.h"
+#include "HighLevelFunctions/FlashStorage.h"
+#include "HighLevelFunctions/HiddenVolume.h"
+#include "HighLevelFunctions/password_safe.h"
 
 extern typeStick20Configuration_st StickConfiguration_st;
 u8 GetSmartCardStatus (typeStick20Configuration_st * Status_st);

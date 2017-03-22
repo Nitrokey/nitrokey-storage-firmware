@@ -41,7 +41,7 @@
 #include "OTP/report_protocol.h"
 #include "FlashStorage.h"
 #include "HiddenVolume.h"
-#include "OTP\\hotp.h"
+#include "OTP/hotp.h"
 #include "password_safe.h"
 #include "DFU_test.h"
 #include "CCID/USART/ISO7816_USART.h"

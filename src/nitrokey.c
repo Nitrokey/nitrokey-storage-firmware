@@ -94,11 +94,11 @@
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 #include "USB_CCID/USB_CCID_task.h"
 #include "BUFFERED_SIO.h"
-#include "Tools\Interpreter.h"
+#include "Tools/Interpreter.h"
 #include "INTERNAL_WORK/internal_work.h"
 
 #ifdef TIME_MEASURING_ENABLE
-#include "Tools\TIME_MEASURING.h"
+#include "Tools/TIME_MEASURING.h"
 #endif
 
 #include "usart.h"

@@ -58,7 +58,7 @@
 #include "TIME_MEASURING.h"
 #include "LED_test.h"
 
-#include "..\HighLevelFunctions\FlashStorage.h"
+#include "HighLevelFunctions/FlashStorage.h"
 
 #include "portmacro.h"
 extern volatile portTickType xTickCount;
