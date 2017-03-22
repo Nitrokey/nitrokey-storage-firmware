@@ -56,15 +56,15 @@
 
 #include "TIME_MEASURING.h"
 #include "Inbetriebnahme.h"
-#include "..\FILE_IO\FileAccessInterface.h"
+#include "FILE_IO/FileAccessInterface.h"
 #include "CCID/USART/ISO7816_USART.h"
 #include "CCID/USART/ISO7816_ADPU.h"
 #include "CCID/USART/ISO7816_Prot_T1.h"
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 #include "USB_CCID/USB_CCID.h"
-#include "HighLevelFunctions\FlashStorage.h"
+#include "HighLevelFunctions/FlashStorage.h"
 
-#include "OTP\report_protocol.h"
+#include "OTP/report_protocol.h"
 
 #include "SD_Test.h"
 #include "LED_test.h"

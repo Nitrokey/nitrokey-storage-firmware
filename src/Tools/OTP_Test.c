@@ -39,8 +39,8 @@
 #include "tools.h"
 #include "TIME_MEASURING.h"
 
-#include "OTP_test.h"
-#include "..\\OTP\\hotp.h"
+#include "OTP_Test.h"
+#include "OTP/hotp.h"
 
 
 /*******************************************************************************

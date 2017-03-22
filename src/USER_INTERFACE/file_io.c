@@ -43,7 +43,7 @@
 #include "tools.h"
 #include "Interpreter.h"
 #include "BUFFERED_SIO.h"
-#include "..\FILE_IO\FileAccessInterface.h"
+#include "FILE_IO/FileAccessInterface.h"
 #include "TIME_MEASURING.h"
 
 /* FAT includes */
@@ -55,7 +55,7 @@
 #include "Inbetriebnahme.h"
 #include "html_io.h"
 #include "INTERNAL_WORK/internal_work.h"
-#include "HighLevelFunctions\HandleAesStorageKey.h"
+#include "HighLevelFunctions/HandleAesStorageKey.h"
 #include "DFU_test.h"
 #include "SD_Test.h"
 

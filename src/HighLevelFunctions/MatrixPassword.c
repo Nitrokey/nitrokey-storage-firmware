@@ -39,9 +39,9 @@
 
 #include "OTP/report_protocol.h"
 #include "FlashStorage.h"
-#include "CCID\\USART\\ISO7816_USART.h"
-#include "CCID\\USART\\ISO7816_ADPU.h"
-#include "USB_CCID\\USB_CCID.h"
+#include "CCID/USART/ISO7816_USART.h"
+#include "CCID/USART/ISO7816_ADPU.h"
+#include "USB_CCID/USB_CCID.h"
 
 #include "MatrixPassword.h"
 
