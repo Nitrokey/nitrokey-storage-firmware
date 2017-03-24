@@ -1,0 +1,82 @@
+  Flash storage description OTP
+
+  OTP parameter block
+
+    The OTP parameter block save the configuration data of each slot. The size of each slot is 64 byte
+
+         Slot        Start    End
+      GLOBAL_CONFIG     0       2
+      free              3      63
+      HOTP_SLOT1       64     127
+      HOTP_SLOT2      128     191
+      TOTP_SLOT1      192     255
+      TOTP_SLOT2      256     319
+      TOTP_SLOT3      320     383
+      TOTP_SLOT4      384     447
+
+
+  OTP configuration slot
+
+    Slot size 64 byte
+
+    Contain the parameter data - 50 data byte
+                       Start   Description
+    SLOT_TYPE_OFFSET     0       1 byte slot type TOTP, HOTP
+    SLOT_NAME_OFFSET     1      15 byte slot name
+    SECRET_OFFSET       16      20 byte secret key
+    CONFIG_OFFSET       36       1 byte config byte
+    TOKEN_ID_OFFSET     37      12 byte token ID
+
+
+  OTP counter storage slot
+
+    This field is used for storing the actual counter value. Because of the limitation of flash
+    erase accesses (1000 for a Stick 1.4 flash page (1024 byte), 100000 for a Stick 2.0 flash page (512 byte)).
+    it is necessary to reduce the erase access of the flash. This is done by using a greater area of the flash.
+    The limitation of flash accesses is only in the change of the bits to 1 in a flash page.
+    Only all bit in a hole flash page can set to 1 in a single process (this is the erase access).
+    The setting to 0 of a bit in the flash page is independent to other bits.
+
+    The implementation:
+    The first 8 byte of the slot contains the base counter of stored value as an unsigned 64 bit value. The
+    remaining page stored a token per flash byte for a used number. When all tokens in a slot are used, the
+    base counter is raised and the tokens are reseted to 0xff
+
+    Flash page layout
+
+    Entry                Position
+    Counter base         0 -    7     8 byte, unsigned 64 bit
+    Use flags            8 - 1023     1016 byte marked a used value (for Stick 1.4)
+    Use flags            8 -  511     504 byte marked a used value (for Stick 2.0)
+
+    Flash page byte order
+    0         1         2         3         4              End of flash page
+    01234567890123456789012345678901234567890123456789.... X
+    VVVVVVVVFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.... .
+
+    V = 64 bit counter base value
+    F = token for a used value, 0xFF = unused, 0x00 = used
+
+    The actual counter is the sum of the counter base value and the number of tokens with a 0 in the slot.
+
+    Example:
+
+          Flash page byte order
+          0         1         2         3         4              End of flash page
+          01234567890123456789012345678901234567890123456789.... X
+      xHi 0000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.... .
+      xLo 0000001000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.... .
+
+          V = 0x0100 = 256
+          Token 0-7 are marked as used = 8 tokens are marked
+
+          Counter value = 256 + 8 = 264
+
+
+    Slot size 1024 byte   Stick 1.4
+    Slot size  512 byte   Stick 2.0
+
+
+  OTP backup slot
+    Backup of the OTP parameter block
+
