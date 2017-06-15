@@ -464,6 +464,7 @@ Bool scsi_decode_command (void)
                 CI_StringOut (Text);
                 CI_StringOut ("\r\n");
             }
+/*
             if (0 == (g_scsi_command[4] & 0x01))
             {
                 SetSdUncryptedCardEnableState (FALSE);  // Close all volumes
@@ -474,7 +475,13 @@ Bool scsi_decode_command (void)
             {
                 SetSdUncryptedCardEnableState (TRUE);   // Open only the unencrypted volume
             }
+*/
             break;  // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
+
+        case SBC_CMD_SYNCHRONIZE_CACHE_10: // 0x35 - Optional.
+            status = TRUE;
+            sbc_lun_status_is_good ();
+            break;
 
         case SBC_CMD_FORMAT_UNIT:  // 0x04 - Mandatory.
         case SBC_CMD_REASSIGN_BLOCKS:  // 0x07 - Optional.
@@ -485,7 +492,7 @@ Bool scsi_decode_command (void)
         case SBC_CMD_SEND_DIAGNOSTIC:  // 0x1D - Mandatory.
         case SBC_CMD_WRITE_AND_VERIFY_10:  // 0x2E - Optional.
         case SBC_CMD_PREFETCH_10:  // 0x34 - Optional.
-        case SBC_CMD_SYNCHRONIZE_CACHE_10: // 0x35 - Optional.
+//        case SBC_CMD_SYNCHRONIZE_CACHE_10: // 0x35 - Optional.
         case SBC_CMD_READ_DEFECT_DATA_10:  // 0x37 - Optional.
         case SBC_CMD_WRITE_BUFFER: // 0x3B - Optional.
         case SBC_CMD_READ_BUFFER:  // 0x3C - Optional.
