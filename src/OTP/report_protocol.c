@@ -2695,6 +2695,14 @@ void UpdateStick20Command (u8 Status_u8, u8 ProgressBarValue_u8)
     HID_Stick20Status_st.ProgressBarValue_u8 = ProgressBarValue_u8;
 
     CopyUpdateToHIDData ();
+
+    u32 calculated_crc32;
+
+    calculated_crc32 = generateCRC(HID_GetReport_Value_tmp);
+    HID_GetReport_Value_tmp[OUTPUT_CRC_OFFSET] = calculated_crc32 & 0xFF;
+    HID_GetReport_Value_tmp[OUTPUT_CRC_OFFSET + 1] = (calculated_crc32 >> 8) & 0xFF;
+    HID_GetReport_Value_tmp[OUTPUT_CRC_OFFSET + 2] = (calculated_crc32 >> 16) & 0xFF;
+    HID_GetReport_Value_tmp[OUTPUT_CRC_OFFSET + 3] = (calculated_crc32 >> 24) & 0xFF;
 }
 
 /*******************************************************************************
