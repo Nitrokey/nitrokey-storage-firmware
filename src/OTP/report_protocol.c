@@ -60,7 +60,7 @@
 #include "Interpreter.h"
 
 #include "HighLevelFunctions/FlashStorage.h"
-#include "User_Interface/html_io.h"
+#include "USER_INTERFACE/html_io.h"
 #include "HighLevelFunctions/password_safe.h"
 #include "hotp.h"
 

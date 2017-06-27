@@ -44,7 +44,7 @@
 #include "ISO7816_ADPU.h"
 #include "ISO7816_Prot_T1.h"
 #include "LED_test.h"
-#include "USB_CCID\\USB_CCID.h"
+#include "USB_CCID/USB_CCID.h"
 
 
 
@@ -899,7 +899,7 @@ void ISO7816_APDU_Test (void)
 
 
     /*
-       SELECT FILE - so übernehmen 00 00 0B gpg: DBG: send apdu: c=00 i=A4 p1=04 p2=00 lc=6 le=-1 em=0 gpg: DBG: PCSC_data: 00 A4 04 00 06 D2 76 00
+       SELECT FILE - so Ã¼bernehmen 00 00 0B gpg: DBG: send apdu: c=00 i=A4 p1=04 p2=00 lc=6 le=-1 em=0 gpg: DBG: PCSC_data: 00 A4 04 00 06 D2 76 00
        01 24 01 gpg: DBG: response: sw=9000 datalen=0 gpg: DBG: dump: 2D */
 
     // Command

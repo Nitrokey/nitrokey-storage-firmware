@@ -54,7 +54,7 @@
 
 #include "LED_test.h"
 #include "tools.h"
-#include "..\HighLevelFunctions\FlashStorage.h"
+#include "HighLevelFunctions/FlashStorage.h"
 
 void TIME_MEASURING_Start (unsigned char Timer);
 void TIME_MEASURING_INT_Start (unsigned char Timer);

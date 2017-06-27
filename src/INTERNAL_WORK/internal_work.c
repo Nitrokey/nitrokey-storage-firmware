@@ -56,8 +56,8 @@
 #include "CCID/USART/ISO7816_Prot_T1.h"
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 
-#include "OTP\report_protocol.h"
-#include "HighLevelFunctions\HandleAesStorageKey.h"
+#include "OTP/report_protocol.h"
+#include "HighLevelFunctions/HandleAesStorageKey.h"
 #include "internal_work.h"
 
 

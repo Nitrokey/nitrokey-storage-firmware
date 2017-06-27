@@ -42,12 +42,12 @@
 
 #include "tools.h"
 #include "usart.h"
-#include "CCID\\USART\\ISO7816_USART.h"
-#include "CCID\\USART\\ISO7816_ADPU.h"
-#include "CCID\\USART\\ISO7816_Prot_T1.h"
+#include "CCID/USART/ISO7816_USART.h"
+#include "CCID/USART/ISO7816_ADPU.h"
+#include "CCID/USART/ISO7816_Prot_T1.h"
 #include "USB_CCID.h"
 #include "USB_CCID_task.h"
-#include "CCID/Local_ACCESS/Debug_T1.h"
+#include "CCID/LOCAL_ACCESS/Debug_T1.h"
 
 /*******************************************************************************
 
