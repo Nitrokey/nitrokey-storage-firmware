@@ -1,279 +1,489 @@
-cmake_minimum_required(VERSION 3.5)
-project(src)
+
+cmake_minimum_required(VERSION 2.8)
+
+set(AVR_UPLOADTOOL avrdude)
+set(AVR_PROGRAMMER avrispmkII)
+set(AVR_UPLOADTOOL_PORT usb)
+# AVR and fuses needs to be set
+#set(AVR_MCU atmega8)
+set(AVR_MCU atmega328p)
+set(AVR_H_FUSE 0xd9)
+set(AVR_L_FUSE 0xc3)
+
+project(storage-firmware C)
+
+##################################################################################
+# status messages
+##################################################################################
+message(STATUS "Current uploadtool is: ${AVR_UPLOADTOOL}")
+message(STATUS "Current programmer is: ${AVR_PROGRAMMER}")
+message(STATUS "Current upload port is: ${AVR_UPLOADTOOL_PORT}")
+message(STATUS "Current uploadtool options are: ${AVR_UPLOADTOOL_OPTIONS}")
+message(STATUS "Current MCU is set to: ${AVR_MCU}")
+message(STATUS "Current H_FUSE is set to: ${AVR_H_FUSE}")
+message(STATUS "Current L_FUSE is set to: ${AVR_L_FUSE}")
+
+##################################################################################
+# set build type, if not already set at cmake command line
+##################################################################################
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif(NOT CMAKE_BUILD_TYPE)
+
+##################################################################################
+# needs to be defined for AVR toolchain
+##################################################################################
+set(MCU_SPEED "4000000UL")
+
+##################################################################################
+# some cmake cross-compile necessities
+##################################################################################
+if(DEFINED ENV{AVR_FIND_ROOT_PATH})
+    set(CMAKE_FIND_ROOT_PATH $ENV{AVR_FIND_ROOT_PATH})
+else(DEFINED ENV{AVR_FIND_ROOT_PATH})
+    if(EXISTS "/opt/local/avr")
+        set(CMAKE_FIND_ROOT_PATH "/opt/local/avr")
+    elseif(EXISTS "/usr/avr")
+        set(CMAKE_FIND_ROOT_PATH "/usr/avr")
+    elseif(EXISTS "/usr/lib/avr")
+        set(CMAKE_FIND_ROOT_PATH "/usr/lib/avr")
+    elseif(EXISTS "/usr/local/CrossPack-AVR")
+        set(CMAKE_FIND_ROOT_PATH "/usr/local/CrossPack-AVR")
+    else(EXISTS "/opt/local/avr")
+        message(FATAL_ERROR "Please set AVR_FIND_ROOT_PATH in your environment.")
+    endif(EXISTS "/opt/local/avr")
+endif(DEFINED ENV{AVR_FIND_ROOT_PATH})
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+# not added automatically, since CMAKE_SYSTEM_NAME is "generic"
+set(CMAKE_SYSTEM_INCLUDE_PATH "${CMAKE_FIND_ROOT_PATH}/include")
+set(CMAKE_SYSTEM_LIBRARY_PATH "${CMAKE_FIND_ROOT_PATH}/lib")
+
+##################################################################################
+# status messages for generating
+##################################################################################
+message(STATUS "Set CMAKE_FIND_ROOT_PATH to ${CMAKE_FIND_ROOT_PATH}")
+message(STATUS "Set CMAKE_SYSTEM_INCLUDE_PATH to ${CMAKE_SYSTEM_INCLUDE_PATH}")
+message(STATUS "Set CMAKE_SYSTEM_LIBRARY_PATH to ${CMAKE_SYSTEM_LIBRARY_PATH}")
+
+##################################################################################
+# set compiler options for build types
+##################################################################################
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    set(CMAKE_C_FLAGS_RELEASE "-Os")
+    set(CMAKE_CXX_FLAGS_RELEASE "-Os")
+endif(CMAKE_BUILD_TYPE MATCHES Release)
+
+if(CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+    set(CMAKE_C_FLAGS_RELWITHDEBINFO "-Os -save-temps -g -gdwarf-3 -gstrict-dwarf")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-Os -save-temps -g -gdwarf-3 -gstrict-dwarf")
+endif(CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    set(CMAKE_C_FLAGS_DEBUG "-O0 -save-temps -g -gdwarf-3 -gstrict-dwarf")
+    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -save-temps -g -gdwarf-3 -gstrict-dwarf")
+endif(CMAKE_BUILD_TYPE MATCHES Debug)
+
+##################################################################################
+# compiler options for all build types
+##################################################################################
+add_definitions("-DF_CPU=${MCU_SPEED}")
+add_definitions("-fpack-struct")
+add_definitions("-fshort-enums")
+add_definitions("-Wall")
+add_definitions("-Werror")
+# http://gcc.gnu.org/onlinedocs/gcc-4.8.2/gcc/Alternate-Keywords.html#Alternate-Keywords
+# [...]-pedantic and other options cause warnings for many GNU C extensions. You can prevent such warnings within
+# one expression by writing __extension__ before the expression. __extension__ has no effect aside from this.[...]
+#add_definitions("-pedantic")
+#add_definitions("-pedantic-errors")
+add_definitions("-funsigned-char")
+add_definitions("-funsigned-bitfields")
+add_definitions("-ffunction-sections")
+add_definitions("-c")
+add_definitions("-std=gnu99")
+
+
+
+
+
+
 
 include_directories(.)
 include_directories(/home/sz/work/includes)
-SET( CMAKE_C_COMPILER "/usr/lib/ccache/avr-gcc" )
-add_definitions(-D__AT32UC3A3256S__=1)
-add_definitions(-D__AT32UC3A3256S__)
-add_definitions(-DBOARD=UC3A3256S)
+include_directories(/home/sz/work/includes/avr32)
+
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/AES)
+include_directories(../src/SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include)
+include_directories(../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG)
+include_directories(../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS)
+include_directories(../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/GCC/AVR32_UC3)
+include_directories(../src/SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include)
+include_directories(../src/SOFTWARE_FRAMEWORK/SERVICES/FAT)
+include_directories(../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/SCSI_DECODER)
+include_directories(../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM)
+include_directories(../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE)
+include_directories(../src/SOFTWARE_FRAMEWORK/SERVICES/USB)
+include_directories(../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI)
+include_directories(../src/CONFIG)
+include_directories(../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/USBB)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/USART)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/TC)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/PM)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/MCI)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER)
+include_directories(../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE)
+include_directories(../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR)
+include_directories(../src/SOFTWARE_FRAMEWORK/UTILS)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC)
+include_directories(../src/SOFTWARE_FRAMEWORK/BOARDS)
+include_directories(../src)
+include_directories(../src/VIRTUAL_MEM)
+include_directories(../src/USHELL)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/AES)
+include_directories(../src/SOFTWARE_FRAMEWORK/DRIVERS/ADC)
+include_directories(../src/Tools)
+include_directories(../src/USER_INTERFACE)
+include_directories(../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/HID)
+
+
+
+
+#SET( CMAKE_C_COMPILER "/usr/lib/ccache/avr-gcc" )
+#SET( CMAKE_C_COMPILER "/usr/lib/ccache/avr-gcc" )
+#add_definitions(-D__AT32UC3A3256S__=1)
+#add_definitions(-D__AT32UC3A3256S__)
+#add_definitions(-DBOARD=UC3A3256S)
+add_definitions(-DBOARD=EVK1104)
 add_definitions(-DFREERTOS_USED)
 
 set(SOURCE_FILES
-#    CCID/LOCAL_ACCESS/Debug_T1.c
-#    CCID/LOCAL_ACCESS/Debug_T1.h
-    CCID/LOCAL_ACCESS/OpenPGP_V20.c
-    CCID/LOCAL_ACCESS/OpenPGP_V20.h
-    CCID/UNIT_TEST/CONVERT_USB_LOG.c
-    CCID/UNIT_TEST/CONVERT_USB_LOG.h
-    CCID/UNIT_TEST/SIM_USB_CCID.c
-    CCID/UNIT_TEST/SIM_USB_CCID.h
-    CCID/USART/ISO7816_ADPU.c
-    CCID/USART/ISO7816_ADPU.h
-    CCID/USART/ISO7816_Prot_T0.c
-    CCID/USART/ISO7816_Prot_T0.h
-    CCID/USART/ISO7816_Prot_T1.c
-    CCID/USART/ISO7816_Prot_T1.h
-    CCID/USART/ISO7816_USART.c
-    CCID/USART/ISO7816_USART.h
-    CCID/USART/ISO7816_USART_INT.c
-    CCID/USART/ISO7816_USART_INT.h
-    Cipher/Xts/aes.h
-    Cipher/Xts/aescrypt.c
-    Cipher/Xts/aeskey.c
-    Cipher/Xts/aesopt.h
-    Cipher/Xts/aestab.c
-    Cipher/Xts/aestab.h
-    Cipher/Xts/brg_endian.h
-    Cipher/Xts/brg_types.h
-    Cipher/Xts/gentest.c
-    Cipher/Xts/mode_hdr.h
-    Cipher/Xts/modetest.c
-    Cipher/Xts/xts.c
-    Cipher/Xts/xts.h
-    CONFIG/conf_access.h
-    CONFIG/conf_at45dbx.h
-    CONFIG/conf_explorer.h
-    CONFIG/conf_sd_mmc_mci.h
-    CONFIG/conf_sd_mmc_spi.h
-    CONFIG/conf_usb.h
-    CONFIG/FreeRTOSConfig.h
-    FILE_IO/FileAccessInterface.c
-    FILE_IO/FileAccessInterface.h
-    HighLevelFunctions/FlashStorage.c
-    HighLevelFunctions/FlashStorage.h
-    HighLevelFunctions/HandleAesStorageKey.c
-    HighLevelFunctions/HandleAesStorageKey.h
-    HighLevelFunctions/HiddenVolume.c
-    HighLevelFunctions/HiddenVolume.h
-    HighLevelFunctions/MatrixPassword.c
-    HighLevelFunctions/MatrixPassword.h
-    HighLevelFunctions/password_safe.c
-    HighLevelFunctions/password_safe.h
-    INTERNAL_WORK/internal_work.c
-    INTERNAL_WORK/internal_work.h
-    OTP/aes.c
-    OTP/aes.h
-    OTP/hmac-sha1.c
-    OTP/hmac-sha1.h
-    OTP/hotp.c
-    OTP/hotp.h
-    OTP/keyboard.c
-    OTP/keyboard.h
-    OTP/report_protocol.c
-    OTP/report_protocol.h
-    OTP/sha1.c
-    OTP/sha1.h
-    SOFTWARE_FRAMEWORK/BOARDS/EVK1104/evk1104.h
-    SOFTWARE_FRAMEWORK/BOARDS/EVK1104/led.c
-    SOFTWARE_FRAMEWORK/BOARDS/EVK1104/led.h
-    SOFTWARE_FRAMEWORK/BOARDS/board.h
-    SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX/at45dbx.c
-    SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX/at45dbx.h
-    SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX/at45dbx_mem.c
-    SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX/at45dbx_mem.h
-    SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI/sd_mmc_cmd.h
-    SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI/sd_mmc_mci.c
-    SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI/sd_mmc_mci.h
-    SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI/sd_mmc_mci_mem.c
-    SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI/sd_mmc_mci_mem.h
-    SOFTWARE_FRAMEWORK/DRIVERS/ADC/adc.c
-    SOFTWARE_FRAMEWORK/DRIVERS/ADC/adc.h
-    SOFTWARE_FRAMEWORK/DRIVERS/AES/aes.c
-    SOFTWARE_FRAMEWORK/DRIVERS/AES/aes.h
-    SOFTWARE_FRAMEWORK/DRIVERS/AES/aes_1231.h
-    SOFTWARE_FRAMEWORK/DRIVERS/AES/ram_aes_ram_example.c
-    SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER/cycle_counter.h
-    SOFTWARE_FRAMEWORK/DRIVERS/FLASHC/flashc.c
-    SOFTWARE_FRAMEWORK/DRIVERS/FLASHC/flashc.h
-    SOFTWARE_FRAMEWORK/DRIVERS/GPIO/gpio.c
-    SOFTWARE_FRAMEWORK/DRIVERS/GPIO/gpio.h
-    SOFTWARE_FRAMEWORK/DRIVERS/INTC/intc.c
-    SOFTWARE_FRAMEWORK/DRIVERS/INTC/intc.h
-    SOFTWARE_FRAMEWORK/DRIVERS/MCI/mci.c
-    SOFTWARE_FRAMEWORK/DRIVERS/MCI/mci.h
-    SOFTWARE_FRAMEWORK/DRIVERS/PM/pm.c
-    SOFTWARE_FRAMEWORK/DRIVERS/PM/pm.h
-    SOFTWARE_FRAMEWORK/DRIVERS/PM/pm_conf_clocks.c
-    SOFTWARE_FRAMEWORK/DRIVERS/PM/power_clocks_lib.c
-    SOFTWARE_FRAMEWORK/DRIVERS/PM/power_clocks_lib.h
-    SOFTWARE_FRAMEWORK/DRIVERS/SPI/spi.c
-    SOFTWARE_FRAMEWORK/DRIVERS/SPI/spi.h
-    SOFTWARE_FRAMEWORK/DRIVERS/TC/tc.c
-    SOFTWARE_FRAMEWORK/DRIVERS/TC/tc.h
-    SOFTWARE_FRAMEWORK/DRIVERS/USART/usart.c
-    SOFTWARE_FRAMEWORK/DRIVERS/USART/usart.h
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_descriptors.c
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_descriptors.h
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_device_task.c
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_device_task.h
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_specific_request.c
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_specific_request.h
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_standard_request.c
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_standard_request.h
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST/usb_host_enum.c
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST/usb_host_enum.h
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST/usb_host_task.c
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST/usb_host_task.h
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/usb_task.c
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/usb_task.h
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/usb_drv.c
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/usb_drv.h
-    SOFTWARE_FRAMEWORK/DRIVERS/USBB/usbb.h
-    SOFTWARE_FRAMEWORK/SERVICES/FAT/fat.c
-    SOFTWARE_FRAMEWORK/SERVICES/FAT/fat.h
-    SOFTWARE_FRAMEWORK/SERVICES/FAT/fat_unusual.c
-    SOFTWARE_FRAMEWORK/SERVICES/FAT/file.c
-    SOFTWARE_FRAMEWORK/SERVICES/FAT/file.h
-    SOFTWARE_FRAMEWORK/SERVICES/FAT/fs_com.h
-    SOFTWARE_FRAMEWORK/SERVICES/FAT/fsaccess.c
-    SOFTWARE_FRAMEWORK/SERVICES/FAT/fsaccess.h
-    SOFTWARE_FRAMEWORK/SERVICES/FAT/navigation.c
-    SOFTWARE_FRAMEWORK/SERVICES/FAT/navigation.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/croutine.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/FreeRTOS.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/list.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/mpu_wrappers.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/portable.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/projdefs.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/queue.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/semphr.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/StackMacros.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/task.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/GCC/AVR32_UC3/port.c
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/GCC/AVR32_UC3/portmacro.h
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/MemMang/heap_3.c
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/croutine.c
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/list.c
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/queue.c
-    SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/tasks.c
-    SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS/ctrl_access.c
-    SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS/ctrl_access.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/aes.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/arc4.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/base64.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/bignum.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/bn_mul.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/camellia.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/certs.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/config.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/debug.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/des.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/dhm.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/havege.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/md2.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/md4.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/md5.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/net.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/openssl.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/padlock.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/rsa.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/sha1.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/sha2.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/sha4.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/ssl.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/timing.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/x509.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/xtea.h
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/aes.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/arc4.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/base64.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/bignum.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/camellia.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/certs.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/debug.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/des.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/dhm.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/havege.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/md2.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/md4.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/md5.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/net.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/padlock.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/rsa.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/sha1.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/sha2.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/sha4.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/ssl_cli.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/ssl_srv.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/ssl_tls.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/timing.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/x509parse.c
-    SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/xtea.c
-    SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/HID/hid.h
-    SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM/host_mem.c
-    SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM/host_mem.h
-    SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/SCSI_DECODER/scsi_decoder.c
-    SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/SCSI_DECODER/scsi_decoder.h
-    SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/device_mass_storage_task.c
-    SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/device_mass_storage_task.h
-    SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/host_mass_storage_task.c
-    SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/host_mass_storage_task.h
-    SOFTWARE_FRAMEWORK/SERVICES/USB/usb_ids.h
-    SOFTWARE_FRAMEWORK/UTILS/DEBUG/debug.c
-    SOFTWARE_FRAMEWORK/UTILS/DEBUG/debug.h
-    SOFTWARE_FRAMEWORK/UTILS/DEBUG/print_funcs.c
-    SOFTWARE_FRAMEWORK/UTILS/DEBUG/print_funcs.h
-    SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE/nlao_cpu.h
-    SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE/nlao_exceptions.h
-    SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE/nlao_interrupts.h
-    SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE/nlao_io.h
-    SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE/nlao_usart.h
-    SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR/mrepeat.h
-    SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR/preprocessor.h
-    SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR/stringz.h
-    SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR/tpaste.h
-    SOFTWARE_FRAMEWORK/UTILS/compiler.h
-    SOFTWARE_FRAMEWORK/UTILS/conf_isp.h
-    SOFTWARE_FRAMEWORK/UTILS/parts.h
-    Tools/AD_Test.c
-    Tools/AD_Test.h
-    Tools/BUFFERED_SIO.c
-    Tools/BUFFERED_SIO.h
-    Tools/DFU_test.c
-    Tools/DFU_test.h
-    Tools/fastHash.c
-    Tools/fastHash.h
-    Tools/Inbetriebnahme.c
-    Tools/Inbetriebnahme.h
-    Tools/Interpreter.c
-    Tools/Interpreter.h
-    Tools/LED_test.c
-    Tools/LED_test.h
-    Tools/OTP_Test.c
-    Tools/OTP_Test.h
-    Tools/SD_Test.c
-    Tools/SD_Test.h
-    Tools/TIME_MEASURING.c
-    Tools/TIME_MEASURING.h
-    Tools/xxHash.c
-    Tools/xxHash.h
-    USB_CCID/USB_CCID.c
-    USB_CCID/USB_CCID.h
-    USB_CCID/USB_CCID_task.c
-    USB_CCID/USB_CCID_task.h
-    USER_INTERFACE/file_io.c
-    USER_INTERFACE/file_io.h
-    USER_INTERFACE/html_io.c
-    USER_INTERFACE/html_io.h
-    USHELL/ushell_task.c
-    USHELL/ushell_task.h
-    VIRTUAL_MEM/virtual_mem.c
-    VIRTUAL_MEM/virtual_mem.h
-    global.h
-    nitrokey.c
-    nitrokey.h
-    tools.c
-    tools.h)
+        #    CCID/LOCAL_ACCESS/Debug_T1.c
+        #    CCID/LOCAL_ACCESS/Debug_T1.h
+        CCID/LOCAL_ACCESS/OpenPGP_V20.c
+        CCID/LOCAL_ACCESS/OpenPGP_V20.h
+        CCID/UNIT_TEST/CONVERT_USB_LOG.c
+        CCID/UNIT_TEST/CONVERT_USB_LOG.h
+        CCID/UNIT_TEST/SIM_USB_CCID.c
+        CCID/UNIT_TEST/SIM_USB_CCID.h
+        CCID/USART/ISO7816_ADPU.c
+        CCID/USART/ISO7816_ADPU.h
+        CCID/USART/ISO7816_Prot_T0.c
+        CCID/USART/ISO7816_Prot_T0.h
+        CCID/USART/ISO7816_Prot_T1.c
+        CCID/USART/ISO7816_Prot_T1.h
+        CCID/USART/ISO7816_USART.c
+        CCID/USART/ISO7816_USART.h
+        CCID/USART/ISO7816_USART_INT.c
+        CCID/USART/ISO7816_USART_INT.h
+        Cipher/Xts/aes.h
+        Cipher/Xts/aescrypt.c
+        Cipher/Xts/aeskey.c
+        Cipher/Xts/aesopt.h
+        Cipher/Xts/aestab.c
+        Cipher/Xts/aestab.h
+        Cipher/Xts/brg_endian.h
+        Cipher/Xts/brg_types.h
+        Cipher/Xts/gentest.c
+        Cipher/Xts/mode_hdr.h
+        Cipher/Xts/modetest.c
+        Cipher/Xts/xts.c
+        Cipher/Xts/xts.h
+        CONFIG/conf_access.h
+        CONFIG/conf_at45dbx.h
+        CONFIG/conf_explorer.h
+        CONFIG/conf_sd_mmc_mci.h
+        CONFIG/conf_sd_mmc_spi.h
+        CONFIG/conf_usb.h
+        CONFIG/FreeRTOSConfig.h
+        FILE_IO/FileAccessInterface.c
+        FILE_IO/FileAccessInterface.h
+        HighLevelFunctions/FlashStorage.c
+        HighLevelFunctions/FlashStorage.h
+        HighLevelFunctions/HandleAesStorageKey.c
+        HighLevelFunctions/HandleAesStorageKey.h
+        HighLevelFunctions/HiddenVolume.c
+        HighLevelFunctions/HiddenVolume.h
+        HighLevelFunctions/MatrixPassword.c
+        HighLevelFunctions/MatrixPassword.h
+        HighLevelFunctions/password_safe.c
+        HighLevelFunctions/password_safe.h
+        INTERNAL_WORK/internal_work.c
+        INTERNAL_WORK/internal_work.h
+        OTP/aes.c
+        OTP/aes.h
+        OTP/hmac-sha1.c
+        OTP/hmac-sha1.h
+        OTP/hotp.c
+        OTP/hotp.h
+        OTP/keyboard.c
+        OTP/keyboard.h
+        OTP/report_protocol.c
+        OTP/report_protocol.h
+        OTP/sha1.c
+        OTP/sha1.h
+        SOFTWARE_FRAMEWORK/BOARDS/EVK1104/evk1104.h
+        SOFTWARE_FRAMEWORK/BOARDS/EVK1104/led.c
+        SOFTWARE_FRAMEWORK/BOARDS/EVK1104/led.h
+        SOFTWARE_FRAMEWORK/BOARDS/board.h
+        SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX/at45dbx.c
+        SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX/at45dbx.h
+        SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX/at45dbx_mem.c
+        SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX/at45dbx_mem.h
+        SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI/sd_mmc_cmd.h
+        SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI/sd_mmc_mci.c
+        SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI/sd_mmc_mci.h
+        SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI/sd_mmc_mci_mem.c
+        SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/SD_MMC/SD_MMC_MCI/sd_mmc_mci_mem.h
+        SOFTWARE_FRAMEWORK/DRIVERS/ADC/adc.c
+        SOFTWARE_FRAMEWORK/DRIVERS/ADC/adc.h
+        SOFTWARE_FRAMEWORK/DRIVERS/AES/aes.c
+        SOFTWARE_FRAMEWORK/DRIVERS/AES/aes.h
+        SOFTWARE_FRAMEWORK/DRIVERS/AES/aes_1231.h
+        SOFTWARE_FRAMEWORK/DRIVERS/AES/ram_aes_ram_example.c
+        SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER/cycle_counter.h
+        SOFTWARE_FRAMEWORK/DRIVERS/FLASHC/flashc.c
+        SOFTWARE_FRAMEWORK/DRIVERS/FLASHC/flashc.h
+        SOFTWARE_FRAMEWORK/DRIVERS/GPIO/gpio.c
+        SOFTWARE_FRAMEWORK/DRIVERS/GPIO/gpio.h
+        SOFTWARE_FRAMEWORK/DRIVERS/INTC/intc.c
+        SOFTWARE_FRAMEWORK/DRIVERS/INTC/intc.h
+        SOFTWARE_FRAMEWORK/DRIVERS/MCI/mci.c
+        SOFTWARE_FRAMEWORK/DRIVERS/MCI/mci.h
+        SOFTWARE_FRAMEWORK/DRIVERS/PM/pm.c
+        SOFTWARE_FRAMEWORK/DRIVERS/PM/pm.h
+        SOFTWARE_FRAMEWORK/DRIVERS/PM/pm_conf_clocks.c
+        SOFTWARE_FRAMEWORK/DRIVERS/PM/power_clocks_lib.c
+        SOFTWARE_FRAMEWORK/DRIVERS/PM/power_clocks_lib.h
+        SOFTWARE_FRAMEWORK/DRIVERS/SPI/spi.c
+        SOFTWARE_FRAMEWORK/DRIVERS/SPI/spi.h
+        SOFTWARE_FRAMEWORK/DRIVERS/TC/tc.c
+        SOFTWARE_FRAMEWORK/DRIVERS/TC/tc.h
+        SOFTWARE_FRAMEWORK/DRIVERS/USART/usart.c
+        SOFTWARE_FRAMEWORK/DRIVERS/USART/usart.h
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_descriptors.c
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_descriptors.h
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_device_task.c
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_device_task.h
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_specific_request.c
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_specific_request.h
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_standard_request.c
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/DEVICE/usb_standard_request.h
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST/usb_host_enum.c
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST/usb_host_enum.h
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST/usb_host_task.c
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/HOST/usb_host_task.h
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/usb_task.c
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/ENUM/usb_task.h
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/usb_drv.c
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/usb_drv.h
+        SOFTWARE_FRAMEWORK/DRIVERS/USBB/usbb.h
+        SOFTWARE_FRAMEWORK/SERVICES/FAT/fat.c
+        SOFTWARE_FRAMEWORK/SERVICES/FAT/fat.h
+        SOFTWARE_FRAMEWORK/SERVICES/FAT/fat_unusual.c
+        SOFTWARE_FRAMEWORK/SERVICES/FAT/file.c
+        SOFTWARE_FRAMEWORK/SERVICES/FAT/file.h
+        SOFTWARE_FRAMEWORK/SERVICES/FAT/fs_com.h
+        SOFTWARE_FRAMEWORK/SERVICES/FAT/fsaccess.c
+        SOFTWARE_FRAMEWORK/SERVICES/FAT/fsaccess.h
+        SOFTWARE_FRAMEWORK/SERVICES/FAT/navigation.c
+        SOFTWARE_FRAMEWORK/SERVICES/FAT/navigation.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/croutine.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/FreeRTOS.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/list.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/mpu_wrappers.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/portable.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/projdefs.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/queue.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/semphr.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/StackMacros.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/include/task.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/GCC/AVR32_UC3/port.c
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/GCC/AVR32_UC3/portmacro.h
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/portable/MemMang/heap_3.c
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/croutine.c
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/list.c
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/queue.c
+        SOFTWARE_FRAMEWORK/SERVICES/FREERTOS/Source/tasks.c
+        SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS/ctrl_access.c
+        SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS/ctrl_access.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/aes.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/arc4.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/base64.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/bignum.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/bn_mul.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/camellia.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/certs.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/config.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/debug.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/des.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/dhm.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/havege.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/md2.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/md4.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/md5.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/net.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/openssl.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/padlock.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/rsa.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/sha1.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/sha2.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/sha4.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/ssl.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/timing.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/x509.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/include/polarssl/xtea.h
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/aes.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/arc4.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/base64.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/bignum.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/camellia.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/certs.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/debug.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/des.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/dhm.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/havege.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/md2.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/md4.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/md5.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/net.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/padlock.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/rsa.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/sha1.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/sha2.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/sha4.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/ssl_cli.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/ssl_srv.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/ssl_tls.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/timing.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/x509parse.c
+        SOFTWARE_FRAMEWORK/SERVICES/POLARSSL/xtea.c
+        SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/HID/hid.h
+        SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM/host_mem.c
+        SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/HOST_MEM/host_mem.h
+        SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/SCSI_DECODER/scsi_decoder.c
+        SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/SCSI_DECODER/scsi_decoder.h
+        SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/device_mass_storage_task.c
+        SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/device_mass_storage_task.h
+        SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/host_mass_storage_task.c
+        SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/MASS_STORAGE/host_mass_storage_task.h
+        SOFTWARE_FRAMEWORK/SERVICES/USB/usb_ids.h
+        SOFTWARE_FRAMEWORK/UTILS/DEBUG/debug.c
+        SOFTWARE_FRAMEWORK/UTILS/DEBUG/debug.h
+        SOFTWARE_FRAMEWORK/UTILS/DEBUG/print_funcs.c
+        SOFTWARE_FRAMEWORK/UTILS/DEBUG/print_funcs.h
+        SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE/nlao_cpu.h
+        SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE/nlao_exceptions.h
+        SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE/nlao_interrupts.h
+        SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE/nlao_io.h
+        SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE/nlao_usart.h
+        SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR/mrepeat.h
+        SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR/preprocessor.h
+        SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR/stringz.h
+        SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR/tpaste.h
+        SOFTWARE_FRAMEWORK/UTILS/compiler.h
+        SOFTWARE_FRAMEWORK/UTILS/conf_isp.h
+        SOFTWARE_FRAMEWORK/UTILS/parts.h
+        Tools/AD_Test.c
+        Tools/AD_Test.h
+        Tools/BUFFERED_SIO.c
+        Tools/BUFFERED_SIO.h
+        Tools/DFU_test.c
+        Tools/DFU_test.h
+        Tools/fastHash.c
+        Tools/fastHash.h
+        Tools/Inbetriebnahme.c
+        Tools/Inbetriebnahme.h
+        Tools/Interpreter.c
+        Tools/Interpreter.h
+        Tools/LED_test.c
+        Tools/LED_test.h
+        Tools/OTP_Test.c
+        Tools/OTP_Test.h
+        Tools/SD_Test.c
+        Tools/SD_Test.h
+        Tools/TIME_MEASURING.c
+        Tools/TIME_MEASURING.h
+        Tools/xxHash.c
+        Tools/xxHash.h
+        USB_CCID/USB_CCID.c
+        USB_CCID/USB_CCID.h
+        USB_CCID/USB_CCID_task.c
+        USB_CCID/USB_CCID_task.h
+        USER_INTERFACE/file_io.c
+        USER_INTERFACE/file_io.h
+        USER_INTERFACE/html_io.c
+        USER_INTERFACE/html_io.h
+        USHELL/ushell_task.c
+        USHELL/ushell_task.h
+        VIRTUAL_MEM/virtual_mem.c
+        VIRTUAL_MEM/virtual_mem.h
+        global.h
+        nitrokey.c
+        nitrokey.h
+        tools.c
+        tools.h)
 
-add_executable(src ${SOURCE_FILES})
+
+
+
+
+
+##################################################################################
+# add AVR executable
+##################################################################################
+add_avr_executable(
+        storage-firmware
+        ${SOURCE_FILES}
+)
+
+###################################################################################
+## add AVR library
+###################################################################################
+#add_avr_library(
+#        <library-name>
+#        <sources> <headers>
+#)
+
+###################################################################################
+## link library to executable
+## NOTE: It needs to be the elf target.
+###################################################################################
+## target_link_libraries(<executable-name>-${AVR_MCU}.elf <library-name>-${AVR_MCU})
+## OR easier
+#target_link_libraries(<executable-name> <library-name> <some-external-libary>)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
