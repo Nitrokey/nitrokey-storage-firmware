@@ -25,7 +25,7 @@
 #include <string.h>
 #include "global.h"
 #include "tools.h"
-#include "USB_CCID\USB_CCID.h"
+#include "USB_CCID/USB_CCID.h"
 #include "SIM_USB_CCID.h"
 
 char* USB_LOG_XP_generate_ok[] = {

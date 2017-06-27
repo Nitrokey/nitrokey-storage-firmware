@@ -46,8 +46,8 @@
 
 #include "TIME_MEASURING.h"
 #include "Inbetriebnahme.h"
-#include "..\FILE_IO\FileAccessInterface.h"
-#include "AD_test.h"
+#include "FILE_IO/FileAccessInterface.h"
+#include "AD_Test.h"
 #include "polarssl/timing.h"
 #include "ctrl_access.h"
 #include "USER_INTERFACE/html_io.h"

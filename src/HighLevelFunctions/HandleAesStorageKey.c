@@ -33,7 +33,7 @@
 #include "tools.h"
 #include "Interpreter.h"
 #include "CCID/USART/ISO7816_ADPU.h"
-#include "CCID/Local_ACCESS/OpenPGP_V20.h"
+#include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 #include "FlashStorage.h"
 #include "HandleAesStorageKey.h"
 #include "password_safe.h"

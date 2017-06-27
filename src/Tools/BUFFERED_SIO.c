@@ -39,7 +39,7 @@
 #include "tools.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "..\CCID\USART\ISO7816_USART.h"
+#include "CCID/USART/ISO7816_USART.h"
 
 #include "print_funcs.h"
 #include "intc.h"
