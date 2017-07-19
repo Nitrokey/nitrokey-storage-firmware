@@ -61,7 +61,14 @@
 #include "HighLevelFunctions/FlashStorage.h"
 
 #include "portmacro.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+
 extern volatile portTickType xTickCount;
+extern volatile xSemaphoreHandle AES_semphr;     // AES semaphore
 
 // _____ P R I V A T E D E C L A R A T I O N S ____________________________
 
@@ -115,13 +122,13 @@ volatile avr32_mci_t* mci = &AVR32_MCI;
 
 #if ACCESS_USB == ENABLED
 
-static Bool is_dma_usb_2_ram_complete (void);
+Bool is_dma_usb_2_ram_complete (void);
 // static Bool is_dma_ram_2_mci_complete( void );
 static void dma_usb_2_ram (void* ram, size_t size);
 // static void dma_ram_2_mci(const void *ram, size_t size, unsigned int BlockNr_u32);
 
-static Bool is_dma_mci_2_ram_complete (void);
-static Bool is_dma_ram_2_usb_complete (void);
+Bool is_dma_mci_2_ram_complete (void);
+Bool is_dma_ram_2_usb_complete (void);
 // static void dma_mci_2_ram(void *ram, size_t size, unsigned int BlockNr_u32);
 static void dma_ram_2_usb (const void* ram, size_t size);
 
@@ -881,7 +888,7 @@ static void dma_ram_2_usb (const void* ram, size_t size)
     (void) AVR32_USBB_UDDMAX_control (g_scsi_ep_ms_in);
 }
 
-static Bool is_dma_ram_2_usb_complete (void)
+Bool is_dma_ram_2_usb_complete (void)
 {
     if (AVR32_USBB_UDDMAX_status (g_scsi_ep_ms_in) & AVR32_USBB_UXDMAX_STATUS_CH_EN_MASK)
         return FALSE;
@@ -942,7 +949,7 @@ static void dma_mci_2_ram_uncrypted (void* ram, size_t size, unsigned int BlockN
     AVR32_DMACA.chenreg = ((2 << AVR32_DMACA_CHENREG_CH_EN_OFFSET) | (2 << AVR32_DMACA_CHENREG_CH_EN_WE_OFFSET));
 }
 
-static Bool is_dma_mci_2_ram_complete (void)
+Bool is_dma_mci_2_ram_complete (void)
 {
     // Wait for the end of the AES->RAM transfer (channel 1).
     if (AVR32_DMACA.chenreg & (2 << AVR32_DMACA_CHENREG_CH_EN_OFFSET))
@@ -1102,7 +1109,7 @@ static void dma_usb_2_ram (void* ram, size_t size)
     (void) AVR32_USBB_UDDMAX_control (g_scsi_ep_ms_out);
 }
 
-static Bool is_dma_usb_2_ram_complete (void)
+Bool is_dma_usb_2_ram_complete (void)
 {
     if (AVR32_USBB_UDDMAX_status (g_scsi_ep_ms_out) & AVR32_USBB_UXDMAX_STATUS_CH_EN_MASK)
         return FALSE;
@@ -1681,17 +1688,23 @@ U32 BlockNr_u32;
 #ifdef TIME_MEASURING_ENABLE
         TIME_MEASURING_Start (TIME_MEASURING_TIME_MSD_AES_READ);
 #endif
+        // Wait for the AES semaphore
+        while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
+        {
+          CI_StringOut ("§2");
+        }
+
         if (buffer_id == 0)
         {
             dma_mci_2_ram (&sector_buf_0, SD_MMC_SECTOR_SIZE, BlockNr_u32);
             buffer_id = 1;
-
         }
         else
         {
             dma_mci_2_ram (&sector_buf_1, SD_MMC_SECTOR_SIZE, BlockNr_u32);
             buffer_id = 0;
         }
+
 
         BlockNr_u32++;
 
@@ -1724,6 +1737,10 @@ U32 BlockNr_u32;
 
         }
 
+        taskENTER_CRITICAL ();
+        xSemaphoreGive (AES_semphr);
+        taskEXIT_CRITICAL ();
+
 #ifdef TIME_MEASURING_ENABLE
         TIME_MEASURING_Stop (TIME_MEASURING_TIME_MSD_AES_READ);
 #endif
@@ -1738,6 +1755,12 @@ U32 BlockNr_u32;
 
        } */
     // Complete execution of the last transfer (which is in the pipe).
+    // Wait for the AES semaphore
+    while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
+    {
+      CI_StringOut ("§8");
+    }
+
     if (buffer_id == 0)
     {
         dma_ram_2_usb (&sector_buf_1, SD_MMC_SECTOR_SIZE);
@@ -1747,10 +1770,11 @@ U32 BlockNr_u32;
         dma_ram_2_usb (&sector_buf_0, SD_MMC_SECTOR_SIZE);
     }
 
-
     while (!is_dma_ram_2_usb_complete ());
 
-
+    taskENTER_CRITICAL ();
+    xSemaphoreGive (AES_semphr);
+    taskEXIT_CRITICAL ();
 
     // Wait until the USB RAM is empty before disabling the autoswitch feature.
     while (Usb_nb_busy_bank (g_scsi_ep_ms_in) != 0);
@@ -1782,6 +1806,12 @@ U32 BlockNr_u32;
 #ifdef TIME_MEASURING_ENABLE
         TIME_MEASURING_Start (TIME_MEASURING_TIME_MSD_AES_WRITE);
 #endif
+        // Wait for the AES semaphore
+        while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
+        {
+          CI_StringOut ("§6");
+        }
+
         // (re)load first stage.
         if (buffer_id == 0)
         {
@@ -1826,9 +1856,20 @@ U32 BlockNr_u32;
             {
             }
         }
+
+        taskENTER_CRITICAL ();
+        xSemaphoreGive (AES_semphr);
+        taskEXIT_CRITICAL ();
+
 #ifdef TIME_MEASURING_ENABLE
         TIME_MEASURING_Stop (TIME_MEASURING_TIME_MSD_AES_WRITE);
 #endif
+    }
+
+    // Wait for the AES semaphore
+    while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
+    {
+      CI_StringOut ("§7");
     }
 
     // Complete execution of the last transfer (which is in the pipe).
@@ -1842,6 +1883,10 @@ U32 BlockNr_u32;
     }
 
     while (!is_dma_ram_2_mci_complete ());
+
+    taskENTER_CRITICAL ();
+    xSemaphoreGive (AES_semphr);
+    taskEXIT_CRITICAL ();
 
     // Wait until the USB RAM is empty before disabling the autoswitch feature.
     while (Usb_nb_busy_bank (g_scsi_ep_ms_out) != 0);

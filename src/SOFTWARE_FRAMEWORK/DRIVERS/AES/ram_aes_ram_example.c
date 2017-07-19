@@ -65,6 +65,11 @@
 #include "tools.h"
 #include "HighLevelFunctions/FlashStorage.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+
 /* AES */
 #define AVR32_AES_ADDRESS                  0xFFFD0000
 #define AVR32_AES                          (*((volatile avr32_aes_t*)AVR32_AES_ADDRESS))
@@ -72,6 +77,13 @@
 
 #include "avr32/aes_1231.h"
 
+
+Bool is_dma_usb_2_ram_complete (void);
+Bool is_dma_mci_2_ram_complete (void);
+Bool is_dma_ram_2_usb_complete (void);
+Bool is_dma_ram_2_mci_complete (void);
+
+extern volatile xSemaphoreHandle AES_semphr;     // AES semaphore
 
 /* ! \name Board-Related Example Settings */
 // ! @{
@@ -213,6 +225,14 @@ void STICK20_ram_aes_ram (unsigned char cMode, unsigned short int u16BufferSize,
     // unsigned int i;
     // unsigned char TestResult = TRUE;
     aes_config_t AesConf;       // AES config structure
+
+    // Wait for the semaphore
+    while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
+    {
+      CI_StringOut ("§1");
+    }
+
+    taskENTER_CRITICAL ();
 
     // ====================
     // Configure the AES.
@@ -374,8 +394,14 @@ void STICK20_ram_aes_ram (unsigned char cMode, unsigned short int u16BufferSize,
     // Enable Channel 0 & 1 : start the process.
     AVR32_DMACA.chenreg = ((3 << AVR32_DMACA_CHENREG_CH_EN_OFFSET) | (3 << AVR32_DMACA_CHENREG_CH_EN_WE_OFFSET));
 
+    taskEXIT_CRITICAL ();
+
     // Wait for the end of the AES->RAM transfer (channel 1).
     while (AVR32_DMACA.chenreg & (2 << AVR32_DMACA_CHENREG_CH_EN_OFFSET));
+
+    taskENTER_CRITICAL ();
+    xSemaphoreGive (AES_semphr);
+    taskEXIT_CRITICAL ();
 
     // ccountt1 = Get_system_register(AVR32_COUNT);
 
@@ -392,6 +418,8 @@ void STICK20_mci_aes (unsigned char cMode, unsigned short int u16BufferSize, uns
     unsigned int i;
     // unsigned char TestResult = TRUE;
     aes_config_t AesConf;       // AES config structure
+
+    taskENTER_CRITICAL ();
 
     // ====================
     // Configure the AES.
@@ -415,8 +443,6 @@ void STICK20_mci_aes (unsigned char cMode, unsigned short int u16BufferSize, uns
     AesConf.CFBSize = 0;    // Don't-care because we're using the CBC mode.
     AesConf.CounterMeasureMask = 0; // Disable all counter measures.
     aes_configure (&AVR32_AES, &AesConf);
-
-
 
     // ====================
     // Configure the DMACA.
@@ -665,6 +691,7 @@ void STICK20_mci_aes (unsigned char cMode, unsigned short int u16BufferSize, uns
     }
     aes_set_initvector (&AVR32_AES, InitVectorSD);
 
+    taskEXIT_CRITICAL ();
     // *
     // * Start the process
     // *
@@ -864,6 +891,18 @@ void AES_Encryption (unsigned short int u16BufferSize, unsigned int* pSrcBuf, un
     // unsigned int i;
     // unsigned char TestResult = TRUE;
 
+  if (DMACA_AES_EVAL_BUF_SIZE < u16BufferSize)
+  {
+    u16BufferSize = u16BufferSize;
+  }
+
+  taskENTER_CRITICAL ();
+
+  // Wait for end of DMA transfers
+  while (!is_dma_mci_2_ram_complete ());
+  while (!is_dma_ram_2_usb_complete ());
+  while (!is_dma_usb_2_ram_complete ());
+  while (!is_dma_ram_2_mci_complete ());
 
     // ====================
     // Configure the DMACA.
@@ -996,8 +1035,11 @@ void AES_Encryption (unsigned short int u16BufferSize, unsigned int* pSrcBuf, un
     // *
     ccountt0 = Get_system_register (AVR32_COUNT);
 
+
     // Enable Channel 0 & 1 : start the process.
     AVR32_DMACA.chenreg = ((3 << AVR32_DMACA_CHENREG_CH_EN_OFFSET) | (3 << AVR32_DMACA_CHENREG_CH_EN_WE_OFFSET));
+
+    taskEXIT_CRITICAL ();
 
     // Wait for the end of the AES->RAM transfer (channel 1).
     while (AVR32_DMACA.chenreg & (2 << AVR32_DMACA_CHENREG_CH_EN_OFFSET));
@@ -1027,6 +1069,18 @@ int AES_StorageKeyEncryption (unsigned int nLength, unsigned char* cData, unsign
     // - No counter measures
     // ****************************************************************************
 
+    // Wait for the semaphore
+    while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
+    {
+      CI_StringOut ("§3");
+    }
+
+    // Wait for end of DMA transfers
+    while (!is_dma_mci_2_ram_complete ());
+    while (!is_dma_ram_2_usb_complete ());
+    while (!is_dma_usb_2_ram_complete ());
+    while (!is_dma_ram_2_mci_complete ());
+
     memcpy (InputData, cData, nLength);
 
     // ====================
@@ -1052,6 +1106,10 @@ int AES_StorageKeyEncryption (unsigned int nLength, unsigned char* cData, unsign
     AES_Encryption (nLength, (unsigned int *) InputData, (unsigned int *) OutputData, (unsigned int *) cKeyData, (unsigned int *) InitVector);
 
     memcpy (cData, (void *) OutputData, nLength);
+
+    taskENTER_CRITICAL ();
+    xSemaphoreGive (AES_semphr);
+    taskEXIT_CRITICAL ();
 
     return (0);
 }
@@ -1091,6 +1149,23 @@ int AES_KeyEncryption (unsigned int nLength, unsigned char* cData, unsigned char
     // - No counter measures
     // ****************************************************************************
 
+    if (DMACA_AES_EVAL_BUF_SIZE < nLength)
+    {
+      nLength = DMACA_AES_EVAL_BUF_SIZE;
+    }
+
+    // Wait for the semaphore
+    while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
+    {
+      CI_StringOut ("§4");
+    }
+
+    // Wait for end of DMA transfers
+    while (!is_dma_mci_2_ram_complete ());
+    while (!is_dma_ram_2_usb_complete ());
+    while (!is_dma_usb_2_ram_complete ());
+    while (!is_dma_ram_2_mci_complete ());
+
     memcpy (InputData, cData, nLength);
 
     // ====================
@@ -1118,10 +1193,19 @@ int AES_KeyEncryption (unsigned int nLength, unsigned char* cData, unsigned char
        for (i=0;i<4;i++) { InitVectorSD[i] = BlockNr_u32; } */
     xxHashInitVector_v (InitVectorSD, BlockNr_u32);
 
+    if (DMACA_AES_EVAL_BUF_SIZE < nLength)
+    {
+      nLength = DMACA_AES_EVAL_BUF_SIZE;
+    }
+
 
     AES_Encryption (nLength, (unsigned int *) InputData, (unsigned int *) OutputData, (unsigned int *) cKeyData, (unsigned int *) InitVectorSD);
 
     memcpy (cData, (void *) OutputData, nLength);
+
+    taskENTER_CRITICAL ();
+    xSemaphoreGive (AES_semphr);
+    taskEXIT_CRITICAL ();
 
     return (0);
 }
@@ -1168,6 +1252,12 @@ int AES_local_test_org (void)
     // - CBC cipher mode
     // - No counter measures
     // ****************************************************************************
+
+    // Wait for the semaphore
+    while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
+    {
+      CI_StringOut ("§5");
+    }
 
     // Init the input array.
     for (i = 0; i < DMACA_AES_EVAL_BUF_SIZE; i += DMACA_AES_EVAL_REFBUF_SIZE)
@@ -1243,6 +1333,11 @@ int AES_local_test_org (void)
 
     test_ram_aes_ram (256, pSrcData_HsbSram, (unsigned int *) pDstData_HsbSram);
     // gpio_clr_gpio_pin(DMACA_AES_EVAL_LED3);
+
+    taskENTER_CRITICAL ();
+    xSemaphoreGive (AES_semphr);
+    taskEXIT_CRITICAL ();
+
     CI_LocalPrintf ("\r\nDone!");
 
     // End of tests: go to sleep.

@@ -74,6 +74,7 @@
 #ifdef FREERTOS_USED
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
 #endif
 #include "conf_usb.h"
 #include "usb_task.h"
@@ -121,6 +122,8 @@
  Global declarations
 
 *******************************************************************************/
+
+xSemaphoreHandle AES_semphr = NULL;     // AES semaphore
 
 /*******************************************************************************
 
@@ -770,6 +773,26 @@ int main (void)
     pm_bod33_ResetEnable ();
 
     // ushell_task_init(pcl_freq_param.pba_f);
+
+
+    // Create the semaphore
+    vSemaphoreCreateBinary (AES_semphr);
+
+
+    // Wait for the semaphore
+    while (!xSemaphoreTake (AES_semphr, portMAX_DELAY));
+
+    // Release the semaphore in order to start a new device/host task
+    portBASE_TYPE task_woken = pdFALSE;
+/*
+    taskENTER_CRITICAL ();
+    xSemaphoreGiveFromISR (AES_semphr, &task_woken);
+    taskEXIT_CRITICAL ();
+*/
+    taskENTER_CRITICAL ();
+    xSemaphoreGive (AES_semphr);
+    taskEXIT_CRITICAL ();
+
 
     // Start stick
     vTaskStartScheduler ();

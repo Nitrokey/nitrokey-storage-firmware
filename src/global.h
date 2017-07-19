@@ -26,7 +26,7 @@
 #define VERSION_MAJOR 0 // 255 = debug version
 #define VERSION_MINOR 46    // 0 = development
 
-#define INTERNAL_VERSION_NR 0
+#define INTERNAL_VERSION_NR 2
 
 #define TRUE		1
 #define FALSE   0
@@ -37,7 +37,7 @@
 // Achtung: Bootloader in trampoline.x aktivieren
 
 // *** Activate only for PROD version ***
-#define STICK_20_A_MUSTER_PROD
+//#define STICK_20_A_MUSTER_PROD
 
 
 // #define STICK_20_SEND_DEBUGINFOS_VIA_HID // = Debug version, use ca. 2k flash

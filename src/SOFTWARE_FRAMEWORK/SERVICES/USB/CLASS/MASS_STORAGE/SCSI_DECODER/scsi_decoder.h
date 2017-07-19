@@ -363,6 +363,8 @@ extern U8 g_scsi_ep_ms_in;
 // ! USB mass-storage OUT endpoint.
 extern U8 g_scsi_ep_ms_out;
 
+extern void Sbc_build_sense (U8 lun, U8 skey, U8 sasc, U8 sascq);
+
 /* ! \brief Decodes and launches the execution of SCSI commands. \return Boolean indicating success. */
 extern Bool scsi_decode_command (void);
 
@@ -392,6 +394,9 @@ extern Bool sbc_mode_sense (Bool b_sense_10);
    disable the removal of the medium. The logical unit shall not allow medium removal if any initiator port currently has medium removal prevented.
    \return Boolean indicating success. */
 extern Bool sbc_prevent_allow_medium_removal (void);
+
+
+extern Bool sbc_readformat_capacity (void);
 
 /* ! \brief Manages the READ CAPACITY (10) command. The READ CAPACITY (10) command requests that the device server transfer 8 bytes of parameter
    data describing the capacity and medium format of the direct-access block device to the data-in buffer. This command may be processed as if it has
