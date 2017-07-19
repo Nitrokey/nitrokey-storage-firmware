@@ -427,6 +427,10 @@ Bool scsi_decode_command (void)
             status = sbc_prevent_allow_medium_removal ();
             break;
 
+        case SBC_CMD_READFORMAT_CAPACITIES:    // 0x23 - Optional.
+            status = sbc_readformat_capacity ();
+            break;
+
         case SBC_CMD_READ_CAPACITY_10: // 0x25 - Mandatory.
             status = sbc_read_capacity ();
             break;
@@ -476,6 +480,11 @@ Bool scsi_decode_command (void)
             }
             break;  // for which we can not reply INVALID COMMAND, otherwise the disk will not mount.
 
+        case SBC_CMD_SYNCHRONIZE_CACHE_10: // 0x35 - Optional.
+            status = TRUE;
+            sbc_lun_status_is_good ();
+            break;
+
         case SBC_CMD_FORMAT_UNIT:  // 0x04 - Mandatory.
         case SBC_CMD_REASSIGN_BLOCKS:  // 0x07 - Optional.
         case SBC_CMD_READ_6:   // 0x08 - Mandatory.
@@ -485,7 +494,7 @@ Bool scsi_decode_command (void)
         case SBC_CMD_SEND_DIAGNOSTIC:  // 0x1D - Mandatory.
         case SBC_CMD_WRITE_AND_VERIFY_10:  // 0x2E - Optional.
         case SBC_CMD_PREFETCH_10:  // 0x34 - Optional.
-        case SBC_CMD_SYNCHRONIZE_CACHE_10: // 0x35 - Optional.
+//        case SBC_CMD_SYNCHRONIZE_CACHE_10: // 0x35 - Optional.
         case SBC_CMD_READ_DEFECT_DATA_10:  // 0x37 - Optional.
         case SBC_CMD_WRITE_BUFFER: // 0x3B - Optional.
         case SBC_CMD_READ_BUFFER:  // 0x3C - Optional.
@@ -714,9 +723,60 @@ Bool sbc_prevent_allow_medium_removal (void)
 }
 
 
+
+Bool sbc_readformat_capacity (void)
+{
+  U32 mem_size_nb_sector;
+  switch (mem_read_capacity (usb_LUN, &mem_size_nb_sector))
+  {
+    case CTRL_GOOD:
+        Usb_reset_endpoint_fifo_access (g_scsi_ep_ms_in);
+
+        // Capacity List Header                         4 byte
+        Usb_write_endpoint_data (g_scsi_ep_ms_in, 32, sbc_format_mcu_to_scsi_data (32, 0x08 + 0x08));
+
+        // *** Maximum Capacity Descriptor ***          8 byte
+        // Return nb block.
+        Usb_write_endpoint_data (g_scsi_ep_ms_in, 32, sbc_format_mcu_to_scsi_data (32, mem_size_nb_sector));
+
+        // Return Descriptor Code
+        Usb_write_endpoint_data (g_scsi_ep_ms_in,  8, 0x02);    // Formatted Media - Current media capacity
+
+        // Return block size (= 512 bytes)
+        Usb_write_endpoint_data (g_scsi_ep_ms_in,  8, 0x00);
+        Usb_write_endpoint_data (g_scsi_ep_ms_in, 16, Sbc_format_mcu_to_scsi_data (16, 512));
+
+        // *** Formattable Capacity Descriptor ***      8 byte
+        // Return nb block.
+        Usb_write_endpoint_data (g_scsi_ep_ms_in, 32, sbc_format_mcu_to_scsi_data (32, mem_size_nb_sector));
+
+        // Return block size (= 512 bytes)
+        Usb_write_endpoint_data (g_scsi_ep_ms_in, 32, Sbc_format_mcu_to_scsi_data (32, 512));
+
+
+        Sbc_valid_write_usb (0x04 + 0x08 + 0x08);
+        sbc_lun_status_is_good ();
+        return TRUE;
+
+    case CTRL_NO_PRESENT:
+        sbc_lun_status_is_not_present ();
+        break;
+
+    case CTRL_BUSY:
+        sbc_lun_status_is_busy_or_change ();
+        break;
+
+    case CTRL_FAIL:
+    default:
+        sbc_lun_status_is_fail ();
+        break;
+  }
+  return FALSE;
+}
+
 Bool sbc_read_capacity (void)
 {
-U32 mem_size_nb_sector;
+  U32 mem_size_nb_sector;
 
     switch (mem_read_capacity (usb_LUN, &mem_size_nb_sector))
     {
