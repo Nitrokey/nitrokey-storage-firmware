@@ -32,7 +32,7 @@
 #include "usb_standard_request.h"
 #include "usb_specific_request.h"
 #include "usb_task.h"
-
+#include "DebugLog.h"
 
 // _____ M A C R O S ________________________________________________________
 
@@ -89,9 +89,11 @@ void usb_process_request (void)
     bmRequestType = Usb_read_endpoint_data (EP_CONTROL, 8);
     bRequest = Usb_read_endpoint_data (EP_CONTROL, 8);
 
+
     switch (bRequest)
     {
         case GET_DESCRIPTOR:
+            DL_LogEvent (DL_LOG__REQ_GET_DESCRIPTOR   );
             if (bmRequestType == 0x80)
                 usb_get_descriptor ();
             else
@@ -99,6 +101,7 @@ void usb_process_request (void)
             break;
 
         case GET_CONFIGURATION:
+          DL_LogEvent (DL_LOG__REQ_GET_CONFIGURATION);
             if (bmRequestType == 0x80)
                 usb_get_configuration ();
             else
@@ -106,6 +109,7 @@ void usb_process_request (void)
             break;
 
         case SET_ADDRESS:
+          DL_LogEvent (DL_LOG__REQ_SET_ADDRESS      );
             if (bmRequestType == 0x00)
                 usb_set_address ();
             else
@@ -113,6 +117,7 @@ void usb_process_request (void)
             break;
 
         case SET_CONFIGURATION:
+          DL_LogEvent (DL_LOG__REQ_SET_CONFIGURATION);
             if (bmRequestType == 0x00)
                 usb_set_configuration ();
             else
@@ -120,6 +125,7 @@ void usb_process_request (void)
             break;
 
         case CLEAR_FEATURE:
+          DL_LogEvent (DL_LOG__REQ_CLEAR_FEATURE    );
             if (bmRequestType <= 0x02)
                 usb_clear_feature ();
             else
@@ -127,6 +133,7 @@ void usb_process_request (void)
             break;
 
         case SET_FEATURE:
+          DL_LogEvent (DL_LOG__REQ_SET_FEATURE      );
             if (bmRequestType <= 0x02)
                 usb_set_feature ();
             else
@@ -134,6 +141,7 @@ void usb_process_request (void)
             break;
 
         case GET_STATUS:
+          DL_LogEvent (DL_LOG__REQ_GET_STATUS       );
             if (0x7F < bmRequestType && bmRequestType <= 0x82)
                 usb_get_status ();
             else
@@ -141,6 +149,7 @@ void usb_process_request (void)
             break;
 
         case GET_INTERFACE:
+          DL_LogEvent (DL_LOG__REQ_GET_INTERFACE    );
             if (bmRequestType == 0x81)
             {
                 if (!usb_get_interface ())
@@ -154,22 +163,36 @@ void usb_process_request (void)
             break;
 
         case SET_INTERFACE:
+          DL_LogEvent (DL_LOG__REQ_SET_INTERFACE    );
             if (bmRequestType == 0x01)
                 usb_set_interface ();
             else
                 goto unsupported_request;
             break;
 
+
         case SET_DESCRIPTOR:
+          DL_LogEvent (DL_LOG__REQ_SET_DESCRIPTOR   );
+          goto unsupported_request_default;
+
         case SYNCH_FRAME:
+          DL_LogEvent (DL_LOG__REQ_SYNCH_FRAME      );
+          goto unsupported_request_default;
+
+        unsupported_request:
+          DL_LogEvent (DL_LOG__REQ_UNSUPPORTED      );
+          goto unsupported_request_default;
+
         default:   // !< unsupported request => call to user read request
-          unsupported_request:
-            if (!usb_user_read_request (bmRequestType, bRequest))
-            {
-                Usb_enable_stall_handshake (EP_CONTROL);
-                Usb_ack_setup_received_free ();
-            }
-            break;
+          DL_LogEvent (DL_LOG__REQ_UNKNOWN      );
+          unsupported_request_default:
+
+          if (!usb_user_read_request (bmRequestType, bRequest))
+          {
+              Usb_enable_stall_handshake (EP_CONTROL);
+              Usb_ack_setup_received_free ();
+          }
+          break;
     }
 }
 
@@ -185,7 +208,18 @@ void usb_set_address (void)
     Usb_ack_setup_received_free ();
 
     Usb_ack_control_in_ready_send ();   // !< send a ZLP for STATUS phase
-    while (!Is_usb_control_in_ready ());    // !< waits for status phase done
+
+    int LoopCounter = 0;
+    while (!Is_usb_control_in_ready ())    // !< waits for status phase done
+    {
+      LoopCounter++;
+      if (100000 < LoopCounter)
+      {
+        break;
+      }
+    }
+
+
     // !< before using the new address
     Usb_enable_address ();
 }
@@ -239,6 +273,7 @@ void usb_get_descriptor (void)
 #if (USB_HIGH_SPEED_SUPPORT==ENABLED)
     Bool b_first_data = TRUE;
 #endif
+    U32 Counter;
 
     zlp = FALSE;    /* no zero length packet */
     string_type = Usb_read_endpoint_data (EP_CONTROL, 8);   /* read LSB of wValue */
@@ -322,7 +357,15 @@ void usb_get_descriptor (void)
 
     while (data_to_transfer && !Is_usb_nak_out (EP_CONTROL))
     {
-        while (!Is_usb_control_in_ready () && !Is_usb_nak_out (EP_CONTROL));
+        int LoopCounter = 0;
+        while (!Is_usb_control_in_ready () && !Is_usb_nak_out (EP_CONTROL))
+        {
+          LoopCounter++;
+          if (1000000 < LoopCounter)
+          {
+            break;
+          }
+        }
 
         if (Is_usb_nak_out (EP_CONTROL))
             break;  // don't clear the flag now, it will be cleared after
@@ -358,13 +401,40 @@ void usb_get_descriptor (void)
 
     if (zlp && !Is_usb_nak_out (EP_CONTROL))
     {
-        while (!Is_usb_control_in_ready ());
+        int LoopCounter = 0;
+        while (!Is_usb_control_in_ready ())
+        {
+          LoopCounter++;
+          if (100000 < LoopCounter)
+          {
+            break;
+          }
+        }
+
         Usb_ack_control_in_ready_send ();
     }
 
-    while (!Is_usb_nak_out (EP_CONTROL));
+    int LoopCounter = 0;
+    while (!Is_usb_nak_out (EP_CONTROL))
+    {
+      LoopCounter++;
+      if (100000 < LoopCounter)
+      {
+        break;
+      }
+    }
+
     Usb_ack_nak_out (EP_CONTROL);
-    while (!Is_usb_control_out_received ());
+
+    Counter = 0;
+    while (!Is_usb_control_out_received ())
+    {
+      Counter++;
+      if (100000 < Counter)
+      {
+        break;
+      }
+    }
     Usb_ack_control_out_received_free ();
 }
 
@@ -380,7 +450,16 @@ void usb_get_configuration (void)
     Usb_write_endpoint_data (EP_CONTROL, 8, usb_configuration_nb);
     Usb_ack_control_in_ready_send ();
 
-    while (!Is_usb_control_out_received ());
+    int LoopCounter = 0;
+    while (!Is_usb_control_out_received ())
+    {
+      LoopCounter++;
+      if (100000 < LoopCounter)
+      {
+        break;
+      }
+    }
+
     Usb_ack_control_out_received_free ();
 }
 
@@ -424,7 +503,15 @@ void usb_get_status (void)
     Usb_write_endpoint_data (EP_CONTROL, 8, 0x00);
     Usb_ack_control_in_ready_send ();
 
-    while (!Is_usb_control_out_received ());
+    int LoopCounter = 0;
+    while (!Is_usb_control_out_received ())
+    {
+      LoopCounter++;
+      if (100000 < LoopCounter)
+      {
+        break;
+      }
+    }
 
     /*        for (i=0;i<100000;i++) // Make break out { if (Is_usb_control_out_received()) { break; } } */
 
@@ -659,7 +746,16 @@ Bool usb_get_interface (void)
     Usb_write_endpoint_data (EP_CONTROL, 8, usb_interface_status[wInterface]);
     Usb_ack_control_in_ready_send ();
 
-    while (!Is_usb_control_out_received ());
+    int LoopCounter = 0;
+    while (!Is_usb_control_out_received ())
+    {
+      LoopCounter++;
+      if (100000 < LoopCounter)
+      {
+        break;
+      }
+    }
+
     Usb_ack_control_out_received_free ();
     return TRUE;
 }

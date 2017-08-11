@@ -131,7 +131,16 @@ void USB_CCID_send_INT_Message (void)
 
        // MSC Compliance - Free BAD out receive during SCSI command while( Is_usb_out_received(EP_CCID_OUT) ) {
        Usb_ack_out_received_free(EP_CCID_OUT); } */
-    while (!Is_usb_in_ready (EP_CCID_INT));
+
+    int LoopCounter = 0;
+    while (!Is_usb_in_ready (EP_CCID_INT))
+    {
+      LoopCounter++;
+      if (100000 < LoopCounter)
+      {
+        break;
+      }
+    }
 
     Usb_reset_endpoint_fifo_access (EP_CCID_INT);
 
@@ -279,11 +288,19 @@ static void USB_CCID_SendDataToUSB (void)
         Usb_ack_out_received_free (EP_CCID_OUT);
     }
 
+    int LoopCounter = 0;
     while (!Is_usb_in_ready (EP_CCID_IN))
     {
         if (!Is_usb_endpoint_enabled (EP_CCID_IN))
         {
             i = 0;  // todo USB Reset
+        }
+        {
+          LoopCounter++;
+          if (100000 < LoopCounter)
+          {
+            break;
+          }
         }
     }
 

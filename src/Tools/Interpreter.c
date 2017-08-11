@@ -74,6 +74,7 @@
 #include "SD_Test.h"
 #include "..\HighLevelFunctions\HiddenVolume.h"
 #include "..\HighLevelFunctions\password_safe.h"
+#include "DebugLog.h"
 
 /*******************************************************************************
 
@@ -152,6 +153,7 @@ typeCommand tCommandData[CI_MAX_COMMANDS] = {
     {"pwm", "", CI_CMD_PWM, "Password matrix",},
     {"hv", "", CI_CMD_HIDDEN_VOULME, "Hidden volumes",},
     {"pws", "", CI_CMD_PASSWORD_SAFE, "Password safe",},
+    {"dl", "", CI_CMD_DEBUG_LOG, "Debug log",},
     {NULL, NULL, 0, NULL}
 };
 
@@ -1127,6 +1129,10 @@ int CI_ExecCmd (char* szCommandLine)
             IBN_PWS_Tests (nParamsGet_u8, (u8) nValue[0], nValue[1], String_pu8[0]);
             break;
 
+        case CI_CMD_DEBUG_LOG:
+            IBN_DL_Test (nParamsGet_u8, (u8) nValue[0], nValue[1], String_pu8[0]);
+            break;
+
     }
 
 #ifdef TIME_MEASURING_ENABLE
@@ -1249,9 +1255,9 @@ void IDF_task (void* pvParameters)
     u32 LoopCount_u32 = 0;
     portTickType xLastWakeTime;
     u32 sd_LastAccessedBlockReadMin_u32 = 0;
-    u32 sd_LastAccessedBlockReadMax_u32 = 4000000000LL;
+    u32 sd_LastAccessedBlockReadMax_u32 = 4000000000UL;
     u32 sd_LastAccessedBlockWriteMin_u32 = 0;
-    u32 sd_LastAccessedBlockWriteMax_u32 = 4000000000LL;
+    u32 sd_LastAccessedBlockWriteMax_u32 = 4000000000UL;
 
     xLastWakeTime = xTaskGetTickCount ();
     // while (1) ;
@@ -1259,6 +1265,11 @@ void IDF_task (void* pvParameters)
     while (TRUE)
     {
         vTaskDelayUntil (&xLastWakeTime, configTSK_IDF_TEST_PERIOD);
+
+        if (0 == LoopCount_u32 % 100)  // Every 50 ms
+        {
+          DL_ShowSequenceLog ();
+        }
 
         if (0 == LoopCount_u32 % 2000)  // Every second
         {

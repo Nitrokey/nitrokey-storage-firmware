@@ -142,7 +142,16 @@ void Keyboard_SetReport_Output (void)
 
 
     Usb_ack_setup_received_free ();
-    while (!Is_usb_control_out_received ());
+
+    int LoopCounter = 0;
+    while (!Is_usb_control_out_received ())
+    {
+      LoopCounter++;
+      if (100000 < LoopCounter)
+      {
+        break;
+      }
+    }
 
     Usb_reset_endpoint_fifo_access (EP_CONTROL);
 
@@ -159,7 +168,16 @@ void Keyboard_SetReport_Output (void)
 
     Usb_ack_control_out_received_free ();
     Usb_ack_control_in_ready_send ();
-    while (!Is_usb_control_in_ready ());
+
+    LoopCounter = 0;
+    while (!Is_usb_control_in_ready ())
+    {
+      LoopCounter++;
+      if (100000 < LoopCounter)
+      {
+        break;
+      }
+    }
 
     CI_Print8BitValue (BytesIn_u32);
     CI_StringOut (" -");
@@ -298,7 +316,16 @@ u16 Length_u16;
     /* USB Debug CI_StringOut ("\n\r Get "); for (i=0;i<BytesIn_u32;i++) { CI_Print8BitValue (HID_SetReport_Value[i]); } CI_StringOut ("\n\r"); */
     Usb_ack_control_out_received_free ();
     Usb_ack_control_in_ready_send ();
-    while (!Is_usb_control_in_ready ());
+
+    int LoopCounter = 0;
+    while (!Is_usb_control_in_ready ())
+    {
+      LoopCounter++;
+      if (100000 < LoopCounter)
+      {
+        break;
+      }
+    }
 
     return (NULL);
 }
@@ -338,7 +365,17 @@ U16 wInterface;
 #endif
 
     Usb_ack_control_in_ready_send ();
-    while (!Is_usb_control_in_ready ());
+
+
+    int LoopCounter = 0;
+    while (!Is_usb_control_in_ready ())
+    {
+      LoopCounter++;
+      if (100000 < LoopCounter)
+      {
+        break;
+      }
+    }
 }
 
 
@@ -426,7 +463,16 @@ static void hid_get_descriptor (U8 size_of_report, const U8 * p_usb_hid_report)
 
     if (zlp && (!Is_usb_nak_out (EP_CONTROL)))
     {
-        while (!Is_usb_control_in_ready ());
+        int LoopCounter = 0;
+        while (!Is_usb_control_in_ready ())
+        {
+          LoopCounter++;
+          if (100000 < LoopCounter)
+          {
+            break;
+          }
+        }
+
         Usb_ack_control_in_ready_send ();
     }
 
@@ -670,9 +716,27 @@ U8 text[20];
                 Usb_reset_endpoint_fifo_access (EP_CONTROL);
                 Usb_write_endpoint_data (EP_CONTROL, 8, get_nb_lun () - 1);
                 Usb_ack_control_in_ready_send ();
-                while (!Is_usb_control_in_ready ());
 
-                while (!Is_usb_control_out_received ());
+                int LoopCounter = 0;
+                while (!Is_usb_control_in_ready ())
+                {
+                  LoopCounter++;
+                  if (100000 < LoopCounter)
+                  {
+                    break;
+                  }
+                }
+
+                LoopCounter = 0;
+                while (!Is_usb_control_out_received ())
+                  {
+                    LoopCounter++;
+                    if (100000 < LoopCounter)
+                    {
+                      break;
+                    }
+                  }
+
                 Usb_ack_control_out_received_free ();
 
                 ms_multiple_drive = TRUE;

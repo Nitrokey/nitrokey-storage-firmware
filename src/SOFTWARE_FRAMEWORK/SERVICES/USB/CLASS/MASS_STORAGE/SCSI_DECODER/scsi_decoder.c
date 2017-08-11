@@ -608,7 +608,15 @@ U8 request_sense_output[18];    // The maximal size of request is 17.
         usb_write_ep_txpacket (g_scsi_ep_ms_in, request_sense_output, allocation_length, NULL);
         Sbc_valid_write_usb (allocation_length);
         // MSC Compliance - Wait end of all transmitions on USB line, because a stall may be send after data
-        while (0 != Usb_nb_busy_bank (EP_MS_IN));
+        int LoopCounter = 0;
+        while (0 != Usb_nb_busy_bank (EP_MS_IN))
+        {
+          LoopCounter++;
+          if (1000000 < LoopCounter)
+          {
+            break;
+          }
+        }
     }
 
     sbc_lun_status_is_good ();
@@ -642,8 +650,17 @@ U8 allocation_length;
         Usb_reset_endpoint_fifo_access (g_scsi_ep_ms_in);
         usb_write_ep_txpacket (g_scsi_ep_ms_in, &sbc_std_inquiry_data, allocation_length, NULL);
         Sbc_valid_write_usb (allocation_length);
+
         // MSC Compliance - Wait end of all transmitions on USB line, because a stall may be send after data
-        while (0 != Usb_nb_busy_bank (EP_MS_IN));
+        int LoopCounter = 0;
+        while (0 != Usb_nb_busy_bank (EP_MS_IN))
+        {
+          LoopCounter++;
+          if (100000 < LoopCounter)
+          {
+            break;
+          }
+        }
     }
     sbc_lun_status_is_good ();
 

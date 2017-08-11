@@ -24,9 +24,9 @@
 // #include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0 // 255 = debug version
-#define VERSION_MINOR 46    // 0 = development
+#define VERSION_MINOR 47    // 0 = development
 
-#define INTERNAL_VERSION_NR 2
+#define INTERNAL_VERSION_NR 0
 
 #define TRUE		1
 #define FALSE   0
@@ -37,7 +37,7 @@
 // Achtung: Bootloader in trampoline.x aktivieren
 
 // *** Activate only for PROD version ***
-//#define STICK_20_A_MUSTER_PROD
+#define STICK_20_A_MUSTER_PROD
 
 
 // #define STICK_20_SEND_DEBUGINFOS_VIA_HID // = Debug version, use ca. 2k flash
@@ -58,11 +58,12 @@
 
 
 #ifndef STICK_20_A_MUSTER_PROD
-#define INTERPRETER_ENABLE  // Disable for PROD Version
+  #define INTERPRETER_ENABLE  // Disable for PROD Version
+  #define DEBUG_LOG_ENABLE
 #endif
 
 #ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
-#define INTERPRETER_ENABLE  // Enable also for PROD Version
+  #define INTERPRETER_ENABLE  // Enable also for PROD Version
 #endif
 
 
@@ -147,16 +148,14 @@
 
 // Remove all printf in production version
 #ifdef INTERPRETER_ENABLE
-int CI_LocalPrintf (char* szFormat, ...);
-int CI_LocalPrintfNoDelay (char* szFormat, ...);
-int CI_TickLocalPrintf (char* szFormat, ...);
+  int CI_LocalPrintf (char* szFormat, ...);
+  int CI_LocalPrintfNoDelay (char* szFormat, ...);
+  int CI_TickLocalPrintf (char* szFormat, ...);
 #else
-#define CI_LocalPrintf(...)
-#define CI_TickLocalPrintf(...)
-#define CI_StringOut(...)
+  #define CI_LocalPrintf(...)
+  #define CI_TickLocalPrintf(...)
+  #define CI_StringOut(...)
 #endif
-
-
 
 #define FMCK_HZ                       60000000
 #define FCPU_HZ                       FMCK_HZ

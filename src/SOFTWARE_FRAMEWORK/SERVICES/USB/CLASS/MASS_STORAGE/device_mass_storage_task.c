@@ -336,7 +336,16 @@ static void usb_mass_storage_csw (void)
         Usb_ack_out_received_free (EP_MS_OUT);
     }
 
-    while (!Is_usb_in_ready (EP_MS_IN));
+    int LoopCounter = 0;
+    while (!Is_usb_in_ready (EP_MS_IN))
+    {
+      LoopCounter++;
+      if (100000 < LoopCounter)
+      {
+        break;
+      }
+    }
+
     /*
        // for (i=0;i<100000;i++) // Make break out { if (Is_usb_in_ready(EP_MS_IN)) { break; } } */
     Usb_reset_endpoint_fifo_access (EP_MS_IN);
