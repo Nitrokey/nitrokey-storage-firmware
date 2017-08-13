@@ -754,12 +754,12 @@ u8 PC_to_RDR_IccPowerOn_u8 (t_USB_CCID_data_st * USB_CCID_data_pst)
     {
         return (CCID_ERROR_CMD_ABORTED);
     }
-
+/* Restart always to get a defined state of the smartcard
     if (CCID_SLOT_STATUS_PRESENT_ACTIVE == CCID_SlotStatus_u8)  // If smartcard is on, don't start
     {
         return (CCID_NO_ERROR);
     }
-
+*/
     // We used only one voltage
     if (FALSE == CCID_RestartSmartcard_u8 ())
     {

@@ -266,6 +266,7 @@ static void USB_CCID_GetDataFromUSB (void)
 
 static void USB_CCID_SendDataToUSB (void)
 {
+    int LoopCounter = 0;
     int USB_Datalen_s32;
     int i;
 
@@ -273,12 +274,26 @@ static void USB_CCID_SendDataToUSB (void)
     {
         if (Is_usb_setup_received ())
             usb_process_request ();
+        {
+          LoopCounter++;
+          if (100000 < LoopCounter)
+          {
+            break;
+          }
+        }
     }
 
     while (Is_usb_endpoint_stall_requested (EP_CCID_OUT))
     {
         if (Is_usb_setup_received ())
             usb_process_request ();
+        {
+          LoopCounter++;
+          if (100000 < LoopCounter)
+          {
+            break;
+          }
+        }
     }
 
     // MSC Compliance - Free BAD out receive during SCSI command
@@ -288,7 +303,6 @@ static void USB_CCID_SendDataToUSB (void)
         Usb_ack_out_received_free (EP_CCID_OUT);
     }
 
-    int LoopCounter = 0;
     while (!Is_usb_in_ready (EP_CCID_IN))
     {
         if (!Is_usb_endpoint_enabled (EP_CCID_IN))
@@ -323,7 +337,16 @@ static void USB_CCID_SendDataToUSB (void)
     while (0 != Usb_nb_busy_bank (EP_CCID_IN))
     {
         if (Is_usb_setup_received ())
+        {
             usb_process_request ();
+        }
+        {
+          LoopCounter++;
+          if (100000 < LoopCounter)
+          {
+            break;
+          }
+        }
     }
 }
 
