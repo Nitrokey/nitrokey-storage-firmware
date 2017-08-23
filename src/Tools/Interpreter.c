@@ -1314,6 +1314,8 @@ void IDF_task (void* pvParameters)
         }
         IDF_Debugtool ();
 
+        DL_CheckSystem ();
+
 #ifdef TIME_MEASURING_ENABLE
         TIME_MEASURING_Stop (TIME_MEASURING_TIMER_IDF_10MS);
 #endif

@@ -27,7 +27,7 @@
 #ifndef DEBUGLOG_H_
 #define DEBUGLOG_H_
 
-
+//#undef DEBUG_LOG_ENABLE
 
 #define DL_LOG__ERROR__NO_ENTRY          0
 #define DL_LOG__ERROR__INVALID_ENTRY     1
@@ -44,7 +44,20 @@
 #define DL_LOG__REQ_SYNCH_FRAME         12
 #define DL_LOG__REQ_UNSUPPORTED         13
 #define DL_LOG__REQ_UNKNOWN             14
-#define DL_LOG__MAX_ENTRY               15
+
+
+#define DL_LOG__GET_USER_DESC__HID            15
+#define DL_LOG__GET_USER_DESC__HID_REPORT     16
+#define DL_LOG__GET_USER_DESC__HID_PHYSICAL   17
+#define DL_LOG__GET_USER_DESC__UNKNOWN        18
+
+#define DL_LOG__GET_DESC__
+#define DL_LOG__
+#define DL_LOG__
+
+
+
+#define DL_LOG__MAX_ENTRY               19
 
 
 #ifndef DEBUG_LOG_ENABLE
@@ -54,6 +67,8 @@
   #undef DL_SaveLog
   #undef DL_AddSequenceLog
   #undef DL_ShowSequenceLog
+  #undef DL_CheckSystem
+  #undef DL_LogEventWithValue
 
   #define DL_Init(...)
   #define DL_LogEvent(...)
@@ -61,14 +76,18 @@
   #define DL_SaveLog(...)
   #define DL_AddSequenceLog(...)
   #define DL_ShowSequenceLog(...)
+  #define DL_CheckSystem(...)
+  #define DL_LogEventWithValue(...)
 #else
   void DL_Init (void);
 
   void DL_LogEvent (unsigned char Event);
+  void DL_LogEventWithValue (unsigned char Event, unsigned short Value);
   void DL_LogEventError (unsigned char Event);
   void DL_SaveLog (void);
-  void DL_AddSequenceLog (unsigned int Tick,unsigned char Event);
+  void DL_AddSequenceLog (unsigned int Tick,unsigned char Event,unsigned int Value);
   void DL_ShowSequenceLog (void);
+  void DL_CheckSystem(void);
 
   void IBN_DL_Test (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned int Param_u32, unsigned char* String_pu8);
 #endif

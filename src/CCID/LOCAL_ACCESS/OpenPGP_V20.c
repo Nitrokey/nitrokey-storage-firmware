@@ -963,7 +963,7 @@ int LA_OpenPGP_V20_Test_ChangeUserPin (unsigned char* pcOldPin, unsigned char* p
 
     if (FALSE == nRet)
     {
-        CI_LocalPrintf ("fail\n\r");
+        CI_LocalPrintf ("fail 1\n\r");
         return (FALSE);
     }
     CI_LocalPrintf ("OK \n\r");
@@ -1008,7 +1008,7 @@ int LA_OpenPGP_V20_Test_ChangeAdminPin (unsigned char* pcOldPin, unsigned char* 
 
     if (FALSE == nRet)
     {
-        CI_LocalPrintf ("fail\n\r");
+        CI_LocalPrintf ("fail 2\n\r");
         return (FALSE);
     }
     CI_LocalPrintf ("OK \n\r");
@@ -1041,7 +1041,7 @@ int LA_OpenPGP_V20_Test_GetAID (unsigned char* cMainVersion, unsigned char* cSec
     nRet = LA_OpenPGP_V20_GetData (&tSC_OpenPGP_V20, 0x00, 0x4F);
     if (FALSE == nRet)
     {
-        CI_LocalPrintf ("fail\n\r");
+        CI_LocalPrintf ("fail 3\n\r");
         return (FALSE);
     }
 
@@ -1078,7 +1078,7 @@ int LA_OpenPGP_V20_GetPasswordstatus (char* PasswordStatus)
     nRet = LA_OpenPGP_V20_GetData (&tSC_OpenPGP_V20, 0x00, 0xC4);
     if (FALSE == nRet)
     {
-        CI_LocalPrintf ("fail\n\r");
+        CI_LocalPrintf ("fail 4\n\r");
         return (FALSE);
     }
 
@@ -1113,7 +1113,7 @@ int LA_OpenPGP_V20_GetAID (char* AID)
     Ret_u32 = LA_OpenPGP_V20_SelectFile (&tSC_OpenPGP_V20);
     if (FALSE == Ret_u32)
     {
-        CI_LocalPrintf ("fail\n\r");
+        CI_LocalPrintf ("fail 5\n\r");
         return (FALSE);
     }
     CI_LocalPrintf ("OK\n\r");
@@ -1146,7 +1146,7 @@ int LA_OpenPGP_V20_Test_SendAdminPW (unsigned char* pcPW)
     nRet = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20, 3, n, pcPW);
     if (FALSE == nRet)
     {
-        CI_LocalPrintf ("fail\n\r");
+        CI_LocalPrintf ("fail 6\n\r");
         return (FALSE);
     }
     CI_LocalPrintf ("OK\n\r");
@@ -1174,7 +1174,7 @@ int LA_OpenPGP_V20_Test_SendUserPW2 (unsigned char* pcPW)
     nRet = LA_OpenPGP_V20_Verify (&tSC_OpenPGP_V20, 2, n, pcPW);
     if (FALSE == nRet)
     {
-        CI_LocalPrintf ("fail\n\r");
+        CI_LocalPrintf ("fail 7\n\r");
         return (FALSE);
     }
     CI_LocalPrintf ("OK \n\r");
@@ -1204,7 +1204,7 @@ int LA_OpenPGP_V20_Test_SendAESMasterKey (int nLen, unsigned char* pcMasterKey)
 
     if (FALSE == nRet)
     {
-        CI_LocalPrintf ("fail\n\r");
+        CI_LocalPrintf ("fail 8\n\r");
         return (FALSE);
     }
 
@@ -1271,7 +1271,7 @@ int LA_OpenPGP_V20_Test_ScAESKey (int nLen, unsigned char* pcKey)
 
     if (32 < nLen)
     {
-        CI_LocalPrintf ("len fail\n\r");
+        CI_LocalPrintf ("len fail 9\n\r");
         return (FALSE);
     }
 
@@ -1287,7 +1287,7 @@ int LA_OpenPGP_V20_Test_ScAESKey (int nLen, unsigned char* pcKey)
     else
     {
         memset (pcKey, 0, nLen);
-        CI_LocalPrintf ("fail\n\r");
+        CI_LocalPrintf ("fail 10\n\r");
         return (FALSE);
     }
 
@@ -1413,7 +1413,7 @@ int LA_OpenPGP_V20_Test_ResetRetryCounter (unsigned char* pcPW)
     nRet = LA_OpenPGP_V20_ResetRetryCounter (&tSC_OpenPGP_V20, n, pcPW);
     if (FALSE == nRet)
     {
-        CI_LocalPrintf ("fail\n\r");
+        CI_LocalPrintf ("fail 11\n\r");
         return (FALSE);
     }
     CI_LocalPrintf ("OK \n\r");

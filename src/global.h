@@ -24,7 +24,7 @@
 // #include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0 // 255 = debug version
-#define VERSION_MINOR 47    // 0 = development
+#define VERSION_MINOR 48    // 0 = development
 
 #define INTERNAL_VERSION_NR 0
 
@@ -43,8 +43,8 @@
 // #define STICK_20_SEND_DEBUGINFOS_VIA_HID // = Debug version, use ca. 2k flash
 
 #ifdef  STICK_20_SEND_DEBUGINFOS_VIA_HID
-#undef VERSION_MAJOR
-#define VERSION_MAJOR 255
+  #undef VERSION_MAJOR
+  #define VERSION_MAJOR 255
 #endif
 
 
@@ -59,7 +59,7 @@
 
 #ifndef STICK_20_A_MUSTER_PROD
   #define INTERPRETER_ENABLE  // Disable for PROD Version
-  #define DEBUG_LOG_ENABLE
+//  #define DEBUG_LOG_ENABLE
 #endif
 
 #ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
@@ -88,13 +88,14 @@
   Defines for debugging
 
 ******************************************************************************/
-//#define DEBUG_LOG_CCID_DETAIL // Shows details of smartcard io + set CCID_T1_DebugLevel = 3;
-// #define DEBUG_USB_CCID_IO_DETAIL // Shows details of CCID USB transfers
-
-// #define MMC_DEBUG_PRINT // Shows details of SD card actions
-
-// #define DEBUG_SCSI_IO // Debug SCSI IO
-
+#ifndef STICK_20_A_MUSTER_PROD
+//  #define DEBUG_LOG_CCID_DETAIL // Shows details of smartcard io + set CCID_T1_DebugLevel = 3;
+//  #define DEBUG_USB_CCID_IO_DETAIL // Shows details of CCID USB transfers
+  
+  // #define MMC_DEBUG_PRINT // Shows details of SD card actions
+  
+  // #define DEBUG_SCSI_IO // Debug SCSI IO
+#endif
 /*******************************************************************************
 
   Defines for enabling interpreter test

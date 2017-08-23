@@ -239,6 +239,11 @@ static void USB_CCID_GetDataFromUSB (void)
 
 //    USB_CCID_Datalen_s32 = USB_CCID_data_st.CCID_datalen;
 
+    while (0 != ISO7816_GetLockCounter ())
+    {
+
+    }
+
     USB_to_CRD_DispatchUSBMessage_v (&USB_CCID_data_st);
 
 // Clear buffer after transmission

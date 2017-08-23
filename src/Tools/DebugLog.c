@@ -53,32 +53,45 @@ extern volatile portTickType xTickCount;
 
 #define DL_LOG__ENTRYS      DL_LOG__MAX_ENTRY
 
-#define DL_LOG__SEQUENCE_LOG_SIZE     100
-
+#define DL_LOG__SEQUENCE_LOG_SIZE          100
+#define DL_LOG__SEQUENCE_LOG_NO_VALUE      999999999UL
 
 unsigned char *DL_LogNames[] =
 {
     (unsigned char *)"NO_ENTRY",
     (unsigned char *)"INVALID_ENTRY",
-    (unsigned char *)"REQ_GET_DESCRIPTOR   ",
+    (unsigned char *)"REQ_GET_DESCRIPTOR",
     (unsigned char *)"REQ_GET_CONFIGURATION",
-    (unsigned char *)"REQ_SET_ADDRESS      ",
+    (unsigned char *)"REQ_SET_ADDRESS",
     (unsigned char *)"REQ_SET_CONFIGURATION",
-    (unsigned char *)"REQ_CLEAR_FEATURE    ",
-    (unsigned char *)"REQ_SET_FEATURE      ",
-    (unsigned char *)"REQ_GET_STATUS       ",
-    (unsigned char *)"REQ_GET_INTERFACE    ",
-    (unsigned char *)"REQ_SET_INTERFACE    ",
-    (unsigned char *)"REQ_SET_DESCRIPTOR   ",
-    (unsigned char *)"REQ_SYNCH_FRAME      ",
-    (unsigned char *)"REQ_UNSUPPORTED      ",
-    (unsigned char *)"REQ_UNKNOWN          ",
+    (unsigned char *)"REQ_CLEAR_FEATURE",
+    (unsigned char *)"REQ_SET_FEATURE",
+    (unsigned char *)"REQ_GET_STATUS",
+    (unsigned char *)"REQ_GET_INTERFACE",
+    (unsigned char *)"REQ_SET_INTERFACE",
+    (unsigned char *)"REQ_SET_DESCRIPTOR",
+    (unsigned char *)"REQ_SYNCH_FRAME",
+    (unsigned char *)"REQ_UNSUPPORTED",
+    (unsigned char *)"REQ_UNKNOWN",
+    (unsigned char *)"GET_USER_DESC__HID",
+    (unsigned char *)"GET_USER_DESC__HID_REPORT",
+    (unsigned char *)"GET_USER_DESC__HID_PHYSICAL",
+    (unsigned char *)"GET_USER_DESC__UNKNOWN",
     (unsigned char *)"Text 3",
 };
 
+
+#define DL_LOG__GET_USER_DESC__HID            15
+#define DL_LOG__GET_USER_DESC__HID_REPORT     16
+#define DL_LOG__GET_USER_DESC__HID_PHYSICAL   17
+#define DL_LOG__GET_USER_DESC__UNKNOWN        18
+
+
+
 typedef struct {
-  unsigned int  Event;
-  unsigned int  Tick;
+  unsigned int   Event;
+  unsigned int   Tick;
+  unsigned int   Value;
 }type_DL_SequenceLog;
 
 
@@ -95,8 +108,8 @@ type_DL_LogDataEntry tDL_LogSavedData[DL_LOG__ENTRYS];
 
 
 type_DL_SequenceLog  tDL_SequenceLog[DL_LOG__SEQUENCE_LOG_SIZE];
-unsigned char tDL_SequenceLogPos = 0;
-unsigned char tDL_SequenceLogStart = 0;
+unsigned char tDL_SequenceLogNextFreePos = 1;
+unsigned char tDL_SequenceLogStart       = 0;
 
 
 void DL_Init (void)
@@ -114,8 +127,8 @@ void DL_Init (void)
   DL_SaveLog ();
 
 // Init Sequence Log
-  tDL_SequenceLogPos = 0;
-  tDL_SequenceLogStart = 0;
+  tDL_SequenceLogNextFreePos   = 1;
+  tDL_SequenceLogStart         = 0;
   for (i=0;i<DL_LOG__SEQUENCE_LOG_SIZE;i++)
   {
     tDL_SequenceLog[i].Event = DL_LOG__ERROR__NO_ENTRY;
@@ -131,8 +144,20 @@ void DL_LogEvent (unsigned char Event)
   }
   tDL_LogData[Event].Count++;
   tDL_LogData[Event].LastCallTick = xTickCount;
-  DL_AddSequenceLog (tDL_LogData[Event].LastCallTick,Event);
+  DL_AddSequenceLog (tDL_LogData[Event].LastCallTick,Event,DL_LOG__SEQUENCE_LOG_NO_VALUE);
 }
+
+void DL_LogEventWithValue (unsigned char Event, unsigned short Value)
+{
+  if (DL_LOG__ENTRYS <= Event)
+  {
+    return;
+  }
+  tDL_LogData[Event].Count++;
+  tDL_LogData[Event].LastCallTick = xTickCount;
+  DL_AddSequenceLog (tDL_LogData[Event].LastCallTick,Event,Value);
+}
+
 
 void DL_LogEventError (unsigned char Event)
 {
@@ -142,7 +167,7 @@ void DL_LogEventError (unsigned char Event)
   }
   tDL_LogData[Event].ErrorCount++;
   tDL_LogData[Event].LastErrorTick = xTickCount;
-  DL_AddSequenceLog (tDL_LogData[Event].LastErrorTick,Event);
+  DL_AddSequenceLog (tDL_LogData[Event].LastErrorTick,Event,DL_LOG__SEQUENCE_LOG_NO_VALUE);
 }
 
 
@@ -152,20 +177,21 @@ void DL_SaveLog (void)
 }
 
 
-void DL_AddSequenceLog (unsigned int Tick,unsigned char Event)
+void DL_AddSequenceLog (unsigned int Tick,unsigned char Event,unsigned int Value)
 {
-  tDL_SequenceLog[tDL_SequenceLogPos].Event = Event;
-  tDL_SequenceLog[tDL_SequenceLogPos].Tick  = Tick;
+  tDL_SequenceLog[tDL_SequenceLogNextFreePos].Event = Event;
+  tDL_SequenceLog[tDL_SequenceLogNextFreePos].Tick  = Tick;
+  tDL_SequenceLog[tDL_SequenceLogNextFreePos].Value = Value;
 
 // Set next  entry
-  tDL_SequenceLogPos++;
-  if (DL_LOG__SEQUENCE_LOG_SIZE <= tDL_SequenceLogPos)
+  tDL_SequenceLogNextFreePos++;
+  if (DL_LOG__SEQUENCE_LOG_SIZE <= tDL_SequenceLogNextFreePos)
   {
-    tDL_SequenceLogPos = 0;
+    tDL_SequenceLogNextFreePos = 0;
   }
 
 // Move start of Log
-  if (tDL_SequenceLogPos == tDL_SequenceLogStart)
+  if (tDL_SequenceLogNextFreePos == tDL_SequenceLogStart)
   {
     tDL_SequenceLogStart++;
   }
@@ -202,26 +228,85 @@ void DL_ShowSequenceLog (void)
     }
 
     // End of while
-    if (nLogStart == tDL_SequenceLogPos)
+    if (nLogStart == tDL_SequenceLogNextFreePos)
     {
       break;
     }
 
-    if (DL_LOG__MAX_ENTRY < tDL_SequenceLog[tDL_SequenceLogPos].Event)
+    if (DL_LOG__MAX_ENTRY < tDL_SequenceLog[tDL_SequenceLogNextFreePos].Event)
     {
-      tDL_SequenceLog[tDL_SequenceLogPos].Event = DL_LOG__ERROR__INVALID_ENTRY;
+      tDL_SequenceLog[tDL_SequenceLogNextFreePos].Event = DL_LOG__ERROR__INVALID_ENTRY;
     }
 
     // Print entry
-    CI_LocalPrintf ("-%07d %02x - %s\n",tDL_SequenceLog[tDL_SequenceLogStart].Tick,
-                                        tDL_SequenceLog[tDL_SequenceLogStart].Event,
-                                        DL_LogNames[tDL_SequenceLog[tDL_SequenceLogStart].Event]);
+    if (DL_LOG__SEQUENCE_LOG_NO_VALUE == tDL_SequenceLog[tDL_SequenceLogStart].Value)
+    {
+      CI_LocalPrintf ("-%7d %02x - %s\n",tDL_SequenceLog[tDL_SequenceLogStart].Tick/2,
+                                          tDL_SequenceLog[tDL_SequenceLogStart].Event,
+                                          DL_LogNames[tDL_SequenceLog[tDL_SequenceLogStart].Event]);
+    }
+    else
+    {
+      CI_LocalPrintf ("-%7d %02x Value %4d - %s\n",tDL_SequenceLog[tDL_SequenceLogStart].Tick/2,
+                                                   tDL_SequenceLog[tDL_SequenceLogStart].Event,
+                                                   tDL_SequenceLog[tDL_SequenceLogStart].Value,
+                                                   DL_LogNames[tDL_SequenceLog[tDL_SequenceLogStart].Event]);
+    }
+
+
     tDL_SequenceLogStart++;
     if (DL_LOG__SEQUENCE_LOG_SIZE <= tDL_SequenceLogStart)
     {
       tDL_SequenceLogStart = 0;
     }
   }
+}
+
+
+/*******************************************************************************
+
+  DL_ShowSequenceLog
+
+*******************************************************************************/
+
+void DL_CheckUsbSetupOk(void)
+{
+  static unsigned char LastSetupOkFlag = FALSE;
+         unsigned char SetupOkFlag;
+
+  if (Is_usb_setup_received ())
+  {
+    SetupOkFlag = FALSE;
+  }
+  else
+  {
+    SetupOkFlag = TRUE;
+  }
+
+  if (LastSetupOkFlag != SetupOkFlag)
+  {
+    if (TRUE == SetupOkFlag)
+    {
+      CI_TickLocalPrintf ("*** USB Setup OK ***\r\n");
+    }
+    else
+    {
+      CI_TickLocalPrintf ("*** USB Setup NOT OK ***\r\n");
+    }
+    LastSetupOkFlag = SetupOkFlag;
+  }
+
+}
+
+/*******************************************************************************
+
+  DL_CheckSystem
+
+*******************************************************************************/
+
+void DL_CheckSystem(void)
+{
+  DL_CheckUsbSetupOk ();
 }
 
 
@@ -244,7 +329,7 @@ void IBN_DL_Test (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned in
     switch (CMD_u8)
     {
         case 0:
-            DL_AddSequenceLog (xTickCount / 2,Param_u32);
+            DL_AddSequenceLog (xTickCount / 2,Param_u32,DL_LOG__SEQUENCE_LOG_NO_VALUE);
             break;
     }
 }

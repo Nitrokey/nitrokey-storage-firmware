@@ -653,6 +653,16 @@ s32 XfrLenght_s32;
     /*
        CI_TickLocalPrintf ("CCID_XfrBlock - Max len %3d\n",XfrLenght_s32); Print_T1_Block
        (USB_CCID_data_pst->USB_data[CCID_OFFSET_LENGTH],&USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA]); */
+
+
+//    CI_TickLocalPrintf ("CCID_XfrBlock - PCB %02x - %02x Internal PCB\n",USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+1], ISO7816_T1_Get_I_BlockNr ());
+
+    // Change block counter for smart card access via HID only for I-Blocks
+    if (0 == (0x80 & USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA+1]))
+    {
+        ISO7816_T1_Add_I_BlockNr ();
+    }
+
 #ifdef DEBUG_LOG_CCID_DETAIL
     LogStart_T1_Block (XfrLenght_s32, (u8 *) & USB_CCID_data_pst->USB_data[CCID_OFFSET_XFR_BLOCK_DATA]);
 #endif

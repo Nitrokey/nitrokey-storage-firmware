@@ -172,6 +172,13 @@ void HID_ExcuteCmd (void)
 
     // If cmd is active, disable CCID smart card access
 
+    if (0 != USB_CCID_GetLockCounter ())
+    {
+      UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_BUSY, 0);
+      memset (HID_String_au8, 0, 50); // Clear input data, with possible sent passwords
+      return;
+    }
+
     /*
        if (HTML_CMD_NOTHING == cmd) { HID_SmartcardAccess_u8 = TRUE; } */
 
@@ -825,7 +832,6 @@ u32 Ret_u32 = FALSE;
     {
         return (FALSE);
     }
-
 
     /* Get smartcard ID from AID */
     Ret_u32 = LA_OpenPGP_V20_GetAID ((char *) Text_u8);

@@ -61,6 +61,7 @@
 #include "OTP/report_protocol.h"
 #include "Interpreter.h"
 #include "string.h"
+#include "DebugLog.h"
 
 // _____ M A C R O S ________________________________________________________
 
@@ -586,14 +587,14 @@ U8 text[20];
 #if (USB_HIGH_SPEED_SUPPORT==DISABLED)
 #ifdef KB_INTERFACE_NB
                     case HID_DESCRIPTOR:
-                        CI_LocalPrintf ("Get GET_HID_DESCRIPTOR\r\n");
+                        DL_LogEvent (DL_LOG__GET_USER_DESC__HID);
                         hid_get_descriptor (sizeof (usb_conf_desc_fs.hid_kb), (const U8 *) &usb_conf_desc_fs.hid_kb);
                         return TRUE;
 #endif
 #else
 #ifdef KB_INTERFACE_NB
                     case HID_DESCRIPTOR:
-                        CI_LocalPrintf ("Get GET_HID_DESCRIPTOR\r\n");
+                        DL_LogEvent (DL_LOG__GET_USER_DESC__HID);
                         if (Is_usb_full_speed_mode ())
                         {
                             hid_get_descriptor (sizeof (usb_conf_desc_fs.hid_kb), (const U8 *) &usb_conf_desc_fs.hid_kb);
@@ -608,18 +609,15 @@ U8 text[20];
 #endif
 
                     case HID_REPORT_DESCRIPTOR:
-                        CI_StringOut ("Get GET_HID_REPORT_DESCRIPTOR - Size = ");   // ,sizeof(usb_hid_report_descriptor_keyboard));
-                        itoa (sizeof (usb_hid_report_descriptor_keyboard), text);
-                        CI_StringOut ((char*)text);
-                        CI_StringOut ("\r\n");
+                        DL_LogEventWithValue (DL_LOG__GET_USER_DESC__HID_REPORT,sizeof (usb_hid_report_descriptor_keyboard));
                         hid_get_descriptor (sizeof (usb_hid_report_descriptor_keyboard), usb_hid_report_descriptor_keyboard);
                         return TRUE;
 
                     case HID_PHYSICAL_DESCRIPTOR:
-                        CI_StringOut ("Get GET_HID_PHYSICAL_DESCRIPTOR\r\n");
-                        break;
+                        DL_LogEvent (DL_LOG__GET_USER_DESC__HID_PHYSICAL);
+                         break;
                     default:
-                        CI_StringOut ("Get GET_DESCRIPTOR unknown\r\n");
+                        DL_LogEvent (DL_LOG__GET_USER_DESC__UNKNOWN);
                         break;
                 }
                 break;
