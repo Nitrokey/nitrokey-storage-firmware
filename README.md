@@ -15,8 +15,9 @@ Install the following tools in this order:
 
 ### Linux
 
-The compile procedure is as follows:
-1. Clone this git project (git clone https://github.com/Nitrokey/nitrokey-storage-firmware.git)
+The compile procedure is as follows (tested on ArchLinux but should work on any
+other GNU/Linux OS):
+1. Clone this git project (`git clone https://github.com/Nitrokey/nitrokey-storage-firmware.git`)
 2. Download and extract [AVR32 Studio](http://www.atmel.com/tools/Archive/AVR32STUDIO2_6.aspx). Example archive filename: `avr32studio-ide-2.6.0.753-linux.gtk.x86_64.zip`. At the moment no newer version seems to be available for Linux.
 3. Start AVR32 Studio by executing `avr32studio` in the extracted folder.
 4. Import project into AVR32 Studio: File | Import... | General | Existing Projects into Workspace | Choose the folder of downloaded git project.
