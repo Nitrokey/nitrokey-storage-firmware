@@ -26,7 +26,7 @@
 #define VERSION_MAJOR 0 // 255 = debug version
 #define VERSION_MINOR 48    // 0 = development
 
-#define INTERNAL_VERSION_NR 0
+#define INTERNAL_VERSION_NR 7
 
 #define TRUE		1
 #define FALSE   0

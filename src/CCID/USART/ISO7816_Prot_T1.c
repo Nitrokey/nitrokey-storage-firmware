@@ -266,14 +266,23 @@ int ISO7816_T1_Send_R_Block (void)
     cSendBuffer[2] = 0; // LEN
     cSendBuffer[3] = ISO7816_XOR_String (3, cSendBuffer);   // EDC
 
+
+#ifdef DEBUG_LOG_CCID_DETAIL
+    LogStart_T1_Block (4, cSendBuffer);
+#endif
+
+//    CI_TickLocalPrintf ("Send R Block - %02x %02x %02x %02x ",cSendBuffer[0],cSendBuffer[1],cSendBuffer[2],cSendBuffer[3]);
+
     // Send block
     nRet = ISO7816_SendString (4, cSendBuffer);
 
     if (USART_SUCCESS != nRet)
     {
+//      CI_TickLocalPrintf ("FAIL\r\n");
         return (FALSE);
     }
 
+//    CI_TickLocalPrintf ("OK\r\n");
     return (TRUE);
 }
 
@@ -681,6 +690,7 @@ int ISO7816_T1_SendString (unsigned int nSendBytes, unsigned char* cSendData, un
     unsigned int nErrorCount;
     unsigned int nSendFlag;
     unsigned int nChainingFlag;
+    unsigned int nFolgeDatenBloecke;
     int nRet;
 
     // Buffer overflow ?
@@ -696,6 +706,7 @@ int ISO7816_T1_SendString (unsigned int nSendBytes, unsigned char* cSendData, un
     nReceivePointer = 0;
     nErrorCount = 0;
     nSendFlag = ISO7816_T1_SEND_I_BLOCK;
+    nFolgeDatenBloecke = 0;
 
     while (nSendBytes > nSendPointer)
     {
@@ -760,6 +771,7 @@ int ISO7816_T1_SendString (unsigned int nSendBytes, unsigned char* cSendData, un
                 memcpy (&cReceiveData[nReceivePointer], &ISO7816_T1_ReceiveBuffer[3], nResponseLen - 4);
                 nReceivePointer += nResponseLen - 4;
                 nSendFlag = ISO7816_T1_SEND_R_BLOCK;
+                nFolgeDatenBloecke++;
                 ISO7816_T1_Add_I_BlockNr ();    // Switch block nr for next i-block
                 break;
 
@@ -782,6 +794,15 @@ int ISO7816_T1_SendString (unsigned int nSendBytes, unsigned char* cSendData, un
         {
             return (FALSE);
         }
+    }
+/*
+    CI_LocalPrintf ("**  - ");
+    HexPrint (nReceivePointer, cReceiveData);
+    CI_LocalPrintf ("\r\n");
+*/
+    if (0 != (nFolgeDatenBloecke % 2))
+    {
+      ISO7816_T1_Add_I_BlockNr ();    // Korrektur bei BLOCK_CHAINING - Switch block nr for next i-block
     }
 
     *nReceiveBytes = nReceivePointer;
