@@ -410,6 +410,58 @@ cid_t* cid;
     }
 }
 
+
+/*******************************************************************************
+
+  Read_ReadWriteStatusEncryptedVolume_u8
+
+  Changes
+  Date      Author          Info
+  11.12.17  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 Read_ReadWriteStatusEncryptedVolume_u8 (void)
+{
+    // If configuration not found then init it
+    if (FALSE == ReadStickConfigurationFromUserPage ())
+    {
+        InitStickConfigurationToUserPage_u8 ();
+    }
+    return (StickConfiguration_st.ReadWriteFlagCryptedVolume_u8);
+}
+
+/*******************************************************************************
+
+  Write_ReadWriteStatusEncryptedVolume_u8
+
+  Changes
+  Date      Author          Info
+  11.12.17  RB              Function created
+
+  Reviews
+  Date      Reviewer        Info
+
+*******************************************************************************/
+
+u8 Write_ReadWriteStatusEncryptedVolume_u8 (u8 NewStatus_u8)
+{
+    // If configuration not found then init it
+    if (FALSE == ReadStickConfigurationFromUserPage ())
+    {
+        InitStickConfigurationToUserPage_u8 ();
+    }
+
+    StickConfiguration_st.ReadWriteFlagCryptedVolume_u8 = NewStatus_u8;
+
+    WriteStickConfigurationToUserPage ();
+
+    return (TRUE);
+}
+
 /*******************************************************************************
 
   Read_ReadWriteStatusUncryptedVolume_u8

@@ -345,7 +345,11 @@ Bool sd_mmc_mci_wr_protect (U8 slot)
 
 Bool sd_mmc_mci_wr_protect_0 (void)
 {
-    return sd_mmc_mci_wr_protect (0);
+  if (READ_WRITE_ACTIVE == GetSdEncryptedCardReadWriteEnableState ()) // TRUE = Write enable
+  {
+      return (FALSE);
+  }
+  return (TRUE);
 }
 
 

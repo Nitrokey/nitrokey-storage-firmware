@@ -138,11 +138,11 @@ void sd_mmc_mci_dma_read_init (void);
 void sd_mmc_mci_dma_write_init (void);
 
 unsigned char cSdEncryptedCardEnabledByUser = FALSE;
-unsigned char cSdEncryptedCardEnabledByUserRW = READ_WRITE_ACTIVE;
+unsigned char cSdEncryptedCardReadWriteEnabled = READ_WRITE_ACTIVE;
 
 
 unsigned char cSdUncryptedCardEnabledByUser = TRUE;
-unsigned char cSdUncryptedCardReadWriteEnabled = READ_WRITE_ACTIVE;
+unsigned char cSdUncryptedCardReadWriteEnabled = READ_ONLY_ACTIVE;
 
 // #define MMC_DEBUG_PRINT // set in global.h
 
@@ -1691,7 +1691,7 @@ U32 BlockNr_u32;
         // Wait for the AES semaphore
         while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
         {
-          CI_StringOut ("§2");
+//          CI_StringOut ("§2");
         }
 
         if (buffer_id == 0)
@@ -1758,7 +1758,7 @@ U32 BlockNr_u32;
     // Wait for the AES semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-      CI_StringOut ("§8");
+//      CI_StringOut ("§8");
     }
 
     if (buffer_id == 0)
@@ -1809,7 +1809,7 @@ U32 BlockNr_u32;
         // Wait for the AES semaphore
         while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
         {
-          CI_StringOut ("§6");
+//          CI_StringOut ("§6");
         }
 
         // (re)load first stage.
@@ -1869,7 +1869,7 @@ U32 BlockNr_u32;
     // Wait for the AES semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-      CI_StringOut ("§7");
+//      CI_StringOut ("§7");
     }
 
     // Complete execution of the last transfer (which is in the pipe).
@@ -2027,6 +2027,38 @@ unsigned char GetSdEncryptedCardEnableState (void)
 
 /******************************************************************************
 
+  SetSdEncryptedCardReadWriteEnableState
+
+******************************************************************************/
+
+void SetSdEncryptedCardReadWriteEnableState (unsigned char cState)
+{
+    cSdEncryptedCardReadWriteEnabled = READ_ONLY_ACTIVE;
+
+    if (READ_WRITE_ACTIVE == cState)
+    {
+        cSdEncryptedCardReadWriteEnabled = READ_WRITE_ACTIVE;
+    }
+
+    Write_ReadWriteStatusEncryptedVolume_u8 (cSdEncryptedCardReadWriteEnabled);
+}
+
+/******************************************************************************
+
+  GetSdEncryptedCardReadWriteEnableState
+
+******************************************************************************/
+
+unsigned char GetSdEncryptedCardReadWriteEnableState (void)
+{
+    cSdEncryptedCardReadWriteEnabled = Read_ReadWriteStatusEncryptedVolume_u8 ();
+
+    return (cSdEncryptedCardReadWriteEnabled);
+}
+
+
+/******************************************************************************
+
   SetSdUncryptedCardEnableState
 
 ******************************************************************************/
@@ -2051,7 +2083,6 @@ unsigned char GetSdUncryptedCardEnableState (void)
 {
     return (cSdUncryptedCardEnabledByUser);
 }
-
 
 /******************************************************************************
 

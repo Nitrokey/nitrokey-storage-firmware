@@ -229,7 +229,7 @@ void STICK20_ram_aes_ram (unsigned char cMode, unsigned short int u16BufferSize,
     // Wait for the semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-      CI_StringOut ("§1");
+//      CI_StringOut ("§1");
     }
 
     taskENTER_CRITICAL ();
@@ -1072,7 +1072,7 @@ int AES_StorageKeyEncryption (unsigned int nLength, unsigned char* cData, unsign
     // Wait for the semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-      CI_StringOut ("§3");
+//      CI_StringOut ("§3");
     }
 
     // Wait for end of DMA transfers
@@ -1157,7 +1157,7 @@ int AES_KeyEncryption (unsigned int nLength, unsigned char* cData, unsigned char
     // Wait for the semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-      CI_StringOut ("§4");
+//      CI_StringOut ("§4");
     }
 
     // Wait for end of DMA transfers
@@ -1256,7 +1256,7 @@ int AES_local_test_org (void)
     // Wait for the semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-      CI_StringOut ("§5");
+//      CI_StringOut ("§5");
     }
 
     // Init the input array.

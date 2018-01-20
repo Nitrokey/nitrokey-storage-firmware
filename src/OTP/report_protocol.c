@@ -1163,6 +1163,58 @@ u8 text[10];
                     memcpy (HID_String_au8, &report[1], HID_STRING_LEN);
                     break;
 
+
+                case STICK20_CMD_ENABLE_ADMIN_READONLY_UNCRYPTED_LUN:
+                    CI_StringOut ("Get STICK20_CMD_ENABLE_ADMIN_READONLY_UNCRYPTED_LUN\r\n");
+
+                    StartStick20Command (STICK20_CMD_ENABLE_ADMIN_READONLY_UNCRYPTED_LUN);
+
+                    // Transfer data to other context
+                    HID_CmdGet_u8 = HTML_CMD_ENABLE_ADMIN_READONLY_UNCRYPTED_LUN;
+                    memcpy (HID_String_au8, &report[1], 33);
+                    break;
+
+                case STICK20_CMD_ENABLE_ADMIN_READWRITE_UNCRYPTED_LUN:
+                    CI_StringOut ("Get STICK20_CMD_ENABLE_ADMIN_READWRITE_UNCRYPTED_LUN\r\n");
+
+                    StartStick20Command (STICK20_CMD_ENABLE_ADMIN_READWRITE_UNCRYPTED_LUN);
+
+                    // Transfer data to other context
+                    HID_CmdGet_u8 = HTML_CMD_ENABLE_ADMIN_READWRITE_UNCRYPTED_LUN;
+                    memcpy (HID_String_au8, &report[1], 33);
+                    break;
+
+                case STICK20_CMD_ENABLE_ADMIN_READONLY_ENCRYPTED_LUN:
+                    CI_StringOut ("Get STICK20_CMD_ENABLE_ADMIN_READONLY_ENCRYPTED_LUN\r\n");
+
+                    StartStick20Command (STICK20_CMD_ENABLE_ADMIN_READONLY_ENCRYPTED_LUN);
+
+                    // Transfer data to other context
+                    HID_CmdGet_u8 = HTML_CMD_ENABLE_ADMIN_READONLY_ENCRYPTED_LUN;
+                    memcpy (HID_String_au8, &report[1], 33);
+                    break;
+
+                case STICK20_CMD_ENABLE_ADMIN_READWRITE_ENCRYPTED_LUN:
+                    CI_StringOut ("Get STICK20_CMD_ENABLE_ADMIN_READWRITE_ENCRYPTED_LUN\r\n");
+
+                    StartStick20Command (STICK20_CMD_ENABLE_ADMIN_READWRITE_ENCRYPTED_LUN);
+
+                    // Transfer data to other context
+                    HID_CmdGet_u8 = HTML_CMD_ENABLE_ADMIN_READWRITE_ENCRYPTED_LUN;
+                    memcpy (HID_String_au8, &report[1], 33);
+                    break;
+
+
+                case STICK20_CMD_CHECK_SMARTCARD_USAGE:
+                    CI_StringOut ("Get STICK20_CMD_CHECK_SMARTCARD_USAGE\r\n");
+
+                    StartStick20Command (STICK20_CMD_CHECK_SMARTCARD_USAGE);
+
+                    // Transfer data to other context
+                    HID_CmdGet_u8 = HTML_CMD_CHECK_SMARTCARD_USAGE;
+                    memcpy (HID_String_au8, &report[1], 33);
+                    break;
+
 #ifdef STICK_20_SEND_DEBUGINFOS_VIA_HID
                 case STICK20_CMD_SEND_DEBUG_DATA:
                     // CI_StringOut ("Get STICK20_CMD_SEND_DEBUG_DATA\r\n");

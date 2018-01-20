@@ -596,6 +596,9 @@ extern Bool sd_mmc_mci_cmd_send_status (U8 slot);
 extern void SetSdEncryptedCardEnableState (unsigned char cState);
 extern unsigned char GetSdEncryptedCardEnableState (void);
 
+void SetSdEncryptedCardReadWriteEnableState (unsigned char cState);
+unsigned char GetSdEncryptedCardReadWriteEnableState (void);
+
 void SetSdUncryptedCardEnableState (unsigned char cState);
 unsigned char GetSdUncryptedCardEnableState (void);
 
