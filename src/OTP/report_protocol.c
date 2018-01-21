@@ -1163,7 +1163,7 @@ u8 text[10];
                     memcpy (HID_String_au8, &report[1], HID_STRING_LEN);
                     break;
 
-
+/*
                 case STICK20_CMD_ENABLE_ADMIN_READONLY_UNCRYPTED_LUN:
                     CI_StringOut ("Get STICK20_CMD_ENABLE_ADMIN_READONLY_UNCRYPTED_LUN\r\n");
 
@@ -1203,7 +1203,7 @@ u8 text[10];
                     HID_CmdGet_u8 = HTML_CMD_ENABLE_ADMIN_READWRITE_ENCRYPTED_LUN;
                     memcpy (HID_String_au8, &report[1], 33);
                     break;
-
+*/
 
                 case STICK20_CMD_CHECK_SMARTCARD_USAGE:
                     CI_StringOut ("Get STICK20_CMD_CHECK_SMARTCARD_USAGE\r\n");
