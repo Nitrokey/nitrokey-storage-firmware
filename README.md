@@ -46,7 +46,7 @@ The PCB layout for the developer version can be found in the [Nitrokey Storage H
 This has been tested with the [AVR JTAGICE XPII](https://www.waveshare.com/product/mcu-tools/avr/programmers-debuggers/usb-avr-jtagice-xpii.htm), however the more recent [Atmel ICE](http://www.microchip.com/DevelopmentTools/ProductDetails.aspx?PartNO=atatmel-ice) and any other AVR UC3 compatible debugger should work as well.
 
 ### Prepare connections
-The JTAG connections on the PCB have a pitch of 1.27mm. To ease connecting and disconnecting, it is easiest to solder a pin header to the PCB and use a pin socket to quickly attach the device to the debugger. It is suggested to use the following parts for that:
+The JTAG connections on the PCB have a pitch of 1.27mm. To ease connecting and disconnecting, it is easiest to solder a pin header to the PCB and use a pin socket to quickly attach the device to the debugger. It is recommended to use the following parts for that (however any connector with a 1.27mm pitch will work):
 
 | Part                                  | Digikey Part Number       |
 |---                                    |---                        |
@@ -57,7 +57,7 @@ The JTAG connections on the PCB have a pitch of 1.27mm. To ease connecting and d
 | Heatshrink                            |                           |
 
 - Solder the 1.27mm Pin header to the board
-- Connect the 1.27mm socket and 2.54mm header to the cable and isolate individual contacts with heatshrink
+- Solder the 1.27mm socket and 2.54mm header to the cable and isolate individual contacts with heatshrink
 
 ### Connect Debugger interface to the Nitrokey
 
@@ -114,7 +114,7 @@ The debugger should now be available. Configure the debugging environment by fol
 Congratulations, your IDE should now be ready for debugging. Set breakpoints as needed and start a JTAG debugging session by pressing F11.
 
 ### Defaulting to USB DFU
-If you accidentally erased the DFU bootloader from the chip or run into any trouble, the stick can always be reproggrammed like this:
+If you accidentally erased the DFU bootloader from the chip or run into any trouble, the stick can always be reprogrammed like this:
 - In the "AVR Targets" dialog, right click on your JTAG debugger and select `Program Bootloader`
 - Leave all the entries in their default state and reprogram the bootloader by clicking `Finish`
 
