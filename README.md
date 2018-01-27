@@ -38,6 +38,7 @@ avr-objcopy -R .eeprom -O ihex USB_MASS.elf firmware.hex
 
 ## Debugging
 **Note: To connect an external debugger as described here, you will need a development version of the Nitrokey Storage that makes the JTAG pins available (pictured below). This version is currently not for sale.**
+
 ![NK Storage Development Version](/img/nkstorage_jtag.jpg "Nitrokey Storage Development Version")
 
 ### Compatible Debuggers
@@ -60,6 +61,7 @@ The JTAG connections on the PCB have a pitch of 1.27mm. To ease connecting and d
 ### Connect Debugger interface to the Nitrokey
 
 Use jumper wires to connect the cable from the Nitrokey to the Debugger interface connector as pictured below:
+
 ![NK Storage Debugger Connection](/img/debugger_connection.png)
 
 | Nitrokey Side                         | AVR JTAG Connector Side   |
@@ -74,6 +76,7 @@ Use jumper wires to connect the cable from the Nitrokey to the Debugger interfac
 
 The device still needs to be powered via USB during debugging.
 For an initial function test, issue the following commands from the AVR32Studio home directory:
+
 ```
 cd /plugins/com.atmel.avr.utilities.linux.x86_64_3.0.0.201009140848/os/linux/x86_64/bin
 ./avr32program --part UC3A3256S cpuinfo
