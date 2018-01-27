@@ -38,6 +38,7 @@ avr-objcopy -R .eeprom -O ihex USB_MASS.elf firmware.hex
 
 ## Debugging
 **Note: To connect an external debugger as described here, you will need a development version of the Nitrokey Storage that makes the JTAG pins available (pictured below). This version is currently not for sale.**
+The PCB layout for the developer version can be found in the [Nitrokey Storage Hardware](https://github.com/Nitrokey/nitrokey-storage-hardware) repository, inside the dev folders.
 
 ![NK Storage Development Version](/img/nkstorage_jtag.jpg "Nitrokey Storage Development Version")
 
