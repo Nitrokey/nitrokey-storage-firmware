@@ -75,7 +75,7 @@ Use jumper wires to connect the cable from the Nitrokey to the Debugger interfac
 | VDD                                   | VTref                     |
 
 The device still needs to be powered via USB during debugging.
-For an initial function test, issue the following commands from the AVR32Studio home directory:
+For an initial function test, you can issue the following commands from the AVR32Studio home directory:
 
 ```
 cd /plugins/com.atmel.avr.utilities.linux.x86_64_3.0.0.201009140848/os/linux/x86_64/bin
@@ -92,3 +92,27 @@ JTAG ID                                       0x7202003f
 SRAM size                                     128 kB
 Flash size                                    256 kB
 ```
+
+### Using the debugger in AVR32Studio
+
+To enable the debugger, follow these steps inside the IDE:
+- Enable the "AVR Targets" dialog under `Window -> Show View -> AVR Targets`
+- Right click inside the "AVR Targets" window and select `Scan Targets`. Your debugger should now be shown as a target.
+- Right click on the debugger entry and select `Properties`
+- Select the "Details" tab. Under "Device", select `AVR UC3A Series -> AT32UC3A3256S`
+
+The debugger should now be available. Configure the debugging environment by following these steps:
+- Open `Run -> Debug Configurations`
+- If there is no entry under `AVR Application`, create one by double clicking on it. Otherwise select the existing entry.
+- Under "File", select `Debug/USB_MASS.elf`
+- Under "Target" select `JTAGICE mkII` (or your correspondig JTAG debugger)
+- Under "Erase Options" select `Erase sectors`
+- Under "Run Options" select `Reset MCU`
+- Apply Settings and close the dialog window
+Congratulations, your IDE should now be ready for debugging. Set breakpoints as needed and start a JTAG debugging session by pressing F11.
+
+### Defaulting to USB DFU
+If you accidentally erased the DFU bootloader from the chip or run into any trouble, the stick can always be reproggrammed like this:
+- In the "AVR Targets" dialog, right click on your JTAG debugger and select `Program Bootloader`
+- Leave all the entries in their default state and reprogram the bootloader by clicking `Finish`
+The device will now start in DFU mode and can be programmed as described above in the Firmware Upgrade Instructions
