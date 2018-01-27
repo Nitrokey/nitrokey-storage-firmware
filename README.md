@@ -109,10 +109,12 @@ The debugger should now be available. Configure the debugging environment by fol
 - Under "Erase Options" select `Erase sectors`
 - Under "Run Options" select `Reset MCU`
 - Apply Settings and close the dialog window
+
 Congratulations, your IDE should now be ready for debugging. Set breakpoints as needed and start a JTAG debugging session by pressing F11.
 
 ### Defaulting to USB DFU
 If you accidentally erased the DFU bootloader from the chip or run into any trouble, the stick can always be reproggrammed like this:
 - In the "AVR Targets" dialog, right click on your JTAG debugger and select `Program Bootloader`
 - Leave all the entries in their default state and reprogram the bootloader by clicking `Finish`
+
 The device will now start in DFU mode and can be programmed as described above in the Firmware Upgrade Instructions
