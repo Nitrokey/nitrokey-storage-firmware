@@ -531,6 +531,7 @@ void HID_ExcuteCmd (void)
         case HTML_CMD_ENABLE_READONLY_UNCRYPTED_LUN:
             CI_TickLocalPrintf ("Set readonly to unencrypted volume\r\n");
 
+            /*
             if (TRUE == IW_SendToSC_PW1 (&HID_String_au8[1]))
             {
                 SetSdUncryptedCardEnableState (FALSE);  // Disable access
@@ -547,15 +548,15 @@ void HID_ExcuteCmd (void)
                 UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD, 0);
                 CI_TickLocalPrintf ("*** wrong password ***\r\n");
             }
-/*
+            */
             UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD, 0);
             CI_TickLocalPrintf ("*** wrong password - NOT USED ***\r\n");
-*/
             break;
 
         case HTML_CMD_ENABLE_READWRITE_UNCRYPTED_LUN:
             CI_TickLocalPrintf ("Set readwrite to unencrypted volume\r\n");
 
+            /*
             if (TRUE == IW_SendToSC_PW1 (&HID_String_au8[1]))
             {
                 SetSdUncryptedCardEnableState (FALSE);  // Disable access
@@ -572,10 +573,10 @@ void HID_ExcuteCmd (void)
                 UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD, 0);
                 CI_TickLocalPrintf ("*** wrong password ***\r\n");
             }
-/*
+            */
+
             UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD, 0);
             CI_TickLocalPrintf ("*** wrong password - NOT USED ***\r\n");
-*/
             break;
 
         case HTML_CMD_SEND_PASSWORD_MATRIX:

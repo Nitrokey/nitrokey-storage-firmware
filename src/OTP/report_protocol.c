@@ -1163,7 +1163,6 @@ u8 text[10];
                     memcpy (HID_String_au8, &report[1], HID_STRING_LEN);
                     break;
 
-/*
                 case STICK20_CMD_ENABLE_ADMIN_READONLY_UNCRYPTED_LUN:
                     CI_StringOut ("Get STICK20_CMD_ENABLE_ADMIN_READONLY_UNCRYPTED_LUN\r\n");
 
@@ -1184,6 +1183,7 @@ u8 text[10];
                     memcpy (HID_String_au8, &report[1], 33);
                     break;
 
+/*
                 case STICK20_CMD_ENABLE_ADMIN_READONLY_ENCRYPTED_LUN:
                     CI_StringOut ("Get STICK20_CMD_ENABLE_ADMIN_READONLY_ENCRYPTED_LUN\r\n");
 
