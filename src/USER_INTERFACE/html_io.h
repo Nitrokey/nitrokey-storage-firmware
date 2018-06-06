@@ -81,6 +81,8 @@
 
 #define HTML_CMD_CHECK_SMARTCARD_USAGE                    37
 
+#define HTML_CMD_WINK								38
+
 /* Look for 4 byte alignment of 32 bit values */
 typedef struct
 {

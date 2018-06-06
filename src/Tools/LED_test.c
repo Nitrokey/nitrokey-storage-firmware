@@ -78,6 +78,8 @@ static volatile u8 LED_GreenToggleFlag_u8 = LED_OFF;
 static volatile u8 LED_RedToggleFlag_u8 = LED_OFF;
 static volatile u8 LED_RedGreenToggleFlag_u8 = LED_OFF;
 
+static volatile u8 LED_WinkActive_u8 = LED_OFF;
+
 
 /*******************************************************************************
 
@@ -328,6 +330,43 @@ void LED_RedGreenOn (void)
     LED_Manager10ms_v ();       // Update LEDs
 }
 
+/*******************************************************************************
+
+  LED_WinkOn
+
+  Set LEDs to switch between red and green every 500ms.
+  Overrides all other LED mode writes when set.
+
+  Changes
+  Date      Author          Info
+  06.06.18  ET              Implementation of function
+
+*******************************************************************************/
+
+void LED_WinkOn (void)
+{
+	LED_WinkActive_u8 = LED_ON;
+	LED_Manager10ms_v ();       // Update LEDs
+}
+
+
+/*******************************************************************************
+
+  LED_WinkOff
+
+  Disables Wink mode for LEDs, allowing other LED accesses to pass through.
+
+  Changes
+  Date      Author          Info
+  06.06.18  ET              Implementation of function
+
+*******************************************************************************/
+
+void LED_WinkOff (void)
+{
+	LED_WinkActive_u8 = LED_OFF;
+	LED_Manager10ms_v ();       // Update LEDs
+}
 
 /*******************************************************************************
 
@@ -397,6 +436,20 @@ void LED_Manager10ms_v (void)
         {
             StateRedLed_u8 = LED_OFF;
         }
+    }
+
+    if (LED_ON == LED_WinkActive_u8)
+    {
+    	if (LED_FLASH_DELAY / 2 > FlashCounter_u8)
+    	{
+    		StateRedLed_u8 = LED_ON;
+    		StateGreenLed_u8 = LED_OFF;
+    	}
+    	else
+    	{
+    		StateRedLed_u8 = LED_OFF;
+    		StateGreenLed_u8 = LED_ON;
+    	}
     }
 
     if (LED_FLASH_DELAY == FlashCounter_u8) // Restart counter

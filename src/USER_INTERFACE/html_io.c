@@ -69,6 +69,7 @@
 #include "INTERNAL_WORK/internal_work.h"
 #include "HighLevelFunctions/HandleAesStorageKey.h"
 #include "DFU_test.h"
+#include "LED_test.h"
 #include "SD_Test.h"
 #include "file_io.h"
 #include "OTP/report_protocol.h"
@@ -909,7 +910,6 @@ void HID_ExcuteCmd (void)
             }
             break;
 
-
         case HTML_CMD_CHECK_SMARTCARD_USAGE:
             CI_TickLocalPrintf ("Check smartcard usage\r\n");
             if (0 == USB_CCID_GetLockCounter ())
@@ -923,6 +923,13 @@ void HID_ExcuteCmd (void)
                 CI_TickLocalPrintf ("smartcard busy\r\n");
             }
             break;
+
+        case HTML_CMD_WINK:
+            CI_TickLocalPrintf ("Get HTML_CMD_WINK\r\n");
+            LED_WinkOn ();
+            UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
+            break;
+
 
         default:
             CI_TickLocalPrintf ("HID_ExcuteCmd: Get unknown command: %d \r\n", Cmd_u8);

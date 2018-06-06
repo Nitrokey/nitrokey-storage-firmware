@@ -42,6 +42,9 @@ void LED_RedGreenToggle (void);
 void LED_RedGreenOff (void);
 void LED_RedGreenOn (void);
 
+void LED_WinkOn (void);
+void LED_WinkOff (void);
+
 void IBN_LED_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned int Param_u32, unsigned char* String_pu8);
 
 
