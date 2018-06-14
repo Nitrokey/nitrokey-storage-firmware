@@ -150,6 +150,8 @@
 #define CMD_STATUS_NOT_AUTHORIZED         5
 #define CMD_STATUS_TIMESTAMP_WARNING      6
 #define CMD_STATUS_NO_NAME_ERROR          7
+#define CMD_STATUS_AES_DEC_FAILED           10
+#define CMD_STATUS_UNKNOWN_ERROR           100
 
 /*
    Output report size offset description 1 0 device status 1 1 last command's type 4 2 last command's CRC 1 6 last command's status 53 7 last

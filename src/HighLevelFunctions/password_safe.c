@@ -635,7 +635,7 @@ u8 PWS_DecryptedPasswordSafeKey (void)
 
 u8 PWS_EnableAccess (u8 * password)
 {
-u32 Ret_u32;
+    u32 Ret_u32;
 
     CI_LocalPrintf ("PWS_EnableAccess: ");
 
@@ -643,19 +643,19 @@ u32 Ret_u32;
     if (TRUE != Ret_u32)
     {
         CI_LocalPrintf (" *** FAIL ***\r\n");
-        return (FALSE);
+        return (PWS_RETURN_WRONG_PASSWORD);
     }
 
     Ret_u32 = PWS_DecryptedPasswordSafeKey ();
     if (TRUE != Ret_u32)
     {
         CI_LocalPrintf (" *** FAIL ***. Can't decrypt key\r\n");
-        return (FALSE);
+        return (PWS_RETURN_AES_ERROR);
     }
 
     CI_LocalPrintf ("OK\r\n");
 
-    return (TRUE);
+    return (PWS_RETURN_SUCCESS);
 }
 
 

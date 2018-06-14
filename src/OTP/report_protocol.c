@@ -2509,16 +2509,22 @@ u32 Ret_u32;
 
 u8 cmd_getPasswordSafeEnable (u8 * report, u8 * output)
 {
-u32 Ret_u32;
+    u8 Ret_u8;
 
-    Ret_u32 = PWS_EnableAccess (&report[1]);
-    if (TRUE == Ret_u32)
+    Ret_u8 = PWS_EnableAccess (&report[1]);
+    if (PWS_RETURN_SUCCESS == Ret_u8)
     {
         output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
     }
-    else
-    {
+    else if (PWS_RETURN_AES_ERROR == Ret_u8){
+//      output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_AES_DEC_FAILED; //FIXME enable in later releases
+      output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_UNKNOWN_ERROR;
+    }
+    else if (PWS_RETURN_WRONG_PASSWORD == Ret_u8) {
         output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_PASSWORD;
+    }
+    else {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_UNKNOWN_ERROR;
     }
 
     return (0);
