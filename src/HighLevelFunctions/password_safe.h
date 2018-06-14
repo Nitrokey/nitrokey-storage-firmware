@@ -65,6 +65,10 @@ void IBN_PWS_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
 #define PWS_SEND_TAB          2
 #define PWS_SEND_CR           3
 
+
+#define PWS_RETURN_SUCCESS (1)
+#define PWS_RETURN_WRONG_PASSWORD (0)
+#define PWS_RETURN_AES_ERROR (10)
 /*******************************************************************************
 
   Typedef password slot
