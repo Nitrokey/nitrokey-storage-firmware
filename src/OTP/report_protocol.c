@@ -1021,6 +1021,16 @@ u8 text[10];
                     memcpy (HID_String_au8, &report[1], 33);
                     break;
 
+                case STICK20_CMD_WINK:
+                  CI_StringOut ("Get STICK20_CMD_WINK\r\n");
+
+                  StartStick20Command (STICK20_CMD_WINK);
+
+                  // Transfer data to other context
+                  HID_CmdGet_u8 = HTML_CMD_WINK;
+//                  memcpy (HID_String_au8, &report[1], 33);
+                  break;
+
                 case STICK20_CMD_SEND_DEVICE_STATUS:
                     CI_StringOut ("Get STICK20_CMD_SEND_DEVICE_STATUS\r\n");
 
