@@ -854,7 +854,7 @@ void HID_ExcuteCmd (void)
             break;
 
         case HTML_CMD_ENABLE_ADMIN_READWRITE_ENCRYPTED_LUN:
-            CI_TickLocalPrintf ("Set readwrite to unencrypted volume ADMIN\r\n");
+            CI_TickLocalPrintf ("Set readwrite to encrypted volume ADMIN\r\n");
             if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
             {
                 SetSdUncryptedCardEnableState (FALSE);  // Disable access
