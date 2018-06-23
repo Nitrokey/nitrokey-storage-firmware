@@ -1041,19 +1041,6 @@ u8 text[10];
                     memcpy (HID_String_au8, &report[1], 33);
                     break;
 
-                    /*
-                       case STICK20_CMD_SEND_HIDDEN_VOLUME_PASSWORD : CI_StringOut ("Get STICK20_CMD_SEND_HIDDEN_VOLUME_PASSWORD\r\n");
-
-                       StartStick20Command (STICK20_CMD_SEND_HIDDEN_VOLUME_PASSWORD);
-
-                       // Transfer data to other context HID_CmdGet_u8 = HTML_SEND_HIDDEN_VOLUME_PASSWORD; memcpy (HID_String_au8,&report[1],33);
-                       break; */
-                    /*
-                       case STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP : CI_StringOut ("Get STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP\r\n");
-
-                       StartStick20Command (STICK20_CMD_SEND_HIDDEN_VOLUME_SETUP);
-
-                       // Transfer data to other context HID_CmdGet_u8 = HTML_SEND_HIDDEN_VOLUME_SETUP; memcpy (HID_String_au8,&report[1],33); break; */
                 case STICK20_CMD_SEND_PASSWORD:
                     CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD\r\n");
 
