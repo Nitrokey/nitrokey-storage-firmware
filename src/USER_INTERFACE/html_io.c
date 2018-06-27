@@ -69,6 +69,7 @@
 #include "INTERNAL_WORK/internal_work.h"
 #include "HighLevelFunctions/HandleAesStorageKey.h"
 #include "DFU_test.h"
+#include "LED_test.h"
 #include "SD_Test.h"
 #include "file_io.h"
 #include "OTP/report_protocol.h"
@@ -531,51 +532,15 @@ void HID_ExcuteCmd (void)
         case HTML_CMD_ENABLE_READONLY_UNCRYPTED_LUN:
             CI_TickLocalPrintf ("Set readonly to unencrypted volume\r\n");
 
-            if (TRUE == IW_SendToSC_PW1 (&HID_String_au8[1]))
-            {
-                SetSdUncryptedCardEnableState (FALSE);  // Disable access
-                SetSdEncryptedCardEnableState (FALSE);
-                SetSdUncryptedCardReadWriteEnableState (READ_ONLY_ACTIVE);
-                vTaskDelay (6000);
-                SetSdUncryptedCardEnableState (TRUE);   // Enable access
-
-                UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
-                CI_TickLocalPrintf ("ok\r\n");
-            }
-            else
-            {
-                UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD, 0);
-                CI_TickLocalPrintf ("*** wrong password ***\r\n");
-            }
-/*
             UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD, 0);
             CI_TickLocalPrintf ("*** wrong password - NOT USED ***\r\n");
-*/
             break;
 
         case HTML_CMD_ENABLE_READWRITE_UNCRYPTED_LUN:
             CI_TickLocalPrintf ("Set readwrite to unencrypted volume\r\n");
 
-            if (TRUE == IW_SendToSC_PW1 (&HID_String_au8[1]))
-            {
-                SetSdUncryptedCardEnableState (FALSE);  // Disable access
-                SetSdEncryptedCardEnableState (FALSE);
-                SetSdUncryptedCardReadWriteEnableState (READ_WRITE_ACTIVE);
-                vTaskDelay (6000);
-                SetSdUncryptedCardEnableState (TRUE);   // Enable access
-
-                UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
-                CI_TickLocalPrintf ("ok\r\n");
-            }
-            else
-            {
-                UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD, 0);
-                CI_TickLocalPrintf ("*** wrong password ***\r\n");
-            }
-/*
             UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD, 0);
             CI_TickLocalPrintf ("*** wrong password - NOT USED ***\r\n");
-*/
             break;
 
         case HTML_CMD_SEND_PASSWORD_MATRIX:
@@ -889,7 +854,7 @@ void HID_ExcuteCmd (void)
             break;
 
         case HTML_CMD_ENABLE_ADMIN_READWRITE_ENCRYPTED_LUN:
-            CI_TickLocalPrintf ("Set readwrite to unencrypted volume ADMIN\r\n");
+            CI_TickLocalPrintf ("Set readwrite to encrypted volume ADMIN\r\n");
             if (TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
             {
                 SetSdUncryptedCardEnableState (FALSE);  // Disable access
@@ -908,7 +873,6 @@ void HID_ExcuteCmd (void)
             }
             break;
 
-
         case HTML_CMD_CHECK_SMARTCARD_USAGE:
             CI_TickLocalPrintf ("Check smartcard usage\r\n");
             if (0 == USB_CCID_GetLockCounter ())
@@ -922,6 +886,13 @@ void HID_ExcuteCmd (void)
                 CI_TickLocalPrintf ("smartcard busy\r\n");
             }
             break;
+
+        case HTML_CMD_WINK:
+            CI_TickLocalPrintf ("Get HTML_CMD_WINK\r\n");
+            LED_WinkOn ();
+            UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
+            break;
+
 
         default:
             CI_TickLocalPrintf ("HID_ExcuteCmd: Get unknown command: %d \r\n", Cmd_u8);

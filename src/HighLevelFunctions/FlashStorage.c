@@ -277,7 +277,7 @@ u32 ActiveSmartCardID_u32;
 u8 InitStickConfigurationToUserPage_u8 (void)
 {
     StickConfiguration_st.MagicNumber_StickConfig_u16 = MAGIC_NUMBER_STICK20_CONFIG;
-    StickConfiguration_st.ReadWriteFlagUncryptedVolume_u8 = READ_WRITE_ACTIVE;
+    StickConfiguration_st.ReadWriteFlagUncryptedVolume_u8 = READ_ONLY_ACTIVE;
     StickConfiguration_st.ReadWriteFlagCryptedVolume_u8 = READ_WRITE_ACTIVE;
     StickConfiguration_st.ReadWriteFlagHiddenVolume_u8 = READ_WRITE_ACTIVE;
     StickConfiguration_st.FirmwareLocked_u8 = 0;

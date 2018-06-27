@@ -401,7 +401,7 @@ void sd_mmc_mci_resources_init (void)
     // Enable pull-up for Write Protect.
     gpio_enable_pin_pull_up (SD_SLOT_8BITS_WRITE_PROTECT);
     //
-    // Für STICK20 microSD Sockel
+    // For STICK20 microSD Sockel
     gpio_enable_pin_pull_up (SD_SLOT_CMD_STICK20);
     gpio_enable_pin_pull_up (SD_SLOT_DATA0_STICK20);
     //
