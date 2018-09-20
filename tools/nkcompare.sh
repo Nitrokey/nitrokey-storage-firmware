@@ -17,8 +17,8 @@ srec_cat "$1" -Intel -offset=0x80000000 -fill 0xFF 0x00000 0x3E000 -output "$tmp
 srec_cat "$2" -binary -offset=0x00000000 -fill 0xFF 0x00000 0x3E000 -output "$tmpdir"/firmware_exported_filled.bin -binary
 
 #Generate checksums
-hash_orig=$(sha512sum "$tmpdir"/firmware_orig_filled.bin | cut -d " " -f 1)
-hash_expo=$(sha512sum "$tmpdir"/firmware_exported_filled.bin | cut -d " " -f 1)
+hash_orig=$(sha256sum "$tmpdir"/firmware_orig_filled.bin | cut -d " " -f 1)
+hash_expo=$(sha256sum "$tmpdir"/firmware_exported_filled.bin | cut -d " " -f 1)
 
 rm -r "$tmpdir"
 
@@ -29,7 +29,7 @@ NORMAL=$(tput sgr0)
 
 #Compare hash values
 if [ "$hash_orig" = "$hash_expo" ]; then
-    printf "${GREEN}Firmware binaries match${NORMAL}\nSHA512: %s\n" "$hash_orig"
+    printf "${GREEN}Firmware binaries match${NORMAL}\nSHA256: %s\n" "$hash_orig"
 else
-    printf "${RED}Firmware binaries mismatch${NORMAL}\nOriginal Firmware SHA512: %s\nExported Firmware SHA512: %s\n" "$hash_orig" "$hash_expo"
+    printf "${RED}Firmware binaries mismatch${NORMAL}\nOriginal Firmware SHA256: %s\nExported Firmware SHA256: %s\n" "$hash_orig" "$hash_expo"
 fi
