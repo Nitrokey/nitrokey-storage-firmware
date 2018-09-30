@@ -2010,6 +2010,20 @@ u32 Ret_u32;
 u8 cmd_lock_device (u8 * report, u8 * output)
 {
     LockDevice ();
+
+    // Erase temporary admin password
+    memset (temp_password, 0, 25);
+    tmp_password_set = 0;
+
+    // Erase temporary user password
+    memset (temp_user_password, 0, 25);
+    tmp_user_password_set = 0;
+
+    // Erase pre-authenticated message CRCs
+    authorized_crc = 0xFFFFFFFF;
+    authorized_user_crc = 0xFFFFFFFF;
+    authorized_user_crc_set=0;
+
     return (0);
 }
 
