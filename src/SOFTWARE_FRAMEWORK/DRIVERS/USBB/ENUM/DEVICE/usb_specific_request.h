@@ -49,7 +49,7 @@ extern const S_usb_product_string_descriptor usb_user_product_string_descriptor;
 extern const S_usb_serial_number usb_user_serial_number;
 extern const S_usb_language_id usb_user_language_id;
 
-#define USB_HID_REPORT_DESC_KEYBOARD                71
+#define USB_HID_REPORT_DESC_KEYBOARD                42
 extern const U8 usb_hid_report_descriptor_keyboard[USB_HID_REPORT_DESC_KEYBOARD];
 
 // ! @defgroup specific_request USB device specific requests

@@ -130,7 +130,7 @@
 
 
 
-#define RELEASE_NUMBER        0x0100
+#define RELEASE_NUMBER        0x0104
 #define MAN_INDEX             0x01
 #define PROD_INDEX            0x02
 #define SN_INDEX              0x03
@@ -262,7 +262,7 @@
 #define KB_NB_ENDPOINT         1    // ! The number of endpoints this interface has
 #define KB_INTERFACE_CLASS     HID_CLASS    // ! HID Class
 #define KB_INTERFACE_SUB_CLASS NO_SUBCLASS  // !
-#define KB_INTERFACE_PROTOCOL  KEYBOARD_PROTOCOL    // !
+#define KB_INTERFACE_PROTOCOL  GENERIC_PROTOCOL    // !
 #define KB_INTERFACE_INDEX     0
 
             // Keyboard HID descriptor
