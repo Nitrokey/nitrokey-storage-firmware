@@ -148,6 +148,7 @@
 // ! @{
 #define HID_CLASS                             0x03
 #define BOOT_SUBCLASS                              0x01
+#define GENERIC_PROTOCOL								0x00
 #define KEYBOARD_PROTOCOL                               0x01
 #define MOUSE_PROTOCOL                                  0x02
 // ! @}
