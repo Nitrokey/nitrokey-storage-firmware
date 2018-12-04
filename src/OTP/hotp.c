@@ -171,6 +171,7 @@
    SLOTS_ADDRESS + TOTP_SLOT4_OFFSET}; u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS] = {TOTP_SLOT1_OFFSET, TOTP_SLOT2_OFFSET, TOTP_SLOT3_OFFSET,
    TOTP_SLOT4_OFFSET}; */
 
+/*
 u32 hotp_slots[NUMBER_OF_HOTP_SLOTS] = {
     SLOTS_ADDRESS + HOTP_SLOT1_OFFSET,
     SLOTS_ADDRESS + HOTP_SLOT2_OFFSET,
@@ -225,6 +226,12 @@ u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS + 1] = {
     TOTP_SLOT14_OFFSET,
     TOTP_SLOT15_OFFSET,
     TOTP_SLOT16_OFFSET
+};
+*/
+uint32_t hotp_slot_counters[NUMBER_OF_HOTP_SLOTS] = {
+    SLOT1_COUNTER_ADDRESS,
+    SLOT2_COUNTER_ADDRESS,
+    SLOT3_COUNTER_ADDRESS,
 };
 
 u8 page_buffer[FLASH_PAGE_SIZE * 3];
@@ -945,7 +952,8 @@ u8 config = 0;
     if (config & (1 << SLOT_CONFIG_DIGITS))
         len = 8;
 
-    result = *((u8 *) hotp_slots[slot]);
+    OTP_slot * hotp_slot = ((OTP_slot *) get_HOTP_slot_offset(slot_number));
+    //result = *((u8 *) hotp_slots[slot]);
 
     if (result == 0xFF) // unprogrammed slot
         return 0;
@@ -1104,7 +1112,7 @@ u8* page = (u8 *) SLOTS_ADDRESS;
     // Check if the secret from the tool is empty and if it is use the old secret
     // Secret could begin with 0x00, so checking the whole secret before keeping the old one in mandatory
     Found = FALSE;
-    for (i=0;i<20;i++)
+    for (i=0;i < OTP_SECRET_LENGTH;i++)
     {
       if (0 != secret[i])
       {
@@ -1115,7 +1123,7 @@ u8* page = (u8 *) SLOTS_ADDRESS;
 
     if (FALSE == Found)
     {
-        memcpy (data + SECRET_OFFSET, page_buffer + offset + SECRET_OFFSET, 20);
+        memcpy (data + SECRET_OFFSET, page_buffer + offset + SECRET_OFFSET, OTP_SECRET_LENGTH);
     }
 
     // write page to backup location
@@ -1199,7 +1207,7 @@ u16 length = getu16 ((u8 *) BACKUP_PAGE_ADDRESS + BACKUP_LENGTH_OFFSET);
   16.08.13  RB              First review
 
 *******************************************************************************/
-
+/* TODO: Obsolete
 u8 get_hotp_slot_config (u8 slot_number)
 {
 u8 result = 0;
@@ -1211,7 +1219,7 @@ u8 result = 0;
     }
 
     return result;
-}
+} */ 
 
 /*******************************************************************************
 
@@ -1225,7 +1233,7 @@ u8 result = 0;
   Date      Reviewer        Info
 
 *******************************************************************************/
-
+/* TODO: Obsolete
 u8 get_totp_slot_config (u8 slot_number)
 {
 u8 result = 0;
@@ -1238,7 +1246,7 @@ u8 result = 0;
 
     return result;
 }
-
+*/
 
 /*******************************************************************************
 
@@ -1285,7 +1293,7 @@ time_t now;
         len = 8;
 
     // result= get_hotp_value(challenge,(u8 *)(totp_slots[slot]+SECRET_OFFSET),20,len);
-    result = get_hotp_value (time_min, (u8 *) (totp_slots[slot] + SECRET_OFFSET), 20, len);
+    result = get_hotp_value (time_min, (u8 *) (totp_slots[slot] + SECRET_OFFSET), OTP_SECRET_LENGTH, len);
 
     return result;
 
@@ -1308,7 +1316,11 @@ time_t now;
 
 u8* get_hotp_slot_addr (u8 slot_number)
 {
-u8* result = NULL;
+
+    return SLOTS_ADDRESS + get_slot_offset(slot_count);
+    
+    /* TODO: Obsolete
+    u8* result = NULL;
 
     if (slot_number >= NUMBER_OF_HOTP_SLOTS)
     {
@@ -1319,7 +1331,7 @@ u8* result = NULL;
         result = (u8 *) hotp_slots[slot_number];
     }
 
-    return result;
+    return result; */
 }
 
 /*******************************************************************************
@@ -1338,7 +1350,10 @@ u8* result = NULL;
 
 u8* get_totp_slot_addr (u8 slot_number)
 {
-u8* result = NULL;
+    return SLOTS_ADDRESS + get_slot_offset(NUMBER_OF_HOTP_SLOTS + slot_count);
+
+    /* TODO: Obsolete
+    u8* result = NULL;
 
     if (slot_number >= NUMBER_OF_TOTP_SLOTS)
     {
@@ -1349,5 +1364,25 @@ u8* result = NULL;
         result = (u8 *) totp_slots[slot_number];
     }
 
-    return result;
+    return result; */
+}
+
+
+u32 get_slot_offset(int slot_number)
+{
+    const int global_config_offset = 64;
+    size_t slot_offset = sizeof(OTP_slot) * slot_count + global_config_offset;
+    for(size_t i = 0; i < 3; i++)
+    {
+
+    }
+
+    // TODO: What does this do?
+    const int first_page_limit = SLOT_PAGE_SIZE - sizeof(OTP_slot);
+    const int second_page_start = 1024+8;
+    if (slot_offset > first_page_limit){
+        slot_offset -= first_page_limit;
+        slot_offset += second_page_start;
+    }
+    return slot_offset;
 }
