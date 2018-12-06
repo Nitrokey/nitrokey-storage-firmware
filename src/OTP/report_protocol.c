@@ -1389,12 +1389,12 @@ u8 cmd_write_to_slot (u8 * report, u8 * output)
 {
 
 u8 slot_no = report[CMD_WTS_SLOT_NUMBER_OFFSET];
-u8 slot_tmp[64];                // this is will be the new slot contents
+u8 slot_tmp[sizeof(OTP_slot)];                // this is will be the new slot contents
 u8 slot_name[15];
 u32 Counter_u32;
 u64 counter;
 
-    memset (slot_tmp, 0, 64);
+    memset (slot_tmp, 0, sizeof(OTP_slot));
 
     slot_tmp[0] = 0x01; // marks slot as programmed
 
@@ -1408,7 +1408,7 @@ u64 counter;
     }
 
 
-    if ((slot_no >= 0x10) && (slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS))   // HOTP slot
+    if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
         slot_no = slot_no & 0x0F;
 
@@ -1434,13 +1434,13 @@ u8 text[20];
 
         set_counter_value (hotp_slot_counters[slot_no], counter);
 
-        write_to_slot (slot_tmp, hotp_slot_offsets[slot_no], 64);
+        write_to_slot (slot_tmp, get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
     }
-    else if ((slot_no >= 0x20) && (slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS))  // TOTP slot
+    else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
         slot_no = slot_no & 0x0F;
 
-        write_to_slot (slot_tmp, totp_slot_offsets[slot_no], 64);
+        write_to_slot (slot_tmp, get_totp_slot_addr(slot_no), sizeof(OTP_slot));
     }
     else
     {
@@ -1467,14 +1467,14 @@ u8 text[10];
 u8 slot_no = report[1];
 
 
-    if ((slot_no >= 0x10) && (slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS))   // HOTP slot
+    if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
         slot_no = slot_no & 0x0F;
-u8 is_programmed = *((u8 *) (hotp_slots[slot_no]));
+        OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot);
 
-        if (is_programmed == 0x01)
+        if (is_HOTP_slot_programmed(slot_no))
         {
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET, (u8 *) (hotp_slots[slot_no] + SLOT_NAME_OFFSET), 15);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET, slot->name, 15);
 
             CI_StringOut ("HOTP Slot ");
             itoa (slot_no, text);
@@ -1489,14 +1489,14 @@ u8 is_programmed = *((u8 *) (hotp_slots[slot_no]));
             return 1;
         }
     }
-    else if ((slot_no >= 0x20) && (slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS))  // TOTP slot
+    else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
         slot_no = slot_no & 0x0F;
-u8 is_programmed = *((u8 *) (totp_slots[slot_no]));
+        OTP_slot *slot = (OTP_slot *) get_totp_slot_addr(slot);
 
-        if (is_programmed == 0x01)
+        if (is_TOTP_slot_programmed(slot_no))
         {
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET, (u8 *) (totp_slots[slot_no] + SLOT_NAME_OFFSET), 15);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET, (u8 *) slot->name, 15);
             CI_StringOut ("TOTP Slot ");
             itoa (slot_no, text);
             CI_StringOut ((char *) text);
@@ -1533,16 +1533,16 @@ u8 cmd_read_slot (u8 * report, u8 * output)
 u8 slot_no = report[CMD_RS_SLOT_NUMBER_OFFSET];
 u64 counter;
 
-    if ((slot_no >= 0x10) && (slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS))   // HOTP slot
+    if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
         slot_no = slot_no & 0x0F;
-u8 is_programmed = *((u8 *) (hotp_slots[slot_no]));
+        OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot);
 
-        if (is_programmed == 0x01)
+        if (is_HOTP_slot_programmed(slot_no))
         {
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET, (u8 *) (hotp_slots[slot_no] + SLOT_NAME_OFFSET), 15);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 15, (u8 *) (hotp_slots[slot_no] + CONFIG_OFFSET), 1);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, (u8 *) (hotp_slots[slot_no] + TOKEN_ID_OFFSET), 13);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET, slot->name, 15);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 15, &slot->config, 1);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, slot->token_id, 13);
 
             counter = get_counter_value (hotp_slot_counters[slot_no]);
             itoa ((u32) counter, &output[OUTPUT_CMD_RESULT_OFFSET + 29]);   // Bytes after OUTPUT_CMD_RESULT_OFFSET+29+8 is unused
@@ -1569,16 +1569,17 @@ u8 text[20];
             return 1;
         }
     }
-    else if ((slot_no >= 0x20) && (slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS))  // TOTP slot
+    else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
         slot_no = slot_no & 0x0F;
-u8 is_programmed = *((u8 *) (totp_slots[slot_no]));
-        if (is_programmed == 0x01)
+        OTP_slot *slot = (OTP_slot *) get_totp_slot_addr(slot);
+
+        if (is_TOTP_slot_programmed(slot_no))
         {
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET, (u8 *) (totp_slots[slot_no] + SLOT_NAME_OFFSET), 15);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 15, (u8 *) (totp_slots[slot_no] + CONFIG_OFFSET), 1);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, (u8 *) (totp_slots[slot_no] + TOKEN_ID_OFFSET), 13);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, (u8 *) (totp_slots[slot_no] + INTERVAL_OFFSET), 2);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET, slot->name, 15);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 15, &slot->config, 1);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, slot->token, 13);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, slot->interval_or_counter, 2);
         }
         else
         {
@@ -1700,11 +1701,12 @@ u32 result = 0;
 
 u8 slot_no = report[CMD_GC_SLOT_NUMBER_OFFSET];
 
-    if ((slot_no >= 0x10) && (slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS))   // HOTP slot
+    if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
         slot_no = slot_no & 0x0F;
-u8 is_programmed = *((u8 *) (hotp_slots[slot_no]));
-        if (is_programmed == 0x01)
+        OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
+
+        if (is_HOTP_slot_programmed(slot_no))
         {
             result = get_code_from_hotp_slot (slot_no);
 
@@ -1712,17 +1714,19 @@ u8 is_programmed = *((u8 *) (hotp_slots[slot_no]));
             result = change_endian_u32 (result);
 
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET, &result, 4);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 4, (u8 *) hotp_slots[slot_no] + CONFIG_OFFSET, 14);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 4, &slot->config, 1);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 5, slot->token_id, 13);
+
         }
         else
         {
             output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_SLOT_NOT_PROGRAMMED;
         }
     }
-    else if ((slot_no >= 0x20) && (slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS))  // TOTP slot
+    else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
         slot_no = slot_no & 0x0F;
-u8 is_programmed = *((u8 *) (totp_slots[slot_no]));
+        OTP_slot *slot = (OTP_slot *) get_totp_slot_addr(slot_no);
 
 /* Improvement for future, check USB timestamp against local timestamp
         if (FALSE == CheckSystemtime ((u32) timestamp))
@@ -1730,7 +1734,7 @@ u8 is_programmed = *((u8 *) (totp_slots[slot_no]));
 
         }
 */
-        if (is_programmed == 0x01)
+        if (is_TOTP_slot_programmed(slot_no))
         {
             result = get_code_from_totp_slot (slot_no, timestamp / (u64) interval);
             // result = get_code_from_totp_slot (slot_no,challenge);
@@ -1738,8 +1742,10 @@ u8 is_programmed = *((u8 *) (totp_slots[slot_no]));
             // Change endian
             result = change_endian_u32 (result);
 
+
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET, &result, 4);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 4, (u8 *) totp_slots[slot_no] + CONFIG_OFFSET, 14);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 4, &slot->config, 1);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 5, slot->token_id, 13);
         }
         else
         {
@@ -1811,12 +1817,12 @@ u32 i;
 u8 cmd_erase_slot (u8 * report, u8 * output)
 {
 u8 slot_no = report[CMD_WTS_SLOT_NUMBER_OFFSET];
-u8 slot_tmp[64];
+u8 slot_tmp[sizeof(OTP_slot)];
 u8 text_au8[10];
 
-    memset (slot_tmp, 0xFF, 64);
+    memset (slot_tmp, 0xFF, sizeof(OTP_slot));
 
-    if ((slot_no >= 0x10) && (slot_no <= 0x10 + NUMBER_OF_HOTP_SLOTS))  // HOTP slot
+    if (is_HOTP_slot_number(slot_no))  // HOTP slot
     {
         slot_no = slot_no & 0x0F;
 
@@ -1825,10 +1831,10 @@ u8 text_au8[10];
         CI_StringOut ((char *) text_au8);
         CI_StringOut ("\r\n");
 
-        write_to_slot (slot_tmp, hotp_slot_offsets[slot_no], 64);
+        write_to_slot (slot_tmp, get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
         erase_counter (slot_no);
     }
-    else if ((slot_no >= 0x20) && (slot_no <= 0x20 + NUMBER_OF_TOTP_SLOTS)) // TOTP slot
+    else if (is_TOTP_slot_number(slot_no)) // TOTP slot
     {
         slot_no = slot_no & 0x0F;
 
@@ -1838,7 +1844,7 @@ u8 text_au8[10];
         CI_StringOut ("\r\n");
 
 
-        write_to_slot (slot_tmp, totp_slot_offsets[slot_no], 64);
+        write_to_slot (slot_tmp, get_totp_slot_addr(slot_no), sizeof(OTP_slot));
     }
     else
     {
@@ -2924,4 +2930,20 @@ void OTP_main (void)
 
         }
     }
+}
+
+bool is_TOTP_slot_number(u8 slot_no) { return slot_no >= 0x20 && slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS; }
+
+bool is_HOTP_slot_number(u8 slot_no) { return slot_no >= 0x10 && slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS; }
+
+bool is_HOTP_slot_programmed(u8 slot_no){
+  OTP_slot* otp_slot = (OTP_slot *) get_HOTP_slot_offset(slot_no);
+  bool is_programmed = otp_slot->type != 0xFF;
+  return is_programmed;
+}
+
+bool is_TOTP_slot_programmed(u8 slot_no){
+  OTP_slot* otp_slot = (OTP_slot *) get_TOTP_slot_offset(slot_no);
+  bool is_programmed = otp_slot->type != 0xFF;
+  return is_programmed;
 }

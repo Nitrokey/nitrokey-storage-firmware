@@ -197,6 +197,8 @@ void IBN_OTP_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
             slot_no = Param_u32;
             if (slot_no < NUMBER_OF_HOTP_SLOTS) // HOTP slot
             {
+            	//TODO: Change to new struct format
+            	/*
                 is_programmed = *((u8 *) (hotp_slots[slot_no]));
                 if (is_programmed == 0x01)
                 {
@@ -207,7 +209,7 @@ void IBN_OTP_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
                 else
                 {
                     CI_LocalPrintf ("Slot %d not programmed\n\r", slot_no);
-                }
+                }*/
             }
             else
             {
@@ -219,6 +221,8 @@ void IBN_OTP_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
             slot_no = Param_u32;
             if (slot_no < NUMBER_OF_HOTP_SLOTS) // HOTP slot
             {
+            	//TODO: Refactor and add back in
+            	/*
                 is_programmed = *((u8 *) (hotp_slots[slot_no]));
 
                 Data_pu8 = (u8 *) hotp_slot_counters[slot_no];
@@ -233,7 +237,7 @@ void IBN_OTP_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
                     CI_LocalPrintf ("0x%03x ", i * 32);
                     HexPrint (32, &Data_pu8[i * 32]);
                     CI_LocalPrintf ("\n\r");
-                }
+                } */
             }
 
             break;

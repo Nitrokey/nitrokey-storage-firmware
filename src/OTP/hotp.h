@@ -101,29 +101,29 @@ TODO: Not sure if that's actually the case. Why do we even store the system time
 
 // #define SLOT_SIZE             64 << TODO: Obsolete
 
-#define GLOBAL_CONFIG_OFFSET  (SLOT_SIZE * 0)
+#define GLOBAL_CONFIG_OFFSET  0
 #define SECRET_LENGTH_DEFINE  20
 // TODO: Increase to 40 when everything else works
 
 #define __packed __attribute__((__packed__))
 typedef struct {
-    uint8_t type; //'H' - HOTP, 'T' - TOTP, 0xFF - not programmed
-    uint8_t slot_number;
-    uint8_t name[15];
-    uint8_t secret[SECRET_LENGTH_DEFINE];
+    u8 type; //'H' - HOTP, 'T' - TOTP, 0xFF - not programmed
+    u8 slot_number;
+    u8 name[15];
+    u8 secret[SECRET_LENGTH_DEFINE];
     union {
-      uint8_t config;
+      u8 config;
       struct {
         bool use_8_digits   : 1;
         bool use_enter      : 1;
         bool use_tokenID    : 1;
       };
     };
-    uint8_t token_id[13];
-    uint64_t interval_or_counter;
+    u8 token_id[13];
+    u64 interval_or_counter;
 } __packed OTP_slot;
 
-extern uint32_t hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];
+extern u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];
 
 /*
 #define HOTP_SLOT1_OFFSET     (SLOT_SIZE * 1)
@@ -203,5 +203,8 @@ u32 get_code_from_totp_slot (u8 slot, u64 challenge);
 
 u8* get_hotp_slot_addr (u8 slot_number);
 u8* get_totp_slot_addr (u8 slot_number);
+
+u32 get_slot_offset(u8 slot_number);
+
 
 #endif // HOTP_H

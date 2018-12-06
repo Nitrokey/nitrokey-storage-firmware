@@ -228,7 +228,7 @@ u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS + 1] = {
     TOTP_SLOT16_OFFSET
 };
 */
-uint32_t hotp_slot_counters[NUMBER_OF_HOTP_SLOTS] = {
+u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS] = {
     SLOT1_COUNTER_ADDRESS,
     SLOT2_COUNTER_ADDRESS,
     SLOT3_COUNTER_ADDRESS,
@@ -1091,6 +1091,8 @@ void erase_counter (u8 slot)
 
 void write_to_slot (u8 * data, u16 offset, u16 len)
 {
+
+	//TODO: Why does this need a size at all?
 u16 dummy_u16;
 u8* secret;
 u8  i;
@@ -1100,7 +1102,7 @@ u8  Found;
 
 
     // copy entire page to ram
-u8* page = (u8 *) SLOTS_ADDRESS;
+    u8* page = (u8 *) SLOTS_ADDRESS;
     memcpy (page_buffer, page, FLASH_PAGE_SIZE * 3);
 
     // make changes to page
@@ -1112,7 +1114,7 @@ u8* page = (u8 *) SLOTS_ADDRESS;
     // Check if the secret from the tool is empty and if it is use the old secret
     // Secret could begin with 0x00, so checking the whole secret before keeping the old one in mandatory
     Found = FALSE;
-    for (i=0;i < OTP_SECRET_LENGTH;i++)
+    for (i = 0; i < SECRET_LENGTH_DEFINE; i++)
     {
       if (0 != secret[i])
       {
@@ -1317,21 +1319,8 @@ time_t now;
 u8* get_hotp_slot_addr (u8 slot_number)
 {
 
-    return SLOTS_ADDRESS + get_slot_offset(slot_count);
-    
-    /* TODO: Obsolete
-    u8* result = NULL;
+    return (u8*)(SLOTS_ADDRESS + get_slot_offset(slot_number));
 
-    if (slot_number >= NUMBER_OF_HOTP_SLOTS)
-    {
-        return NULL;
-    }
-    else
-    {
-        result = (u8 *) hotp_slots[slot_number];
-    }
-
-    return result; */
 }
 
 /*******************************************************************************
@@ -1350,39 +1339,25 @@ u8* get_hotp_slot_addr (u8 slot_number)
 
 u8* get_totp_slot_addr (u8 slot_number)
 {
-    return SLOTS_ADDRESS + get_slot_offset(NUMBER_OF_HOTP_SLOTS + slot_count);
+    return (u8*)(SLOTS_ADDRESS + get_slot_offset(NUMBER_OF_HOTP_SLOTS + slot_number));
 
-    /* TODO: Obsolete
-    u8* result = NULL;
-
-    if (slot_number >= NUMBER_OF_TOTP_SLOTS)
-    {
-        return NULL;
-    }
-    else
-    {
-        result = (u8 *) totp_slots[slot_number];
-    }
-
-    return result; */
 }
 
 
-u32 get_slot_offset(int slot_number)
+u32 get_slot_offset(u8 slot_number)
 {
-    const int global_config_offset = 64;
-    size_t slot_offset = sizeof(OTP_slot) * slot_count + global_config_offset;
-    for(size_t i = 0; i < 3; i++)
-    {
+    const u32 global_config_offset = 64;
+    u32 slot_offset = sizeof(OTP_slot) * slot_number + global_config_offset;
 
-    }
+    // TODO: Slots now overlap page boundaries. Check if this is an issue.
+    // TODO: Add upper bound for backup info
 
-    // TODO: What does this do?
-    const int first_page_limit = SLOT_PAGE_SIZE - sizeof(OTP_slot);
-    const int second_page_start = 1024+8;
+    /*
+    const u32 first_page_limit = SLOT_PAGE_SIZE - sizeof(OTP_slot);
+    const u32 second_page_start = 1024+8;
     if (slot_offset > first_page_limit){
         slot_offset -= first_page_limit;
         slot_offset += second_page_start;
-    }
+    } */
     return slot_offset;
 }
