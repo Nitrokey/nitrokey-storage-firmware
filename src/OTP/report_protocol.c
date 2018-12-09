@@ -1578,8 +1578,8 @@ u8 text[20];
         {
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET, slot->name, 15);
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 15, &slot->config, 1);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, slot->token, 13);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, slot->interval_or_counter, 2);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, slot->token_id, 13);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, slot->interval, 2);
         }
         else
         {
@@ -2843,6 +2843,7 @@ void OTP_main (void)
 
         }
 
+        /* Auto-paste feature currently disabled due to changed USB signature
         if (numLockClicked)
         {
             numLockClicked = 0;
@@ -2928,22 +2929,22 @@ void OTP_main (void)
                 }
             }
 
-        }
+        } */
     }
 }
 
-bool is_TOTP_slot_number(u8 slot_no) { return slot_no >= 0x20 && slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS; }
+u8 is_TOTP_slot_number(u8 slot_no) { return slot_no >= 0x20 && slot_no < 0x20 + NUMBER_OF_TOTP_SLOTS; }
 
-bool is_HOTP_slot_number(u8 slot_no) { return slot_no >= 0x10 && slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS; }
+u8 is_HOTP_slot_number(u8 slot_no) { return slot_no >= 0x10 && slot_no < 0x10 + NUMBER_OF_HOTP_SLOTS; }
 
-bool is_HOTP_slot_programmed(u8 slot_no){
-  OTP_slot* otp_slot = (OTP_slot *) get_HOTP_slot_offset(slot_no);
-  bool is_programmed = otp_slot->type != 0xFF;
+u8 is_HOTP_slot_programmed(u8 slot_no){
+  OTP_slot* otp_slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
+  u8 is_programmed = otp_slot->type != 0xFF;
   return is_programmed;
 }
 
-bool is_TOTP_slot_programmed(u8 slot_no){
-  OTP_slot* otp_slot = (OTP_slot *) get_TOTP_slot_offset(slot_no);
-  bool is_programmed = otp_slot->type != 0xFF;
+u8 is_TOTP_slot_programmed(u8 slot_no){
+  OTP_slot* otp_slot = (OTP_slot *) get_totp_slot_addr(slot_no);
+  u8 is_programmed = otp_slot->type != 0xFF;
   return is_programmed;
 }

@@ -936,7 +936,7 @@ u8 text[20];
 
 *******************************************************************************/
 
-u32 get_code_from_hotp_slot (u8 slot)
+u32 get_code_from_hotp_slot (u8 slot_no)
 {
 u32 result;
 u8 len = 6;
@@ -944,23 +944,20 @@ u64 counter;
 FLASH_Status err;
 u8 config = 0;
 
-    if (slot >= NUMBER_OF_HOTP_SLOTS)
+    if (slot_no >= NUMBER_OF_HOTP_SLOTS)
         return 0;
 
-    config = get_hotp_slot_config (slot);
+    OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
 
-    if (config & (1 << SLOT_CONFIG_DIGITS))
+    if (slot->use_8_digits != 0)
         len = 8;
 
-    OTP_slot * hotp_slot = ((OTP_slot *) get_HOTP_slot_offset(slot_number));
-    //result = *((u8 *) hotp_slots[slot]);
-
-    if (result == 0xFF) // unprogrammed slot
+    if (slot->type != 'H') // unprogrammed or TOTP slot
         return 0;
 
     LED_GreenOn ();
 
-    counter = get_counter_value (hotp_slot_counters[slot]);
+    counter = get_counter_value (hotp_slot_counters[slot_no]);
     /*
        For a counter test without flash { static u32 co = 0; counter = co; co++; } */
 #ifdef DEBUG_HOTP
@@ -981,10 +978,10 @@ u32 c;
     }
 #endif
 
-    result = get_hotp_value (counter, (u8 *) (hotp_slots[slot] + SECRET_OFFSET), 20, len);
+    result = get_hotp_value (counter, slot->secret, SECRET_LENGTH_DEFINE, len);
 
 
-    err = increment_counter_page (hotp_slot_counters[slot]);
+    err = increment_counter_page (hotp_slot_counters[slot_no]);
 
 #ifdef DEBUG_HOTP
     {
@@ -1092,7 +1089,8 @@ void erase_counter (u8 slot)
 void write_to_slot (u8 * data, u16 offset, u16 len)
 {
 
-	//TODO: Why does this need a size at all?
+	//TODO: Why does this need a len param at all? This should be doable with sizeof()
+
 u16 dummy_u16;
 u8* secret;
 u8  i;
@@ -1109,7 +1107,10 @@ u8  Found;
     memcpy (page_buffer + offset, data, len);
 
     // check if the secret from the tool is empty and if it is use the old secret
-    secret = (u8 *) (data + SECRET_OFFSET);
+    OTP_slot *input = (OTP_slot *) data;
+    OTP_slot *current = (OTP_slot *) page_buffer + offset;
+
+    secret = input->secret;
 
     // Check if the secret from the tool is empty and if it is use the old secret
     // Secret could begin with 0x00, so checking the whole secret before keeping the old one in mandatory
@@ -1125,7 +1126,7 @@ u8  Found;
 
     if (FALSE == Found)
     {
-        memcpy (data + SECRET_OFFSET, page_buffer + offset + SECRET_OFFSET, OTP_SECRET_LENGTH);
+        memcpy (input->secret, current->secret, SECRET_LENGTH_DEFINE);
     }
 
     // write page to backup location
@@ -1264,7 +1265,7 @@ u8 result = 0;
 
 *******************************************************************************/
 
-u32 get_code_from_totp_slot (u8 slot, u64 challenge)
+u32 get_code_from_totp_slot (u8 slot_no, u64 challenge)
 {
 u64 time_min;
 u16 interval;
@@ -1277,25 +1278,23 @@ time_t now;
     time (&now);
     current_time = now;
 
-    if (slot >= NUMBER_OF_TOTP_SLOTS)
+    if (slot_no >= NUMBER_OF_TOTP_SLOTS)
         return 0;
 
-    interval = getu16 (totp_slots[slot] + INTERVAL_OFFSET);
+    OTP_slot *slot = (OTP_slot *) get_totp_slot_addr(slot_no);
+
+    interval = getu16 (slot->interval);
 
     time_min = current_time / interval;
 
-    result = *((u8 *) totp_slots[slot]);
-    if (result == 0xFF) // unprogrammed slot
+    if (slot->config != 'T') // unprogrammed slot
         return 0;
 
-
-    config = get_totp_slot_config (slot);
-
-    if (config & (1 << SLOT_CONFIG_DIGITS))
+    if (slot->use_8_digits != 0)
         len = 8;
 
     // result= get_hotp_value(challenge,(u8 *)(totp_slots[slot]+SECRET_OFFSET),20,len);
-    result = get_hotp_value (time_min, (u8 *) (totp_slots[slot] + SECRET_OFFSET), OTP_SECRET_LENGTH, len);
+    result = get_hotp_value (time_min, slot->secret, SECRET_LENGTH_DEFINE, len);
 
     return result;
 

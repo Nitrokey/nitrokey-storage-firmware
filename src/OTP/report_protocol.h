@@ -352,11 +352,11 @@ u8 cmd_unlock_userpassword (u8 * report, u8 * output);
 u8 cmd_lock_device (u8 * report, u8 * output);
 u8 cmd_getSdCardHighWaterMark (u8 * report, u8 * output);
 
-bool is_TOTP_slot_number(u8 slot_no);
-bool is_HOTP_slot_number(u8 slot_no);
+u8 is_TOTP_slot_number(u8 slot_no);
+u8 is_HOTP_slot_number(u8 slot_no);
 
-bool is_TOTP_slot_programmed(u8 slot_no);
-bool is_HOTP_slot_programmed(u8 slot_no);
+u8 is_TOTP_slot_programmed(u8 slot_no);
+u8 is_HOTP_slot_programmed(u8 slot_no);
 
 void OTP_main (void);
 

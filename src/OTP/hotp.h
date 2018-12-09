@@ -114,13 +114,13 @@ typedef struct {
     union {
       u8 config;
       struct {
-        bool use_8_digits   : 1;
-        bool use_enter      : 1;
-        bool use_tokenID    : 1;
+        u8 use_8_digits   : 1;
+        u8 use_enter      : 1;
+        u8 use_tokenID    : 1;
       };
     };
     u8 token_id[13];
-    u64 interval_or_counter;
+    u8 interval[2];
 } __packed OTP_slot;
 
 extern u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];
@@ -200,11 +200,8 @@ u8 get_hotp_slot_config (u8 slot_number);
 u8 get_totp_slot_config (u8 slot_number);
 u32 get_code_from_totp_slot (u8 slot, u64 challenge);
 
-
-u8* get_hotp_slot_addr (u8 slot_number);
 u8* get_totp_slot_addr (u8 slot_number);
-
+u8* get_hotp_slot_addr (u8 slot_number);
 u32 get_slot_offset(u8 slot_number);
-
 
 #endif // HOTP_H
