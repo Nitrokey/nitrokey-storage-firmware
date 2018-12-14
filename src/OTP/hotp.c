@@ -1086,18 +1086,18 @@ void erase_counter (u8 slot)
 
 *******************************************************************************/
 
-void write_to_slot (u8 * data, u16 offset, u16 len)
+void write_to_slot (u8 * data, u16 addr, u16 len)
 {
 
 	//TODO: Why does this need a len param at all? This should be doable with sizeof()
 
-u16 dummy_u16;
-u8* secret;
-u8  i;
-u8  Found;
+	u16 dummy_u16;
+	u8* secret;
+	u8  i;
+	u8  Found;
+	u16 offset = addr - SLOTS_ADDRESS;
 
     LED_GreenOn ();
-
 
     // copy entire page to ram
     u8* page = (u8 *) SLOTS_ADDRESS;

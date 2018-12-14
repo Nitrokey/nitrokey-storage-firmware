@@ -1389,16 +1389,21 @@ u8 cmd_write_to_slot (u8 * report, u8 * output)
 {
 
 u8 slot_no = report[CMD_WTS_SLOT_NUMBER_OFFSET];
-u8 slot_tmp[sizeof(OTP_slot)];                // this is will be the new slot contents
+OTP_slot slot_tmp;                // this is will be the new slot contents
 u8 slot_name[15];
 u32 Counter_u32;
 u64 counter;
 
-    memset (slot_tmp, 0, sizeof(OTP_slot));
+    memset (&slot_tmp, 0, sizeof(OTP_slot));
 
-    slot_tmp[0] = 0x01; // marks slot as programmed
+    //TODO: Change this to struct format when supported
 
-    memcpy (slot_tmp + 1, report + CMD_WTS_SLOT_NAME_OFFSET, 51);
+    memcpy (slot_tmp.name, report + CMD_WTS_SLOT_NAME_OFFSET, 15);
+    memcpy (slot_tmp.secret, report + CMD_WTS_SECRET_OFFSET, 20);
+    slot_tmp.config = report[CMD_WTS_CONFIG_OFFSET];
+    memcpy (slot_tmp.token_id, report + CMD_WTS_TOKEN_ID_OFFSET, 13);
+    //TODO: Shouldn't this be setting the interval for TOTP as well?
+
     memcpy (slot_name, report + CMD_WTS_SLOT_NAME_OFFSET, 15);
 
     if (slot_name[0] == 0)
@@ -1411,6 +1416,8 @@ u64 counter;
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
         slot_no = slot_no & 0x0F;
+        slot_tmp.slot_number = slot_no;
+        slot_tmp.config = 'H';
 
         // u64 counter = getu64 (report+CMD_WTS_COUNTER_OFFSET);
         // u64 counter = atoi (report+CMD_WTS_COUNTER_OFFSET);
@@ -1434,13 +1441,15 @@ u8 text[20];
 
         set_counter_value (hotp_slot_counters[slot_no], counter);
 
-        write_to_slot (slot_tmp, get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
+        write_to_slot ((u8*) &slot_tmp, get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
     }
     else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
         slot_no = slot_no & 0x0F;
+        slot_tmp.config = 'T';
+        slot_tmp.slot_number = slot_no;
 
-        write_to_slot (slot_tmp, get_totp_slot_addr(slot_no), sizeof(OTP_slot));
+        write_to_slot ((u8*) &slot_tmp, get_totp_slot_addr(slot_no), sizeof(OTP_slot));
     }
     else
     {
