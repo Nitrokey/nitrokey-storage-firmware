@@ -1397,6 +1397,7 @@ u64 counter;
     memset (&slot_tmp, 0, sizeof(OTP_slot));
 
     //TODO: Change this to struct format when supported
+	WriteStrToDebugFile("OTP Test...");
 
     memcpy (slot_tmp.name, report + CMD_WTS_SLOT_NAME_OFFSET, 15);
     memcpy (slot_tmp.secret, report + CMD_WTS_SECRET_OFFSET, 20);
