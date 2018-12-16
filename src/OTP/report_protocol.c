@@ -1394,6 +1394,8 @@ u8 slot_name[15];
 u32 Counter_u32;
 u64 counter;
 
+	WriteStrToDebugFile("OTP Test...");
+
     memset (slot_tmp, 0, 64);
 
     slot_tmp[0] = 0x01; // marks slot as programmed

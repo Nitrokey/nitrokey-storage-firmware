@@ -41,6 +41,7 @@
 
 
 // #define STICK_20_SEND_DEBUGINFOS_VIA_HID // = Debug version, use ca. 2k flash
+//#define INTERPRETER_ENABLE
 
 #ifdef  STICK_20_SEND_DEBUGINFOS_VIA_HID
   #undef VERSION_MAJOR
