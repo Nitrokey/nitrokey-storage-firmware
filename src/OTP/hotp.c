@@ -1270,7 +1270,6 @@ u32 get_code_from_totp_slot (u8 slot_no, u64 challenge)
 u64 time_min;
 u16 interval;
 u32 result;
-u8 config = 0;
 u8 len = 6;
 time_t now;
 
@@ -1287,7 +1286,7 @@ time_t now;
 
     time_min = current_time / interval;
 
-    if (slot->config != 'T') // unprogrammed slot
+    if (slot->type != 'T') // unprogrammed slot
         return 0;
 
     if (slot->use_8_digits != 0)

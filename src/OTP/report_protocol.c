@@ -1397,13 +1397,12 @@ u64 counter;
     memset (&slot_tmp, 0, sizeof(OTP_slot));
 
     //TODO: Change this to struct format when supported
-	WriteStrToDebugFile("OTP Test...");
 
     memcpy (slot_tmp.name, report + CMD_WTS_SLOT_NAME_OFFSET, 15);
     memcpy (slot_tmp.secret, report + CMD_WTS_SECRET_OFFSET, 20);
     slot_tmp.config = report[CMD_WTS_CONFIG_OFFSET];
     memcpy (slot_tmp.token_id, report + CMD_WTS_TOKEN_ID_OFFSET, 13);
-    //TODO: Shouldn't this be setting the interval for TOTP as well?
+    memcpy (&slot_tmp.interval, report + CMD_WTS_COUNTER_OFFSET, 2);
 
     memcpy (slot_name, report + CMD_WTS_SLOT_NAME_OFFSET, 15);
 
@@ -1418,7 +1417,7 @@ u64 counter;
     {
         slot_no = slot_no & 0x0F;
         slot_tmp.slot_number = slot_no;
-        slot_tmp.config = 'H';
+        slot_tmp.type = 'H';
 
         // u64 counter = getu64 (report+CMD_WTS_COUNTER_OFFSET);
         // u64 counter = atoi (report+CMD_WTS_COUNTER_OFFSET);
@@ -1442,15 +1441,16 @@ u8 text[20];
 
         set_counter_value (hotp_slot_counters[slot_no], counter);
 
-        write_to_slot ((u8*) &slot_tmp, get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
+        write_to_slot ((u8*) &slot_tmp, (u8*) get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
     }
     else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
         slot_no = slot_no & 0x0F;
-        slot_tmp.config = 'T';
+        slot_tmp.type = 'T';
         slot_tmp.slot_number = slot_no;
 
-        write_to_slot ((u8*) &slot_tmp, get_totp_slot_addr(slot_no), sizeof(OTP_slot));
+
+        write_to_slot ((u8*) &slot_tmp, (u8*) get_totp_slot_addr(slot_no), sizeof(OTP_slot));
     }
     else
     {
@@ -1480,7 +1480,7 @@ u8 slot_no = report[1];
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
         slot_no = slot_no & 0x0F;
-        OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot);
+        OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
 
         if (is_HOTP_slot_programmed(slot_no))
         {
@@ -1502,7 +1502,7 @@ u8 slot_no = report[1];
     else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
         slot_no = slot_no & 0x0F;
-        OTP_slot *slot = (OTP_slot *) get_totp_slot_addr(slot);
+        OTP_slot *slot = (OTP_slot *) get_totp_slot_addr(slot_no);
 
         if (is_TOTP_slot_programmed(slot_no))
         {
@@ -1546,7 +1546,7 @@ u64 counter;
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
         slot_no = slot_no & 0x0F;
-        OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot);
+        OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
 
         if (is_HOTP_slot_programmed(slot_no))
         {
@@ -1582,7 +1582,7 @@ u8 text[20];
     else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
         slot_no = slot_no & 0x0F;
-        OTP_slot *slot = (OTP_slot *) get_totp_slot_addr(slot);
+        OTP_slot *slot = (OTP_slot *) get_totp_slot_addr(slot_no);
 
         if (is_TOTP_slot_programmed(slot_no))
         {
@@ -1841,7 +1841,7 @@ u8 text_au8[10];
         CI_StringOut ((char *) text_au8);
         CI_StringOut ("\r\n");
 
-        write_to_slot (slot_tmp, get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
+        write_to_slot (slot_tmp, (u8*) get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
         erase_counter (slot_no);
     }
     else if (is_TOTP_slot_number(slot_no)) // TOTP slot
@@ -1853,8 +1853,7 @@ u8 text_au8[10];
         CI_StringOut ((char *) text_au8);
         CI_StringOut ("\r\n");
 
-
-        write_to_slot (slot_tmp, get_totp_slot_addr(slot_no), sizeof(OTP_slot));
+        write_to_slot (slot_tmp,(u8*) get_totp_slot_addr(slot_no), sizeof(OTP_slot));
     }
     else
     {
@@ -2949,12 +2948,12 @@ u8 is_HOTP_slot_number(u8 slot_no) { return slot_no >= 0x10 && slot_no < 0x10 + 
 
 u8 is_HOTP_slot_programmed(u8 slot_no){
   OTP_slot* otp_slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
-  u8 is_programmed = otp_slot->type != 0xFF;
+  u8 is_programmed = (otp_slot->type == 'H');
   return is_programmed;
 }
 
 u8 is_TOTP_slot_programmed(u8 slot_no){
   OTP_slot* otp_slot = (OTP_slot *) get_totp_slot_addr(slot_no);
-  u8 is_programmed = otp_slot->type != 0xFF;
+  u8 is_programmed = (otp_slot->type == 'T');
   return is_programmed;
 }
