@@ -942,7 +942,6 @@ u32 result;
 u8 len = 6;
 u64 counter;
 FLASH_Status err;
-u8 config = 0;
 
     if (slot_no >= NUMBER_OF_HOTP_SLOTS)
         return 0;
@@ -1086,16 +1085,13 @@ void erase_counter (u8 slot)
 
 *******************************************************************************/
 
-void write_to_slot (u8 * data, u16 addr, u16 len)
+void write_to_slot (u8 * data, u8* addr, u16 len)
 {
-
-	//TODO: Why does this need a len param at all? This should be doable with sizeof()
-
 	u16 dummy_u16;
 	u8* secret;
 	u8  i;
 	u8  Found;
-	u16 offset = addr - SLOTS_ADDRESS;
+	u16 offset = (u16) addr - SLOTS_ADDRESS;
 
     LED_GreenOn ();
 
@@ -1348,14 +1344,9 @@ u32 get_slot_offset(u8 slot_number)
     u32 slot_offset = sizeof(OTP_slot) * slot_number + global_config_offset;
 
     // TODO: Slots now overlap page boundaries. Check if this is an issue.
-    // TODO: Add upper bound for backup info
 
-    /*
-    const u32 first_page_limit = SLOT_PAGE_SIZE - sizeof(OTP_slot);
-    const u32 second_page_start = 1024+8;
-    if (slot_offset > first_page_limit){
-        slot_offset -= first_page_limit;
-        slot_offset += second_page_start;
-    } */
+    //TODO: What should be the default value here?
+    if(slot_offset > 3 * FLASH_PAGE_SIZE) slot_offset = global_config_offset;
+
     return slot_offset;
 }

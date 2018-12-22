@@ -1388,31 +1388,38 @@ u8 cmd_get_user_password_retry_count (u8 * report, u8 * output)
 u8 cmd_write_to_slot (u8 * report, u8 * output)
 {
 
-u8 slot_no = report[CMD_WTS_SLOT_NUMBER_OFFSET];
-OTP_slot slot_tmp;                // this is will be the new slot contents
-u8 slot_name[15];
-u32 Counter_u32;
-u64 counter;
+	u8 slot_no = report[CMD_WTS_SLOT_NUMBER_OFFSET];
+	OTP_slot slot_tmp;                // this is will be the new slot contents
+	u8 slot_name[15];
+	u32 Counter_u32;
+	u64 counter;
 
     memset (&slot_tmp, 0, sizeof(OTP_slot));
 
     //TODO: Change this to struct format when supported
 
+    // Get common data for HOTP/TOTP slots from report
     memcpy (slot_tmp.name, report + CMD_WTS_SLOT_NAME_OFFSET, 15);
     memcpy (slot_tmp.secret, report + CMD_WTS_SECRET_OFFSET, 20);
-    slot_tmp.config = report[CMD_WTS_CONFIG_OFFSET];
     memcpy (slot_tmp.token_id, report + CMD_WTS_TOKEN_ID_OFFSET, 13);
-    memcpy (&slot_tmp.interval, report + CMD_WTS_COUNTER_OFFSET, 2);
+    memcpy (slot_tmp.interval, report + CMD_WTS_COUNTER_OFFSET, 2);
 
+    // manually translate config data from report
+    // TODO: read this directly if possible
+    u8 config = report[CMD_WTS_CONFIG_OFFSET];
+    if (config & 1 << SLOT_CONFIG_DIGITS)	{ slot_tmp.use_8_digits = 1; }
+    if (config & 1 << SLOT_CONFIG_ENTER) 	{ slot_tmp.use_enter = 1; }
+    if (config & 1 << SLOT_CONFIG_TOKENID)	{ slot_tmp.use_tokenID = 1; }
+
+    // check for empty slot name
     memcpy (slot_name, report + CMD_WTS_SLOT_NAME_OFFSET, 15);
-
     if (slot_name[0] == 0)
     {
         output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NO_NAME_ERROR;
         return 1;
     }
 
-
+    // check if slot data is HOTP
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
         slot_no = slot_no & 0x0F;
@@ -1425,7 +1432,7 @@ u64 counter;
         Counter_u32 = atoi ((char *)&report[CMD_WTS_COUNTER_OFFSET]);
         counter = Counter_u32;
         {
-u8 text[20];
+        	u8 text[20];
             CI_StringOut ("Write HOTP Slot ");
             itoa (slot_no, text);
             CI_StringOut ((char *) text);
@@ -1441,16 +1448,15 @@ u8 text[20];
 
         set_counter_value (hotp_slot_counters[slot_no], counter);
 
-        write_to_slot ((u8*) &slot_tmp, (u8*) get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
+        write_to_slot ((u8*) &slot_tmp, get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
     }
     else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
         slot_no = slot_no & 0x0F;
-        slot_tmp.type = 'T';
         slot_tmp.slot_number = slot_no;
+        slot_tmp.type = 'T';
 
-
-        write_to_slot ((u8*) &slot_tmp, (u8*) get_totp_slot_addr(slot_no), sizeof(OTP_slot));
+        write_to_slot ((u8*) &slot_tmp, get_totp_slot_addr(slot_no), sizeof(OTP_slot));
     }
     else
     {
@@ -1475,7 +1481,6 @@ u8 cmd_read_slot_name (u8 * report, u8 * output)
 {
 u8 text[10];
 u8 slot_no = report[1];
-
 
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
@@ -1602,7 +1607,6 @@ u8 text[20];
         output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
         return 1;
     }
-
     return 0;
 }
 
