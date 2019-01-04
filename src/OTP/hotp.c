@@ -1095,25 +1095,22 @@ void write_to_slot (u8 * data, u8* addr, u16 len)
 
     LED_GreenOn ();
 
-    // copy entire page to ram
-    u8* page = (u8 *) SLOTS_ADDRESS;
-    memcpy (page_buffer, page, FLASH_PAGE_SIZE * 3);
+    // copy all slot data from Flash to RAM
+    memcpy (page_buffer, SLOTS_ADDRESS, FLASH_PAGE_SIZE * 3);
 
-    // make changes to page
+    // write changes in input slot to RAM buffer
     memcpy (page_buffer + offset, data, len);
 
     // check if the secret from the tool is empty and if it is use the old secret
-    OTP_slot *input = (OTP_slot *) data;
-    OTP_slot *current = (OTP_slot *) page_buffer + offset;
-
-    secret = input->secret;
+    OTP_slot *input_slot = (OTP_slot *) data;
+    OTP_slot *buffer_slot = (OTP_slot *) page_buffer + offset;
 
     // Check if the secret from the tool is empty and if it is use the old secret
     // Secret could begin with 0x00, so checking the whole secret before keeping the old one in mandatory
     Found = FALSE;
     for (i = 0; i < SECRET_LENGTH_DEFINE; i++)
     {
-      if (0 != secret[i])
+      if (0 != input_slot->secret[i])
       {
         Found = TRUE;
         break;
@@ -1122,7 +1119,7 @@ void write_to_slot (u8 * data, u8* addr, u16 len)
 
     if (FALSE == Found)
     {
-        memcpy (input->secret, current->secret, SECRET_LENGTH_DEFINE);
+        memcpy (input_slot->secret, buffer_slot->secret, SECRET_LENGTH_DEFINE);
     }
 
     // write page to backup location

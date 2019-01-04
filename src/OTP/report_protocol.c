@@ -1404,8 +1404,7 @@ u8 cmd_write_to_slot (u8 * report, u8 * output)
     memcpy (slot_tmp.token_id, report + CMD_WTS_TOKEN_ID_OFFSET, 13);
     memcpy (slot_tmp.interval, report + CMD_WTS_COUNTER_OFFSET, 2);
 
-    // manually translate config data from report
-    // TODO: read this directly if possible
+    // parse config bits from report
     u8 config = report[CMD_WTS_CONFIG_OFFSET];
     if (config & 1 << SLOT_CONFIG_DIGITS)	{ slot_tmp.use_8_digits = 1; }
     if (config & 1 << SLOT_CONFIG_ENTER) 	{ slot_tmp.use_enter = 1; }
@@ -1556,8 +1555,14 @@ u64 counter;
         if (is_HOTP_slot_programmed(slot_no))
         {
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET, slot->name, 15);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 15, &slot->config, 1);
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, slot->token_id, 13);
+
+            // read config bits an put into right endianness
+            u8 config = 0;
+            if (slot->use_8_digits == 1) 	{ config |= 1 << SLOT_CONFIG_DIGITS; }
+            if (slot->use_enter == 1) 		{ config |= 1 << SLOT_CONFIG_ENTER; }
+            if (slot->use_tokenID == 1) 	{ config |= 1 << SLOT_CONFIG_TOKENID; }
+            output[OUTPUT_CMD_RESULT_OFFSET +15] = config;
 
             counter = get_counter_value (hotp_slot_counters[slot_no]);
             itoa ((u32) counter, &output[OUTPUT_CMD_RESULT_OFFSET + 29]);   // Bytes after OUTPUT_CMD_RESULT_OFFSET+29+8 is unused
@@ -1592,9 +1597,15 @@ u8 text[20];
         if (is_TOTP_slot_programmed(slot_no))
         {
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET, slot->name, 15);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 15, &slot->config, 1);
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, slot->token_id, 13);
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, slot->interval, 2);
+
+            // read config bits an put into right endianness
+            u8 config = 0;
+            if (slot->use_8_digits == 1) 	{ config |= 1 << SLOT_CONFIG_DIGITS; }
+            if (slot->use_enter == 1) 		{ config |= 1 << SLOT_CONFIG_ENTER; }
+            if (slot->use_tokenID == 1) 	{ config |= 1 << SLOT_CONFIG_TOKENID; }
+            output[OUTPUT_CMD_RESULT_OFFSET + 15] = config;
         }
         else
         {
