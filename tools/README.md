@@ -26,6 +26,8 @@ If you have installed any Linux-like environment like [Git for Windows], you can
 7. You should now see the result of the comparison and the resulting hashsum(s).
 
 ### macOS
+Guide written and tested on: macOS 10.13.6.
+
 1. Install SRecord using [homebrew]:
 ```
 brew install srecord
@@ -42,6 +44,12 @@ brew install srecord
 ```
 # download.hex - firmware file downloaded from device's site
 # firmware.bin - firmware file exported from the device
+
+# macOS only - get firmware files (example)
+# Copy exported firmware file from the Unencrypted Volume
+cp /Volumes/Nitrokey/firmware.bin .
+# Download v0.53 firmware from the firmware releases
+curl -L -o download.hex https://github.com/Nitrokey/nitrokey-storage-firmware/releases/download/V0.53/storage-firmware-V0.53-0-g905976e.hex
 
 # Checking against damaged download.hex firmware file
 > ./nkcompare.sh download.hex firmware.bin
