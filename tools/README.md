@@ -44,6 +44,7 @@ brew install srecord
 ```
 # download.hex - firmware file downloaded from device's site
 # firmware.bin - firmware file exported from the device
+# Assuming ./nkcompare.sh is in current directory
 
 # Get firmware files (example)
 # Copy exported firmware file from the Unencrypted Volume (macOS only)
