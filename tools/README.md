@@ -44,9 +44,10 @@ brew install srecord
 ```
 # download.hex - firmware file downloaded from device's site
 # firmware.bin - firmware file exported from the device
+# Assuming ./nkcompare.sh is in current directory
 
-# macOS only - get firmware files (example)
-# Copy exported firmware file from the Unencrypted Volume
+# Get firmware files (example)
+# Copy exported firmware file from the Unencrypted Volume (macOS only)
 cp /Volumes/Nitrokey/firmware.bin .
 # Download v0.53 firmware from the firmware releases
 curl -L -o download.hex https://github.com/Nitrokey/nitrokey-storage-firmware/releases/download/V0.53/storage-firmware-V0.53-0-g905976e.hex

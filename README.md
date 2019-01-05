@@ -1,5 +1,9 @@
-Nitrokey Storage Firmware
-=========================
+# Nitrokey Storage Firmware
+
+## Firmware verification
+To verify firmware flashed on device, please use the Nitrokey Storage Firmware Checksum Tool from the [tools] directory.
+
+[tools]: https://github.com/Nitrokey/nitrokey-storage-firmware/tree/master/tools
 
 ## Building
 
@@ -29,6 +33,10 @@ other GNU/Linux OS):
 Before flashing there may be a need to convert binary file to .hex. If it was not done automatically execute the following in Debug or Release directory:
 ```
 avr-objcopy -R .eeprom -O ihex USB_MASS.elf firmware.hex
+```
+or, while in `./Debug` directory:
+```
+make firmware.hex
 ```
 
 ## Flashing the Firmware to Device
