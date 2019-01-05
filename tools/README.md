@@ -38,6 +38,32 @@ brew install srecord
 6. Invoke the script by typing `./nkcompare.sh <filename of downloaded firmware>.hex firmware.bin` (with the actual name of the downloaded file filled in instead of the `<...>`)
 7. You should now see the result of the comparison and the resulting hashsum(s).
 
+### Output examples for macOS / Linux
+```
+# download.hex - firmware file downloaded from device's site
+# firmware.bin - firmware file exported from the device
+
+# Checking against damaged download.hex firmware file
+> ./nkcompare.sh download.hex firmware.bin
+Running ./nkcompare.sh download.hex firmware.bin
+srec_cat: download.hex: 2: checksum mismatch (01 != 00)
+Failed to run 'srec_cat with download.hex'. Please check error messages. Exiting.
+
+# Checking against matching firmwares
+> ./nkcompare.sh download.hex firmware.bin
+Running ./nkcompare.sh download.hex firmware.bin
+Firmware binaries match
+SHA256: aea280a50225b270b980fe81ad873d9418b449916ee1c15a01e280f484ecc80c
+
+# Checking not matching firmwares
+> ./nkcompare.sh download.hex firmware.bin
+Running ./nkcompare.sh download.hex firmware.bin
+Firmware binaries mismatch
+Original Firmware SHA256: aea280a50225b270b980fe81ad873d9418b449916ee1c15a01e280f484ecc80c
+Exported Firmware SHA256: 93befae03706222ba09013f5d85d438e57f913727afa2a7802510ab5f07c0294
+
+```
+
 [SRecord]: http://srecord.sourceforge.net/
 [Windows Version]: https://sourceforge.net/projects/srecord/files/srecord-win32/
 [Git for Windows]: https://git-scm.com/download/win
