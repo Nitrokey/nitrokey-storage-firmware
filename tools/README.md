@@ -25,6 +25,20 @@ If you have installed any Linux-like environment like [Git for Windows], you can
 6. Invoke the script by typing `./nkcompare.sh <filename of downloaded firmware>.hex firmware.bin` (with the actual name of the downloaded file filled in instead of the `<...>`)
 7. You should now see the result of the comparison and the resulting hashsum(s).
 
+### macOS
+1. Install SRecord using [homebrew]:
+```
+brew install srecord
+```
+2. If not done already, make sure the unencrypted volume is in read-write mode, export the firmware, and remove and insert back the device.
+2. Make a new folder and put the `nkcompare.sh` script in it.
+3. Put the downloaded firmware Hex file and the exported firmware file from the stick in that folder as well
+4. Open a terminal and navigate to the folder
+5. Make the script executable with `sudo chmod +x nkcompare.sh`
+6. Invoke the script by typing `./nkcompare.sh <filename of downloaded firmware>.hex firmware.bin` (with the actual name of the downloaded file filled in instead of the `<...>`)
+7. You should now see the result of the comparison and the resulting hashsum(s).
+
 [SRecord]: http://srecord.sourceforge.net/
 [Windows Version]: https://sourceforge.net/projects/srecord/files/srecord-win32/
 [Git for Windows]: https://git-scm.com/download/win
+[homebrew]: https://brew.sh/
