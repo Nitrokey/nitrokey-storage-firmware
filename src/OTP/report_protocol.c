@@ -2872,55 +2872,18 @@ void OTP_main (void)
             numLockClicked = 0;
             // sendString("NumLock",7);
 
+            // get slot number configured for NumLock
             u8 slot_number = ((u8 *) SLOTS_ADDRESS + GLOBAL_CONFIG_OFFSET)[0];
-            if (slot_number <= 1)
-            {
-
-                if (is_HOTP_slot_programmed(slot_number))
-                {
-                	OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_number);
-
-					u32 code = get_code_from_hotp_slot (slot_number);
-
-                    if (slot->use_tokenID == 1)
-                        sendString ((char *) (slot->token_id), 12);
-
-                    if (slot->use_8_digits == 1)
-                        sendNumberN (code, 8);
-                    else
-                        sendNumberN (code, 6);
-
-                    if (slot->use_enter == 1)
-                        sendEnter ();
-                }
-            }
+            send_hotp_slot(slot_number);
         }
         if (capsLockClicked)
         {
             capsLockClicked = 0;
             // sendString("CapsLock",8);
 
+            // get slot number configured for CapsLock
             u8 slot_number = ((u8 *) SLOTS_ADDRESS + GLOBAL_CONFIG_OFFSET)[1];
-            if (slot_number <= 1)
-            {
-                if (is_HOTP_slot_programmed(slot_number))
-                {
-                	OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_number);
-
-                	u32 code = get_code_from_hotp_slot (slot_number);
-
-                    if (slot->use_tokenID == 1)
-                        sendString ((char *) (slot->token_id), 12);
-
-                    if (slot->use_8_digits == 1)
-                        sendNumberN (code, 8);
-                    else
-                        sendNumberN (code, 6);
-
-                    if (slot->use_enter == 1)
-                        sendEnter ();
-                }
-            }
+            send_hotp_slot(slot_number);
         }
 
         if (scrollLockClicked)
@@ -2928,28 +2891,32 @@ void OTP_main (void)
             scrollLockClicked = 0;
             // sendString("ScrollLock",10);
 
+            // get slot number configured for ScrollLock
             u8 slot_number = ((u8 *) SLOTS_ADDRESS + GLOBAL_CONFIG_OFFSET)[2];
-            if (slot_number <= 1)
-            {
-                if (is_HOTP_slot_programmed(slot_number))
-                {
-                	OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_number);
+            send_hotp_slot(slot_number);
+        }
+    }
+}
 
-                	u32 code = get_code_from_hotp_slot (slot_number);
+void send_hotp_slot(u8 slot_no) {
+    if (slot_no <= 1)
+    {
+        if (is_HOTP_slot_programmed(slot_no))
+        {
+        	OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
 
-                    if (slot->use_tokenID == 1)
-                        sendString ((char *) (slot->token_id), 12);
+        	u32 code = get_code_from_hotp_slot (slot_no);
 
-                    if (slot->use_8_digits == 1)
-                        sendNumberN (code, 8);
-                    else
-                        sendNumberN (code, 6);
+            if (slot->use_tokenID == 1)
+                sendString ((char *) (slot->token_id), 12);
 
-                    if (slot->use_enter == 1)
-                        sendEnter ();
-                }
-            }
+            if (slot->use_8_digits == 1)
+                sendNumberN (code, 8);
+            else
+                sendNumberN (code, 6);
 
+            if (slot->use_enter == 1)
+                sendEnter ();
         }
     }
 }

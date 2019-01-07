@@ -68,9 +68,7 @@ typedef enum
 
 #define FLASH_PAGE_SIZE 512 // AVR
 
-//#define SLOT_PAGE_SIZE  500 // less than actual page, so we can copy it to backup page with additional info
-// TODO: Add different safeguard for backup mechanism
-
+#define SLOT_PAGE_SIZE  500 // less than actual page, so we can copy it to backup page with additional info
 
 /* OTP BLOCK LAYOUT:
 Page 500 - 502  : 0x800_3E800 : OTP Slots data, contains the handling structs for each OTP slot
@@ -99,8 +97,6 @@ TODO: Not sure if that's actually the case. Why do we even store the system time
 #define BACKUP_LENGTH_OFFSET  (BACKUP_SIZE -  8)  // 504 - no flash block addr
 #define BACKUP_OK_OFFSET      (BACKUP_SIZE -  6)  // 506 - no flash block addr
 
-// #define SLOT_SIZE             64 << TODO: Obsolete
-
 #define GLOBAL_CONFIG_OFFSET  0
 #define SECRET_LENGTH_DEFINE  20
 // TODO: Increase to 40 when everything else works
@@ -125,51 +121,10 @@ typedef struct {
 
 extern u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];
 
-/*
-#define HOTP_SLOT1_OFFSET     (SLOT_SIZE * 1)
-#define HOTP_SLOT2_OFFSET     (SLOT_SIZE * 2)
-#define HOTP_SLOT3_OFFSET     (SLOT_SIZE * 3)
-
-#define TOTP_SLOT1_OFFSET     ((SLOT_SIZE * 4) + (SLOT_SIZE *  0))
-#define TOTP_SLOT2_OFFSET     ((SLOT_SIZE * 4) + (SLOT_SIZE *  1))
-#define TOTP_SLOT3_OFFSET     ((SLOT_SIZE * 4) + (SLOT_SIZE *  2))
-#define TOTP_SLOT4_OFFSET     ((SLOT_SIZE * 4) + (SLOT_SIZE *  3))
-#define TOTP_SLOT5_OFFSET     ((SLOT_SIZE * 4) + (SLOT_SIZE *  4))
-#define TOTP_SLOT6_OFFSET     ((SLOT_SIZE * 4) + (SLOT_SIZE *  5))
-#define TOTP_SLOT7_OFFSET     ((SLOT_SIZE * 4) + (SLOT_SIZE *  6))
-#define TOTP_SLOT8_OFFSET     ((SLOT_SIZE * 4) + (SLOT_SIZE *  7))
-#define TOTP_SLOT9_OFFSET     ((SLOT_SIZE * 4) + (SLOT_SIZE *  8))
-#define TOTP_SLOT10_OFFSET    ((SLOT_SIZE * 4) + (SLOT_SIZE *  9))
-#define TOTP_SLOT11_OFFSET    ((SLOT_SIZE * 4) + (SLOT_SIZE * 10))
-#define TOTP_SLOT12_OFFSET    ((SLOT_SIZE * 4) + (SLOT_SIZE * 11))
-#define TOTP_SLOT13_OFFSET    ((SLOT_SIZE * 4) + (SLOT_SIZE * 12))
-#define TOTP_SLOT14_OFFSET    ((SLOT_SIZE * 4) + (SLOT_SIZE * 13))
-#define TOTP_SLOT15_OFFSET    ((SLOT_SIZE * 4) + (SLOT_SIZE * 14))
-#define TOTP_SLOT16_OFFSET    ((SLOT_SIZE * 4) + (SLOT_SIZE * 15))
-*/
-
-// End of data = ((64 * 4) + (64 * 16)) = 1280 >= 3 flash page
-
-/*
-#define SLOT_TYPE_OFFSET     0
-#define SLOT_NAME_OFFSET     1
-#define SECRET_OFFSET       16
-#define CONFIG_OFFSET       36
-#define TOKEN_ID_OFFSET     37
-#define INTERVAL_OFFSET     50
-*/
 #define TIME_OFFSET          4
 
 // How many tokens are stored on one counter page?
 #define TOKEN_PER_FLASHPAGE        (FLASH_PAGE_SIZE-8)
-
-/*
-extern u32 hotp_slots[NUMBER_OF_HOTP_SLOTS];
-extern u32 totp_slots[NUMBER_OF_TOTP_SLOTS + 1];
-extern u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];
-extern u32 hotp_slot_offsets[NUMBER_OF_HOTP_SLOTS];
-extern u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS + 1];
-*/
 
 extern u8 page_buffer[FLASH_PAGE_SIZE * 3];
 
@@ -201,6 +156,7 @@ u8 get_hotp_slot_config (u8 slot_number);
 u8 get_totp_slot_config (u8 slot_number);
 u32 get_code_from_totp_slot (u8 slot, u64 challenge);
 
+void send_hotp_slot(u8 slot_no);
 u8* get_totp_slot_addr (u8 slot_number);
 u8* get_hotp_slot_addr (u8 slot_number);
 u32 get_slot_offset(u8 slot_number);
