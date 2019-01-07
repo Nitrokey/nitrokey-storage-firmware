@@ -2867,31 +2867,30 @@ void OTP_main (void)
 
         }
 
-        /* Auto-paste feature currently disabled due to changed USB signature
         if (numLockClicked)
         {
             numLockClicked = 0;
             // sendString("NumLock",7);
 
-    u8 slot_number = ((u8 *) SLOTS_ADDRESS + GLOBAL_CONFIG_OFFSET)[0];
+            u8 slot_number = ((u8 *) SLOTS_ADDRESS + GLOBAL_CONFIG_OFFSET)[0];
             if (slot_number <= 1)
             {
-    u8 programmed = *((u8 *) hotp_slots[slot_number]);
 
-                if (programmed == 0x01)
+                if (is_HOTP_slot_programmed(slot_number))
                 {
-    u32 code = get_code_from_hotp_slot (slot_number);
-    u8 config = get_hotp_slot_config (slot_number);
+                	OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_number);
 
-                    if (config & (1 << SLOT_CONFIG_TOKENID))
-                        sendString ((char *) (hotp_slots[slot_number] + TOKEN_ID_OFFSET), 12);
+					u32 code = get_code_from_hotp_slot (slot_number);
 
-                    if (config & (1 << SLOT_CONFIG_DIGITS))
+                    if (slot->use_tokenID == 1)
+                        sendString ((char *) (slot->token_id), 12);
+
+                    if (slot->use_8_digits == 1)
                         sendNumberN (code, 8);
                     else
                         sendNumberN (code, 6);
 
-                    if (config & (1 << SLOT_CONFIG_ENTER))
+                    if (slot->use_enter == 1)
                         sendEnter ();
                 }
             }
@@ -2901,25 +2900,24 @@ void OTP_main (void)
             capsLockClicked = 0;
             // sendString("CapsLock",8);
 
-    u8 slot_number = ((u8 *) SLOTS_ADDRESS + GLOBAL_CONFIG_OFFSET)[1];
+            u8 slot_number = ((u8 *) SLOTS_ADDRESS + GLOBAL_CONFIG_OFFSET)[1];
             if (slot_number <= 1)
             {
-    u8 programmed = *((u8 *) hotp_slots[slot_number]);
-
-                if (programmed == 0x01)
+                if (is_HOTP_slot_programmed(slot_number))
                 {
-    u32 code = get_code_from_hotp_slot (slot_number);
-    u8 config = get_hotp_slot_config (slot_number);
+                	OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_number);
 
-                    if (config & (1 << SLOT_CONFIG_TOKENID))
-                        sendString ((char *) (hotp_slots[slot_number] + TOKEN_ID_OFFSET), 12);
+                	u32 code = get_code_from_hotp_slot (slot_number);
 
-                    if (config & (1 << SLOT_CONFIG_DIGITS))
+                    if (slot->use_tokenID == 1)
+                        sendString ((char *) (slot->token_id), 12);
+
+                    if (slot->use_8_digits == 1)
                         sendNumberN (code, 8);
                     else
                         sendNumberN (code, 6);
 
-                    if (config & (1 << SLOT_CONFIG_ENTER))
+                    if (slot->use_enter == 1)
                         sendEnter ();
                 }
             }
@@ -2930,30 +2928,29 @@ void OTP_main (void)
             scrollLockClicked = 0;
             // sendString("ScrollLock",10);
 
-    u8 slot_number = ((u8 *) SLOTS_ADDRESS + GLOBAL_CONFIG_OFFSET)[2];
+            u8 slot_number = ((u8 *) SLOTS_ADDRESS + GLOBAL_CONFIG_OFFSET)[2];
             if (slot_number <= 1)
             {
-    u8 programmed = *((u8 *) hotp_slots[slot_number]);
-
-                if (programmed == 0x01)
+                if (is_HOTP_slot_programmed(slot_number))
                 {
-    u32 code = get_code_from_hotp_slot (slot_number);
-    u8 config = get_hotp_slot_config (slot_number);
+                	OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_number);
 
-                    if (config & (1 << SLOT_CONFIG_TOKENID))
-                        sendString ((char *) (hotp_slots[slot_number] + TOKEN_ID_OFFSET), 12);
+                	u32 code = get_code_from_hotp_slot (slot_number);
 
-                    if (config & (1 << SLOT_CONFIG_DIGITS))
+                    if (slot->use_tokenID == 1)
+                        sendString ((char *) (slot->token_id), 12);
+
+                    if (slot->use_8_digits == 1)
                         sendNumberN (code, 8);
                     else
                         sendNumberN (code, 6);
 
-                    if (config & (1 << SLOT_CONFIG_ENTER))
+                    if (slot->use_enter == 1)
                         sendEnter ();
                 }
             }
 
-        } */
+        }
     }
 }
 
