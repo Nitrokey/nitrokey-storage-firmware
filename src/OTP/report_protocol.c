@@ -1447,7 +1447,7 @@ u8 cmd_write_to_slot (u8 * report, u8 * output)
 
         set_counter_value (hotp_slot_counters[slot_no], counter);
 
-        write_to_slot ((u8*) &slot_tmp, get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
+        write_to_slot ((u8*) &slot_tmp, get_hotp_slot_addr(slot_no));
     }
     else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
@@ -1455,7 +1455,7 @@ u8 cmd_write_to_slot (u8 * report, u8 * output)
         slot_tmp.slot_number = slot_no;
         slot_tmp.type = 'T';
 
-        write_to_slot ((u8*) &slot_tmp, get_totp_slot_addr(slot_no), sizeof(OTP_slot));
+        write_to_slot ((u8*) &slot_tmp, get_totp_slot_addr(slot_no));
     }
     else
     {
@@ -1817,7 +1817,7 @@ u32 i;
         CI_StringOut ("\r\n");
     }
 
-    write_to_slot (slot_tmp, GLOBAL_CONFIG_OFFSET, 5);
+    write_to_config (slot_tmp, 5);
 
     return 0;
 }
@@ -1856,7 +1856,7 @@ u8 text_au8[10];
         CI_StringOut ((char *) text_au8);
         CI_StringOut ("\r\n");
 
-        write_to_slot (slot_tmp, (u8*) get_hotp_slot_addr(slot_no), sizeof(OTP_slot));
+        write_to_slot (slot_tmp, (u8*) get_hotp_slot_addr(slot_no));
         erase_counter (slot_no);
     }
     else if (is_TOTP_slot_number(slot_no)) // TOTP slot
@@ -1868,7 +1868,7 @@ u8 text_au8[10];
         CI_StringOut ((char *) text_au8);
         CI_StringOut ("\r\n");
 
-        write_to_slot (slot_tmp,(u8*) get_totp_slot_addr(slot_no), sizeof(OTP_slot));
+        write_to_slot (slot_tmp,(u8*) get_totp_slot_addr(slot_no));
     }
     else
     {

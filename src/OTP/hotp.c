@@ -1085,10 +1085,9 @@ void erase_counter (u8 slot)
 
 *******************************************************************************/
 
-void write_to_slot (u8 * data, u8* addr, u16 len)
+void write_to_slot (u8 * data, u8 * addr)
 {
 	u16 dummy_u16;
-	u8* secret;
 	u8  i;
 	u8  Found;
 	u16 offset = (u16) addr - SLOTS_ADDRESS;
@@ -1096,14 +1095,11 @@ void write_to_slot (u8 * data, u8* addr, u16 len)
     LED_GreenOn ();
 
     // copy all slot data from Flash to RAM
-    memcpy (page_buffer, SLOTS_ADDRESS, FLASH_PAGE_SIZE * 3);
-
-    // write changes in input slot to RAM buffer
-    memcpy (page_buffer + offset, data, len);
+    memcpy (page_buffer, (u8*) SLOTS_ADDRESS, FLASH_PAGE_SIZE * 3);
 
     // check if the secret from the tool is empty and if it is use the old secret
-    OTP_slot *input_slot = (OTP_slot *) data;
-    OTP_slot *buffer_slot = (OTP_slot *) page_buffer + offset;
+    OTP_slot *input_slot 	= (OTP_slot *) data;
+    OTP_slot *buffer_slot 	= (OTP_slot *) (page_buffer + offset);
 
     // Check if the secret from the tool is empty and if it is use the old secret
     // Secret could begin with 0x00, so checking the whole secret before keeping the old one in mandatory
@@ -1122,11 +1118,52 @@ void write_to_slot (u8 * data, u8* addr, u16 len)
         memcpy (input_slot->secret, buffer_slot->secret, SECRET_LENGTH_DEFINE);
     }
 
+    // write changes in input slot to RAM buffer
+    memcpy (buffer_slot, input_slot, sizeof(OTP_slot));
+
     // write page to backup location
     backup_data (page_buffer, FLASH_PAGE_SIZE * 3, SLOTS_ADDRESS);
 
     // Clear flash mem
     // flashc_memset8 ((void*)SLOTS_ADDRESS,0xFF,FLASH_PAGE_SIZE*3,TRUE);
+
+    // write page to regular location
+    write_data_to_flash (page_buffer, FLASH_PAGE_SIZE * 3, SLOTS_ADDRESS);
+
+    // Init backup block
+    dummy_u16 = 0x4F4B;
+    flashc_memcpy ((void *) (BACKUP_PAGE_ADDRESS + BACKUP_OK_OFFSET), (void *) &dummy_u16, 2, TRUE);
+
+    LED_GreenOff ();
+
+}
+
+/*******************************************************************************
+
+  write_to_config
+
+  Write a new configuration to config section
+
+  Changes
+  Date      Reviewer        Info
+  07.01.19  ET              Add function
+
+*******************************************************************************/
+
+void write_to_config (u8 * data, u8 len)
+{
+	u16 dummy_u16;
+
+    LED_GreenOn ();
+
+    // copy all slot data from Flash to RAM
+    memcpy (page_buffer, (u8*) SLOTS_ADDRESS, FLASH_PAGE_SIZE * 3);
+
+    // write changes in input slot to RAM buffer
+    memcpy (page_buffer + GLOBAL_CONFIG_OFFSET, data, len);
+
+    // write page to backup location
+    backup_data (page_buffer, FLASH_PAGE_SIZE * 3, SLOTS_ADDRESS);
 
     // write page to regular location
     write_data_to_flash (page_buffer, FLASH_PAGE_SIZE * 3, SLOTS_ADDRESS);
@@ -1340,8 +1377,7 @@ u32 get_slot_offset(u8 slot_number)
     const u32 global_config_offset = 64;
     u32 slot_offset = sizeof(OTP_slot) * slot_number + global_config_offset;
 
-    // TODO: Slots now overlap page boundaries. Check if this is an issue.
-
+    //TODO: Slots now overlap page boundaries. Check if this is an issue.
     //TODO: What should be the default value here?
     if(slot_offset > 3 * FLASH_PAGE_SIZE) slot_offset = global_config_offset;
 
