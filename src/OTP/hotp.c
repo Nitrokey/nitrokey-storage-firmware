@@ -863,7 +863,7 @@ FLASH_Status err;
 
     OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
 
-    if (slot->use_8_digits != 0)
+    if ((slot->config & (1 << SLOT_CONFIG_DIGITS)) == 1)
         len = 8;
 
     if (slot->type != 'H') // unprogrammed or TOTP slot
@@ -1179,7 +1179,7 @@ time_t now;
     if (slot->type != 'T') // unprogrammed slot
         return 0;
 
-    if (slot->use_8_digits != 0)
+    if ((slot->config & (1 << SLOT_CONFIG_DIGITS)) == 1)
         len = 8;
 
     result = get_hotp_value (time_min, slot->secret, SECRET_LENGTH_DEFINE, len);

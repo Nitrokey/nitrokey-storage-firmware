@@ -107,14 +107,7 @@ typedef struct {
     u8 slot_number;
     u8 name[15];
     u8 secret[SECRET_LENGTH_DEFINE];
-    union {
-      u8 config;
-      struct {
-        u8 use_8_digits   : 1;
-        u8 use_enter      : 1;
-        u8 use_tokenID    : 1;
-      };
-    };
+    u8 config;
     u8 token_id[13];
     u8 interval[2];
 } __packed OTP_slot;
