@@ -59,6 +59,10 @@
 #define CMD_UNLOCK_USER_PASSWORD          0x11
 #define CMD_LOCK_DEVICE                   0x12
 #define CMD_FACTORY_RESET                 0x13
+#define CMD_CHANGE_USER_PIN               0x14
+#define CMD_CHANGE_ADMIN_PIN              0x15
+#define CMD_SEND_OTP_DATA                 0x17
+#define CMD_VERIFY_OTP_CODE               0x18
 
 
 #define CMD_GET_PW_SAFE_SLOT_STATUS       0x60
@@ -139,20 +143,26 @@
 
 
 #define STATUS_READY                      0x00
-#define STATUS_BUSY	                      0x01
+#define STATUS_BUSY                       0x01
 #define STATUS_ERROR                      0x02
 #define STATUS_RECEIVED_REPORT            0x03
 
-#define CMD_STATUS_OK                     0
-#define CMD_STATUS_WRONG_CRC              1
-#define CMD_STATUS_WRONG_SLOT             2
-#define CMD_STATUS_SLOT_NOT_PROGRAMMED    3
-#define CMD_STATUS_WRONG_PASSWORD         4
-#define CMD_STATUS_NOT_AUTHORIZED         5
-#define CMD_STATUS_TIMESTAMP_WARNING      6
-#define CMD_STATUS_NO_NAME_ERROR          7
-#define CMD_STATUS_AES_DEC_FAILED           10
-#define CMD_STATUS_UNKNOWN_ERROR           100
+#define CMD_STATUS_OK                               0
+#define CMD_STATUS_WRONG_CRC                        1
+#define CMD_STATUS_WRONG_SLOT                       2
+#define CMD_STATUS_SLOT_NOT_PROGRAMMED              3
+#define CMD_STATUS_WRONG_PASSWORD                   4
+#define CMD_STATUS_NOT_AUTHORIZED                   5
+#define CMD_STATUS_TIMESTAMP_WARNING                6
+#define CMD_STATUS_NO_NAME_ERROR                    7
+#define CMD_STATUS_NOT_SUPPORTED                    8
+#define CMD_STATUS_UNKNOWN_COMMAND                  9
+#define CMD_STATUS_AES_DEC_FAILED                   10
+#define CMD_STATUS_AES_CREATE_KEY_FAILED            11
+#define CMD_STATUS_ERROR_CHANGING_USER_PASSWORD     12
+#define CMD_STATUS_ERROR_CHANGING_ADMIN_PASSWORD    13
+#define CMD_STATUS_ERROR_UNBLOCKING_PIN             14
+#define CMD_STATUS_UNKNOWN_ERROR                    100
 
 /*
    Output report size offset description 1 0 device status 1 1 last command's type 4 2 last command's CRC 1 6 last command's status 53 7 last
@@ -257,6 +267,37 @@ void Stick20HIDSendDebugData (u8 * output);
 #define CMD_WTS_TOKEN_ID_OFFSET      38
 #define CMD_WTS_COUNTER_OFFSET       51
 
+#define __packed __attribute__((__packed__))
+typedef struct {
+    u8 _command_type;
+    u8 temporary_admin_password[25];
+    u8 slot_number;
+    union {
+        u64 slot_counter_or_interval;
+        u8 slot_counter_s[8];
+    } __packed;
+    u8 slot_config;
+    union {
+        u8 slot_token_id[13]; /** OATH Token Identifier */
+        struct { /** @see https://openauthentication.org/token-specs/ */
+            u8 omp[2];
+            u8 tt[2];
+            u8 mui[8];
+            u8 keyboard_layout; //disabled feature in nitroapp as of 20160805
+        } slot_token_fields;
+    };
+} __packed write_to_slot_payload;
+
+static const int CMD_WRITE_CONFIG_PASSWORD_OFFSET = 6;
+static const int CMD_ERASE_SLOT_PASSWORD_OFFSET = 2;
+
+typedef struct {
+    u8 temporary_admin_password[25];
+    u8 type; //0-secret, 1-name
+    u8 id; //multiple reports
+    u8 data[30]; //data, does not need null termination
+} __packed cmd_send_OTP_data_payload;
+
 
 /*
    CMD_READ_SLOT
@@ -266,8 +307,7 @@ void Stick20HIDSendDebugData (u8 * output);
  */
 
 #define CMD_RS_SLOT_NUMBER_OFFSET     1
-
-#define	CMD_RS_OUTPUT_COUNTER_OFFSET 34
+#define CMD_RS_OUTPUT_COUNTER_OFFSET 34
 
 /*
    CMD_GET_CODE
@@ -278,10 +318,17 @@ void Stick20HIDSendDebugData (u8 * output);
 
  */
 
+/* TODO Obsolete
 #define CMD_GC_SLOT_NUMBER_OFFSET      1
 #define CMD_GC_CHALLENGE_OFFSET        2
 #define CMD_GC_TIMESTAMP_OFFSET       10
-#define CMD_GC_INTERVAL_OFFSET        18
+#define CMD_GC_INTERVAL_OFFSET        18 */
+
+#define CMD_GC_SLOT_NUMBER_OFFSET   (1) // 1
+#define CMD_GC_CHALLENGE_OFFSET     (CMD_GC_SLOT_NUMBER_OFFSET + 1) // 2
+#define CMD_GC_TIMESTAMP_OFFSET 	(CMD_GC_CHALLENGE_OFFSET + 8) 	// 10
+#define CMD_GC_INTERVAL_OFFSET		(CMD_GC_TIMESTAMP_OFFSET + 8)	// 18
+#define CMD_GC_PASSWORD_OFFSET 		(CMD_GC_INTERVAL_OFFSET + 1)// 19
 
 /*
    CMD_WRITE_CONFIG
@@ -319,18 +366,16 @@ extern u32 authorized_crc;
 
 void parse_report (u8 * report, u8 * output);
 void cmd_get_status (u8 * report, u8 * output);
-u8 cmd_write_to_slot (u8 * report, u8 * output);
+u8 cmd_write_to_slot (u8 * new_slot, u8 * output);
 u8 cmd_read_slot_name (u8 * report, u8 * output);
 u8 cmd_read_slot (u8 * report, u8 * output);
 u8 cmd_get_code (u8 * report, u8 * output);
 u8 cmd_write_config (u8 * report, u8 * output);
 u8 cmd_erase_slot (u8 * report, u8 * output);
 u8 cmd_first_authenticate (u8 * report, u8 * output);
-u8 cmd_authorize (u8 * report, u8 * output);
 void cmd_get_password_retry_count (u8 * report, u8 * output);
 u8 cmd_get_user_password_retry_count (u8 * report, u8 * output);
 u8 cmd_user_authenticate (u8 * report, u8 * output);
-u8 cmd_user_authorize (u8 * report, u8 * output);
 u8 cmd_set_time (u8 * report, u8 * output);
 u8 cmd_test_counter (u8 * report, u8 * output);
 u8 cmd_test_time (u8 * report, u8 * output);
@@ -352,11 +397,15 @@ u8 cmd_unlock_userpassword (u8 * report, u8 * output);
 u8 cmd_lock_device (u8 * report, u8 * output);
 u8 cmd_getSdCardHighWaterMark (u8 * report, u8 * output);
 
+u8 is_valid_admin_temp_password(const u8 *const password);
+u8 is_valid_temp_user_password(const u8 *const user_password);
 u8 is_TOTP_slot_number(u8 slot_no);
 u8 is_HOTP_slot_number(u8 slot_no);
 
 u8 is_TOTP_slot_programmed(u8 slot_no);
 u8 is_HOTP_slot_programmed(u8 slot_no);
+
+u8 is_user_PIN_protection_enabled(void);
 
 void OTP_main (void);
 

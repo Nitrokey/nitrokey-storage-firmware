@@ -100,7 +100,7 @@ TODO: Update size when secret is extended
    name             2       15          Slot name as String
    secret           17      20          Slot secret
    config           37      1           Configuration bits for auto-type functionality
-   token_id         38      13			OATH token Identifier
+   token_id         38      13          OATH token Identifier
    interval         51      2           TOTP interval (unused for HOTP slots)
 
    OTP counter storage slot
@@ -1002,18 +1002,18 @@ void erase_counter (u8 slot)
 
 void write_to_slot (u8 * data, u8 * addr)
 {
-	u16 dummy_u16;
-	u8  i;
-	u8  Found;
-	const u16 offset = (u16) addr - SLOTS_ADDRESS;
+    u16 dummy_u16;
+    u8  i;
+    u8  Found;
+    const u16 offset = (u16) addr - SLOTS_ADDRESS;
 
     LED_GreenOn ();
 
     // copy all slot data from Flash to RAM
     memcpy (page_buffer, (u8*) SLOTS_ADDRESS, FLASH_PAGE_SIZE * 3);
 
-    OTP_slot *input_slot 	= (OTP_slot *) data;
-    OTP_slot *buffer_slot 	= (OTP_slot *) (page_buffer + offset);
+    OTP_slot *input_slot    = (OTP_slot *) data;
+    OTP_slot *buffer_slot   = (OTP_slot *) (page_buffer + offset);
 
     // Check if the secret from the tool is empty and if it is use the old secret
     // Secret could begin with 0x00, so checking the whole secret before keeping the old one in mandatory
@@ -1029,7 +1029,7 @@ void write_to_slot (u8 * data, u8 * addr)
 
     if (FALSE == Found)
     {
-    	// Input secret is empty. Keep the secret that is currently in the buffer.
+        // Input secret is empty. Keep the secret that is currently in the buffer.
         memcpy (input_slot->secret, buffer_slot->secret, SECRET_LENGTH_DEFINE);
     }
 
@@ -1067,7 +1067,7 @@ void write_to_slot (u8 * data, u8 * addr)
 
 void write_to_config (u8 * data, u8 len)
 {
-	u16 dummy_u16;
+    u16 dummy_u16;
 
     LED_GreenOn ();
 
