@@ -99,7 +99,6 @@ TODO: Not sure if that's actually the case. Why do we even store the system time
 
 #define GLOBAL_CONFIG_OFFSET  0
 #define SECRET_LENGTH_DEFINE  40
-// TODO: Increase to 40 when everything else works
 
 #define __packed __attribute__((__packed__))
 typedef struct {
@@ -109,7 +108,7 @@ typedef struct {
     u8 secret[SECRET_LENGTH_DEFINE];
     u8 config;
     u8 token_id[13];
-    u64 interval;
+    u8 interval[8];
 } __packed OTP_slot;
 
 extern u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];

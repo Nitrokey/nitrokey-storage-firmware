@@ -685,10 +685,10 @@ static u8 initOldStatus = FALSE;
                 {
                     write_to_slot_transaction_started = FALSE;
                     local_slot_content.slot_number = payload->slot_number;
-                    local_slot_content.interval = payload->slot_counter_or_interval;
                     local_slot_content.config = payload->slot_config;
                     memcpy(local_slot_content.token_id, payload->slot_token_id, sizeof(payload->slot_token_id));
-                    cmd_write_to_slot(&local_slot_content, output);
+                    memcpy(local_slot_content.interval, payload->slot_counter_s, sizeof(payload->slot_counter_s));
+                    cmd_write_to_slot((u8*) &local_slot_content, output);
                 }
                 else
                 {
@@ -760,7 +760,7 @@ u8 text[10];
             case CMD_GET_CODE:
                 CI_StringOut ("Get CMD_GET_CODE\r\n");
                 u8 *const user_temp_password = report + CMD_GC_PASSWORD_OFFSET;
-                if(FALSE == is_user_PIN_protection_enabled() || is_valid_temp_user_password(user_temp_password))
+                if(FALSE == is_user_PIN_protection_enabled() || TRUE == is_valid_temp_user_password(user_temp_password))
                 {
                     cmd_get_code (report, output);
                 }
@@ -772,7 +772,7 @@ u8 text[10];
 
             case CMD_WRITE_CONFIG:
                 CI_StringOut ("Get CMD_WRITE_CONFIG\r\n");
-                if (is_valid_admin_temp_password(report + CMD_WRITE_CONFIG_PASSWORD_OFFSET))
+                if (TRUE == is_valid_admin_temp_password(report + CMD_WRITE_CONFIG_PASSWORD_OFFSET))
                     cmd_write_config (report, output);
                 else
                     not_authorized = 1;
@@ -780,7 +780,7 @@ u8 text[10];
 
             case CMD_ERASE_SLOT:
                 CI_StringOut ("Get CMD_ERASE_SLOT\r\n");
-                if (is_valid_admin_temp_password(report + CMD_WRITE_CONFIG_PASSWORD_OFFSET))
+                if (TRUE == is_valid_admin_temp_password(report + CMD_ERASE_SLOT_PASSWORD_OFFSET))
                     cmd_erase_slot (report, output);
                 else
                     not_authorized = 1;
@@ -1442,7 +1442,7 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
 {
 	OTP_slot * new_slot_data = (OTP_slot *) new_slot;
     u8 slot_no = new_slot_data->slot_number;
-    const u16 BUFFER_SIZE = sizeof(OTP_slot);
+    //const u16 BUFFER_SIZE = sizeof(OTP_slot);
 
     // check for empty slot name
     if (new_slot_data->name[0] == 0) {
@@ -1461,8 +1461,8 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
         // u64 counter = atoi (report+CMD_WTS_COUNTER_OFFSET);
 
         // TODO: Does this cause issues?
-        //u32 Counter_u32 = atoi ((char *)new_slot_data->interval);
-        u64 counter = new_slot_data->interval;
+        u32 counter_u32 = atoi ((char *)new_slot_data->interval);
+        u64 counter = counter_u32;
         {
         	u8 text[20];
             CI_StringOut ("Write HOTP Slot ");
@@ -1480,7 +1480,7 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
 
         set_counter_value (hotp_slot_counters[slot_no], counter);
 
-        write_to_slot ((u8*) &new_slot_data, get_hotp_slot_addr(slot_no));
+        write_to_slot ((u8*) new_slot_data, get_hotp_slot_addr(slot_no));
     }
     else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
@@ -1488,7 +1488,7 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
         new_slot_data->slot_number = slot_no;
         new_slot_data->type = 'T';
 
-        write_to_slot ((u8*) &new_slot_data, get_totp_slot_addr(slot_no));
+        write_to_slot ((u8*) new_slot_data, get_totp_slot_addr(slot_no));
     }
     else
     {
@@ -1913,26 +1913,32 @@ u8 text_au8[10];
 u8 cmd_first_authenticate (u8 * report, u8 * output)
 {
     u8 res = 1;
+    u32 ret_u32 = 1;
     u8 card_password[26]; //must be a C string
 
     u8 cMainVersion_u8;
     u8 cSecVersion_u8;
 
-    //invalidate current admin password
+    // invalidate current admin password
     memset(temp_password, 0, sizeof(temp_password));
     temp_admin_password_set = FALSE;
 
+    // send received admin password to SmartCard
     memcpy(card_password, report + 1, 25);
     card_password[sizeof(card_password)-1] = 0;
+    ret_u32 = LA_OpenPGP_V20_Test_SendAdminPW ((unsigned char *) card_password);
+    if(TRUE == ret_u32) {
+    	res = 0; //TODO: clean this up
+    }
 
-    res = LA_OpenPGP_V20_Test_SendAdminPW ((unsigned char *) card_password);
-
+    // clear card password from memory
     memset(card_password, 0, sizeof(card_password));
 
-    if (res == TRUE) {
+    if (res == 0) {
         memcpy(temp_password, report + 26, 25);
         temp_admin_password_set = TRUE;
         LA_OpenPGP_V20_Test_GetAID (&cMainVersion_u8, &cSecVersion_u8);
+        PWS_DecryptedPasswordSafeKey();
         return 0;   //success
     } else {
         output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_PASSWORD;
@@ -1957,21 +1963,28 @@ u8 cmd_first_authenticate (u8 * report, u8 * output)
 u8 cmd_user_authenticate (u8 * report, u8 * output)
 {
     u8 res = 1;
+    u32 res_u32 = 1;
     u8 user_password[26]; //must be a C string
 
     //invalidate current user password
     memset(temp_user_password, 0, sizeof(temp_user_password));
     temp_user_password_set = FALSE;
 
+    // send received user password to smartcard
     memcpy(user_password, report + 1, 25);
     user_password[sizeof(user_password)-1] = 0;
-    res = LA_OpenPGP_V20_Test_SendUserPW2((unsigned char *) user_password);
+    res_u32 = LA_OpenPGP_V20_Test_SendUserPW2((unsigned char *) user_password);
+    if(TRUE == res_u32) {
+    	res = 0; // TODO: Clean this up
+    }
+
+    // clear user password from memory
     memset(user_password, 0, sizeof(user_password));
 
     if (res == 0) { //correct User PIN
         memcpy(temp_user_password, report + 26, 25);
         temp_user_password_set = TRUE;
-        return 0;   //successfull authentication
+        return 0;   //successful authentication
     } else {      //incorrect User PIN
         output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_PASSWORD;
         return 1;   // wrong card password
