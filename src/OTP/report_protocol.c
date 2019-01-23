@@ -1463,11 +1463,7 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
             itoa (slot_no, text);
             CI_StringOut ((char *) text);
             CI_StringOut (" counter -");
-            itoa (new_slot_data->interval_or_counter, text);
-            CI_StringOut ((char *) text);
-            CI_StringOut (" -");
-            memcpy (text, (char *) new_slot_data->interval_or_counter, 8);
-            text[8] = 0;
+            itoa ((u32) new_slot_data->interval_or_counter, text);
             CI_StringOut ((char *) text);
             CI_StringOut ("-\r\n");
         }
