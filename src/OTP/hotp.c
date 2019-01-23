@@ -271,16 +271,11 @@ s8 i = 0;
 
 *******************************************************************************/
 
-u64 endian_swap (u64 x)
+u64 endian_swap (u64 val)
 {
-#if defined LITTLE_ENDIAN
-    x = (x >> 56) |
-        ((x << 40) & 0x00FF000000000000LL) |
-        ((x << 24) & 0x0000FF0000000000LL) |
-        ((x << 8) & 0x000000FF00000000LL) |
-        ((x >> 8) & 0x00000000FF000000LL) | ((x >> 24) & 0x0000000000FF0000LL) | ((x >> 40) & 0x000000000000FF00LL) | (x << 56);
-#endif
-    return x;
+	val = 		((val << 8) & 0xFF00FF00FF00FF00ULL ) | ((val >> 8) & 0x00FF00FF00FF00FFULL );
+	val = 		((val << 16) & 0xFFFF0000FFFF0000ULL ) | ((val >> 16) & 0x0000FFFF0000FFFFULL );
+	return (val << 32) | (val >> 32);
 }
 
 
@@ -389,7 +384,7 @@ void write_data_to_flash (u8 * data, u16 len, u32 addr)
 u32 get_hotp_value (u64 counter, u8 * secret, u8 secret_length, u8 len)
 {
 u8 hmac_result[20];
-u64 c = endian_swap (counter);
+u64 c = counter;
 
     LED_GreenOn ();
 
@@ -1158,7 +1153,6 @@ u16 length = getu16 ((u8 *) BACKUP_PAGE_ADDRESS + BACKUP_LENGTH_OFFSET);
 u32 get_code_from_totp_slot (u8 slot_no, u64 challenge)
 {
 u64 time_min;
-u16 interval;
 u32 result;
 u8 len = 6;
 time_t now;
@@ -1172,9 +1166,7 @@ time_t now;
 
     OTP_slot *slot = (OTP_slot *) get_totp_slot_addr(slot_no);
 
-    interval = getu16 (slot->interval);
-
-    time_min = current_time / interval;
+    time_min = current_time / slot->interval_or_counter;
 
     if (slot->type != 'T') // unprogrammed slot
         return 0;

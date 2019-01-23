@@ -686,8 +686,9 @@ static u8 initOldStatus = FALSE;
                     write_to_slot_transaction_started = FALSE;
                     local_slot_content.slot_number = payload->slot_number;
                     local_slot_content.config = payload->slot_config;
+                    local_slot_content.interval_or_counter = endian_swap(payload->slot_counter_or_interval);
                     memcpy(local_slot_content.token_id, payload->slot_token_id, sizeof(payload->slot_token_id));
-                    memcpy(local_slot_content.interval, payload->slot_counter_s, sizeof(payload->slot_counter_s));
+
                     cmd_write_to_slot((u8*) &local_slot_content, output);
                 }
                 else
@@ -1442,7 +1443,6 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
 {
 	OTP_slot * new_slot_data = (OTP_slot *) new_slot;
     u8 slot_no = new_slot_data->slot_number;
-    //const u16 BUFFER_SIZE = sizeof(OTP_slot);
 
     // check for empty slot name
     if (new_slot_data->name[0] == 0) {
@@ -1457,28 +1457,22 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
         new_slot_data->slot_number = slot_no;
         new_slot_data->type = 'H';
 
-        // u64 counter = getu64 (report+CMD_WTS_COUNTER_OFFSET);
-        // u64 counter = atoi (report+CMD_WTS_COUNTER_OFFSET);
-
-        // TODO: Does this cause issues?
-        u32 counter_u32 = atoi ((char *)new_slot_data->interval);
-        u64 counter = counter_u32;
         {
         	u8 text[20];
             CI_StringOut ("Write HOTP Slot ");
             itoa (slot_no, text);
             CI_StringOut ((char *) text);
             CI_StringOut (" counter -");
-            itoa (counter, text);
+            itoa (new_slot_data->interval_or_counter, text);
             CI_StringOut ((char *) text);
             CI_StringOut (" -");
-            memcpy (text, (char *) new_slot_data->interval, 8);
+            memcpy (text, (char *) new_slot_data->interval_or_counter, 8);
             text[8] = 0;
             CI_StringOut ((char *) text);
             CI_StringOut ("-\r\n");
         }
 
-        set_counter_value (hotp_slot_counters[slot_no], counter);
+        set_counter_value (hotp_slot_counters[slot_no], new_slot_data->interval_or_counter);
 
         write_to_slot ((u8*) new_slot_data, get_hotp_slot_addr(slot_no));
     }
@@ -1592,8 +1586,13 @@ u64 counter;
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, slot->token_id, 13);
             output[OUTPUT_CMD_RESULT_OFFSET +15] = slot->config;
 
+            //TODO: Not supported by app yet
             counter = get_counter_value (hotp_slot_counters[slot_no]);
-            itoa ((u32) counter, &output[OUTPUT_CMD_RESULT_OFFSET + 29]);   // Bytes after OUTPUT_CMD_RESULT_OFFSET+29+8 is unused
+            counter = endian_swap(counter);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, &counter, sizeof(u64));
+
+         //   counter = get_counter_value (hotp_slot_counters[slot_no]);
+         //   itoa ((u32) counter, &output[OUTPUT_CMD_RESULT_OFFSET + 29]);   // Bytes after OUTPUT_CMD_RESULT_OFFSET+29+8 is unused
 
             {
 u8 text[20];
@@ -1601,7 +1600,7 @@ u8 text[20];
                 itoa (slot_no, text);
                 CI_StringOut ((char *) text);
                 CI_StringOut (" counter -");
-                itoa (counter, text);
+                itoa ((u32) counter, text);
                 CI_StringOut ((char *) text);
                 CI_StringOut ("- -");
                 memcpy (text, (char *) &output[OUTPUT_CMD_RESULT_OFFSET + 29], 8);
@@ -1626,7 +1625,8 @@ u8 text[20];
         {
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET, slot->name, 15);
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, slot->token_id, 13);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, slot->interval, 2);
+            u64 interval = endian_swap(slot->interval_or_counter);
+            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, &interval, sizeof(u64));
             output[OUTPUT_CMD_RESULT_OFFSET + 15] = slot->config;
         }
         else

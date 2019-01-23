@@ -108,7 +108,7 @@ typedef struct {
     u8 secret[SECRET_LENGTH_DEFINE];
     u8 config;
     u8 token_id[13];
-    u8 interval[8];
+    u64 interval_or_counter;
 } __packed OTP_slot;
 
 extern u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];
