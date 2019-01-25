@@ -437,7 +437,7 @@ void HID_ExcuteCmd (void)
         case HTML_CMD_DISABLE_HIDDEN_AES_LUN:
             SetSdEncryptedCardEnableState (FALSE);
             SetSdEncryptedHiddenState (FALSE);
-            memset (StorageKey_pu8, 0, 32); // Set dummy key
+            memset_safe (StorageKey_pu8, 0, 32); // Set dummy key
             AES_SetNewStorageKey ((u8 *) AES_DummyKey_au8); // Set dummy key
             HID_NextPasswordIsHiddenPassword_u32 = FALSE;
 
@@ -484,7 +484,7 @@ void HID_ExcuteCmd (void)
             {
                 SetSdEncryptedCardEnableState (FALSE);
                 SetSdEncryptedHiddenState (FALSE);
-                memset (StorageKey_pu8, 0, 32);
+                memset_safe (StorageKey_pu8, 0, 32);
 
                 AES_SetNewStorageKey ((u8 *) AES_DummyKey_au8); // Set dummy key
             }
@@ -672,8 +672,8 @@ void HID_ExcuteCmd (void)
             // Clear password
             HID_AdminPasswordEnabled_u32 = FALSE;
             HID_UserPasswordEnabled_u32 = FALSE;
-            memset (HID_UserPassword_au8, 0, HID_PASSWORD_LEN);
-            memset (HID_AdminPassword_au8, 0, HID_PASSWORD_LEN);
+            memset_safe (HID_UserPassword_au8, 0, HID_PASSWORD_LEN);
+            memset_safe (HID_AdminPassword_au8, 0, HID_PASSWORD_LEN);
             break;
 
         case HTML_CMD_CLEAR_NEW_SD_CARD_FOUND:
@@ -903,7 +903,7 @@ void HID_ExcuteCmd (void)
     }
 
     HID_CmdGet_u8 = HTML_CMD_NOTHING;
-    memset (HID_String_au8, 0, 50); // Clear input data, with possible sent passwords
+    memset_safe (HID_String_au8, 0, 50); // Clear input data, with possible sent passwords
 
     /*
        HID_SmartcardAccess_u8 = FALSE; */
@@ -1093,8 +1093,8 @@ void LockDevice (void)
 
     HID_AdminPasswordEnabled_u32 = FALSE;
     HID_UserPasswordEnabled_u32 = FALSE;
-    memset (HID_UserPassword_au8, 0, HID_PASSWORD_LEN);
-    memset (HID_AdminPassword_au8, 0, HID_PASSWORD_LEN);
+    memset_safe (HID_UserPassword_au8, 0, HID_PASSWORD_LEN);
+    memset_safe (HID_AdminPassword_au8, 0, HID_PASSWORD_LEN);
 
     // Disable password safe
     PWS_DisableKey ();

@@ -225,7 +225,7 @@ typePasswordSafeSlot_st Slot_st;
     LED_GreenOn ();
 
     // Clear data in slot
-    memset ((char *) &Slot_st, 0, sizeof (Slot_st));
+    memset_safe ((char *) &Slot_st, 0, sizeof (Slot_st));
     Slot_st.SlotActiv_u8 = PWS_SLOT_INACTIV_TOKEN;
 
 #ifdef ENABLE_IBN_PWS_TESTS_ENCRYPTION
@@ -474,7 +474,7 @@ typePasswordSafeSlot_st Slot_st;
     CI_LocalPrintf ("PWS_GetSlotLoginName: Slot %d\r\n", Slot_u8);
 
     // Clear the output array
-    memset (Loginname_pu8, 0, PWS_LOGINNAME_LENGTH);
+    memset_safe (Loginname_pu8, 0, PWS_LOGINNAME_LENGTH);
 
     if (FALSE == PWS_ReadSlot (Slot_u8, &Slot_st))
     {
@@ -703,7 +703,7 @@ u32 Ret_u32;
 
 u8 PWS_DisableKey (void)
 {
-    memset (DecryptedPasswordSafeKey_au8, 0, AES_KEYSIZE_256_BIT);
+    memset_safe (DecryptedPasswordSafeKey_au8, 0, AES_KEYSIZE_256_BIT);
 
     DecryptedPasswordSafeKey_u8 = FALSE;
 

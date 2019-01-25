@@ -165,8 +165,8 @@ u8 Buffer_au8[AES_KEYSIZE_256_BIT];
 #endif
 
     // Clear the critical memory
-    memset (StorageKey_au8, 0, AES_KEYSIZE_256_BIT);
-    memset (Buffer_au8, 0, AES_KEYSIZE_256_BIT);
+    memset_safe (StorageKey_au8, 0, AES_KEYSIZE_256_BIT);
+    memset_safe (Buffer_au8, 0, AES_KEYSIZE_256_BIT);
 
 
     return (TRUE);
@@ -407,7 +407,7 @@ u8 MasterKey_au8[AES_KEYSIZE_256_BIT];
     }
 
     // Clear the critical memory
-    memset (MasterKey_au8, 0, AES_KEYSIZE_256_BIT);
+    memset_safe (MasterKey_au8, 0, AES_KEYSIZE_256_BIT);
 
     return (TRUE);
 }
@@ -627,7 +627,7 @@ void HighLevelTests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned
             break;
         case 4:
             CI_LocalPrintf ("Clear AES storage key in flash\r\n");
-            memset (Buffer_au8, 255, 32);
+            memset_safe (Buffer_au8, 255, 32);
             // Store the encrypted storage key in USER PAGE
             WriteAESStorageKeyToUserPage (Buffer_au8);
             break;

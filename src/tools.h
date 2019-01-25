@@ -29,7 +29,6 @@
 
 #define CCID_TASK_DELAY_1_MS_IN_TICKS			1 * (configTICK_RATE_HZ/1000)
 
-
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -67,6 +66,8 @@ u16 change_endian_u16 (u16 x);
 
 void UpdateMsdLastAccessTimer (u32 NewTime);
 void MSD_AccessManager100ms (void);
+
+void memset_safe(void *const pnt, unsigned char val, const u32 len);
 
 typedef struct
 {

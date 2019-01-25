@@ -1850,7 +1850,7 @@ u8 slot_no = report[CMD_WTS_SLOT_NUMBER_OFFSET];
 u8 slot_tmp[sizeof(OTP_slot)];
 u8 text_au8[10];
 
-    memset (slot_tmp, 0xFF, sizeof(OTP_slot));
+    memset_safe (slot_tmp, 0xFF, sizeof(OTP_slot));
 
     if (is_HOTP_slot_number(slot_no))  // HOTP slot
     {
@@ -1902,7 +1902,7 @@ u8 cmd_first_authenticate (u8 * report, u8 * output)
     u8 cSecVersion_u8;
 
     // invalidate current temporary admin password
-    memset(temp_admin_password, 0, sizeof(temp_admin_password));
+    memset_safe(temp_admin_password, 0, sizeof(temp_admin_password));
     temp_admin_password_set = FALSE;
 
     // send received admin password to SmartCard
@@ -1911,7 +1911,7 @@ u8 cmd_first_authenticate (u8 * report, u8 * output)
     res = LA_OpenPGP_V20_Test_SendAdminPW ((unsigned char *) card_password);
     
     // clear card password from memory
-    memset(card_password, 0, sizeof(card_password));
+    memset_safe(card_password, 0, sizeof(card_password));
 
     if (TRUE == res) {
         // Correct admin PIN, store temporary admin password
@@ -1947,7 +1947,7 @@ u8 cmd_user_authenticate (u8 * report, u8 * output)
     u8 user_password[26]; //must be a C string
 
     //invalidate current user password
-    memset(temp_user_password, 0, sizeof(temp_user_password));
+    memset_safe(temp_user_password, 0, sizeof(temp_user_password));
     temp_user_password_set = FALSE;
 
     // send received user password to smartcard
@@ -1956,7 +1956,7 @@ u8 cmd_user_authenticate (u8 * report, u8 * output)
     res = LA_OpenPGP_V20_Test_SendUserPW2((unsigned char *) user_password);
 
     // clear user password from memory
-    memset(user_password, 0, sizeof(user_password));
+    memset_safe(user_password, 0, sizeof(user_password));
 
     if (TRUE == res) {
         // correct user PIN, accept temporary password
@@ -1998,7 +1998,7 @@ u32 Ret_u32;
         res = 0;
     }
 
-    memset (newUserPassword_au8, 0, 40);
+    memset_safe (newUserPassword_au8, 0, 40);
 
     if (0 == res)
     {
@@ -2029,8 +2029,8 @@ u8 cmd_lock_device (u8 * report, u8 * output)
     // Wipe temporary passwords from memory
     temp_admin_password_set = FALSE;
     temp_user_password_set = FALSE;
-    memset(temp_admin_password, 0, sizeof(temp_admin_password));
-    memset(temp_user_password, 0, sizeof(temp_user_password));
+    memset_safe(temp_admin_password, 0, sizeof(temp_admin_password));
+    memset_safe(temp_user_password, 0, sizeof(temp_user_password));
 
     LockDevice ();
     return (0);
