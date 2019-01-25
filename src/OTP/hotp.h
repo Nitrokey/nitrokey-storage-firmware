@@ -74,8 +74,7 @@ typedef enum
 Page 500 - 502  : 0x800_3E800 : OTP Slots data, contains the handling structs for each OTP slot
 Page 503 - 505  : 0x800_3EE00 : HOTP Slot counters, contains one offset counter per page for each of the HOTP slots
 Page 506 - 508  : 0x800_3F400 : Backup pages, used for temporary backup of data to flash memory
-Page 509        : 0x800_3FA00 : TOTP time, contains the current system time for TOTP generation 
-TODO: Not sure if that's actually the case. Why do we even store the system time in flash?
+Page 509        : 0x800_3FA00 : TOTP time, stores the Unix timestamp from the last set_time operation
 */
 #define FLASH_START            0x80000000
 #define OTP_FLASH_START_PAGE   500
@@ -102,13 +101,13 @@ TODO: Not sure if that's actually the case. Why do we even store the system time
 
 #define __packed __attribute__((__packed__))
 typedef struct {
-    u8 type; //'H' - HOTP, 'T' - TOTP, 0xFF - not programmed
-    u8 slot_number;
-    u8 name[15];
-    u8 secret[SECRET_LENGTH_DEFINE];
-    u8 config;
-    u8 token_id[13];
-    u64 interval_or_counter;
+    u8 type;                            // 'H' - HOTP, 'T' - TOTP, 0xFF - not programmed
+    u8 slot_number;                     // only used for passing Slot data around
+    u8 name[15];                        // name as displayed in the interface as C string
+    u8 secret[SECRET_LENGTH_DEFINE];    // Token secret
+    u8 config;                          // Configuration for auto-type functionality
+    u8 token_id[13];                    // OATH Token Identifer
+    u64 interval_or_counter;            // TOTP interval, HOTP counter is not kept up-to-date here
 } __packed OTP_slot;
 
 extern u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];

@@ -84,14 +84,13 @@
 
    Stick 2.x
 
-TODO: Update size when secret is extended
 
    SLOT PAGE LAYOUT:
    Slot             Start   End     Description
    GLOBAL_CONFIG    0       2       Holds the configuration data for the auto-type functionality
    free             3       63      not in use
-   HOTP 1-3         ?       ?       Configuration data for 3 HOTP slots
-   TOTP 1-16        ?       ?       Configuration data for 16 TOTP slots
+   HOTP 1-3         64      282     Configuration data for 3 HOTP slots
+   TOTP 1-16        283     1450    Configuration data for 16 TOTP slots
 
    OTP SLOT LAYOUT:
    Name             Start   Length      Description
@@ -273,9 +272,9 @@ s8 i = 0;
 
 u64 endian_swap (u64 val)
 {
-	val = 		((val << 8) & 0xFF00FF00FF00FF00ULL ) | ((val >> 8) & 0x00FF00FF00FF00FFULL );
-	val = 		((val << 16) & 0xFFFF0000FFFF0000ULL ) | ((val >> 16) & 0x0000FFFF0000FFFFULL );
-	return (val << 32) | (val >> 32);
+    val =       ((val << 8) & 0xFF00FF00FF00FF00ULL ) | ((val >> 8) & 0x00FF00FF00FF00FFULL );
+    val =       ((val << 16) & 0xFFFF0000FFFF0000ULL ) | ((val >> 16) & 0x0000FFFF0000FFFFULL );
+    return (val << 32) | (val >> 32);
 }
 
 
@@ -1225,8 +1224,7 @@ u32 get_slot_offset(u8 slot_number)
     const u32 global_config_offset = 64;
     u32 slot_offset = sizeof(OTP_slot) * slot_number + global_config_offset;
 
-    //TODO: Slots now overlap page boundaries. Check if this is an issue.
-    //TODO: What should be the default value here?
+    //FIXME: There is no way of communicating a failure/invalid slot number now
     if(slot_offset > (2 * FLASH_PAGE_SIZE + SLOT_PAGE_SIZE - sizeof(OTP_slot))) slot_offset = global_config_offset;
 
     return slot_offset;

@@ -113,16 +113,7 @@ u8 HID_GetReport_Value_tmp[KEYBOARD_FEATURE_COUNT];
 
 u8 OTP_device_status = STATUS_READY;
 
-/* TODO: Obsolete*/
-/* u8 temp_password[25];*/
-/* u8 tmp_password_set = 0;*/
-/* u32 authorized_crc = 0xFFFFFFFF;*/
-/* u8 temp_user_password[25];*/
-/* u8 tmp_user_password_set = 0;*/
-/* u32 authorized_user_crc = 0xFFFFFFFF;*/
-/* u32 authorized_user_crc_set=0;*/
-
-u8 temp_password[25];
+u8 temp_admin_password[25];
 u8 temp_user_password[25];
 u8 temp_admin_password_set = FALSE;
 u8 temp_user_password_set = FALSE;
@@ -1582,16 +1573,12 @@ u64 counter;
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, slot->token_id, 13);
             output[OUTPUT_CMD_RESULT_OFFSET +15] = slot->config;
 
-            //TODO: Not supported by app yet
             counter = get_counter_value (hotp_slot_counters[slot_no]);
             counter = endian_swap(counter);
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, &counter, sizeof(u64));
 
-         //   counter = get_counter_value (hotp_slot_counters[slot_no]);
-         //   itoa ((u32) counter, &output[OUTPUT_CMD_RESULT_OFFSET + 29]);   // Bytes after OUTPUT_CMD_RESULT_OFFSET+29+8 is unused
-
             {
-u8 text[20];
+                u8 text[20];
                 CI_StringOut ("Read HOTP Slot ");
                 itoa (slot_no, text);
                 CI_StringOut ((char *) text);
@@ -1908,35 +1895,33 @@ u8 text_au8[10];
 
 u8 cmd_first_authenticate (u8 * report, u8 * output)
 {
-    u8 res = 1;
-    u32 ret_u32 = 1;
+    u32 res = FALSE;
     u8 card_password[26]; //must be a C string
 
     u8 cMainVersion_u8;
     u8 cSecVersion_u8;
 
-    // invalidate current admin password
-    memset(temp_password, 0, sizeof(temp_password));
+    // invalidate current temporary admin password
+    memset(temp_admin_password, 0, sizeof(temp_admin_password));
     temp_admin_password_set = FALSE;
 
     // send received admin password to SmartCard
     memcpy(card_password, report + 1, 25);
     card_password[sizeof(card_password)-1] = 0;
-    ret_u32 = LA_OpenPGP_V20_Test_SendAdminPW ((unsigned char *) card_password);
-    if(TRUE == ret_u32) {
-    	res = 0; //TODO: clean this up
-    }
-
+    res = LA_OpenPGP_V20_Test_SendAdminPW ((unsigned char *) card_password);
+    
     // clear card password from memory
     memset(card_password, 0, sizeof(card_password));
 
-    if (res == 0) {
-        memcpy(temp_password, report + 26, 25);
+    if (TRUE == res) {
+        // Correct admin PIN, store temporary admin password
+        memcpy(temp_admin_password, report + 26, 25);
         temp_admin_password_set = TRUE;
         LA_OpenPGP_V20_Test_GetAID (&cMainVersion_u8, &cSecVersion_u8);
         PWS_DecryptedPasswordSafeKey();
-        return 0;   //success
+        return 0;
     } else {
+        // wrong PIN
         output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_PASSWORD;
         return 1;   // wrong card password
     }
@@ -1958,8 +1943,7 @@ u8 cmd_first_authenticate (u8 * report, u8 * output)
 
 u8 cmd_user_authenticate (u8 * report, u8 * output)
 {
-    u8 res = 1;
-    u32 res_u32 = 1;
+    u32 res = FALSE;
     u8 user_password[26]; //must be a C string
 
     //invalidate current user password
@@ -1969,19 +1953,18 @@ u8 cmd_user_authenticate (u8 * report, u8 * output)
     // send received user password to smartcard
     memcpy(user_password, report + 1, 25);
     user_password[sizeof(user_password)-1] = 0;
-    res_u32 = LA_OpenPGP_V20_Test_SendUserPW2((unsigned char *) user_password);
-    if(TRUE == res_u32) {
-    	res = 0; // TODO: Clean this up
-    }
+    res = LA_OpenPGP_V20_Test_SendUserPW2((unsigned char *) user_password);
 
     // clear user password from memory
     memset(user_password, 0, sizeof(user_password));
 
-    if (res == 0) { //correct User PIN
+    if (TRUE == res) {
+        // correct user PIN, accept temporary password
         memcpy(temp_user_password, report + 26, 25);
         temp_user_password_set = TRUE;
-        return 0;   //successful authentication
-    } else {      //incorrect User PIN
+        return 0;
+    } else {
+        // wrong PIN
         output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_PASSWORD;
         return 1;   // wrong card password
     }
@@ -2043,6 +2026,12 @@ u32 Ret_u32;
 
 u8 cmd_lock_device (u8 * report, u8 * output)
 {
+    // Wipe temporary passwords from memory
+    temp_admin_password_set = FALSE;
+    temp_user_password_set = FALSE;
+    memset(temp_admin_password, 0, sizeof(temp_admin_password));
+    memset(temp_user_password, 0, sizeof(temp_user_password));
+
     LockDevice ();
     return (0);
 }
@@ -2845,9 +2834,9 @@ void send_hotp_slot(u8 slot_no) {
     {
         if (is_HOTP_slot_programmed(slot_no))
         {
-        	OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
+            OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
 
-        	u32 code = get_code_from_hotp_slot (slot_no);
+            u32 code = get_code_from_hotp_slot (slot_no);
 
             if ((slot->config & 1 << SLOT_CONFIG_TOKENID) == 1)
                 sendString ((char *) (slot->token_id), 12);
@@ -2863,7 +2852,7 @@ void send_hotp_slot(u8 slot_no) {
     }
 }
 
-u8 is_valid_admin_temp_password(const u8 *const password) { return temp_admin_password_set && memcmp(password, temp_password, 25) == 0;  }
+u8 is_valid_admin_temp_password(const u8 *const password) { return temp_admin_password_set && memcmp(password, temp_admin_password, 25) == 0;  }
 
 u8 is_valid_temp_user_password(const u8 *const user_password) { return temp_user_password_set && memcmp(user_password, temp_user_password, 25) == 0;  }
 
