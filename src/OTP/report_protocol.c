@@ -749,6 +749,10 @@ u8 text[10];
                    if (calculated_crc32==authorized_crc) cmd_read_slot(report,output); else not_authorized=1; */
                 break;
 
+            case CMD_VERIFY_OTP_CODE:
+                cmd_verify_code(report, output);
+                break;
+
             case CMD_GET_CODE:
                 CI_StringOut ("Get CMD_GET_CODE\r\n");
                 u8 *const user_temp_password = report + CMD_GC_PASSWORD_OFFSET;
@@ -1628,6 +1632,40 @@ u64 counter;
 
 /*******************************************************************************
 
+  cmd_verify_code
+
+  Reviews
+  Date      Reviewer        Info
+  02.02.19  ET              Integration from NK Pro
+
+*******************************************************************************/
+
+u8 cmd_verify_code(u8 *report, u8 *output) {
+  const u8 HOTP_VERIFY_SLOT_NO = 3;
+  u8 slot_no = HOTP_VERIFY_SLOT_NO;
+  cmd_query_verify_code* input = (cmd_query_verify_code*) (report+1);
+  s8 result = 0;
+
+  slot_no = slot_no & 0x0F;
+  OTP_slot* otp_slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
+
+  if (otp_slot->type != 'H') {
+    output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_SLOT_NOT_PROGRAMMED;
+    return 1;
+  }
+  u32 otp_code_to_verify = input->otp_code_to_verify;
+  result = validate_code_from_hotp_slot(slot_no, otp_code_to_verify);
+
+  u8 code_correct = (u8) (result >= 0);
+  //wink_correct(code_correct);
+  output[OUTPUT_CMD_RESULT_OFFSET] = (u8) (code_correct ? 1 : 0);
+  output[OUTPUT_CMD_RESULT_OFFSET+1] = (u8) result;
+
+  return 0;
+}
+
+/*******************************************************************************
+
   CheckSystemtime
 
 
@@ -1731,7 +1769,8 @@ u32 result = 0;
 
 u8 slot_no = report[CMD_GC_SLOT_NUMBER_OFFSET];
 
-    if (is_HOTP_slot_number(slot_no))   // HOTP slot
+    const u8 is_HOTP_reserved = (slot_no & 0x0F) == NUMBER_OF_HOTP_SLOTS - 1; //last one is reserved
+    if (TRUE == is_HOTP_slot_number(slot_no) && FALSE == is_HOTP_reserved)   // HOTP slot
     {
         slot_no = slot_no & 0x0F;
         OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_no);

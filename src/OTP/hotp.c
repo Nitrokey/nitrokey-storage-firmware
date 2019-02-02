@@ -830,6 +830,56 @@ u8 text[20];
     return err; // no error
 }
 
+/*******************************************************************************
+
+  validate_code_from_hotp_slot
+
+  Changes
+  Date      Reviewer        Info
+  02.02.19  ET              Integration from NK Pro
+
+*******************************************************************************/
+
+s8 validate_code_from_hotp_slot(u8 slot_number, u32 code_to_verify) {
+    const s32 RET_GENERAL_ERROR = -1;
+    const s32 RET_CODE_NOT_VALID = -2;
+
+    u8 generated_hotp_code_length = 6;
+    FLASH_Status err;
+    uint32_t calculated_code;
+
+    if (slot_number >= NUMBER_OF_HOTP_SLOTS)
+        return RET_GENERAL_ERROR;
+
+    OTP_slot * hotp_slot = ((OTP_slot *) get_hotp_slot_addr(slot_number));
+    if (hotp_slot->type != 'H') // unprogrammed slot_number
+        return RET_GENERAL_ERROR;
+
+    if ((hotp_slot->config & (1 << SLOT_CONFIG_DIGITS)) == 1)
+        generated_hotp_code_length = 8;
+
+    const u64 counter = get_counter_value (hotp_slot_counters[slot_number]);
+
+    u8 counter_offset = 0;
+    const u8 calculate_ahead_values = 10;
+    for (counter_offset = 0; counter_offset < calculate_ahead_values; counter_offset++){
+        calculated_code = get_hotp_value (counter+counter_offset, hotp_slot->secret, SECRET_LENGTH_DEFINE, generated_hotp_code_length);
+        if (calculated_code == code_to_verify) break;
+    }
+
+    const u8 code_found = counter_offset < calculate_ahead_values;
+    if(TRUE == code_found){
+        //increment the counter for the lacking values, plus one to be ready for next validation
+        u8 i;
+        for (i = 0; i < counter_offset + 1; i++){
+            err = (FLASH_Status) increment_counter_page (hotp_slot_counters[slot_number]);
+            if (err != FLASH_COMPLETE) return RET_GENERAL_ERROR;
+        }
+        return counter_offset;
+    }
+
+    return RET_CODE_NOT_VALID;
+}
 
 /*******************************************************************************
 

@@ -325,6 +325,20 @@ typedef struct {
 #define CMD_GC_PASSWORD_OFFSET      (CMD_GC_INTERVAL_OFFSET + 1)        // 19
 
 /*
+   CMD_VERIFY_CODE
+
+   report: 4b Code to verify
+
+   output: 1b bool code correct 1b result
+
+ */
+
+typedef struct {
+    //TODO: Endianness issues?
+    u32 otp_code_to_verify;
+} __packed cmd_query_verify_code;
+
+/*
    CMD_WRITE_CONFIG
 
    report: 1b command type 1b Numlock slot 1b Capslock slot 1b Scrolllock slot
@@ -364,6 +378,7 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output);
 u8 cmd_read_slot_name (u8 * report, u8 * output);
 u8 cmd_read_slot (u8 * report, u8 * output);
 u8 cmd_get_code (u8 * report, u8 * output);
+u8 cmd_verify_code(u8 *report, u8 *output);
 u8 cmd_write_config (u8 * report, u8 * output);
 u8 cmd_erase_slot (u8 * report, u8 * output);
 u8 cmd_first_authenticate (u8 * report, u8 * output);

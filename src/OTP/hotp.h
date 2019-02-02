@@ -50,7 +50,7 @@ typedef enum
     FLASH_TIMEOUT
 } FLASH_Status;
 
-#define NUMBER_OF_HOTP_SLOTS 3
+#define NUMBER_OF_HOTP_SLOTS 4
 #define NUMBER_OF_TOTP_SLOTS 15
 
 #define SLOT_CONFIG_DIGITS 0
@@ -137,6 +137,7 @@ u32 get_flash_time_value (void);
 u32 get_time_value (void);
 u8 set_time_value (u32 time);
 u8 set_counter_value (u32 addr, u64 counter);
+s8 validate_code_from_hotp_slot(u8 slot_number, u32 code_to_verify);
 u32 get_code_from_hotp_slot (u8 slot);
 u8 increment_counter_page (u32 addr);
 void write_to_slot (u8 * data, u8 * addr);
