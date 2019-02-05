@@ -1653,7 +1653,8 @@ u8 cmd_verify_code(u8 *report, u8 *output) {
     output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_SLOT_NOT_PROGRAMMED;
     return 1;
   }
-  u32 otp_code_to_verify = input->otp_code_to_verify;
+
+  u32 otp_code_to_verify = change_endian_u32(input->otp_code_to_verify);
   result = validate_code_from_hotp_slot(slot_no, otp_code_to_verify);
 
   u8 code_correct = (u8) (result >= 0);

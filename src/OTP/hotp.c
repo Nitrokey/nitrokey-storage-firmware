@@ -146,6 +146,7 @@ u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS] = {
     SLOT1_COUNTER_ADDRESS,
     SLOT2_COUNTER_ADDRESS,
     SLOT3_COUNTER_ADDRESS,
+    SLOT4_COUNTER_ADDRESS,
 };
 
 u8 page_buffer[FLASH_PAGE_SIZE * 3];
@@ -846,7 +847,7 @@ s8 validate_code_from_hotp_slot(u8 slot_number, u32 code_to_verify) {
 
     u8 generated_hotp_code_length = 6;
     FLASH_Status err;
-    uint32_t calculated_code;
+    u32 calculated_code;
 
     if (slot_number >= NUMBER_OF_HOTP_SLOTS)
         return RET_GENERAL_ERROR;
