@@ -78,6 +78,9 @@ static volatile u8 LED_GreenToggleFlag_u8 = LED_OFF;
 static volatile u8 LED_RedToggleFlag_u8 = LED_OFF;
 static volatile u8 LED_RedGreenToggleFlag_u8 = LED_OFF;
 
+static volatile u8 LED_RedFlashTimes_u8 = 0;
+static volatile u8 LED_GreenFlashTimes_u8 = 0;
+
 static volatile u8 LED_WinkActive_u8 = LED_OFF;
 
 
@@ -332,6 +335,55 @@ void LED_RedGreenOn (void)
 
 /*******************************************************************************
 
+  LED_RedFlashNTimes
+
+  Changes
+  Date      Author          Info
+  02.02.19  ET              Implement function
+
+*******************************************************************************/
+
+void LED_RedFlashNTimes (unsigned char times)
+{
+    LED_RedFlashTimes_u8 = times;
+    LED_Manager10ms_v ();       // Update LEDs
+}
+
+/*******************************************************************************
+
+  LED_GreenFlashNTimes
+
+  Changes
+  Date      Author          Info
+  02.02.19  ET              Implement function
+
+*******************************************************************************/
+
+void LED_GreenFlashNTimes (unsigned char times)
+{
+    LED_GreenFlashTimes_u8 = times;
+    LED_Manager10ms_v ();       // Update LEDs
+}
+
+
+/*******************************************************************************
+
+  LED_GreenFlashNTimes
+
+  Changes
+  Date      Author          Info
+  02.02.19  ET              Implement function
+
+*******************************************************************************/
+
+void LED_ClearFlashing (void)
+{
+	LED_GreenFlashTimes_u8 = 0;
+	LED_RedFlashTimes_u8 = 0;
+    LED_Manager10ms_v ();       // Update LEDs
+}
+/*******************************************************************************
+
   LED_WinkOn
 
   Set LEDs to switch between red and green every 500ms.
@@ -345,8 +397,8 @@ void LED_RedGreenOn (void)
 
 void LED_WinkOn (void)
 {
-	LED_WinkActive_u8 = LED_ON;
-	LED_Manager10ms_v ();       // Update LEDs
+    LED_WinkActive_u8 = LED_ON;
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 
@@ -364,8 +416,8 @@ void LED_WinkOn (void)
 
 void LED_WinkOff (void)
 {
-	LED_WinkActive_u8 = LED_OFF;
-	LED_Manager10ms_v ();       // Update LEDs
+    LED_WinkActive_u8 = LED_OFF;
+    LED_Manager10ms_v ();       // Update LEDs
 }
 
 /*******************************************************************************
@@ -390,7 +442,10 @@ void LED_Manager10ms_v (void)
     u8 StateRedLed_u8 = LED_OFF;
     u8 StateGreenLed_u8 = LED_OFF;
     u8 StateRedLedFlashing_u8 = LED_OFF;
+    u8 StateGreenLedFlashing_u8 = LED_OFF;
     static u16 FlashCounter_u16 = 0;
+    static u8 RedFlashDelay = LED_FLASH_DELAY * 2;
+    static u8 GreenFlashDelay = LED_FLASH_DELAY * 2;
 
     if (TRUE == LED_StartUpActiv)   // Startup usage
     {
@@ -425,6 +480,26 @@ void LED_Manager10ms_v (void)
       StateRedLedFlashing_u8 = LED_ON;
     }
 
+    if (LED_RedFlashTimes_u8 > 0)
+    {
+        StateRedLedFlashing_u8 = LED_ON;
+        RedFlashDelay--;
+        if (RedFlashDelay == 0){
+            RedFlashDelay = LED_FLASH_DELAY * 2;
+            LED_RedFlashTimes_u8--;
+        }
+    }
+
+    if (LED_GreenFlashTimes_u8 > 0)
+    {
+        StateGreenLedFlashing_u8 = LED_ON;
+        GreenFlashDelay--;
+        if (GreenFlashDelay == 0){
+            GreenFlashDelay = LED_FLASH_DELAY * 2;
+            LED_GreenFlashTimes_u8--;
+        }
+    }
+
     // Flash controller
     FlashCounter_u16++;
     if (LED_ON == StateRedLedFlashing_u8)
@@ -436,6 +511,18 @@ void LED_Manager10ms_v (void)
         else
         {
             StateRedLed_u8 = LED_OFF;
+        }
+    }
+
+    if (LED_ON == StateGreenLedFlashing_u8)
+    {
+        if ((FlashCounter_u16 / LED_FLASH_DELAY) % 2 == 0)
+        {
+            StateGreenLed_u8 = LED_ON;
+        }
+        else
+        {
+            StateGreenLed_u8 = LED_OFF;
         }
     }
 

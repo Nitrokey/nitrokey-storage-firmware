@@ -55,6 +55,8 @@
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 #include "USB_CCID/USB_CCID.h"
 #include "Tools/DFU_test.h"
+#include "Tools/LED_test.h"
+
 
 #include "BUFFERED_SIO.h"
 #include "Interpreter.h"
@@ -1658,7 +1660,16 @@ u8 cmd_verify_code(u8 *report, u8 *output) {
   result = validate_code_from_hotp_slot(slot_no, otp_code_to_verify);
 
   u8 code_correct = (u8) (result >= 0);
-  //wink_correct(code_correct);
+  if (TRUE == code_correct)
+  {
+	  LED_ClearFlashing();
+	  LED_GreenFlashNTimes(3);
+  }
+  else
+  {
+	  LED_ClearFlashing();
+	  LED_RedFlashNTimes(10);
+  }
   output[OUTPUT_CMD_RESULT_OFFSET] = (u8) (code_correct ? 1 : 0);
   output[OUTPUT_CMD_RESULT_OFFSET+1] = (u8) result;
 
@@ -1811,7 +1822,6 @@ u8 slot_no = report[CMD_GC_SLOT_NUMBER_OFFSET];
 
             // Change endian
             result = change_endian_u32 (result);
-
 
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET, &result, 4);
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 5, slot->token_id, 13);
