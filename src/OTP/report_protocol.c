@@ -1663,12 +1663,12 @@ u8 cmd_verify_code(u8 *report, u8 *output) {
   if (TRUE == code_correct)
   {
 	  LED_ClearFlashing();
-	  LED_GreenFlashNTimes(3);
+	  LED_GreenFlashNTimes(20);
   }
   else
   {
 	  LED_ClearFlashing();
-	  LED_RedFlashNTimes(10);
+	  LED_RedFlashNTimes(1000);
   }
   output[OUTPUT_CMD_RESULT_OFFSET] = (u8) (code_correct ? 1 : 0);
   output[OUTPUT_CMD_RESULT_OFFSET+1] = (u8) result;
