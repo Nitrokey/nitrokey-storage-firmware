@@ -1395,6 +1395,7 @@ u32 i;
 
 void cmd_get_password_retry_count (u8 * report, u8 * output)
 {
+    GetSmartCardStatus (&StickConfiguration_st);
     output[OUTPUT_CMD_RESULT_OFFSET] = StickConfiguration_st.AdminPwRetryCount;
 }
 
@@ -1414,6 +1415,7 @@ void cmd_get_password_retry_count (u8 * report, u8 * output)
 
 u8 cmd_get_user_password_retry_count (u8 * report, u8 * output)
 {
+    GetSmartCardStatus (&StickConfiguration_st);
     output[OUTPUT_CMD_RESULT_OFFSET] = StickConfiguration_st.UserPwRetryCount;
     return 0;
 }
