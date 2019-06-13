@@ -1,7 +1,16 @@
 cmake_minimum_required(VERSION 3.9)
-project(src)
+project(nitrokey_storage)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD 90)
+
+MESSAGE(WARNING "This is only a stub. Not possible to build a firmware with it at the moment.")
+
+# Copied from the AVR32 build log for the further processing
+set(NKDEFINES "-DBOARD=EVK1104 -DFREERTOS_USED")
+set(NKFLAGS "-O0 -fdata-sections -g3 -Wall -c -fmessage-length=0 -mpart=uc3a3256s -ffunction-sections -masm-addr-pseudos")
+set(NKCOMPILER avr32-gcc)
+set(NKLINKFLAGS "-nostartfiles -L../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS -L../src/SOFTWARE_FRAMEWORK/BOARDS -Wl,--gc-sections -Wl,-e,_trampoline -T../src/SOFTWARE_FRAMEWORK/UTILS/LINKER_SCRIPTS/AT32UC3A3/256/GCC/link_uc3a3256.lds -mpart=uc3a3256s -Wl,--gc-sections --rodata-writable -Wl,--direct-data -oUSB_MASS.elf -lnewlib_addons-at32ucr2-speed_opt")
+
 
 include_directories(.)
 
