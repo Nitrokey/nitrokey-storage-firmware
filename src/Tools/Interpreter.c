@@ -22,11 +22,11 @@
 
    Datei    Interpreter.cpp
 
-   Author   Rudolf Böddeker
+   Author   Rudolf Bï¿½ddeker
 
    Achtung!!!
    Mit Eingabe eines Befehls erfolgt ein "printf"-Aufruf
-   welcher der Stackbedarf zusätzlich erhöht.
+   welcher der Stackbedarf zusï¿½tzlich erhï¿½ht.
    (Z.B. beim R32C, ca. 220 Byte)
 
 ********************************************************************/
@@ -57,23 +57,23 @@
 
 #include "CCID/USART/ISO7816_USART.h"
 #include "CCID/USART/ISO7816_ADPU.h"
-#include "CCID/Local_ACCESS/OpenPGP_V20.h"
+//#include "CCID/Local_ACCESS/OpenPGP_V20.h"
 
-#include "BUFFERED_SIO.H"
+#include "BUFFERED_SIO.h"
 #include "Interpreter.h"
 #include "TIME_MEASURING.h"
 #include "Inbetriebnahme.h"
-#include "..\FILE_IO\FileAccessInterface.h"
+#include "../FILE_IO/FileAccessInterface.h"
 #include "conf_usb.h"
 #include "LED_test.h"
 #include "DFU_test.h"
-#include "..\USER_INTERFACE\file_io.h"
-#include "OTP_test.h"
-#include "..\HighLevelFunctions\MatrixPassword.h"
-#include "..\HighLevelFunctions\HandleAesStorageKey.h"
+#include "../USER_INTERFACE/file_io.h"
+#include "OTP_Test.h"
+#include "../HighLevelFunctions/MatrixPassword.h"
+#include "../HighLevelFunctions/HandleAesStorageKey.h"
 #include "SD_Test.h"
-#include "..\HighLevelFunctions\HiddenVolume.h"
-#include "..\HighLevelFunctions\password_safe.h"
+#include "../HighLevelFunctions/HiddenVolume.h"
+#include "../HighLevelFunctions/password_safe.h"
 #include "DebugLog.h"
 
 /*******************************************************************************
@@ -410,7 +410,7 @@ void CI_PrintIntro (void)
   CI_CheckNewCommandLine
 
   RETURN       ERROR    kein Komando erhalten
-               n        Länge der Komandozeile
+               n        Lï¿½nge der Komandozeile
 
   Reviews
   Date      Reviewer        Info
@@ -1226,7 +1226,7 @@ s32 IDF_Debugtool (void)
         return (L_OK);  /* kein Komando vorhanden */
     }
 
-    CI_StringOut ("\n\r");  /* Neue Zeile für Komandobearbeitung */
+    CI_StringOut ("\n\r");  /* Neue Zeile fï¿½r Komandobearbeitung */
 
     CI_ExecCmd (szCommandData);
 

@@ -726,7 +726,7 @@ u8 ret_u8;
     CI_LocalPrintf ("\r\n");
 
     // Clear the critical memory
-    memset (Userpassword_pu8, 0, strlen ((char *) Userpassword_pu8));
+    memset_safe (Userpassword_pu8, 0, strlen ((char *) Userpassword_pu8));
 
     return (ret_u8);
 }

@@ -50,28 +50,8 @@ typedef enum
     FLASH_TIMEOUT
 } FLASH_Status;
 
-/*
-   #define NUMBER_OF_HOTP_SLOTS 2 #define NUMBER_OF_TOTP_SLOTS 4 */
-
-#define NUMBER_OF_HOTP_SLOTS 3
+#define NUMBER_OF_HOTP_SLOTS 4
 #define NUMBER_OF_TOTP_SLOTS 15
-
-
-
-// Flash memory pages:
-// 0x801E800
-// 0x801EC00 <- slots
-// 0x801F000 <- slot 1 counter
-// 0x801F400 <- slot 2 counter
-// 0x801F800
-// 0x801FC00 <- backup page
-
-
-/*
-   slot structure: 1b 0x01 if slot is used (programmed) 15b slot name 20b secret 1b configuration flags: MSB [x|x|x|x|x|send token id|send enter
-   after code?|no. of digits 6/8] LSB 12b token id 1b keyboard layout 2b TOTP interval value
-
- */
 
 #define SLOT_CONFIG_DIGITS 0
 #define SLOT_CONFIG_ENTER 1
@@ -90,64 +70,53 @@ typedef enum
 
 #define SLOT_PAGE_SIZE  500 // less than actual page, so we can copy it to backup page with additional info
 
+/* OTP BLOCK LAYOUT:
+Page 500 - 502  : 0x800_3E800 : OTP Slots data, contains the handling structs for each OTP slot
+Page 503 - 505  : 0x800_3EE00 : HOTP Slot counters, contains one offset counter per page for each of the HOTP slots
+Page 506 - 508  : 0x800_3F400 : Backup pages, used for temporary backup of data to flash memory
+Page 509        : 0x800_3FA00 : TOTP time, stores the Unix timestamp from the last set_time operation
+*/
 #define FLASH_START            0x80000000
-#define OTP_FLASH_START_PAGE   500
-#define SLOTS_ADDRESS         (0x80000000 + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (512*0))   // 0x8003e800
-#define SLOT1_COUNTER_ADDRESS (0x80000000 + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (512*3))   // 0x8003
-#define SLOT2_COUNTER_ADDRESS (0x80000000 + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (512*4))   // 0x8003
-#define SLOT3_COUNTER_ADDRESS (0x80000000 + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (512*5))   // 0x8003
-#define BACKUP_PAGE_ADDRESS   (0x80000000 + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (512*6))   // (3 Pages) 0x8003
-#define TIME_ADDRESS          (0x80000000 + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (512*9))   //
+#define OTP_FLASH_START_PAGE   499
+#define SLOTS_ADDRESS         (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*0))   // 0x8003e800
+#define SLOT1_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*3))   // 0x8003
+#define SLOT2_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*4))   // 0x8003
+#define SLOT3_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*5))   // 0x8003
+#define SLOT4_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*6))   // 0x8003
+#define BACKUP_PAGE_ADDRESS   (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*7))   // (3 Pages) 0x8003
+#define TIME_ADDRESS          (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*10))   //
 
-// OTP block = 3 flash blocks = 3*512 byte
-#define BACKUP_ADDRESS_OFFSET ((512 * 3) - 12)  // 500 - no flash block addr
-#define BACKUP_LENGTH_OFFSET  ((512 * 3) -  8)  // 504 - no flash block addr
-#define BACKUP_OK_OFFSET      ((512 * 3) -  6)  // 506 - no flash block addr
+/* Backup page layout:
+0x800_3F400 - 0x800_3F7F4 : 1524 Bytes : Backup Memory
+0x800_3F7F4 - 0x800_3F9FA :    4 Bytes : The address, which was backed up
+0x800_3F9FA - 0x800_3F9FC :    2 Bytes : Length of the backup
+0x800_3F9FC - 0x800_3FA00 :    2 Bytes : Backup OK token, 0x4F4B if successful
+*/
+#define BACKUP_SIZE           (FLASH_PAGE_SIZE * 3)
+#define BACKUP_ADDRESS_OFFSET (BACKUP_SIZE - 12)  // 500 - no flash block addr
+#define BACKUP_LENGTH_OFFSET  (BACKUP_SIZE -  8)  // 504 - no flash block addr
+#define BACKUP_OK_OFFSET      (BACKUP_SIZE -  6)  // 506 - no flash block addr
 
-#define GLOBAL_CONFIG_OFFSET  (64 * 0)
+#define GLOBAL_CONFIG_OFFSET  0
+#define SECRET_LENGTH_DEFINE  40
 
-#define HOTP_SLOT1_OFFSET     (64 * 1)
-#define HOTP_SLOT2_OFFSET     (64 * 2)
-#define HOTP_SLOT3_OFFSET     (64 * 3)
+#define __packed __attribute__((__packed__))
+typedef struct {
+    u8 type;                            // 'H' - HOTP, 'T' - TOTP, 0xFF - not programmed
+    u8 slot_number;                     // only used for passing Slot data around
+    u8 name[15];                        // name as displayed in the interface as C string
+    u8 secret[SECRET_LENGTH_DEFINE];    // Token secret
+    u8 config;                          // Configuration for auto-type functionality
+    u8 token_id[13];                    // OATH Token Identifer
+    u64 interval_or_counter;            // TOTP interval, HOTP counter is not kept up-to-date here
+} __packed OTP_slot;
 
-#define TOTP_SLOT1_OFFSET     ((64 * 4) + (64 *  0))
-#define TOTP_SLOT2_OFFSET     ((64 * 4) + (64 *  1))
-#define TOTP_SLOT3_OFFSET     ((64 * 4) + (64 *  2))
-#define TOTP_SLOT4_OFFSET     ((64 * 4) + (64 *  3))
-#define TOTP_SLOT5_OFFSET     ((64 * 4) + (64 *  4))
-#define TOTP_SLOT6_OFFSET     ((64 * 4) + (64 *  5))
-#define TOTP_SLOT7_OFFSET     ((64 * 4) + (64 *  6))
-#define TOTP_SLOT8_OFFSET     ((64 * 4) + (64 *  7))
-#define TOTP_SLOT9_OFFSET     ((64 * 4) + (64 *  8))
-#define TOTP_SLOT10_OFFSET    ((64 * 4) + (64 *  9))
-#define TOTP_SLOT11_OFFSET    ((64 * 4) + (64 * 10))
-#define TOTP_SLOT12_OFFSET    ((64 * 4) + (64 * 11))
-#define TOTP_SLOT13_OFFSET    ((64 * 4) + (64 * 12))
-#define TOTP_SLOT14_OFFSET    ((64 * 4) + (64 * 13))
-#define TOTP_SLOT15_OFFSET    ((64 * 4) + (64 * 14))
-#define TOTP_SLOT16_OFFSET    ((64 * 4) + (64 * 15))
-
-// End of data = ((64 * 4) + (64 * 16)) = 1280 >= 3 flash page
-
-
-#define SLOT_TYPE_OFFSET     0
-#define SLOT_NAME_OFFSET     1
-#define SECRET_OFFSET       16
-#define CONFIG_OFFSET       36
-#define TOKEN_ID_OFFSET     37
-#define INTERVAL_OFFSET     50
+extern u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];
 
 #define TIME_OFFSET          4
 
-
+// How many tokens are stored on one counter page?
 #define TOKEN_PER_FLASHPAGE        (FLASH_PAGE_SIZE-8)
-
-
-extern u32 hotp_slots[NUMBER_OF_HOTP_SLOTS];
-extern u32 totp_slots[NUMBER_OF_TOTP_SLOTS + 1];
-extern u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS];
-extern u32 hotp_slot_offsets[NUMBER_OF_HOTP_SLOTS];
-extern u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS + 1];
 
 extern u8 page_buffer[FLASH_PAGE_SIZE * 3];
 
@@ -169,17 +138,20 @@ u32 get_flash_time_value (void);
 u32 get_time_value (void);
 u8 set_time_value (u32 time);
 u8 set_counter_value (u32 addr, u64 counter);
+s8 validate_code_from_hotp_slot(u8 slot_number, u32 code_to_verify);
 u32 get_code_from_hotp_slot (u8 slot);
 u8 increment_counter_page (u32 addr);
-void write_to_slot (u8 * data, u16 offset, u16 len);
+void write_to_slot (u8 * data, u8 * addr);
+void write_to_config (u8 * data, u8 len);
 void backup_data (u8 * data, u16 len, u32 addr);
 u8 check_backups (void);
 u8 get_hotp_slot_config (u8 slot_number);
 u8 get_totp_slot_config (u8 slot_number);
 u32 get_code_from_totp_slot (u8 slot, u64 challenge);
 
-
-u8* get_hotp_slot_addr (u8 slot_number);
+void send_hotp_slot(u8 slot_no);
 u8* get_totp_slot_addr (u8 slot_number);
+u8* get_hotp_slot_addr (u8 slot_number);
+u32 get_slot_offset(u8 slot_number);
 
 #endif // HOTP_H

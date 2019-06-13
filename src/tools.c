@@ -804,3 +804,26 @@ void MSD_AccessManager100ms (void)
     }
 
 }
+
+/*******************************************************************************
+
+  memset_safe
+
+  Changes
+  Date      Reviewer        Info
+  25.11.19  ET              Function created
+
+  This sets the supplied region of memory to zero, but can not be optimized away
+  like a regular memset() operation.
+
+*******************************************************************************/
+
+//TODO: Fix build paths and use size_t instead of u32
+void memset_safe(void *const pnt, unsigned char val, const u32 len)
+{
+    volatile unsigned char *volatile pnt_ = (volatile unsigned char *volatile) pnt;
+    u32 i = (u32) 0U;
+    while (i < len){
+        pnt_[i++] = val;
+    }
+}

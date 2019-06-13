@@ -42,6 +42,10 @@ void LED_RedGreenToggle (void);
 void LED_RedGreenOff (void);
 void LED_RedGreenOn (void);
 
+void LED_RedFlashNTimes (unsigned char times);
+void LED_GreenFlashNTimes (unsigned char times);
+void LED_ClearFlashing (void);
+
 void LED_WinkOn (void);
 void LED_WinkOff (void);
 

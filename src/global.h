@@ -24,7 +24,7 @@
 // #include "portmacro.h" Don't use is here, system crashes
 
 #define VERSION_MAJOR 0 // 255 = debug version
-#define VERSION_MINOR 53    // 0 = development
+#define VERSION_MINOR 54    // 0 = development
 
 #define INTERNAL_VERSION_NR 0
 
@@ -41,6 +41,7 @@
 
 
 // #define STICK_20_SEND_DEBUGINFOS_VIA_HID // = Debug version, use ca. 2k flash
+//#define INTERPRETER_ENABLE
 
 #ifdef  STICK_20_SEND_DEBUGINFOS_VIA_HID
   #undef VERSION_MAJOR

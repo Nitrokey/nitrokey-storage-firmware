@@ -91,6 +91,7 @@ void IBN_OTP_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
 #endif
     u8* Data_pu8;
     u8 slot_no;
+    OTP_slot *slot;
     u8 is_programmed;
     u32 result;
 
@@ -197,8 +198,9 @@ void IBN_OTP_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
             slot_no = Param_u32;
             if (slot_no < NUMBER_OF_HOTP_SLOTS) // HOTP slot
             {
-                is_programmed = *((u8 *) (hotp_slots[slot_no]));
-                if (is_programmed == 0x01)
+            	OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
+
+                if (slot->type == 'H')
                 {
                     result = get_code_from_hotp_slot (slot_no);
                     change_endian_u32 (result);
@@ -219,7 +221,9 @@ void IBN_OTP_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
             slot_no = Param_u32;
             if (slot_no < NUMBER_OF_HOTP_SLOTS) // HOTP slot
             {
-                is_programmed = *((u8 *) (hotp_slots[slot_no]));
+            	slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
+
+                is_programmed = slot->type == 'H';
 
                 Data_pu8 = (u8 *) hotp_slot_counters[slot_no];
 
@@ -241,14 +245,15 @@ void IBN_OTP_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
             /*
                slot structure: 1b 0x01 if slot is used (programmed) 15b slot name 20b secret 1b configuration flags: MSB [x|x|x|x|x|send token
                id|send enter after code?|no. of digits 6/8] LSB 12b token id 1b keyboard layout */
-            Data_pu8 = get_totp_slot_addr (Param_u32);
+        	slot = (OTP_slot *) get_totp_slot_addr(slot_no);
+
             if (NULL == Data_pu8)
             {
                 CI_LocalPrintf ("Wrong topt slot %d\n\r", Param_u32);
                 return;
             }
 
-            if (0x01 == Data_pu8[0])
+            if (slot->type == 'T')
             {
                 CI_LocalPrintf ("slot %d is used\n\r", Param_u32);
             }
@@ -257,29 +262,25 @@ void IBN_OTP_Tests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned 
                 CI_LocalPrintf ("slot %d is not used\n\r", Param_u32);
             }
 
-            CI_LocalPrintf ("slot name -%.15.15s-\n\r", &Data_pu8[1]);
+            CI_LocalPrintf ("slot name -%.15.15s-\n\r", slot->name);
             CI_LocalPrintf ("        : ");
-            HexPrint (15, &Data_pu8[1]);
+            HexPrint (15, slot->name);
             CI_LocalPrintf ("\n\r");
 
 
             CI_LocalPrintf ("Secret  : ");
-            HexPrint (20, &Data_pu8[16]);
+            HexPrint (40, slot->secret);
             CI_LocalPrintf ("\n\r");
 
             CI_LocalPrintf ("Config  : ");
-            HexPrint (1, &Data_pu8[36]);
+            HexPrint (1, slot->config);
             CI_LocalPrintf ("\n\r");
 
             CI_LocalPrintf ("Token   : ");
-            HexPrint (12, &Data_pu8[37]);
+            HexPrint (12, slot->token_id);
             CI_LocalPrintf ("\n\r");
 
-            CI_LocalPrintf ("Keyboard: ");
-            HexPrint (1, &Data_pu8[39]);
-            CI_LocalPrintf ("\n\r");
-
-            CI_LocalPrintf ("slot name -%.15.15s-\n\r", &Data_pu8[1]);
+            CI_LocalPrintf ("slot name -%.15.15s-\n\r", slot->name);
             break;
 
         case 7:    // Show topt time

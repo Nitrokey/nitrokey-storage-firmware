@@ -82,45 +82,25 @@
 
    Flash storage description OTP
 
-   Stick 1.x
-
-   OTP parameter block
-
-   The OTP parameter block save the configuration data of each slot. The size of each slot is 64 byte
-
-   Slot Start End GLOBAL_CONFIG 0 2 free 3 63 HOTP_SLOT1 64 127 HOTP_SLOT2 128 191 TOTP_SLOT1 192 255 TOTP_SLOT2 256 319 TOTP_SLOT3 320 383
-   TOTP_SLOT4 384 447 TOTP_SLOT5 448 511 TOTP_SLOT6 512 575 TOTP_SLOT7 576 639 TOTP_SLOT8 640 703 TOTP_SLOT9 704 767 TOTP_SLOT10 768 831 TOTP_SLOT11
-   832 895 TOTP_SLOT12 896 959 TOTP_SLOT13 960 1023 TOTP_SLOT14 1024 1087 TOTP_SLOT15 1088 1151 TOTP_SLOT16 1152 1215
-
-
-   OTP configuration slot
-
-
-   Slot size 64 byte
-
-   Contain the parameter data - 50 data byte Start Description SLOT_TYPE_OFFSET 0 1 byte slot type TOTP, HOTP SLOT_NAME_OFFSET 1 15 byte slot name
-   SECRET_OFFSET 16 20 byte secret key CONFIG_OFFSET 36 1 byte config byte TOKEN_ID_OFFSET 37 12 byte token ID
-
    Stick 2.x
 
-   OTP parameter block
 
-   The OTP parameter block save the configuration data of each slot. The size of each slot is 80 byte
+   SLOT PAGE LAYOUT:
+   Slot             Start   End     Description
+   GLOBAL_CONFIG    0       2       Holds the configuration data for the auto-type functionality
+   free             3       63      not in use
+   HOTP 1-3         64      282     Configuration data for 3 HOTP slots
+   TOTP 1-16        283     1450    Configuration data for 16 TOTP slots
 
-   Slot Start End GLOBAL_CONFIG 0 2 free 3 63
-
-   HOTP_SLOT1 64 127 HOTP_SLOT2 128 191 HOTP_SLOT3 192 255
-
-   TOTP_SLOT1 256 335 TOTP_SLOT2 336 415 TOTP_SLOT3 416 495 TOTP_SLOT4 496 575 TOTP_SLOT5 576 655 TOTP_SLOT6 656 735 TOTP_SLOT7 736 815 TOTP_SLOT8
-   816 895 TOTP_SLOT9 896 975 TOTP_SLOT10 976 1055 TOTP_SLOT11 1056 1135 TOTP_SLOT12 1136 1215 TOTP_SLOT13 1216 1295 TOTP_SLOT14 1296 1375
-   TOTP_SLOT15 1376 1455 TOTP_SLOT16 1456 1535
-
-
-   Slot size 64 byte
-
-   Contain the parameter data - 50 data byte Start Description SLOT_TYPE_OFFSET 0 1 byte slot type TOTP, HOTP SLOT_NAME_OFFSET 1 15 byte slot name
-   SECRET_OFFSET 16 20 byte secret key CONFIG_OFFSET 36 1 byte config byte TOKEN_ID_OFFSET 37 12 byte token ID INTERVAL_OFFSET 50 8 byte (Only HOPT)
-
+   OTP SLOT LAYOUT:
+   Name             Start   Length      Description
+   type             0       1           Slot type Description: 'T' when programmed TOTP, 'H' when programmed TOTP, 0xFF when empty
+   slot_number      1       1           Configured slot number
+   name             2       15          Slot name as String
+   secret           17      20          Slot secret
+   config           37      1           Configuration bits for auto-type functionality
+   token_id         38      13          OATH token Identifier
+   interval         51      2           TOTP interval (unused for HOTP slots)
 
    OTP counter storage slot
 
@@ -162,69 +142,11 @@
 
  */
 
-/*
-   u32 hotp_slots[NUMBER_OF_HOTP_SLOTS] = {SLOTS_ADDRESS + HOTP_SLOT1_OFFSET, SLOTS_ADDRESS + HOTP_SLOT2_OFFSET}; u32
-   hotp_slot_counters[NUMBER_OF_HOTP_SLOTS] = {SLOT1_COUNTER_ADDRESS, SLOT2_COUNTER_ADDRESS}; u32 hotp_slot_offsets[NUMBER_OF_HOTP_SLOTS] =
-   {HOTP_SLOT1_OFFSET, HOTP_SLOT2_OFFSET};
-
-   u32 totp_slots[NUMBER_OF_TOTP_SLOTS] = {SLOTS_ADDRESS + TOTP_SLOT1_OFFSET, SLOTS_ADDRESS + TOTP_SLOT2_OFFSET, SLOTS_ADDRESS + TOTP_SLOT3_OFFSET,
-   SLOTS_ADDRESS + TOTP_SLOT4_OFFSET}; u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS] = {TOTP_SLOT1_OFFSET, TOTP_SLOT2_OFFSET, TOTP_SLOT3_OFFSET,
-   TOTP_SLOT4_OFFSET}; */
-
-u32 hotp_slots[NUMBER_OF_HOTP_SLOTS] = {
-    SLOTS_ADDRESS + HOTP_SLOT1_OFFSET,
-    SLOTS_ADDRESS + HOTP_SLOT2_OFFSET,
-    SLOTS_ADDRESS + HOTP_SLOT3_OFFSET
-};
-
 u32 hotp_slot_counters[NUMBER_OF_HOTP_SLOTS] = {
     SLOT1_COUNTER_ADDRESS,
     SLOT2_COUNTER_ADDRESS,
-    SLOT3_COUNTER_ADDRESS
-};
-
-u32 hotp_slot_offsets[NUMBER_OF_HOTP_SLOTS] = {
-    HOTP_SLOT1_OFFSET,
-    HOTP_SLOT2_OFFSET,
-    HOTP_SLOT3_OFFSET,
-};
-
-u32 totp_slots[NUMBER_OF_TOTP_SLOTS + 1] = {
-    SLOTS_ADDRESS + TOTP_SLOT1_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT2_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT3_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT4_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT5_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT6_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT7_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT8_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT9_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT10_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT11_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT12_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT13_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT14_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT15_OFFSET,
-    SLOTS_ADDRESS + TOTP_SLOT16_OFFSET
-};
-
-u32 totp_slot_offsets[NUMBER_OF_TOTP_SLOTS + 1] = {
-    TOTP_SLOT1_OFFSET,
-    TOTP_SLOT2_OFFSET,
-    TOTP_SLOT3_OFFSET,
-    TOTP_SLOT4_OFFSET,
-    TOTP_SLOT5_OFFSET,
-    TOTP_SLOT6_OFFSET,
-    TOTP_SLOT7_OFFSET,
-    TOTP_SLOT8_OFFSET,
-    TOTP_SLOT9_OFFSET,
-    TOTP_SLOT10_OFFSET,
-    TOTP_SLOT11_OFFSET,
-    TOTP_SLOT12_OFFSET,
-    TOTP_SLOT13_OFFSET,
-    TOTP_SLOT14_OFFSET,
-    TOTP_SLOT15_OFFSET,
-    TOTP_SLOT16_OFFSET
+    SLOT3_COUNTER_ADDRESS,
+    SLOT4_COUNTER_ADDRESS,
 };
 
 u8 page_buffer[FLASH_PAGE_SIZE * 3];
@@ -349,16 +271,11 @@ s8 i = 0;
 
 *******************************************************************************/
 
-u64 endian_swap (u64 x)
+u64 endian_swap (u64 val)
 {
-#if defined LITTLE_ENDIAN
-    x = (x >> 56) |
-        ((x << 40) & 0x00FF000000000000LL) |
-        ((x << 24) & 0x0000FF0000000000LL) |
-        ((x << 8) & 0x000000FF00000000LL) |
-        ((x >> 8) & 0x00000000FF000000LL) | ((x >> 24) & 0x0000000000FF0000LL) | ((x >> 40) & 0x000000000000FF00LL) | (x << 56);
-#endif
-    return x;
+    val =       ((val << 8) & 0xFF00FF00FF00FF00ULL ) | ((val >> 8) & 0x00FF00FF00FF00FFULL );
+    val =       ((val << 16) & 0xFFFF0000FFFF0000ULL ) | ((val >> 16) & 0x0000FFFF0000FFFFULL );
+    return (val << 32) | (val >> 32);
 }
 
 
@@ -467,7 +384,7 @@ void write_data_to_flash (u8 * data, u16 len, u32 addr)
 u32 get_hotp_value (u64 counter, u8 * secret, u8 secret_length, u8 len)
 {
 u8 hmac_result[20];
-u64 c = endian_swap (counter);
+u64 c = counter;
 
     LED_GreenOn ();
 
@@ -914,6 +831,56 @@ u8 text[20];
     return err; // no error
 }
 
+/*******************************************************************************
+
+  validate_code_from_hotp_slot
+
+  Changes
+  Date      Reviewer        Info
+  02.02.19  ET              Integration from NK Pro
+
+*******************************************************************************/
+
+s8 validate_code_from_hotp_slot(u8 slot_number, u32 code_to_verify) {
+    const s32 RET_GENERAL_ERROR = -1;
+    const s32 RET_CODE_NOT_VALID = -2;
+
+    u8 generated_hotp_code_length = 6;
+    FLASH_Status err;
+    u32 calculated_code;
+
+    if (slot_number >= NUMBER_OF_HOTP_SLOTS)
+        return RET_GENERAL_ERROR;
+
+    OTP_slot * hotp_slot = ((OTP_slot *) get_hotp_slot_addr(slot_number));
+    if (hotp_slot->type != 'H') // unprogrammed slot_number
+        return RET_GENERAL_ERROR;
+
+    if ((hotp_slot->config & (1 << SLOT_CONFIG_DIGITS)) == 1)
+        generated_hotp_code_length = 8;
+
+    const u64 counter = get_counter_value (hotp_slot_counters[slot_number]);
+
+    u8 counter_offset = 0;
+    const u8 calculate_ahead_values = 10;
+    for (counter_offset = 0; counter_offset < calculate_ahead_values; counter_offset++){
+        calculated_code = get_hotp_value (counter+counter_offset, hotp_slot->secret, SECRET_LENGTH_DEFINE, generated_hotp_code_length);
+        if (calculated_code == code_to_verify) break;
+    }
+
+    const u8 code_found = counter_offset < calculate_ahead_values;
+    if(TRUE == code_found){
+        //increment the counter for the lacking values, plus one to be ready for next validation
+        u8 i;
+        for (i = 0; i < counter_offset + 1; i++){
+            err = (FLASH_Status) increment_counter_page (hotp_slot_counters[slot_number]);
+            if (err != FLASH_COMPLETE) return RET_GENERAL_ERROR;
+        }
+        return counter_offset;
+    }
+
+    return RET_CODE_NOT_VALID;
+}
 
 /*******************************************************************************
 
@@ -929,30 +896,27 @@ u8 text[20];
 
 *******************************************************************************/
 
-u32 get_code_from_hotp_slot (u8 slot)
+u32 get_code_from_hotp_slot (u8 slot_no)
 {
 u32 result;
 u8 len = 6;
 u64 counter;
 FLASH_Status err;
-u8 config = 0;
 
-    if (slot >= NUMBER_OF_HOTP_SLOTS)
+    if (slot_no >= NUMBER_OF_HOTP_SLOTS)
         return 0;
 
-    config = get_hotp_slot_config (slot);
+    OTP_slot *slot = (OTP_slot *) get_hotp_slot_addr(slot_no);
 
-    if (config & (1 << SLOT_CONFIG_DIGITS))
+    if ((slot->config & (1 << SLOT_CONFIG_DIGITS)) == 1)
         len = 8;
 
-    result = *((u8 *) hotp_slots[slot]);
-
-    if (result == 0xFF) // unprogrammed slot
+    if (slot->type != 'H') // unprogrammed or TOTP slot
         return 0;
 
     LED_GreenOn ();
 
-    counter = get_counter_value (hotp_slot_counters[slot]);
+    counter = get_counter_value (hotp_slot_counters[slot_no]);
     /*
        For a counter test without flash { static u32 co = 0; counter = co; co++; } */
 #ifdef DEBUG_HOTP
@@ -973,10 +937,10 @@ u32 c;
     }
 #endif
 
-    result = get_hotp_value (counter, (u8 *) (hotp_slots[slot] + SECRET_OFFSET), 20, len);
+    result = get_hotp_value (counter, slot->secret, SECRET_LENGTH_DEFINE, len);
 
 
-    err = increment_counter_page (hotp_slot_counters[slot]);
+    err = increment_counter_page (hotp_slot_counters[slot_no]);
 
 #ifdef DEBUG_HOTP
     {
@@ -1081,32 +1045,27 @@ void erase_counter (u8 slot)
 
 *******************************************************************************/
 
-void write_to_slot (u8 * data, u16 offset, u16 len)
+void write_to_slot (u8 * data, u8 * addr)
 {
-u16 dummy_u16;
-u8* secret;
-u8  i;
-u8  Found;
+    u16 dummy_u16;
+    u8  i;
+    u8  Found;
+    const u16 offset = (u16) addr - SLOTS_ADDRESS;
 
     LED_GreenOn ();
 
+    // copy all slot data from Flash to RAM
+    memcpy (page_buffer, (u8*) SLOTS_ADDRESS, FLASH_PAGE_SIZE * 3);
 
-    // copy entire page to ram
-u8* page = (u8 *) SLOTS_ADDRESS;
-    memcpy (page_buffer, page, FLASH_PAGE_SIZE * 3);
-
-    // make changes to page
-    memcpy (page_buffer + offset, data, len);
-
-    // check if the secret from the tool is empty and if it is use the old secret
-    secret = (u8 *) (data + SECRET_OFFSET);
+    OTP_slot *input_slot    = (OTP_slot *) data;
+    OTP_slot *buffer_slot   = (OTP_slot *) (page_buffer + offset);
 
     // Check if the secret from the tool is empty and if it is use the old secret
     // Secret could begin with 0x00, so checking the whole secret before keeping the old one in mandatory
     Found = FALSE;
-    for (i=0;i<20;i++)
+    for (i = 0; i < SECRET_LENGTH_DEFINE; i++)
     {
-      if (0 != secret[i])
+      if (0 != input_slot->secret[i])
       {
         Found = TRUE;
         break;
@@ -1115,14 +1074,56 @@ u8* page = (u8 *) SLOTS_ADDRESS;
 
     if (FALSE == Found)
     {
-        memcpy (data + SECRET_OFFSET, page_buffer + offset + SECRET_OFFSET, 20);
+        // Input secret is empty. Keep the secret that is currently in the buffer.
+        memcpy (input_slot->secret, buffer_slot->secret, SECRET_LENGTH_DEFINE);
     }
+
+    // write changes in input slot to RAM buffer
+    memcpy (buffer_slot, input_slot, sizeof(OTP_slot));
 
     // write page to backup location
     backup_data (page_buffer, FLASH_PAGE_SIZE * 3, SLOTS_ADDRESS);
 
     // Clear flash mem
     // flashc_memset8 ((void*)SLOTS_ADDRESS,0xFF,FLASH_PAGE_SIZE*3,TRUE);
+
+    // write page to regular location
+    write_data_to_flash (page_buffer, FLASH_PAGE_SIZE * 3, SLOTS_ADDRESS);
+
+    // Init backup block
+    dummy_u16 = 0x4F4B;
+    flashc_memcpy ((void *) (BACKUP_PAGE_ADDRESS + BACKUP_OK_OFFSET), (void *) &dummy_u16, 2, TRUE);
+
+    LED_GreenOff ();
+
+}
+
+/*******************************************************************************
+
+  write_to_config
+
+  Write a new configuration to config section
+
+  Changes
+  Date      Reviewer        Info
+  07.01.19  ET              Add function
+
+*******************************************************************************/
+
+void write_to_config (u8 * data, u8 len)
+{
+    u16 dummy_u16;
+
+    LED_GreenOn ();
+
+    // copy all slot data from Flash to RAM
+    memcpy (page_buffer, (u8*) SLOTS_ADDRESS, FLASH_PAGE_SIZE * 3);
+
+    // write changes in input slot to RAM buffer
+    memcpy (page_buffer + GLOBAL_CONFIG_OFFSET, data, len);
+
+    // write page to backup location
+    backup_data (page_buffer, FLASH_PAGE_SIZE * 3, SLOTS_ADDRESS);
 
     // write page to regular location
     write_data_to_flash (page_buffer, FLASH_PAGE_SIZE * 3, SLOTS_ADDRESS);
@@ -1185,61 +1186,6 @@ u16 length = getu16 ((u8 *) BACKUP_PAGE_ADDRESS + BACKUP_LENGTH_OFFSET);
 
 }
 
-
-/*******************************************************************************
-
-  get_hotp_slot_config
-
-  Changes
-  Date      Reviewer        Info
-  24.03.14  RB              Integration from Stick 1.4
-
-  Reviews
-  Date      Reviewer        Info
-  16.08.13  RB              First review
-
-*******************************************************************************/
-
-u8 get_hotp_slot_config (u8 slot_number)
-{
-u8 result = 0;
-    if (slot_number >= NUMBER_OF_HOTP_SLOTS)
-        return 0;
-    else
-    {
-        result = ((u8 *) hotp_slots[slot_number])[CONFIG_OFFSET];
-    }
-
-    return result;
-}
-
-/*******************************************************************************
-
-  get_totp_slot_config
-
-  Changes
-  Date      Reviewer        Info
-  24.03.14  RB              Integration from Stick 1.4
-
-  Reviews
-  Date      Reviewer        Info
-
-*******************************************************************************/
-
-u8 get_totp_slot_config (u8 slot_number)
-{
-u8 result = 0;
-    if (slot_number >= NUMBER_OF_TOTP_SLOTS)
-        return 0;
-    else
-    {
-        result = ((u8 *) totp_slots[slot_number])[CONFIG_OFFSET];
-    }
-
-    return result;
-}
-
-
 /*******************************************************************************
 
   get_code_from_totp_slot
@@ -1254,12 +1200,10 @@ u8 result = 0;
 
 *******************************************************************************/
 
-u32 get_code_from_totp_slot (u8 slot, u64 challenge)
+u32 get_code_from_totp_slot (u8 slot_no, u64 challenge)
 {
 u64 time_min;
-u16 interval;
 u32 result;
-u8 config = 0;
 u8 len = 6;
 time_t now;
 
@@ -1267,25 +1211,20 @@ time_t now;
     time (&now);
     current_time = now;
 
-    if (slot >= NUMBER_OF_TOTP_SLOTS)
+    if (slot_no >= NUMBER_OF_TOTP_SLOTS)
         return 0;
 
-    interval = getu16 (totp_slots[slot] + INTERVAL_OFFSET);
+    OTP_slot *slot = (OTP_slot *) get_totp_slot_addr(slot_no);
 
-    time_min = current_time / interval;
+    time_min = current_time / slot->interval_or_counter;
 
-    result = *((u8 *) totp_slots[slot]);
-    if (result == 0xFF) // unprogrammed slot
+    if (slot->type != 'T') // unprogrammed slot
         return 0;
 
-
-    config = get_totp_slot_config (slot);
-
-    if (config & (1 << SLOT_CONFIG_DIGITS))
+    if ((slot->config & (1 << SLOT_CONFIG_DIGITS)) == 1)
         len = 8;
 
-    // result= get_hotp_value(challenge,(u8 *)(totp_slots[slot]+SECRET_OFFSET),20,len);
-    result = get_hotp_value (time_min, (u8 *) (totp_slots[slot] + SECRET_OFFSET), 20, len);
+    result = get_hotp_value (time_min, slot->secret, SECRET_LENGTH_DEFINE, len);
 
     return result;
 
@@ -1308,18 +1247,7 @@ time_t now;
 
 u8* get_hotp_slot_addr (u8 slot_number)
 {
-u8* result = NULL;
-
-    if (slot_number >= NUMBER_OF_HOTP_SLOTS)
-    {
-        return NULL;
-    }
-    else
-    {
-        result = (u8 *) hotp_slots[slot_number];
-    }
-
-    return result;
+    return (u8*)(SLOTS_ADDRESS + get_slot_offset(slot_number));
 }
 
 /*******************************************************************************
@@ -1338,16 +1266,17 @@ u8* result = NULL;
 
 u8* get_totp_slot_addr (u8 slot_number)
 {
-u8* result = NULL;
+    return (u8*)(SLOTS_ADDRESS + get_slot_offset(NUMBER_OF_HOTP_SLOTS + slot_number));
+}
 
-    if (slot_number >= NUMBER_OF_TOTP_SLOTS)
-    {
-        return NULL;
-    }
-    else
-    {
-        result = (u8 *) totp_slots[slot_number];
-    }
 
-    return result;
+u32 get_slot_offset(u8 slot_number)
+{
+    const u32 global_config_offset = 64;
+    u32 slot_offset = sizeof(OTP_slot) * slot_number + global_config_offset;
+
+    //FIXME: There is no way of communicating a failure/invalid slot number now
+    if(slot_offset > (2 * FLASH_PAGE_SIZE + SLOT_PAGE_SIZE - sizeof(OTP_slot))) slot_offset = global_config_offset;
+
+    return slot_offset;
 }

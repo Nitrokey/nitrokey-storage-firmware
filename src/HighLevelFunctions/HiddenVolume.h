@@ -34,7 +34,7 @@
 
 
 
-#define HV_FLASH_START_PAGE     498
+#define HV_FLASH_START_PAGE     497
 #define HV_MAGIC_NUMBER_SIZE    4
 #define HV_SALT_SIZE            32
 #define HV_MAGIC_NUMBER_ADDRESS (FLASH_START             + HV_FLASH_START_PAGE * FLASH_PAGE_SIZE)   // 0x8003e400
