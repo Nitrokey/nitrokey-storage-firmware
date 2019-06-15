@@ -791,7 +791,7 @@ u8 text[10];
 
             case CMD_AUTHORIZE:
                 CI_StringOut ("Get CMD_AUTHORIZE\r\n");
-                output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_UNKNOWN_COMMAND;
+                output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
                 break;
 
             case CMD_UNLOCK_USER_PASSWORD:
@@ -806,7 +806,7 @@ u8 text[10];
 
             case CMD_USER_AUTHORIZE:
                 CI_StringOut ("Get CMD_USER_AUTHORIZE\r\n");
-                output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_UNKNOWN_COMMAND;
+                output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
                 break;
 
             case CMD_GET_PASSWORD_RETRY_COUNT:
@@ -930,7 +930,7 @@ u8 text[10];
         if (not_authorized)
         {
             CI_StringOut ("*** NOT AUTHORIZED ***\r\n");
-            output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
+            output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
         }
     }
     else
