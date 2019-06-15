@@ -307,6 +307,7 @@ typedef struct {
  */
 
 #define CMD_RS_SLOT_NUMBER_OFFSET     1
+#define CMD_RS_VERSION_OFFSET     2
 #define CMD_RS_OUTPUT_COUNTER_OFFSET 34
 
 /*

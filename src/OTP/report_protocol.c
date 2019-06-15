@@ -1574,7 +1574,9 @@ u8 slot_no = report[1];
 u8 cmd_read_slot (u8 * report, u8 * output)
 {
 u8 slot_no = report[CMD_RS_SLOT_NUMBER_OFFSET];
+u8 format_version = report[CMD_RS_VERSION_OFFSET];
 u64 counter;
+char buf[20] = {};
 
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
@@ -1587,9 +1589,16 @@ u64 counter;
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, slot->token_id, 13);
             output[OUTPUT_CMD_RESULT_OFFSET +15] = slot->config;
 
-            counter = get_counter_value (hotp_slot_counters[slot_no]);
-            counter = endian_swap(counter);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, &counter, sizeof(u64));
+            counter = get_counter_value(hotp_slot_counters[slot_no]);
+            if (format_version == 1) {
+              counter = endian_swap(counter);
+              memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, &counter, sizeof(u64));
+            } else {
+              itoa(counter, buf);
+              buf[7] = 0;
+              memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, buf, 8);
+            }
+
 
             {
                 u8 text[20];
