@@ -605,6 +605,7 @@ u32 received_crc32;
 u32 calculated_crc32;
 u8 i;
 u8 not_authorized = 0;
+static u8 silence_auth_errors = 0;
 
 static u8 oldStatus;
 static u8 initOldStatus = FALSE;
@@ -792,6 +793,7 @@ u8 text[10];
             case CMD_AUTHORIZE:
                 CI_StringOut ("Get CMD_AUTHORIZE\r\n");
                 output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+                silence_auth_errors = 1;
                 break;
 
             case CMD_UNLOCK_USER_PASSWORD:
@@ -807,6 +809,7 @@ u8 text[10];
             case CMD_USER_AUTHORIZE:
                 CI_StringOut ("Get CMD_USER_AUTHORIZE\r\n");
                 output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+                silence_auth_errors = 1;
                 break;
 
             case CMD_GET_PASSWORD_RETRY_COUNT:
@@ -930,7 +933,10 @@ u8 text[10];
         if (not_authorized)
         {
             CI_StringOut ("*** NOT AUTHORIZED ***\r\n");
-            output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+            if (silence_auth_errors == 1)
+              output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+            else
+              output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
         }
     }
     else
