@@ -1209,14 +1209,14 @@ time_t now;
 
     // Get the local ATMEL time
     time (&now);
-    current_time = now;
 
     if (slot_no >= NUMBER_OF_TOTP_SLOTS)
         return 0;
 
     OTP_slot *slot = (OTP_slot *) get_totp_slot_addr(slot_no);
 
-    time_min = current_time / slot->interval_or_counter;
+    // Add last time stamp from app and elapsed seconds since last set_time operation
+    time_min = (current_time + now) / slot->interval_or_counter;
 
     if (slot->type != 'T') // unprogrammed slot
         return 0;
