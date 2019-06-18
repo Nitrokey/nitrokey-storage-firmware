@@ -605,6 +605,7 @@ u32 received_crc32;
 u32 calculated_crc32;
 u8 i;
 u8 not_authorized = 0;
+static u8 silence_auth_errors = 0;
 
 static u8 oldStatus;
 static u8 initOldStatus = FALSE;
@@ -791,7 +792,8 @@ u8 text[10];
 
             case CMD_AUTHORIZE:
                 CI_StringOut ("Get CMD_AUTHORIZE\r\n");
-                output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_UNKNOWN_COMMAND;
+                output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+                silence_auth_errors = 1;
                 break;
 
             case CMD_UNLOCK_USER_PASSWORD:
@@ -806,7 +808,8 @@ u8 text[10];
 
             case CMD_USER_AUTHORIZE:
                 CI_StringOut ("Get CMD_USER_AUTHORIZE\r\n");
-                output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_UNKNOWN_COMMAND;
+                output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+                silence_auth_errors = 1;
                 break;
 
             case CMD_GET_PASSWORD_RETRY_COUNT:
@@ -930,7 +933,10 @@ u8 text[10];
         if (not_authorized)
         {
             CI_StringOut ("*** NOT AUTHORIZED ***\r\n");
-            output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
+            if (silence_auth_errors == 1)
+              output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+            else
+              output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NOT_AUTHORIZED;
         }
     }
     else
@@ -1568,7 +1574,9 @@ u8 slot_no = report[1];
 u8 cmd_read_slot (u8 * report, u8 * output)
 {
 u8 slot_no = report[CMD_RS_SLOT_NUMBER_OFFSET];
+u8 format_version = report[CMD_RS_VERSION_OFFSET];
 u64 counter;
+char buf[20] = {};
 
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
@@ -1581,9 +1589,16 @@ u64 counter;
             memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 16, slot->token_id, 13);
             output[OUTPUT_CMD_RESULT_OFFSET +15] = slot->config;
 
-            counter = get_counter_value (hotp_slot_counters[slot_no]);
-            counter = endian_swap(counter);
-            memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, &counter, sizeof(u64));
+            counter = get_counter_value(hotp_slot_counters[slot_no]);
+            if (format_version == 1) {
+              counter = endian_swap(counter);
+              memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, &counter, sizeof(u64));
+            } else {
+              itoa(counter, buf);
+              buf[7] = 0;
+              memcpy (output + OUTPUT_CMD_RESULT_OFFSET + 29, buf, 8);
+            }
+
 
             {
                 u8 text[20];
