@@ -2176,9 +2176,12 @@ u32 new_time_minutes = (new_time - 1388534400) / 60;    // 1388534400 = 01.01.20
            CI_StringOut ("Local time set to = "); itoa (new_time,text); CI_StringOut ((char*)text);
 
            CI_StringOut (" = "); ctime_r ((time_t*)&new_time,(char*)text); CI_StringOut ((char*)text); CI_StringOut ("\r\n"); } */
-        set_time (new_time);
-
+        
+        // Reset runtime counter and store the time offset that was received from the app
+        set_time (0);
         current_time = new_time;
+
+        // Write new timestamp to Flash
         err = set_time_value (new_time_minutes);
         if (err)
         {
