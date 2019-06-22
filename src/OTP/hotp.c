@@ -1276,7 +1276,7 @@ u32 get_slot_offset(u8 slot_number)
     u32 slot_offset = sizeof(OTP_slot) * slot_number + global_config_offset;
 
     //FIXME: There is no way of communicating a failure/invalid slot number now
-    if(slot_offset > (2 * FLASH_PAGE_SIZE + SLOT_PAGE_SIZE - sizeof(OTP_slot))) slot_offset = global_config_offset;
+    if(slot_offset > (3 * FLASH_PAGE_SIZE + SLOT_PAGE_SIZE - sizeof(OTP_slot))) slot_offset = global_config_offset;
 
     return slot_offset;
 }
