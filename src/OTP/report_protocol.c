@@ -1480,6 +1480,11 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
     else if (is_TOTP_slot_number(slot_no))  // TOTP slot
     {
         slot_no = slot_no & 0x0F;
+        //workaround for issue: https://github.com/Nitrokey/nitrokey-storage-firmware/issues/91
+        if (slot_no == NUMBER_OF_TOTP_SLOTS-1){
+          output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_OK;
+          return 0;
+        }
         new_slot_data->slot_number = slot_no;
         new_slot_data->type = 'T';
 
