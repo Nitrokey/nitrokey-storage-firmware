@@ -1272,11 +1272,15 @@ u8* get_totp_slot_addr (u8 slot_number)
 
 u32 get_slot_offset(u8 slot_number)
 {
-    const u32 global_config_offset = 64;
-    u32 slot_offset = sizeof(OTP_slot) * slot_number + global_config_offset;
+    const u32 GLOBAL_CONFIG_SIZE = 16;
+    u32 slot_offset = sizeof(OTP_slot) * slot_number + GLOBAL_CONFIG_SIZE;
 
     //FIXME: There is no way of communicating a failure/invalid slot number now
-    if(slot_offset > (2 * FLASH_PAGE_SIZE + SLOT_PAGE_SIZE - sizeof(OTP_slot))) slot_offset = global_config_offset;
+    // Check if slot fits in 3 pages (minus 12 bytes at the end for backup)
+    if(slot_offset > (2 * FLASH_PAGE_SIZE + SLOT_PAGE_SIZE - sizeof(OTP_slot)))
+    {
+            slot_offset = GLOBAL_CONFIG_SIZE;
+    }
 
     return slot_offset;
 }
