@@ -50,25 +50,6 @@ typedef enum
     FLASH_TIMEOUT
 } FLASH_Status;
 
-#define NUMBER_OF_HOTP_SLOTS 4
-#define NUMBER_OF_TOTP_SLOTS 15
-
-#define SLOT_CONFIG_DIGITS 0
-#define SLOT_CONFIG_ENTER 1
-#define SLOT_CONFIG_TOKENID 2
-#define SLOT_CONFIG_PASSWORD_USED   3
-#define SLOT_CONFIG_PASSWORD_TIMED  4
-
-#define GLOBAL_CONFIG_OFFSET  0
-/*
-   global config slot:
-
-   1b slot number bound to numlock 
-   1b slot number bound to caps lock 
-   1b slot number bound to scroll lock
-
- */
-
 #define FLASH_PAGE_SIZE 512 // AVR
 
 #define SLOT_PAGE_SIZE  500 // less than actual page, so we can copy it to backup page with additional info
@@ -81,13 +62,13 @@ Page 509        : 0x800_3FA00 : TOTP time, stores the Unix timestamp from the la
 */
 #define FLASH_START            0x80000000
 #define OTP_FLASH_START_PAGE   499
-#define SLOTS_ADDRESS         (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*0))   // 0x8003e800
-#define SLOT1_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*3))   // 0x8003
-#define SLOT2_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*4))   // 0x8003
-#define SLOT3_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*5))   // 0x8003
-#define SLOT4_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*6))   // 0x8003
-#define BACKUP_PAGE_ADDRESS   (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*7))   // (3 Pages) 0x8003
-#define TIME_ADDRESS          (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*10))   //
+#define SLOTS_ADDRESS         (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*0))
+#define SLOT1_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*3))
+#define SLOT2_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*4))
+#define SLOT3_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*5))
+#define SLOT4_COUNTER_ADDRESS (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*6))
+#define BACKUP_PAGE_ADDRESS   (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*7))
+#define TIME_ADDRESS          (FLASH_START + OTP_FLASH_START_PAGE * FLASH_PAGE_SIZE + (FLASH_PAGE_SIZE*10))
 
 /* Backup page layout:
 0x800_3F400 - 0x800_3F7F4 : 1524 Bytes : Backup Memory
@@ -100,6 +81,27 @@ Page 509        : 0x800_3FA00 : TOTP time, stores the Unix timestamp from the la
 #define BACKUP_LENGTH_OFFSET  (BACKUP_SIZE -  8)  // 504 - no flash block addr
 #define BACKUP_OK_OFFSET      (BACKUP_SIZE -  6)  // 506 - no flash block addr
 
+/* OTP Flash Page Defines:  */
+#define NUMBER_OF_HOTP_SLOTS 4
+#define NUMBER_OF_TOTP_SLOTS 15
+
+/* OTP Global Configuration: 16 Bytes at beginning of Slot pages: */
+#define GLOBAL_CONFIG_OFFSET  0
+/*
+   global config slot:
+
+   1b slot number bound to numlock
+   1b slot number bound to caps lock
+   1b slot number bound to scroll lock
+
+ */
+
+/* OTP Slot Configuration Bit Offsets: */
+#define SLOT_CONFIG_DIGITS 0
+#define SLOT_CONFIG_ENTER 1
+#define SLOT_CONFIG_TOKENID 2
+#define SLOT_CONFIG_PASSWORD_USED   3
+#define SLOT_CONFIG_PASSWORD_TIMED  4
 
 #define SECRET_LENGTH_DEFINE  40
 
