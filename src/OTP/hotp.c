@@ -1114,6 +1114,11 @@ void write_to_config (u8 * data, u8 len)
 {
     u16 dummy_u16;
 
+    if(len > GLOBAL_CONFIG_SIZE)
+    {
+        len = GLOBAL_CONFIG_SIZE;
+    }
+
     LED_GreenOn ();
 
     // copy all slot data from Flash to RAM
@@ -1272,7 +1277,6 @@ u8* get_totp_slot_addr (u8 slot_number)
 
 u32 get_slot_offset(u8 slot_number)
 {
-    const u32 GLOBAL_CONFIG_SIZE = 16;
     u32 slot_offset = sizeof(OTP_slot) * slot_number + GLOBAL_CONFIG_SIZE;
 
     //FIXME: There is no way of communicating a failure/invalid slot number now

@@ -86,7 +86,8 @@ Page 509        : 0x800_3FA00 : TOTP time, stores the Unix timestamp from the la
 #define NUMBER_OF_TOTP_SLOTS 15
 
 /* OTP Global Configuration: 16 Bytes at beginning of Slot pages: */
-#define GLOBAL_CONFIG_OFFSET  0
+#define GLOBAL_CONFIG_OFFSET    0
+#define GLOBAL_CONFIG_SIZE      16
 /*
    global config slot:
 
