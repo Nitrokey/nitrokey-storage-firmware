@@ -59,10 +59,13 @@ typedef enum
 #define SLOT_CONFIG_PASSWORD_USED   3
 #define SLOT_CONFIG_PASSWORD_TIMED  4
 
+#define GLOBAL_CONFIG_OFFSET  0
 /*
    global config slot:
 
-   1b slot sent after numlock 1b slot sent after caps lock 1b slot sent after scroll lock
+   1b slot number bound to numlock 
+   1b slot number bound to caps lock 
+   1b slot number bound to scroll lock
 
  */
 
@@ -71,8 +74,8 @@ typedef enum
 #define SLOT_PAGE_SIZE  500 // less than actual page, so we can copy it to backup page with additional info
 
 /* OTP BLOCK LAYOUT:
-Page 500 - 502  : 0x800_3E800 : OTP Slots data, contains the handling structs for each OTP slot
-Page 503 - 505  : 0x800_3EE00 : HOTP Slot counters, contains one offset counter per page for each of the HOTP slots
+Page 499 - 501  : 0x800_3E600 : OTP Slots data, contains the handling structs for each OTP slot
+Page 502 - 505  : 0x800_3EC00 : HOTP Slot counters, contains one offset counter per page for each of the HOTP slots
 Page 506 - 508  : 0x800_3F400 : Backup pages, used for temporary backup of data to flash memory
 Page 509        : 0x800_3FA00 : TOTP time, stores the Unix timestamp from the last set_time operation
 */
@@ -97,7 +100,7 @@ Page 509        : 0x800_3FA00 : TOTP time, stores the Unix timestamp from the la
 #define BACKUP_LENGTH_OFFSET  (BACKUP_SIZE -  8)  // 504 - no flash block addr
 #define BACKUP_OK_OFFSET      (BACKUP_SIZE -  6)  // 506 - no flash block addr
 
-#define GLOBAL_CONFIG_OFFSET  0
+
 #define SECRET_LENGTH_DEFINE  40
 
 #define __packed __attribute__((__packed__))
