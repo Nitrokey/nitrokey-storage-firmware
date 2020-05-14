@@ -479,7 +479,7 @@ void HID_ExcuteCmd (void)
             StickKeysNotInitiated_u8   = StickConfiguration_st.StickKeysNotInitiated_u8;
 
             CI_TickLocalPrintf ("Generate new keys Old State KNI %d, SDF %d\r\n",StickKeysNotInitiated_u8,SdCardFilledWithRandoms_u8);
-            if (TRUE == BuildStorageKeys_u32 ((u8 *) & HID_String_au8[1]))
+            if (TRUE == BuildStorageKeys_u32 ((u8 *) & HID_String_au8[1])) // Clear all user data, including OTP
             {
                 SetSdEncryptedCardEnableState (FALSE);
                 SetSdEncryptedHiddenState (FALSE);

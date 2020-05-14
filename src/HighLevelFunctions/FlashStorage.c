@@ -1156,6 +1156,8 @@ u32 EraseLocalFlashKeyValues_u32 (void)
     flashc_erase_page (PWS_FLASH_START_PAGE, TRUE);
 
     // Clear OTP
+    // TODO review: investigate and document, why this is done 5 times
+    // TODO review: check offsets
     for (i1 = 0; i1 < 5; i1++)
     {
         for (i = 0; i < 256; i++)
@@ -1169,18 +1171,21 @@ u32 EraseLocalFlashKeyValues_u32 (void)
         }
     }
 
+    // TODO review: specify exactly pages count / pages end through constant
     for (i = 0; i < 10; i++)
     {
         flashc_erase_page (OTP_FLASH_START_PAGE + i, TRUE);
     }
 
     // Clear hidden volumes
+    // TODO review: check offsets / refactor
     for (i1 = 0; i1 < 5; i1++)
     {
         for (i = 0; i < 256; i++)
         {
             EraseStoreData_au8[i] = (u8) (rand () % 256);
         }
+        // TODO review: is `2` pages count, or HV count?
         for (i = 0; i < 2; i++)
         {
             flashc_memcpy ((void *) (HV_MAGIC_NUMBER_ADDRESS + i * 512), EraseStoreData_au8, 256, TRUE);
