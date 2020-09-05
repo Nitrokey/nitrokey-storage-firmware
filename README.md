@@ -42,7 +42,12 @@ make firmware.hex
 ## Flashing the Firmware to Device
 
 - [Latest firmware releases](https://github.com/Nitrokey/nitrokey-storage-firmware/releases/latest)
-- [Firmware upgrade instructions](https://www.nitrokey.com/en/doc/firmware-update-storage)
+- [General documentation](https://docs.nitrokey.com/storage/)
+- Firmware upgrade instructions:
+    - [Windows](https://docs.nitrokey.com/storage/windows/firmware-update.html)
+    - [macOS](https://docs.nitrokey.com/storage/mac/firmware-update.html)
+    - [Linux](https://docs.nitrokey.com/storage/linux/firmware-update.html)
+    - [(previous documentation)](https://www.nitrokey.com/documentation/firmware-update-storage)
 
 ## Debugging
 **Note: To connect an external debugger as described here, you will need a development version of the Nitrokey Storage that makes the JTAG pins available (pictured below). This version is currently not for sale.**
