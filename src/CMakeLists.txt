@@ -5,8 +5,9 @@ set(AVR_UPLOADTOOL avrdude)
 set(AVR_PROGRAMMER avrispmkII)
 set(AVR_UPLOADTOOL_PORT usb)
 # AVR and fuses needs to be set
+#-mpart=uc3a3256s
 #set(AVR_MCU atmega8)
-set(AVR_MCU atmega328p)
+set(AVR_MCU ucr2)
 set(AVR_H_FUSE 0xd9)
 set(AVR_L_FUSE 0xc3)
 
@@ -164,6 +165,7 @@ include_directories(../src/SOFTWARE_FRAMEWORK/SERVICES/USB/CLASS/HID)
 #add_definitions(-DBOARD=UC3A3256S)
 add_definitions(-DBOARD=EVK1104)
 add_definitions(-DFREERTOS_USED)
+add_definitions(-mpart=uc3a3256s)
 
 set(SOURCE_FILES
         #    CCID/LOCAL_ACCESS/Debug_T1.c
