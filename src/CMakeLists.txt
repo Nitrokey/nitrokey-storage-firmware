@@ -11,8 +11,13 @@ set(NKFLAGS "-O0 -fdata-sections -g3 -Wall -c -fmessage-length=0 -mpart=uc3a3256
 set(NKCOMPILER avr32-gcc)
 set(NKLINKFLAGS "-nostartfiles -L../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS -L../src/SOFTWARE_FRAMEWORK/BOARDS -Wl,--gc-sections -Wl,-e,_trampoline -T../src/SOFTWARE_FRAMEWORK/UTILS/LINKER_SCRIPTS/AT32UC3A3/256/GCC/link_uc3a3256.lds -mpart=uc3a3256s -Wl,--gc-sections --rodata-writable -Wl,--direct-data -oUSB_MASS.elf -lnewlib_addons-at32ucr2-speed_opt")
 
+add_definitions(${NKDEFINES})
+#add_compile_definitions(${NKFLAGS})
+SET(CMAKE_C_COMPILER avr32-linux-gnu-gcc)
 
 include_directories(.)
+
+include_directories(/home/sz/work/software/as4e-ide/plugins/com.atmel.avr.toolchains.linux.x86_64_3.0.0.201009140852/os/linux/x86_64/avr32/include/)
 
 include_directories(./CCID/LOCAL_ACCESS/)
 include_directories(./CCID/UNIT_TEST/)
