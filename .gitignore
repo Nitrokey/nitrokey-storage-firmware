@@ -1,0 +1,11 @@
+*.o
+*.hex*
+*.elf
+.idea
+cmake-build-debug
+tmp
+*.swp
+*.bin
+*.log
+build*
+
