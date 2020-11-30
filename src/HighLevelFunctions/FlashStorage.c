@@ -232,6 +232,8 @@ u8 WriteStickConfigurationToUserPage (void)
 
 u8 ReadStickConfigurationFromUserPage (void)
 {
+    // TODO should be mutexed with InitStickConfigurationToUserPage_u8
+
 u8 UserPwRetryCount;
 u8 AdminPwRetryCount;
 u32 ActiveSmartCardID_u32;
@@ -276,6 +278,8 @@ u32 ActiveSmartCardID_u32;
 
 u8 InitStickConfigurationToUserPage_u8 (void)
 {
+    // TODO should be mutexed with ReadStickConfigurationFromUserPage
+
     StickConfiguration_st.MagicNumber_StickConfig_u16 = MAGIC_NUMBER_STICK20_CONFIG;
     StickConfiguration_st.ReadWriteFlagUncryptedVolume_u8 = READ_ONLY_ACTIVE;
     StickConfiguration_st.ReadWriteFlagCryptedVolume_u8 = READ_WRITE_ACTIVE;

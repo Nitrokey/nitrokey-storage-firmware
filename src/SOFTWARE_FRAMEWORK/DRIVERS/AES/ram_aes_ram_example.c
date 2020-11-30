@@ -684,6 +684,7 @@ void STICK20_mci_aes (unsigned char cMode, unsigned short int u16BufferSize, uns
     aes_set_key (&AVR32_AES, CipherKey);
 
 
+    // TODO move to ESSIV instead of using raw block no as IV
     // Set the initialization vector.
     for (i = 0; i < 4; i++)
     {

@@ -150,6 +150,7 @@ void device_mass_storage_task (void)
 
     for (i=0;i<2000;i++)
     {
+      // FIXME configuration reload not guarded from concurrent access, possible data race and distorted result in effect
       if (TRUE == ReadStickConfigurationFromUserPage ())
       {
          break;
@@ -189,6 +190,8 @@ void device_mass_storage_task (void)
             // || (ActualTime_u64 > MAX_TICKS_STARTUP_UNTIL_RESTART_MSD_INTERFACE) // Not check on startup
             )
         {
+            // TODO check: potential flaw in calculating of the time difference due to an overflow in watchdog mechanism
+            // watchdog seems to be disabled
             ErrorFound = FALSE;
             if (ActualTime_u64 - LastLunAccessInTick_u64[0] > TickDelayToRestart)
             {
