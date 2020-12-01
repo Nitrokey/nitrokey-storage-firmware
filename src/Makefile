@@ -175,8 +175,15 @@ RUNLINK2:=-lnewlib_addons-at32ucr2-speed_opt
 
 RUNASM:=$(CC) -x assembler-with-cpp -c -mpart=uc3a3256s -Wa,-g $(INC) -Wa,-g3
 
-all: USB_MASS.elf
-	ls -lh $<
+
+GIT=$(shell git describe)
+FIRMWARE=nitrokey-storage-$(GIT).hex
+
+all: firmware.hex $(FIRMWARE)
+	ls -lh $^
+
+$(FIRMWARE): firmware.hex
+	cp $< $@
 
 clean:
 	-rm $(OBJS) $(OBJSASM)
@@ -186,8 +193,15 @@ USB_MASS.elf: $(OBJS) $(OBJSASM)
 	ls -lh $@
 
 %.o: %.c
-	$(RUN) -o $@ $<
+	@echo "*** $< > $@"
+	@$(RUN) -o $@ $<
 
 %.o: %.x
-	$(RUNASM) -o $@ $<
+	@echo "*** $< > $@"
+	@$(RUNASM) -o $@ $<
 
+firmware.hex: USB_MASS.elf
+	ls -l $<
+	avr-objcopy -R .eeprom -O ihex $< $@
+	cp $@ storage-firmware-`git describe --long`.hex
+	ls -l $@ storage-firmware-`git describe --long`.hex
