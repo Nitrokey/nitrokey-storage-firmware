@@ -203,5 +203,3 @@ USB_MASS.elf: $(OBJS) $(OBJSASM)
 firmware.hex: USB_MASS.elf
 	ls -l $<
 	avr-objcopy -R .eeprom -O ihex $< $@
-	cp $@ storage-firmware-`git describe --long`.hex
-	ls -l $@ storage-firmware-`git describe --long`.hex
