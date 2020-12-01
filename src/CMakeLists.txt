@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 project(nitrokey_storage)
 
-set(CMAKE_C_STANDARD 90)
+set(CMAKE_C_STANDARD 99)
 
 MESSAGE(WARNING "This is only a stub. Not possible to build a firmware with it at the moment.")
 
@@ -13,7 +13,11 @@ set(NKLINKFLAGS "-nostartfiles -L../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADD
 
 add_definitions(${NKDEFINES})
 #add_compile_definitions(${NKFLAGS})
-SET(CMAKE_C_COMPILER avr32-linux-gnu-gcc)
+#foreach(DEFI ${NKFLAGS})
+#    MESSAGE(${DEFI})
+#    add_compile_definitions(${DEFI})
+#endforeach()
+SET(CMAKE_C_COMPILER /home/sz/work/software/as4e-ide/plugins/com.atmel.avr.toolchains.linux.x86_64_3.0.0.201009140852/os/linux/x86_64/bin/avr32-gcc)
 
 include_directories(.)
 
