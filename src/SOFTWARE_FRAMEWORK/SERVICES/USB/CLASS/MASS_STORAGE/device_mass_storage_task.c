@@ -133,6 +133,8 @@ extern int sd_mmc_mci_test_unit_only_local_access;
 #define MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE           (5000ULL *(unsigned long long)TIME_MEASURING_TICKS_IN_USEC * 1000ULL)   // 5 sec
 #define MAX_TICKS_STARTUP_UNTIL_RESTART_MSD_INTERFACE   (   0ULL *(unsigned long long)TIME_MEASURING_TICKS_IN_USEC * 1000ULL)   // no delay 0 sec
 
+unsigned char ReadConfigurationSuccesfull(void);
+
 #ifdef FREERTOS_USED
 void device_mass_storage_task (void* pvParameters)
 #else
