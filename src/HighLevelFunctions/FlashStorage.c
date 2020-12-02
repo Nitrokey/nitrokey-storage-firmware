@@ -1155,6 +1155,7 @@ u32 EraseLocalFlashKeyValues_u32 (void)
             EraseStoreData_au8[i] = (u8) (rand () % 256);
         }
         flashc_memcpy ((void *) AVR32_FLASHC_USER_PAGE, EraseStoreData_au8, 256, TRUE);
+        flashc_memcpy ((void *) AVR32_FLASHC_USER_PAGE + 256, EraseStoreData_au8, 256, TRUE);
     }
 
 //    flashc_erase_user_page (TRUE);
