@@ -133,6 +133,8 @@ extern int sd_mmc_mci_test_unit_only_local_access;
 #define MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE           (5000ULL *(unsigned long long)TIME_MEASURING_TICKS_IN_USEC * 1000ULL)   // 5 sec
 #define MAX_TICKS_STARTUP_UNTIL_RESTART_MSD_INTERFACE   (   0ULL *(unsigned long long)TIME_MEASURING_TICKS_IN_USEC * 1000ULL)   // no delay 0 sec
 
+unsigned char ReadConfigurationSuccesfull(void);
+
 #ifdef FREERTOS_USED
 void device_mass_storage_task (void* pvParameters)
 #else
@@ -151,7 +153,7 @@ void device_mass_storage_task (void)
     for (i=0;i<2000;i++)
     {
       // FIXME configuration reload not guarded from concurrent access, possible data race and distorted result in effect
-      if (TRUE == ReadStickConfigurationFromUserPage ())
+      if (TRUE == ReadConfigurationSuccesfull())
       {
          break;
       }
