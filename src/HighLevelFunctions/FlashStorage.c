@@ -100,6 +100,17 @@ typedef struct {
     u8 update_PIN_salt[10];
 } UserPage;
 
+typedef struct {
+    UserPage state;
+    u8 hash[4];
+} HashedUserPage;
+
+typedef struct {
+    HashedUserPage state;
+    HashedUserPage backup;
+} UserPageComplete;
+
+UserPageComplete * user_page_complete = (UserPageComplete * )AVR32_FLASHC_USER_PAGE;
 UserPage * user_page = (UserPage * )AVR32_FLASHC_USER_PAGE;
 
 #define TOKENPASTE(a, b) a ## b // "##" is the "Token Pasting Operator"
@@ -110,6 +121,7 @@ UserPage * user_page = (UserPage * )AVR32_FLASHC_USER_PAGE;
 
 static_assert(sizeof(UserPage) == 252, "size of conf struct invalid");
 static_assert(sizeof(UserPage) <= 512, "size of conf struct is too big");
+static_assert(sizeof(UserPageComplete) <= 512, "size of user page struct is too big");
 static_assert(sizeof(user_page->stick_configuration) >= sizeof(typeStick20Configuration_st), "size of conf struct is too big");
 
 
