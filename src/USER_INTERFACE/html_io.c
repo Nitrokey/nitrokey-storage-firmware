@@ -369,7 +369,8 @@ void HID_ExcuteCmd (void)
 //                   if (STICK20_FILL_SD_CARD_WITH_RANDOM_CHARS_ALL_VOL == HID_String_au8[0]) { SD_SecureEraseHoleCard (); } else {
 //                   SD_SecureEraseCryptedVolume (); }
 
-                SD_SecureEraseCryptedVolume ();
+				//FIXME TODO TEMPORARILY DISABLE SD CLEARING
+//              SD_SecureEraseCryptedVolume ();
 
                 SetSdCardFilledWithRandomsToFlash ();
 
