@@ -227,6 +227,15 @@ u8 WriteStickConfigurationToUserPage (void)
     return (TRUE);
 }
 
+
+u8 ReadConfigurationSuccesfull(void) {
+    if (MAGIC_NUMBER_STICK20_CONFIG != StickConfiguration_st.MagicNumber_StickConfig_u16)
+    {
+        return (FALSE);
+    }
+    return (TRUE);
+}
+
 /*******************************************************************************
 
   ReadStickConfigurationFromUserPage
@@ -269,11 +278,7 @@ u32 ActiveSmartCardID_u32;
     StickConfiguration_st.ActiveSmartCardID_u32 = ActiveSmartCardID_u32;
     taskEXIT_CRITICAL();
 
-    if (MAGIC_NUMBER_STICK20_CONFIG != StickConfiguration_st.MagicNumber_StickConfig_u16)
-    {
-        return (FALSE);
-    }
-    return (TRUE);
+    return ReadConfigurationSuccesfull();
 }
 
 /*******************************************************************************
