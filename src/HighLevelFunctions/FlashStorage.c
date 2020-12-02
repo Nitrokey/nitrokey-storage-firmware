@@ -49,6 +49,12 @@
 #include "CCID/USART/ISO7816_Prot_T1.h"
 #include "CCID/LOCAL_ACCESS/OpenPGP_V20.h"
 
+#ifdef FREERTOS_USED
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+#endif
+
 typeStick20Configuration_st StickConfiguration_st;
 
 
@@ -206,6 +212,7 @@ u8 ReadMatrixColumsAdminPWFromUserPage (u8 * data)
 
 u8 WriteStickConfigurationToUserPage (void)
 {
+    taskENTER_CRITICAL();
     // Set actual firmware version
     StickConfiguration_st.VersionInfo_au8[0] = VERSION_MAJOR;
     StickConfiguration_st.VersionInfo_au8[1] = VERSION_MINOR;
@@ -213,6 +220,8 @@ u8 WriteStickConfigurationToUserPage (void)
     StickConfiguration_st.VersionInfo_au8[3] = INTERNAL_VERSION_NR;   // Internal version nr
 
     flashc_memcpy (AVR32_FLASHC_USER_PAGE + 72, &StickConfiguration_st, 30, TRUE);
+    taskEXIT_CRITICAL();
+    
     return (TRUE);
 }
 
@@ -238,6 +247,7 @@ u8 UserPwRetryCount;
 u8 AdminPwRetryCount;
 u32 ActiveSmartCardID_u32;
 
+    taskENTER_CRITICAL ();
     // Save dynamic data
     UserPwRetryCount = StickConfiguration_st.UserPwRetryCount;
     AdminPwRetryCount = StickConfiguration_st.AdminPwRetryCount;
@@ -255,6 +265,7 @@ u32 ActiveSmartCardID_u32;
     StickConfiguration_st.UserPwRetryCount = UserPwRetryCount;
     StickConfiguration_st.AdminPwRetryCount = AdminPwRetryCount;
     StickConfiguration_st.ActiveSmartCardID_u32 = ActiveSmartCardID_u32;
+    taskEXIT_CRITICAL();
 
     if (MAGIC_NUMBER_STICK20_CONFIG != StickConfiguration_st.MagicNumber_StickConfig_u16)
     {
@@ -280,6 +291,8 @@ u8 InitStickConfigurationToUserPage_u8 (void)
 {
     // TODO should be mutexed with ReadStickConfigurationFromUserPage
 
+    taskENTER_CRITICAL ();
+
     StickConfiguration_st.MagicNumber_StickConfig_u16 = MAGIC_NUMBER_STICK20_CONFIG;
     StickConfiguration_st.ReadWriteFlagUncryptedVolume_u8 = READ_ONLY_ACTIVE;
     StickConfiguration_st.ReadWriteFlagCryptedVolume_u8 = READ_WRITE_ACTIVE;
@@ -298,8 +311,9 @@ u8 InitStickConfigurationToUserPage_u8 (void)
     StickConfiguration_st.StickKeysNotInitiated_u8 = TRUE;
 
     WriteStickConfigurationToUserPage ();
-
     InitUpdatePinHashInFlash ();
+
+    taskEXIT_CRITICAL();
 
     return (TRUE);
 }
