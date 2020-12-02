@@ -484,13 +484,18 @@ cid_t* cid;
 
 u8 read_configuration_or_init_u8(void){
     taskENTER_CRITICAL();
+    if (TRUE == ReadConfigurationSuccesfull()){
+        goto read_configuration_or_init_u8_exit;
+    }
+
     // If configuration not found then init it
     if (FALSE == ReadStickConfigurationFromUserPage ())
     {
         InitStickConfigurationToUserPage_u8 ();
     }
+
+    read_configuration_or_init_u8_exit:
     taskEXIT_CRITICAL();
-    
     return 0;
 }
 
