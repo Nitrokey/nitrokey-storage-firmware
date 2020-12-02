@@ -204,6 +204,9 @@ u8 Text[20];
 
     LockActive_u32 = FALSE;
 
+    // TODO set timeout instead of infinite loop
+    // TODO reorganize this loop to make clear what is the CRITICAL part
+    
     // Check lock
     portENTER_CRITICAL ();
     while (0 != USB_CCID_GetLockCounter ())
