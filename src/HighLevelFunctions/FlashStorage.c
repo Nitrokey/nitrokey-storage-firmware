@@ -69,8 +69,8 @@ typeStick20Configuration_st StickConfiguration_st;
    Userpage layout
 
    Byte 
-   0 - 31 AES Storage key 
-   32 - 51 Matrix columns for user password 
+   0 - 31 AES Storage key
+   32 - 51 Matrix columns for user password
    52 - 71 Matrix columns for admin password 
    72 - 101 Stick Configuration 
    102 - 133 Base for AES key hidden volume (32 byte) 
@@ -82,6 +82,33 @@ typeStick20Configuration_st StickConfiguration_st;
    210 - 241 Update PIN (32 byte) 
    242 - 251 Update PIN SALT (10 byte)
  */
+
+
+typedef struct {
+    u8 AES_key[32];
+    u8 matrix_user[20];
+    u8 matrix_admin[20];
+    u8 stick_configuration[30];
+    u8 hidden_volume_AES_key_base[32];
+    u8 sdcard_id[4];
+    u8 last_timestamp_real[4];
+    u8 sccard_id[4];
+    u8 xor_mask_for_SC_keys[32];
+    u8 password_safe_AES_key[32];
+    u8 update_PIN[32];
+    u8 update_PIN_salt[10];
+} UserPage;
+
+UserPage * user_page = (UserPage * )AVR32_FLASHC_USER_PAGE;
+
+#define TOKENPASTE(a, b) a ## b // "##" is the "Token Pasting Operator"
+#define TOKENPASTE2(a,b) TOKENPASTE(a, b) // expand then paste
+#define static_assert(x, msg) enum { TOKENPASTE2(ASSERT_line_,__LINE__) \
+    = 1 / (msg && (x)) }
+
+
+static_assert(sizeof(UserPage) == 252, "size of conf struct invalid");
+static_assert(sizeof(UserPage) <= 512, "size of conf struct is too big");
 
 /*******************************************************************************
 
