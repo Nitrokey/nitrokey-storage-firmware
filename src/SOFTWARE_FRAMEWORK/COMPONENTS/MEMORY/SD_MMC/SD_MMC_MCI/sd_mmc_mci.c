@@ -1733,7 +1733,36 @@ U32 BlockNr_u32;
         {
             b_last_state_full = TRUE;
             // Wait completion of first stage only.
-            while (!is_dma_mci_2_ram_complete ());
+            //while (!is_dma_mci_2_ram_complete ());			// FIXME got stuck here on after 1 hour of using data 
+			/** data for the failed case:
+			b_last_state_full	1	Bool@0x923e ([R7]-6)
+			buffer_id	1	U8@0x923f ([R7]-5)
+			BlockNr_u32	6086273	U32@0x9240 ([R7]-4)
+			slot	0	U8@0x9238 ([R7]-12)
+			nb_sector	127	U16@0x9234 ([R7]-16)
+			StartBlockNr_u32	6086272	U32@0x9230 ([R7]-20)
+			*/
+			u32 i;
+			for (i=0; ; i++){ // switch from infinite loop to timeout
+				if(is_dma_mci_2_ram_complete()){
+					break;
+				}
+				if (i<=0xFFFF)
+				{
+					continue;
+				}
+				if (i>0xFFFF)		// start hard delay after 0xFFFF iterations
+				{
+					Delay1Ms();
+					//taskYIELD();
+				}
+				if (i>0xFFFF+1000)	// bail after 1000 ms
+				{
+					// TODO cleanup? repeat operation?
+					// repeating would be { BlockNr_u32--; nb_sector++; continue; } 
+					return FALSE;
+				}
+			}
 
         }
 
