@@ -93,6 +93,8 @@ typeStick20Configuration_st StickConfiguration_st;
 
 *******************************************************************************/
 
+u8 read_configuration_or_init_u8(void);
+
 #define LOCAL_DEBUG
 
 #define AES_KEYSIZE_256_BIT     32  // 32 * 8 = 256
@@ -387,11 +389,7 @@ void SendStickStatusToHID (typeStick20Configuration_st * Status_st)
 {
 cid_t* cid;
 
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
 
     memcpy (Status_st, &StickConfiguration_st, sizeof (typeStick20Configuration_st));   // Not the retry counter and sc serial no
 
@@ -442,13 +440,18 @@ cid_t* cid;
 
 *******************************************************************************/
 
-u8 Read_ReadWriteStatusEncryptedVolume_u8 (void)
-{
+u8 read_configuration_or_init_u8(void){
     // If configuration not found then init it
     if (FALSE == ReadStickConfigurationFromUserPage ())
     {
         InitStickConfigurationToUserPage_u8 ();
     }
+    return 0;
+}
+
+u8 Read_ReadWriteStatusEncryptedVolume_u8 (void)
+{
+    read_configuration_or_init_u8();
     return (StickConfiguration_st.ReadWriteFlagCryptedVolume_u8);
 }
 
@@ -467,14 +470,8 @@ u8 Read_ReadWriteStatusEncryptedVolume_u8 (void)
 
 u8 Write_ReadWriteStatusEncryptedVolume_u8 (u8 NewStatus_u8)
 {
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
-
+    read_configuration_or_init_u8();
     StickConfiguration_st.ReadWriteFlagCryptedVolume_u8 = NewStatus_u8;
-
     WriteStickConfigurationToUserPage ();
 
     return (TRUE);
@@ -495,11 +492,7 @@ u8 Write_ReadWriteStatusEncryptedVolume_u8 (u8 NewStatus_u8)
 
 u8 Read_ReadWriteStatusUncryptedVolume_u8 (void)
 {
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
     return (StickConfiguration_st.ReadWriteFlagUncryptedVolume_u8);
 }
 
@@ -518,14 +511,8 @@ u8 Read_ReadWriteStatusUncryptedVolume_u8 (void)
 
 u8 Write_ReadWriteStatusUncryptedVolume_u8 (u8 NewStatus_u8)
 {
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
-
+    read_configuration_or_init_u8();
     StickConfiguration_st.ReadWriteFlagUncryptedVolume_u8 = NewStatus_u8;
-
     WriteStickConfigurationToUserPage ();
 
     return (TRUE);
@@ -599,11 +586,7 @@ u8 ReadSdId (u32 * SdId_u32)
 
 u8 WriteNewSdCardFoundToFlash (u32 * SdId_u32)
 {
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
 
     CI_LocalPrintf ("*** New SD card found ***  Serial number 0x%08x\r\n", *SdId_u32);
 
@@ -634,11 +617,7 @@ u8 WriteNewSdCardFoundToFlash (u32 * SdId_u32)
 
 u8 SetSdCardFilledWithRandomsToFlash (void)
 {
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
 
     CI_LocalPrintf ("SD is filled with random chars\r\n");
 
@@ -665,11 +644,7 @@ u8 SetSdCardFilledWithRandomsToFlash (void)
 
 u8 ClearNewSdCardFoundToFlash (void)
 {
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
 
     CI_LocalPrintf ("Clear new SD card found\r\n");
 
@@ -695,11 +670,7 @@ u8 ClearNewSdCardFoundToFlash (void)
 
 u8 SetSdCardFilledWithRandomCharsToFlash (void)
 {
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
 
     CI_LocalPrintf ("Set new SD card filled with random chars\r\n");
 
@@ -728,11 +699,7 @@ u8 SetSdCardFilledWithRandomCharsToFlash (void)
 
 u8 SetSdCardNotFilledWithRandomCharsToFlash (void)
 {
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
 
     CI_LocalPrintf ("Set new SD card *** not *** filled with random chars\r\n");
 
@@ -759,11 +726,7 @@ u8 SetSdCardNotFilledWithRandomCharsToFlash (void)
 
 u8 SetStickKeysNotInitatedToFlash (void)
 {
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
 
     CI_LocalPrintf ("Set stick keys not initiated\r\n");
 
@@ -789,11 +752,7 @@ u8 SetStickKeysNotInitatedToFlash (void)
 
 u8 ClearStickKeysNotInitatedToFlash (void)
 {
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
 
     CI_LocalPrintf ("Clear: Stick keys not initiated\r\n");
 
@@ -829,11 +788,7 @@ u8 update_u8;
 
     UpdateFlag_u8 = TRUE;   // Run only once
 
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
 
     update_u8 = FALSE;
     if (VERSION_MAJOR != StickConfiguration_st.VersionInfo_au8[0])
