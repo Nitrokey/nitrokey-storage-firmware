@@ -436,7 +436,7 @@ void USB_CCID_task (void* pvParameters)
         {
             Startup_b = FALSE;
             // CI_LocalPrintf ("USB_CCID : USB CCID started - %d\n",xTaskGetTickCount());
-            DelayMs (100);  // Wait 100 ms
+            DelayMs (2000);  // Wait 100 ms
             USB_CCID_send_INT_Message ();   // We are always online
         }
 
