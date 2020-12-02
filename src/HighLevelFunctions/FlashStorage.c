@@ -83,6 +83,7 @@ typeStick20Configuration_st StickConfiguration_st;
    242 - 251 Update PIN SALT (10 byte)
  */
 
+#define __packed __attribute__((__packed__))
 
 typedef struct {
     u8 AES_key[32];
@@ -97,7 +98,7 @@ typedef struct {
     u8 password_safe_AES_key[32];
     u8 update_PIN[32];
     u8 update_PIN_salt[10];
-} UserPage;
+} __packed UserPage;
 
 UserPage * user_page = (UserPage * )AVR32_FLASHC_USER_PAGE;
 
