@@ -68,11 +68,19 @@ typeStick20Configuration_st StickConfiguration_st;
 
    Userpage layout
 
-   Byte 0 - 31 AES Storage key 32 - 51 Matrix columns for user password 52 - 71 Matrix columns for admin password 72 - 101 Stick Configuration 102 -
-   133 Base for AES key hidden volume (32 byte) 134 - 137 ID of sd card (4 byte) 138 - 141 Last stored real timestamp (4 byte) 142 - 145 ID of sc
-   card (4 byte) 146 - 177 XOR mask for sc tranfered keys (32 byte) 178 - 209 Password safe key (32 byte) 210 - 241 Update PIN (32 byte) 242 - 251
-   Update PIN SALT (10 byte)
-
+   Byte 
+   0 - 31 AES Storage key 
+   32 - 51 Matrix columns for user password 
+   52 - 71 Matrix columns for admin password 
+   72 - 101 Stick Configuration 
+   102 - 133 Base for AES key hidden volume (32 byte) 
+   134 - 137 ID of sd card (4 byte) 
+   138 - 141 Last stored real timestamp (4 byte) 
+   142 - 145 ID of sc card (4 byte) 
+   146 - 177 XOR mask for sc tranfered keys (32 byte) 
+   178 - 209 Password safe key (32 byte) 
+   210 - 241 Update PIN (32 byte) 
+   242 - 251 Update PIN SALT (10 byte)
  */
 
 /*******************************************************************************
@@ -254,9 +262,9 @@ u8 ReadStickConfigurationFromUserPage (void)
 {
     // TODO should be mutexed with InitStickConfigurationToUserPage_u8
 
-u8 UserPwRetryCount;
-u8 AdminPwRetryCount;
-u32 ActiveSmartCardID_u32;
+    u8 UserPwRetryCount;
+    u8 AdminPwRetryCount;
+    u32 ActiveSmartCardID_u32;
 
     taskENTER_CRITICAL ();
     // Save dynamic data
