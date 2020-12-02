@@ -586,6 +586,7 @@ u8 CheckStatus_u8 = TRUE;
 
 *******************************************************************************/
 
+#ifndef STICK_20_A_MUSTER_PROD
 void HighLevelTests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned int Param_u32, unsigned char* String_pu8)
 {
     u8 Buffer_au8[32];
@@ -646,3 +647,5 @@ void HighLevelTests (unsigned char nParamsGet_u8, unsigned char CMD_u8, unsigned
             break;
     }
 }
+
+#endif
