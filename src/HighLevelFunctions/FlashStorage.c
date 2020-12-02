@@ -151,7 +151,7 @@ u8 read_configuration_or_init_u8(void);
 
 u8 WriteAESStorageKeyToUserPage (u8 * data)
 {
-    flashc_memcpy (AVR32_FLASHC_USER_PAGE, data, 32, TRUE);
+    flashc_memcpy (user_page->AES_key, data, sizeof(user_page->AES_key), TRUE);
     return (TRUE);
 }
 
@@ -167,7 +167,7 @@ u8 WriteAESStorageKeyToUserPage (u8 * data)
 
 u8 ReadAESStorageKeyToUserPage (u8 * data)
 {
-    memcpy (data, (void *) (AVR32_FLASHC_USER_PAGE), 32);
+    memcpy (data, (void *) (user_page->AES_key), sizeof(user_page->AES_key));
     return (TRUE);
 }
 
@@ -184,7 +184,7 @@ u8 ReadAESStorageKeyToUserPage (u8 * data)
 
 u8 WriteMatrixColumsUserPWToUserPage (u8 * data)
 {
-    flashc_memcpy (AVR32_FLASHC_USER_PAGE + 32, data, 20, TRUE);
+    flashc_memcpy (user_page->matrix_user, data, sizeof(user_page->matrix_user), TRUE);
     return (TRUE);
 }
 
@@ -200,7 +200,7 @@ u8 WriteMatrixColumsUserPWToUserPage (u8 * data)
 
 u8 ReadMatrixColumsUserPWFromUserPage (u8 * data)
 {
-    memcpy (data, (void *) (AVR32_FLASHC_USER_PAGE + 32), 20);
+    memcpy (data, (void *) (user_page->matrix_user), sizeof(user_page->matrix_user));
     return (TRUE);
 }
 
@@ -216,7 +216,7 @@ u8 ReadMatrixColumsUserPWFromUserPage (u8 * data)
 
 u8 WriteMatrixColumsAdminPWFromUserPage (u8 * data)
 {
-    flashc_memcpy (AVR32_FLASHC_USER_PAGE + 52, data, 20, TRUE);
+    flashc_memcpy (user_page->matrix_admin, data, sizeof(user_page->matrix_admin), TRUE);
     return (TRUE);
 }
 
@@ -232,7 +232,7 @@ u8 WriteMatrixColumsAdminPWFromUserPage (u8 * data)
 
 u8 ReadMatrixColumsAdminPWFromUserPage (u8 * data)
 {
-    memcpy (data, (void *) (AVR32_FLASHC_USER_PAGE + 52), 20);
+    memcpy (data, (void *) (user_page->matrix_admin), sizeof(user_page->matrix_admin));
     return (TRUE);
 }
 
@@ -259,7 +259,7 @@ u8 WriteStickConfigurationToUserPage (void)
     StickConfiguration_st.VersionInfo_au8[2] = 0;
     StickConfiguration_st.VersionInfo_au8[3] = INTERNAL_VERSION_NR;   // Internal version nr
 
-    flashc_memcpy (AVR32_FLASHC_USER_PAGE + 72, &StickConfiguration_st, 30, TRUE);
+    flashc_memcpy (user_page->stick_configuration, &StickConfiguration_st, sizeof(user_page->stick_configuration), TRUE);
     taskEXIT_CRITICAL();
     
     return (TRUE);
@@ -302,7 +302,7 @@ u8 ReadStickConfigurationFromUserPage (void)
     AdminPwRetryCount = StickConfiguration_st.AdminPwRetryCount;
     ActiveSmartCardID_u32 = StickConfiguration_st.ActiveSmartCardID_u32;
 
-    memcpy (&StickConfiguration_st, (void *) (AVR32_FLASHC_USER_PAGE + 72), sizeof (typeStick20Configuration_st));
+    memcpy (&StickConfiguration_st, (void *) (user_page->stick_configuration), sizeof (typeStick20Configuration_st));
 
     // Write actual version info
     StickConfiguration_st.VersionInfo_au8[0] = VERSION_MAJOR;
@@ -384,7 +384,7 @@ u8 InitStickConfigurationToUserPage_u8 (void)
 
 u8 WriteHiddenVolumeSlotKey (u8 * data)
 {
-    flashc_memcpy ((void *) (AVR32_FLASHC_USER_PAGE + 102), data, 32, TRUE);
+    flashc_memcpy ((void *) (user_page->hidden_volume_AES_key_base), data, sizeof(user_page->hidden_volume_AES_key_base), TRUE);
     return (TRUE);
 }
 
@@ -407,7 +407,7 @@ u8 WriteHiddenVolumeSlotKey (u8 * data)
 
 u8 ReadHiddenVolumeSlotsKey (u8 * data)
 {
-    memcpy (data, (void *) (AVR32_FLASHC_USER_PAGE + 102), 32);
+    memcpy (data, (void *) (user_page->hidden_volume_AES_key_base), sizeof(user_page->hidden_volume_AES_key_base));
     return (TRUE);
 }
 
@@ -579,7 +579,7 @@ u8 Write_ReadWriteStatusUncryptedVolume_u8 (u8 NewStatus_u8)
 
 u8 WriteSdId (u32 * SdId_u32)
 {
-    flashc_memcpy (AVR32_FLASHC_USER_PAGE + 134, SdId_u32, 4, TRUE);
+    flashc_memcpy (user_page->sdcard_id, SdId_u32, sizeof(user_page->sdcard_id), TRUE);
 
     StickConfiguration_st.ActiveSD_CardID_u32 = *SdId_u32;
     return (TRUE);
@@ -600,7 +600,7 @@ u8 WriteSdId (u32 * SdId_u32)
 
 u8 ReadSdId (u32 * SdId_u32)
 {
-    memcpy (SdId_u32, (void *) (AVR32_FLASHC_USER_PAGE + 134), 4);
+    memcpy (SdId_u32, (void *) (user_page->sdcard_id), sizeof(user_page->sdcard_id));
 
     StickConfiguration_st.ActiveSD_CardID_u32 = *SdId_u32;
     return (TRUE);
@@ -873,7 +873,7 @@ u8 update_u8;
 
 u8 WriteDatetime (u32 Datetime_u32)
 {
-    flashc_memcpy (AVR32_FLASHC_USER_PAGE + 138, &Datetime_u32, 4, TRUE);
+    flashc_memcpy (user_page->last_timestamp_real, &Datetime_u32, sizeof(user_page->last_timestamp_real), TRUE);
     return (TRUE);
 }
 
@@ -892,7 +892,7 @@ u8 WriteDatetime (u32 Datetime_u32)
 
 u8 ReadDatetime (u32 * Datetime_u32)
 {
-    memcpy (Datetime_u32, (void *) (AVR32_FLASHC_USER_PAGE + 138), 4);
+    memcpy (Datetime_u32, (void *) (user_page->last_timestamp_real), sizeof(user_page->last_timestamp_real));
     return (TRUE);
 }
 
@@ -912,7 +912,7 @@ u8 ReadDatetime (u32 * Datetime_u32)
 
 u8 WriteScId (u32 * ScId_u32)
 {
-    flashc_memcpy (AVR32_FLASHC_USER_PAGE + 142, ScId_u32, 4, TRUE);
+    flashc_memcpy (user_page->sccard_id, ScId_u32, sizeof(user_page->sccard_id), TRUE);
 
     StickConfiguration_st.ActiveSmartCardID_u32 = *ScId_u32;
     return (TRUE);
@@ -933,7 +933,7 @@ u8 WriteScId (u32 * ScId_u32)
 
 u8 ReadScId (u32 * ScId_u32)
 {
-    memcpy (ScId_u32, (void *) (AVR32_FLASHC_USER_PAGE + 142), 4);
+    memcpy (ScId_u32, (void *) (user_page->sccard_id), sizeof(user_page->sccard_id));
 
     StickConfiguration_st.ActiveSmartCardID_u32 = *ScId_u32;
     return (TRUE);
@@ -955,7 +955,7 @@ u8 ReadScId (u32 * ScId_u32)
 
 u8 WriteXorPatternToFlash (u8 * XorPattern_pu8)
 {
-    flashc_memcpy (AVR32_FLASHC_USER_PAGE + 146, XorPattern_pu8, 32, TRUE);
+    flashc_memcpy (user_page->xor_mask_for_SC_keys, XorPattern_pu8, sizeof(user_page->xor_mask_for_SC_keys), TRUE);
 
     return (TRUE);
 }
@@ -975,7 +975,7 @@ u8 WriteXorPatternToFlash (u8 * XorPattern_pu8)
 
 u8 ReadXorPatternFromFlash (u8 * XorPattern_pu8)
 {
-    memcpy (XorPattern_pu8, (void *) (AVR32_FLASHC_USER_PAGE + 146), 32);
+    memcpy (XorPattern_pu8, (void *) (user_page->xor_mask_for_SC_keys), sizeof(user_page->xor_mask_for_SC_keys));
 
     return (TRUE);
 }
@@ -1001,7 +1001,7 @@ u8 ReadXorPatternFromFlash (u8 * XorPattern_pu8)
 
 u8 WritePasswordSafeKey (u8 * data)
 {
-    flashc_memcpy ((void *) (AVR32_FLASHC_USER_PAGE + 178), data, 32, TRUE);
+    flashc_memcpy ((void *) (user_page->password_safe_AES_key), data, sizeof(user_page->password_safe_AES_key), TRUE);
     return (TRUE);
 }
 
@@ -1023,7 +1023,7 @@ u8 WritePasswordSafeKey (u8 * data)
 
 u8 ReadPasswordSafeKey (u8 * data)
 {
-    memcpy (data, (void *) (AVR32_FLASHC_USER_PAGE + 178), 32);
+    memcpy (data, (void *) (user_page->password_safe_AES_key), sizeof(user_page->password_safe_AES_key));
     return (TRUE);
 }
 
@@ -1042,7 +1042,7 @@ u8 ReadPasswordSafeKey (u8 * data)
 
 u8 WriteUpdatePinHashToFlash (u8 * PIN_Hash_pu8)
 {
-    flashc_memcpy (AVR32_FLASHC_USER_PAGE + 210, PIN_Hash_pu8, 32, TRUE);
+    flashc_memcpy (user_page->update_PIN, PIN_Hash_pu8, sizeof(user_page->update_PIN), TRUE);
 
     return (TRUE);
 }
@@ -1062,7 +1062,7 @@ u8 WriteUpdatePinHashToFlash (u8 * PIN_Hash_pu8)
 
 u8 ReadUpdatePinHashFromFlash (u8 * PIN_Hash_pu8)
 {
-    memcpy (PIN_Hash_pu8, (void *) (AVR32_FLASHC_USER_PAGE + 210), 32);
+    memcpy (PIN_Hash_pu8, (void *) (user_page->update_PIN), sizeof(user_page->update_PIN));
 
     return (TRUE);
 }
@@ -1082,7 +1082,7 @@ u8 ReadUpdatePinHashFromFlash (u8 * PIN_Hash_pu8)
 
 u8 WriteUpdatePinSaltToFlash (u8 * PIN_pu8)
 {
-    flashc_memcpy (AVR32_FLASHC_USER_PAGE + 242, PIN_pu8, 10, TRUE);
+    flashc_memcpy (user_page->update_PIN_salt, PIN_pu8, sizeof(user_page->update_PIN_salt), TRUE);
 
     return (TRUE);
 }
@@ -1102,7 +1102,7 @@ u8 WriteUpdatePinSaltToFlash (u8 * PIN_pu8)
 
 u8 ReadUpdatePinSaltFromFlash (u8 * PIN_pu8)
 {
-    memcpy (PIN_pu8, (void *) (AVR32_FLASHC_USER_PAGE + 242), 10);
+    memcpy (PIN_pu8, (void *) (user_page->update_PIN_salt), sizeof(user_page->update_PIN_salt));
 
     return (TRUE);
 }
