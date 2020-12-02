@@ -99,6 +99,7 @@ typedef struct
 extern typeStick20Configuration_st StickConfiguration_st;
 
 
+u8 ReadConfigurationSuccesfull(void);
 u8 ReadStickConfigurationFromUserPage (void);
 void SendStickStatusToHID (typeStick20Configuration_st * Status_st);
 

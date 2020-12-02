@@ -151,7 +151,7 @@ void device_mass_storage_task (void)
     for (i=0;i<2000;i++)
     {
       // FIXME configuration reload not guarded from concurrent access, possible data race and distorted result in effect
-      if (TRUE == ReadStickConfigurationFromUserPage ())
+      if (TRUE == ReadConfigurationSuccesfull())
       {
          break;
       }
