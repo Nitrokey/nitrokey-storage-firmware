@@ -93,8 +93,7 @@ typedef struct
     u8 AdminPwRetryCount;       // Admin password retry count 1 byte // 20 Byte not packed
     u32 ActiveSmartCardID_u32;  // 4 byte
     u8 StickKeysNotInitiated_u8;    // No AES keys computed (1 = AES are builded) 1 byte // 25 Byte not packed
-} __packed typeStick20Configuration_st;  // Sum 25 byte (Max 25 Byte) // not packed
-
+} typeStick20Configuration_st;  // Sum 25 byte (Max 25 Byte) // not packed
 
 extern typeStick20Configuration_st StickConfiguration_st;
 

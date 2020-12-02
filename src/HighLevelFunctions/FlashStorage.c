@@ -101,13 +101,13 @@ typedef struct {
 } UserPage;
 
 typedef struct {
-    UserPage state;
+    UserPage user_page_data;
     u8 hash[4];
 } HashedUserPage;
 
 typedef struct {
-    HashedUserPage state;
-    HashedUserPage backup;
+    HashedUserPage main_state;
+    HashedUserPage backup_state;
 } UserPageComplete;
 
 UserPageComplete * user_page_complete = (UserPageComplete * )AVR32_FLASHC_USER_PAGE;
@@ -262,16 +262,43 @@ u8 ReadMatrixColumsAdminPWFromUserPage (u8 * data)
 
 *******************************************************************************/
 
+void hash_data(void * data, void * out, u32 data_size, u32 out_size){
+  //TODO implement
+  // sha2_context sha_ctx;
+  // sha2_starts(&sha_ctx, 0);
+  // sha2_update(&sha_ctx, data, data_size);
+  // sha2_finish (sha2_context * ctx, unsigned char output[32]);
+  u8 hash_out[32];
+  memset(hash_out, 0x42, sizeof(hash_out));
+  // sha2 (data, data_size, hash_out, 0);
+  // TODO use real hash function
+  memmove(out, hash_out, Min(out_size, sizeof(hash_out)));
+}
+
+void WriteUserPageBackup(void){
+  taskENTER_CRITICAL();
+  UserPageComplete complete;
+  memcpy((void*)&complete,(void*) user_page_complete, sizeof(user_page_complete));
+  hash_data((void*)&complete.main_state.user_page_data, complete.main_state.hash, sizeof(complete.main_state.user_page_data), sizeof(complete.main_state.hash));    
+  memcpy((void*)&complete.backup_state, (void*)&complete.main_state, sizeof(complete.main_state));
+  flashc_memcpy((void*)user_page_complete, (void*)&complete, sizeof(user_page_complete), TRUE);
+  taskEXIT_CRITICAL();
+}
+
+void FillConfigurationStVersionInfo(typeStick20Configuration_st * StickConfiguration_st){
+    // Set actual firmware version
+    StickConfiguration_st->VersionInfo_au8[0] = VERSION_MAJOR;
+    StickConfiguration_st->VersionInfo_au8[1] = VERSION_MINOR;
+    StickConfiguration_st->VersionInfo_au8[2] = 0;
+    StickConfiguration_st->VersionInfo_au8[3] = INTERNAL_VERSION_NR;   // Internal version nr
+}
+
 u8 WriteStickConfigurationToUserPage (void)
 {
     taskENTER_CRITICAL();
-    // Set actual firmware version
-    StickConfiguration_st.VersionInfo_au8[0] = VERSION_MAJOR;
-    StickConfiguration_st.VersionInfo_au8[1] = VERSION_MINOR;
-    StickConfiguration_st.VersionInfo_au8[2] = 0;
-    StickConfiguration_st.VersionInfo_au8[3] = INTERNAL_VERSION_NR;   // Internal version nr
-
+    FillConfigurationStVersionInfo(&StickConfiguration_st);
     flashc_memcpy (user_page->stick_configuration, &StickConfiguration_st, sizeof(user_page->stick_configuration), TRUE);
+    WriteUserPageBackup(); // FIXME decrease writes count -> merge with flashc_memcpy
     taskEXIT_CRITICAL();
     
     return (TRUE);
@@ -300,6 +327,21 @@ u8 ReadConfigurationSuccesfull(void) {
 
 *******************************************************************************/
 
+u8 ConfirmUserPageHash(HashedUserPage * user_page){
+    u8 local_hash [4];
+    hash_data((void*)&user_page->user_page_data, local_hash, sizeof(user_page->user_page_data), sizeof(local_hash));
+    return memcmp(local_hash, user_page->hash, sizeof(local_hash)) == 0 ? TRUE : FALSE;
+}
+
+void RestoreStateFromBackup(){
+    taskENTER_CRITICAL();
+    UserPageComplete complete;
+    memcpy(&complete, user_page_complete, sizeof(user_page_complete));
+    memcpy(&complete.main_state, &complete.backup_state, sizeof(complete.main_state));
+    flashc_memcpy(&user_page_complete, &complete, sizeof(user_page_complete), TRUE);
+    taskEXIT_CRITICAL();
+}
+
 u8 ReadStickConfigurationFromUserPage (void)
 {
     // TODO should be mutexed with InitStickConfigurationToUserPage_u8
@@ -314,14 +356,24 @@ u8 ReadStickConfigurationFromUserPage (void)
     AdminPwRetryCount = StickConfiguration_st.AdminPwRetryCount;
     ActiveSmartCardID_u32 = StickConfiguration_st.ActiveSmartCardID_u32;
 
+    // Confirm the hash of the user data page first
+    if (TRUE == ConfirmUserPageHash(&user_page_complete->main_state))
+    {
+      // hash for the user page is correct; do nothing extra
+    } else if (TRUE == ConfirmUserPageHash(&user_page_complete->backup_state)){
+      // restore backup to main state
+      RestoreStateFromBackup();
+    } else {
+      // return false, which will run initialization; watchout for taskEXIT_CRITICAL
+      taskEXIT_CRITICAL();  
+      return FALSE;
+    }
+
     memcpy (&StickConfiguration_st, (void *) (user_page->stick_configuration), sizeof (typeStick20Configuration_st));
+    
 
-    // Write actual version info
-    StickConfiguration_st.VersionInfo_au8[0] = VERSION_MAJOR;
-    StickConfiguration_st.VersionInfo_au8[1] = VERSION_MINOR;
-    StickConfiguration_st.VersionInfo_au8[2] = 0;   // Build number not used
-    StickConfiguration_st.VersionInfo_au8[3] = INTERNAL_VERSION_NR;   // Internal version nr
-
+    FillConfigurationStVersionInfo(&StickConfiguration_st);
+    
     // Restore dynamic data
     StickConfiguration_st.UserPwRetryCount = UserPwRetryCount;
     StickConfiguration_st.AdminPwRetryCount = AdminPwRetryCount;
@@ -355,11 +407,8 @@ u8 InitStickConfigurationToUserPage_u8 (void)
     StickConfiguration_st.ReadWriteFlagCryptedVolume_u8 = READ_WRITE_ACTIVE;
     StickConfiguration_st.ReadWriteFlagHiddenVolume_u8 = READ_WRITE_ACTIVE;
     StickConfiguration_st.FirmwareLocked_u8 = 0;
-    StickConfiguration_st.ActiveSD_CardID_u32 = 0;
-    StickConfiguration_st.VersionInfo_au8[0] = VERSION_MAJOR;
-    StickConfiguration_st.VersionInfo_au8[1] = VERSION_MINOR;
-    StickConfiguration_st.VersionInfo_au8[2] = 0;   // Build number not used
-    StickConfiguration_st.VersionInfo_au8[3] = INTERNAL_VERSION_NR;   // Internal version nr
+    StickConfiguration_st.ActiveSD_CardID_u32 = 0;    
+    FillConfigurationStVersionInfo(&StickConfiguration_st);
     StickConfiguration_st.NewSDCardFound_u8 = 0;
     StickConfiguration_st.SDFillWithRandomChars_u8 = FALSE;
     StickConfiguration_st.VolumeActiceFlag_u8 = 0;
