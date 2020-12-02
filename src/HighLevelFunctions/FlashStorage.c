@@ -109,6 +109,8 @@ UserPage * user_page = (UserPage * )AVR32_FLASHC_USER_PAGE;
 
 static_assert(sizeof(UserPage) == 252, "size of conf struct invalid");
 static_assert(sizeof(UserPage) <= 512, "size of conf struct is too big");
+static_assert(sizeof(user_page->stick_configuration) >= sizeof(typeStick20Configuration_st), "size of conf struct is too big");
+
 
 /*******************************************************************************
 
