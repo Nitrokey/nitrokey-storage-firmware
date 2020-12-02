@@ -389,11 +389,7 @@ void USB_CCID_task (void* pvParameters)
 
     ISO7816_InitSC ();
 
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
 
 //    Usb_enable_stall_handshake (EP_CCID_OUT);
 //    Usb_ack_setup_received_free ();
