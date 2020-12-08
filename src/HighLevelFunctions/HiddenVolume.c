@@ -86,7 +86,7 @@
 
 *******************************************************************************/
 extern U32 gSdEndOfCard_u32;
-extern int sd_mmc_mci_test_unit_only_local_access;
+extern volatile int sd_mmc_mci_test_unit_only_local_access;
 
 void SetHiddenVolumeSizes_u32 (U32 StartBlock_u32, U32 EndBlock_u32);
 
