@@ -118,7 +118,7 @@ U32 Check_Sd_mmc_mci_access_signal_on (void)
 }
 
 
-int sd_mmc_mci_test_unit_only_local_access = FALSE;
+volatile int sd_mmc_mci_test_unit_only_local_access = FALSE;
 
 
 /*******************************************************************************
