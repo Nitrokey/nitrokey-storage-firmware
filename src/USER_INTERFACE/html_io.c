@@ -757,7 +757,7 @@ void HID_ExcuteCmd (void)
         case HTML_CMD_PRODUCTION_TEST:
             CI_TickLocalPrintf ("Get HTML_CMD_PRODUCTION_TEST\r\n");
             GetProductionInfos (&Stick20ProductionInfos_st,FALSE);
-            //Stick20HIDInitSendConfiguration (STICK20_SEND_PRODUCTION_TEST);
+            Stick20HIDInitSendConfiguration (STICK20_SEND_PRODUCTION_TEST);
             UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
             break;
 
