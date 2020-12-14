@@ -229,7 +229,7 @@ void STICK20_ram_aes_ram (unsigned char cMode, unsigned short int u16BufferSize,
     // Wait for the semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-//      CI_StringOut ("§1");
+//      CI_StringOut ("ï¿½1");
     }
 
     taskENTER_CRITICAL ();
@@ -1221,21 +1221,21 @@ int AES_local_test (void)
 
     memcpy (acInputData, acData, 32);
 
-    CI_LocalPrintf ("Unverschlüsselter Key : ");
+    CI_LocalPrintf ("Unverschlï¿½sselter Key : ");
     HexPrint (16, acInputData);
     CI_LocalPrintf ("\r\n");
 
     AES_KeyEncryption (32, acInputData, acKey, AES_PMODE_CIPHER, 0);
     // AES_StorageKeyEncryption (32, acInputData, acKey, AES_PMODE_CIPHER);
 
-    CI_LocalPrintf ("Verschlüsselter Key   : ");
+    CI_LocalPrintf ("Verschlï¿½sselter Key   : ");
     HexPrint (16, acInputData);
     CI_LocalPrintf ("\r\n");
 
     AES_KeyEncryption (32, acInputData, acKey, AES_PMODE_DECIPHER, 0);
     // AES_StorageKeyEncryption (32, acInputData, acKey, AES_PMODE_DECIPHER);
 
-    CI_LocalPrintf ("Entschlüsselter Key   : ");
+    CI_LocalPrintf ("Entschlï¿½sselter Key   : ");
     HexPrint (16, acInputData);
     CI_LocalPrintf ("\r\n");
 
@@ -1257,7 +1257,7 @@ int AES_local_test_org (void)
     // Wait for the semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-//      CI_StringOut ("§5");
+//      CI_StringOut ("ï¿½5");
     }
 
     // Init the input array.

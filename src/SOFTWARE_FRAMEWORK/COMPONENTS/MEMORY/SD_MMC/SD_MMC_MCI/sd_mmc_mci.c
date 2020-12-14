@@ -1697,7 +1697,7 @@ U32 BlockNr_u32;
         // Wait for the AES semaphore
         while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
         {
-//          CI_StringOut ("§2");
+//          CI_StringOut ("ï¿½2");
         }
 
         if (buffer_id == 0)
@@ -1772,7 +1772,7 @@ U32 BlockNr_u32;
     // Wait for the AES semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-//      CI_StringOut ("§8");
+//      CI_StringOut ("ï¿½8");
     }
 
     if (buffer_id == 0)
@@ -1823,7 +1823,7 @@ U32 BlockNr_u32;
         // Wait for the AES semaphore
         while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
         {
-//          CI_StringOut ("§6");
+//          CI_StringOut ("ï¿½6");
         }
 
         // (re)load first stage.
@@ -1886,7 +1886,7 @@ U32 BlockNr_u32;
     // Wait for the AES semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-//      CI_StringOut ("§7");
+//      CI_StringOut ("ï¿½7");
     }
 
     // Complete execution of the last transfer (which is in the pipe).
