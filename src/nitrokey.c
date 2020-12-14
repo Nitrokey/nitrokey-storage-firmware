@@ -116,6 +116,22 @@
 // #define FOSC0_STICK20 8000000 //!< Osc0 frequency: Hz.
 // #define OSC0_STARTUP_STICK20 AVR32_PM_OSCCTRL0_STARTUP_2048_RCOSC //!< Osc0 startup time: RCOsc periods.
 
+#if UINTPTR_MAX == UINT32_MAX
+#define STACK_CHK_GUARD_VALUE 0xa5f3cc8d
+#else
+#define STACK_CHK_GUARD_VALUE 0xdeadbeefa55a857
+#endif
+
+#pragma mark - Declarations -
+void* __stack_chk_guard = STACK_CHK_GUARD_VALUE; //uintptr_t
+
+#pragma mark - Implementations -
+__attribute__((weak,noreturn)) void __stack_chk_fail(void)
+{
+	printf("Stack overflow detected! Aborting program.\n");
+	while (1){}
+	abort();
+}
 
 /*******************************************************************************
 
