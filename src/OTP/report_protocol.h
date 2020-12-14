@@ -234,7 +234,7 @@ typedef struct
 
 u8 Stick20HIDInitSendConfiguration (u8 state_u8);
 u8 Stick20HIDSendAccessStatusData (u8 * output);
-extern u8 Stick20HIDSendConfigurationState_u8;
+extern volatile u8 Stick20HIDSendConfigurationState_u8;
 
 typedef struct
 {
