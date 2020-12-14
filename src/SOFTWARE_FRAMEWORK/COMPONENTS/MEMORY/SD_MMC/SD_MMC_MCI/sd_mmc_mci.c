@@ -911,9 +911,14 @@ Bool is_dma_ram_2_usb_complete (void)
 void STICK20_mci_aes (unsigned char cMode, unsigned short int u16BufferSize, unsigned int* pIOBuffer, unsigned int BlockNr_u32);
 
 static void stop_dma(){
+	taskENTER_CRITICAL ();
     AVR32_DMACA.chenreg = (~(3 << AVR32_DMACA_CHENREG_CH_EN_OFFSET) | ~(3 << AVR32_DMACA_CHENREG_CH_EN_WE_OFFSET));
     AVR32_DMACA.DMACFGREG.dma_en = 0;
-    while(!is_dma_ram_2_mci_complete);
+    while(!is_dma_ram_2_mci_complete());
+	while(!is_dma_ram_2_usb_complete());
+	while(!is_dma_usb_2_ram_complete());
+	while(!is_dma_mci_2_ram_complete());
+	taskEXIT_CRITICAL();
 }
 
 static void dma_mci_2_ram_crypted (void* ram, size_t size, unsigned int BlockNr_u32)
@@ -1726,11 +1731,16 @@ U32 BlockNr_u32;
                 dma_ram_2_usb (&sector_buf_1, SD_MMC_SECTOR_SIZE);
             }
             // Wait completion of both stages.
-            if (!(busy_wait(is_dma_mci_2_ram_complete) && busy_wait(is_dma_ram_2_usb_complete)){
+			Bool res1 = busy_wait(is_dma_mci_2_ram_complete);
+			Bool res2 = busy_wait(is_dma_ram_2_usb_complete);
+            if (!( res1 && res2)){
                 stop_dma();
                 BlockNr_u32--;
                 nb_sector++;
                 buffer_id = (buffer_id+1)%2;
+				taskENTER_CRITICAL ();
+				xSemaphoreGive (AES_semphr);
+				taskEXIT_CRITICAL ();
                 continue;
             }
 
@@ -1748,7 +1758,18 @@ U32 BlockNr_u32;
 			nb_sector	127	U16@0x9234 ([R7]-16)
 			StartBlockNr_u32	6086272	U32@0x9230 ([R7]-20)
 			*/
-			busy_wait(is_dma_mci_2_ram_complete);
+			//busy_wait(is_dma_mci_2_ram_complete);
+			
+			 if (!busy_wait(is_dma_mci_2_ram_complete)){
+                stop_dma();
+                BlockNr_u32--;
+                nb_sector++;
+                buffer_id = (buffer_id+1)%2;
+				taskENTER_CRITICAL ();
+				xSemaphoreGive (AES_semphr);
+				taskEXIT_CRITICAL ();
+                continue;
+            }
         }
 
         taskENTER_CRITICAL ();
