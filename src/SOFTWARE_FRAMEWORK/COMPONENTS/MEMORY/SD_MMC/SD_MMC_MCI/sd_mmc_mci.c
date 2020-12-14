@@ -910,6 +910,12 @@ Bool is_dma_ram_2_usb_complete (void)
 
 void STICK20_mci_aes (unsigned char cMode, unsigned short int u16BufferSize, unsigned int* pIOBuffer, unsigned int BlockNr_u32);
 
+static void stop_dma(){
+    AVR32_DMACA.chenreg = (~(3 << AVR32_DMACA_CHENREG_CH_EN_OFFSET) | ~(3 << AVR32_DMACA_CHENREG_CH_EN_WE_OFFSET));
+    AVR32_DMACA.DMACFGREG.dma_en = 0;
+    while(!is_dma_ram_2_mci_complete);
+}
+
 static void dma_mci_2_ram_crypted (void* ram, size_t size, unsigned int BlockNr_u32)
 {
     // int *pRam = ram;
@@ -1848,8 +1854,13 @@ U32 BlockNr_u32;
             BlockNr_u32++;
 
             // Wait completion of both stages.
-            while (!is_dma_usb_2_ram_complete ());
-            while (!is_dma_ram_2_mci_complete ());
+            if (!(busy_wait(is_dma_usb_2_ram_complete) && busy_wait(is_dma_ram_2_mci_complete) )){
+                stop_dma();
+                BlockNr_u32--;
+                nb_sector++;
+                buffer_id = (buffer_id+1)%2;
+                continue;
+            }
 
             // AES Test
             // STICK20_ram_aes_ram(STICK20_RAM_TO_AES_TO_MCI,SD_MMC_SECTOR_SIZE/4,(unsigned int *)sector_buf_0, pSTICK20_AES_BUFFER);
