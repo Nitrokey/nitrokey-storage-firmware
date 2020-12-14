@@ -226,7 +226,7 @@ u32 calculated_crc32;
 
 //extern volatile long xTickCount;
 
-u8 Stick20HIDSendConfigurationState_u8 = STICK20_SEND_STATUS_IDLE;
+volatile u8 Stick20HIDSendConfigurationState_u8 = STICK20_SEND_STATUS_IDLE;
 
 u8 Stick20HIDInitSendConfiguration (u8 state_u8)
 {
