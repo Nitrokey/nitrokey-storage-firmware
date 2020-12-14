@@ -827,3 +827,25 @@ void memset_safe(void *const pnt, unsigned char val, const u32 len)
         pnt_[i++] = val;
     }
 }
+
+Bool busy_wait(Bool (*function)()) {
+    u32 i ALIGNED;
+    for (i = 0;; i++) { // switch from infinite loop to timeout
+        if (function()) {
+            return TRUE;
+            break;
+        }
+        if (i <= 0xFFFF) {
+            continue;
+        }
+        if (i > 0xFFFF)        // start hard delay after 0xFFFF iterations
+        {
+            Delay1Ms();
+        }
+        if (i > 0xFFFF + 1000)    // bail after 1000 ms
+        {
+            break;
+        }
+    }
+    return FALSE;
+}
