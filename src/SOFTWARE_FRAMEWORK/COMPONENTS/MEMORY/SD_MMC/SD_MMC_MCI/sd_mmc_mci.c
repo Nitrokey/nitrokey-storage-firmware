@@ -1720,13 +1720,13 @@ U32 BlockNr_u32;
                 dma_ram_2_usb (&sector_buf_1, SD_MMC_SECTOR_SIZE);
             }
             // Wait completion of both stages.
-            while (!is_dma_mci_2_ram_complete ());
+            busy_wait(is_dma_mci_2_ram_complete);
 
             // AES Test
             // STICK20_ram_aes_ram(STICK20_MCI_TO_AES_TO_RAM,SD_MMC_SECTOR_SIZE/4,(unsigned int *)sector_buf_0, pSTICK20_AES_BUFFER);
             // CI_LocalPrintf("-");
 
-            while (!is_dma_ram_2_usb_complete ());
+            busy_wait(is_dma_ram_2_usb_complete);
 
         }
         else
@@ -1742,28 +1742,7 @@ U32 BlockNr_u32;
 			nb_sector	127	U16@0x9234 ([R7]-16)
 			StartBlockNr_u32	6086272	U32@0x9230 ([R7]-20)
 			*/
-			u32 i;
-			for (i=0; ; i++){ // switch from infinite loop to timeout
-				if(is_dma_mci_2_ram_complete()){
-					break;
-				}
-				if (i<=0xFFFF)
-				{
-					continue;
-				}
-				if (i>0xFFFF)		// start hard delay after 0xFFFF iterations
-				{
-					Delay1Ms();
-					//taskYIELD();
-				}
-				if (i>0xFFFF+1000)	// bail after 1000 ms
-				{
-					// TODO cleanup? repeat operation?
-					// repeating would be { BlockNr_u32--; nb_sector++; continue; } 
-					return FALSE;
-				}
-			}
-
+			busy_wait(is_dma_mci_2_ram_complete);
         }
 
         taskENTER_CRITICAL ();
@@ -1799,7 +1778,7 @@ U32 BlockNr_u32;
         dma_ram_2_usb (&sector_buf_0, SD_MMC_SECTOR_SIZE);
     }
 
-    while (!is_dma_ram_2_usb_complete ());
+    busy_wait(is_dma_ram_2_usb_complete);
 
     taskENTER_CRITICAL ();
     xSemaphoreGive (AES_semphr);
@@ -1881,9 +1860,7 @@ U32 BlockNr_u32;
         {
             b_last_state_full = TRUE;
             // Wait completion of the first stage only.
-            while (!is_dma_usb_2_ram_complete ())
-            {
-            }
+            busy_wait (is_dma_usb_2_ram_complete);
         }
 
         taskENTER_CRITICAL ();
@@ -1911,7 +1888,7 @@ U32 BlockNr_u32;
         dma_ram_2_mci (&sector_buf_0, SD_MMC_SECTOR_SIZE, BlockNr_u32);
     }
 
-    while (!is_dma_ram_2_mci_complete ());
+    busy_wait(is_dma_ram_2_mci_complete);
 
     taskENTER_CRITICAL ();
     xSemaphoreGive (AES_semphr);

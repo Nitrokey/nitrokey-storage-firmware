@@ -900,10 +900,10 @@ void AES_Encryption (unsigned short int u16BufferSize, unsigned int* pSrcBuf, un
   taskENTER_CRITICAL ();
 
   // Wait for end of DMA transfers
-  while (!is_dma_mci_2_ram_complete ());
-  while (!is_dma_ram_2_usb_complete ());
-  while (!is_dma_usb_2_ram_complete ());
-  while (!is_dma_ram_2_mci_complete ());
+  busy_wait (is_dma_mci_2_ram_complete);
+  busy_wait (is_dma_ram_2_usb_complete);
+  busy_wait (is_dma_usb_2_ram_complete);
+  busy_wait (is_dma_ram_2_mci_complete);
 
     // ====================
     // Configure the DMACA.
@@ -1073,14 +1073,14 @@ int AES_StorageKeyEncryption (unsigned int nLength, unsigned char* cData, unsign
     // Wait for the semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-//      CI_StringOut ("§3");
+//      CI_StringOut ("ï¿½3");
     }
 
     // Wait for end of DMA transfers
-    while (!is_dma_mci_2_ram_complete ());
-    while (!is_dma_ram_2_usb_complete ());
-    while (!is_dma_usb_2_ram_complete ());
-    while (!is_dma_ram_2_mci_complete ());
+    busy_wait(is_dma_mci_2_ram_complete);
+    busy_wait(is_dma_ram_2_usb_complete);
+    busy_wait(is_dma_usb_2_ram_complete);
+    busy_wait(is_dma_ram_2_mci_complete);
 
     memcpy (InputData, cData, nLength);
 
@@ -1158,14 +1158,14 @@ int AES_KeyEncryption (unsigned int nLength, unsigned char* cData, unsigned char
     // Wait for the semaphore
     while (pdTRUE != xSemaphoreTake (AES_semphr, 1))
     {
-//      CI_StringOut ("§4");
+//      CI_StringOut ("ï¿½4");
     }
 
     // Wait for end of DMA transfers
-    while (!is_dma_mci_2_ram_complete ());
-    while (!is_dma_ram_2_usb_complete ());
-    while (!is_dma_usb_2_ram_complete ());
-    while (!is_dma_ram_2_mci_complete ());
+    busy_wait(is_dma_mci_2_ram_complete);
+    busy_wait(is_dma_ram_2_usb_complete);
+    busy_wait(is_dma_usb_2_ram_complete);
+    busy_wait(is_dma_ram_2_mci_complete);
 
     memcpy (InputData, cData, nLength);
 

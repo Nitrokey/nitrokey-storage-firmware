@@ -69,6 +69,9 @@ void MSD_AccessManager100ms (void);
 
 void memset_safe(void *const pnt, unsigned char val, const u32 len);
 
+#include "compiler.h"
+Bool busy_wait(Bool (*function)());
+
 typedef struct
 {
     u32 MSD_ReadCalls_u32;
@@ -88,5 +91,11 @@ typedef struct
 
 extern USB_Log_tst USB_Log_st;
 
+#if (defined __GNUC__) && (defined __AVR32__)
+#define ALIGNED __attribute__ ((__aligned__ (4)))
+#elif (defined __ICCAVR32__)
+#error "not supported"
+//#define aligned (#pragma data_alignment = 4)
+#endif
 
 #endif /* TOOLS_H_ */
