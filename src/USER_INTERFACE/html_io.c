@@ -1031,9 +1031,8 @@ u32 Blockcount_u32;
     Infos_st->CPU_CardID_u32 = CPU_ID_u32;
 
     // Init SD - read capacity
-//    sd_mmc_mci_read_capacity (SD_SLOT, (unsigned long int *) &Blockcount_u32);
-//    Infos_st->SD_Card_Size_u8 = Blockcount_u32 / 2 / 1024 / 1024 + 1;   // in GB
-    Infos_st->SD_Card_Size_u8 = 8;
+   sd_mmc_mci_read_capacity (SD_SLOT, (unsigned long int *) &Blockcount_u32);
+   Infos_st->SD_Card_Size_u8 = Blockcount_u32 / 2 / 1024 / 1024 + 1;   // in GB
 
     // Save smartcard infos
     if (TRUE == WriteTestEnabled)
@@ -1050,17 +1049,12 @@ u32 Blockcount_u32;
     }
 
     // Get SD card infos
-//    cid = (cid_t *) GetSdCidInfo ();
-//    Infos_st->SD_CardID_u32 = (cid->psnh << 8) + cid->psnl;
-//    Infos_st->SD_Card_ManufacturingYear_u8 = cid->mdt / 16;
-//    Infos_st->SD_Card_ManufacturingMonth_u8 = cid->mdt % 0x0f;
-//    Infos_st->SD_Card_OEM_u16 = cid->oid;
-//    Infos_st->SD_Card_Manufacturer_u8 = cid->mid;
-    Infos_st->SD_CardID_u32 = 0xffff;
-    Infos_st->SD_Card_ManufacturingYear_u8 = 0xa;
-    Infos_st->SD_Card_ManufacturingMonth_u8 =  0xb;
-    Infos_st->SD_Card_OEM_u16 =  0xabab;
-    Infos_st->SD_Card_Manufacturer_u8 = 0xab;
+    cid = (cid_t *) GetSdCidInfo ();
+    Infos_st->SD_CardID_u32 = (cid->psnh << 8) + cid->psnl;
+    Infos_st->SD_Card_ManufacturingYear_u8 = cid->mdt / 16;
+    Infos_st->SD_Card_ManufacturingMonth_u8 = cid->mdt % 0x0f;
+    Infos_st->SD_Card_OEM_u16 = cid->oid;
+    Infos_st->SD_Card_Manufacturer_u8 = cid->mid;
 
     // Get SD card speed
     if (TRUE == WriteTestEnabled)
