@@ -167,7 +167,7 @@ INC:= \
 	-I$(SRCDIR)/USHELL \
 	-I$(SRCDIR)/VIRTUAL_MEM \
 
-RUN:=$(CC) -DBOARD=EVK1104 -DFREERTOS_USED $(INC) -Os -fdata-sections  -Wall -c -fmessage-length=0 -mpart=uc3a3256s -ffunction-sections -masm-addr-pseudos
+RUN:=$(CC) -DBOARD=EVK1104 -DFREERTOS_USED $(INC) -O0 -fdata-sections  -Wall -c -fmessage-length=0 -mpart=uc3a3256s -ffunction-sections -masm-addr-pseudos
 
 RUNLINK:= $(CC) -nostartfiles -L$(SRCDIR)/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS -L$(SRCDIR)/SOFTWARE_FRAMEWORK/BOARDS -Wl,--gc-sections -Wl,-e,_trampoline -T$(SRCDIR)/SOFTWARE_FRAMEWORK/UTILS/LINKER_SCRIPTS/AT32UC3A3/256/GCC/link_uc3a3256.lds -mpart=uc3a3256s -Wl,--gc-sections --rodata-writable -Wl,--direct-data
 
