@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Atmel Studio Solution File, Format Version 11.00
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "STICK20_GIT", "STICK20_GIT.cproj", "{B19EB321-4623-42D6-8259-B5D025DAFC16}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B19EB321-4623-42D6-8259-B5D025DAFC16}.Debug|AVR.ActiveCfg = Debug|AVR
+		{B19EB321-4623-42D6-8259-B5D025DAFC16}.Debug|AVR.Build.0 = Debug|AVR
+		{B19EB321-4623-42D6-8259-B5D025DAFC16}.Release|AVR.ActiveCfg = Release|AVR
+		{B19EB321-4623-42D6-8259-B5D025DAFC16}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

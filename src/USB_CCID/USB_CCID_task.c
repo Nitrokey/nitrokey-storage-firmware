@@ -389,11 +389,7 @@ void USB_CCID_task (void* pvParameters)
 
     ISO7816_InitSC ();
 
-    // If configuration not found then init it
-    if (FALSE == ReadStickConfigurationFromUserPage ())
-    {
-        InitStickConfigurationToUserPage_u8 ();
-    }
+    read_configuration_or_init_u8();
 
 //    Usb_enable_stall_handshake (EP_CCID_OUT);
 //    Usb_ack_setup_received_free ();
@@ -440,7 +436,7 @@ void USB_CCID_task (void* pvParameters)
         {
             Startup_b = FALSE;
             // CI_LocalPrintf ("USB_CCID : USB CCID started - %d\n",xTaskGetTickCount());
-            DelayMs (100);  // Wait 100 ms
+            DelayMs (2000);  // Wait 100 ms
             USB_CCID_send_INT_Message ();   // We are always online
         }
 

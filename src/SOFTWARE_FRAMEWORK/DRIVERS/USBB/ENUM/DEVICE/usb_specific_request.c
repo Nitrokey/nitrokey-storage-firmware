@@ -96,7 +96,7 @@ static void hid_get_descriptor (U8 size_of_report, const U8 * p_usb_hid_report);
 
 u8 Stick20HIDSendMatrixData (u8 * output);
 u8 Stick20HIDSendProductionInfos (u8 * output);
-extern u8 Stick20HIDSendConfigurationState_u8;
+extern volatile u8 Stick20HIDSendConfigurationState_u8;
 
 #define STICK20_SEND_STATUS_IDLE     0
 #define STICK20_SEND_STATUS_PIN      1

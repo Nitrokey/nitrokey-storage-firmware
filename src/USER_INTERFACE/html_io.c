@@ -763,7 +763,7 @@ void HID_ExcuteCmd (void)
         case HTML_CMD_PRODUCTION_TEST_WITH_WRITE_TEST:
             CI_TickLocalPrintf ("Get HTML_CMD_PRODUCTION_TEST_WITH_WRITE_TEST\r\n");
             GetProductionInfos (&Stick20ProductionInfos_st,TRUE);
-            Stick20HIDInitSendConfiguration (STICK20_SEND_PRODUCTION_TEST);
+            //Stick20HIDInitSendConfiguration (STICK20_SEND_PRODUCTION_TEST);
             UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_OK, 0);
             break;
 
@@ -1030,9 +1030,8 @@ u32 Blockcount_u32;
     Infos_st->CPU_CardID_u32 = CPU_ID_u32;
 
     // Init SD - read capacity
-    sd_mmc_mci_read_capacity (SD_SLOT, (unsigned long int *) &Blockcount_u32);
-
-    Infos_st->SD_Card_Size_u8 = Blockcount_u32 / 2 / 1024 / 1024 + 1;   // in GB
+   sd_mmc_mci_read_capacity (SD_SLOT, (unsigned long int *) &Blockcount_u32);
+   Infos_st->SD_Card_Size_u8 = Blockcount_u32 / 2 / 1024 / 1024 + 1;   // in GB
 
     // Save smartcard infos
     if (TRUE == WriteTestEnabled)
@@ -1050,7 +1049,6 @@ u32 Blockcount_u32;
 
     // Get SD card infos
     cid = (cid_t *) GetSdCidInfo ();
-
     Infos_st->SD_CardID_u32 = (cid->psnh << 8) + cid->psnl;
     Infos_st->SD_Card_ManufacturingYear_u8 = cid->mdt / 16;
     Infos_st->SD_Card_ManufacturingMonth_u8 = cid->mdt % 0x0f;

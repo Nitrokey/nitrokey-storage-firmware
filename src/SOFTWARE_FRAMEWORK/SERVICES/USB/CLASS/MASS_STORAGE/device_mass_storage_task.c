@@ -133,6 +133,8 @@ extern int sd_mmc_mci_test_unit_only_local_access;
 #define MAX_TICKS_UNTIL_RESTART_MSD_INTERFACE           (5000ULL *(unsigned long long)TIME_MEASURING_TICKS_IN_USEC * 1000ULL)   // 5 sec
 #define MAX_TICKS_STARTUP_UNTIL_RESTART_MSD_INTERFACE   (   0ULL *(unsigned long long)TIME_MEASURING_TICKS_IN_USEC * 1000ULL)   // no delay 0 sec
 
+unsigned char ReadConfigurationSuccesfull(void);
+
 #ifdef FREERTOS_USED
 void device_mass_storage_task (void* pvParameters)
 #else
@@ -150,7 +152,7 @@ void device_mass_storage_task (void)
 
     for (i=0;i<2000;i++)
     {
-      if (TRUE == ReadStickConfigurationFromUserPage ())
+      if (TRUE == ReadConfigurationSuccesfull())
       {
          break;
       }
@@ -179,43 +181,6 @@ void device_mass_storage_task (void)
         usb_mass_storage_cbw ();
         usb_mass_storage_csw ();
     }
-
-    // Check LUN activity
-
-    if (30 <= LoopCounter_u32)
-    {
-        ActualTime_u64 = TIME_MEASURING_GetTime ();
-        if ((FALSE == sd_mmc_mci_test_unit_only_local_access)   // On local access > disable check
-            // || (ActualTime_u64 > MAX_TICKS_STARTUP_UNTIL_RESTART_MSD_INTERFACE) // Not check on startup
-            )
-        {
-            ErrorFound = FALSE;
-            if (ActualTime_u64 - LastLunAccessInTick_u64[0] > TickDelayToRestart)
-            {
-                CI_StringOut ("UNCRYPTED LUN 0 - TIMEOUT\r\n");
-                ErrorFound = TRUE;
-            }
-            // Check LUN activity
-            if (ActualTime_u64 - LastLunAccessInTick_u64[1] > TickDelayToRestart)
-            {
-                CI_StringOut ("ENCRYPTED LUN 1 - TIMEOUT\r\n");
-                ErrorFound = TRUE;
-            }
-            /*
-               if (TRUE == ErrorFound) { CI_StringOut ("*** RESTART MSD DEVICE TASK ***\r\n"); LastLunAccessInTick_u64[0] = ActualTime_u64;
-               LastLunAccessInTick_u64[1] = ActualTime_u64; usb_device_task_delete(); usb_device_task_init(); } */
-        }
-        else
-        {
-            LastLunAccessInTick_u64[0] = ActualTime_u64;    // Avoid wrong timeout
-            LastLunAccessInTick_u64[1] = ActualTime_u64;
-        }
-    }
-    else
-    {
-        LoopCounter_u32 = 0;
-    }
-
 
 #ifdef FREERTOS_USED
 }

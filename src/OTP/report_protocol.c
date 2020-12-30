@@ -226,7 +226,7 @@ u32 calculated_crc32;
 
 //extern volatile long xTickCount;
 
-u8 Stick20HIDSendConfigurationState_u8 = STICK20_SEND_STATUS_IDLE;
+volatile u8 Stick20HIDSendConfigurationState_u8 = STICK20_SEND_STATUS_IDLE;
 
 u8 Stick20HIDInitSendConfiguration (u8 state_u8)
 {
@@ -401,8 +401,8 @@ u8 text_au8[10];
 
 u8 Stick20HIDSendProductionInfos (u8 * output)
 {
-u32 calculated_crc32;
-typeStick20ProductionInfos_st Infos_st;
+    u32 calculated_crc32 ALIGNED;
+    typeStick20ProductionInfos_st Infos_st ALIGNED;
 
     HID_Stick20SendData_st.SendDataType_u8 = OUTPUT_CMD_STICK20_SEND_DATA_TYPE_PROD_INFO;
 
@@ -421,7 +421,7 @@ typeStick20ProductionInfos_st Infos_st;
     Infos_st.SD_WriteSpeed_u16 = change_endian_u16 (Infos_st.SD_WriteSpeed_u16);
 
 
-    memcpy (&HID_Stick20SendData_st.SendData_u8[0], &Infos_st, sizeof (typeStick20ProductionInfos_st));
+    memcpy (HID_Stick20SendData_st.SendData_u8, &Infos_st, s_min(sizeof (typeStick20ProductionInfos_st), sizeof(HID_Stick20SendData_st.SendData_u8)));
 
 
     HID_Stick20SendData_st.FollowBytesFlag_u8 = 0;  // No next data

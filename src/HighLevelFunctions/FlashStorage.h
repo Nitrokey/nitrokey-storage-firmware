@@ -67,6 +67,12 @@ u32 EraseLocalFlashKeyValues_u32 (void);
 #define SD_CRYPTED_VOLUME_BIT_PLACE     1
 #define SD_HIDDEN_VOLUME_BIT_PLACE      2
 
+#ifndef _MSC_VER
+#define __packed __attribute__((__packed__))
+#else
+#define __packed 
+#endif
+
 /*
    #if (defined __GNUC__) && (defined __AVR32__) __attribute__((__aligned__(4))) #elif (defined __ICCAVR32__) #pragma data_alignment = 4 #endif */
 /* Look for 4 byte alignment of 32 bit values */
@@ -87,12 +93,13 @@ typedef struct
     u8 AdminPwRetryCount;       // Admin password retry count 1 byte // 20 Byte not packed
     u32 ActiveSmartCardID_u32;  // 4 byte
     u8 StickKeysNotInitiated_u8;    // No AES keys computed (1 = AES are builded) 1 byte // 25 Byte not packed
-} typeStick20Configuration_st;  // Sum 25 byte (Max 25 Byte) // not packed
+} __packed typeStick20Configuration_st;  // Sum 25 byte (Max 25 Byte) // not packed
 
 
 extern typeStick20Configuration_st StickConfiguration_st;
 
 
+u8 ReadConfigurationSuccesfull(void);
 u8 ReadStickConfigurationFromUserPage (void);
 void SendStickStatusToHID (typeStick20Configuration_st * Status_st);
 

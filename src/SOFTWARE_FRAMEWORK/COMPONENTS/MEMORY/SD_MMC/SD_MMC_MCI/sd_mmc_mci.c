@@ -910,6 +910,17 @@ Bool is_dma_ram_2_usb_complete (void)
 
 void STICK20_mci_aes (unsigned char cMode, unsigned short int u16BufferSize, unsigned int* pIOBuffer, unsigned int BlockNr_u32);
 
+static void stop_dma(){
+	taskENTER_CRITICAL ();
+    AVR32_DMACA.chenreg = (~(3 << AVR32_DMACA_CHENREG_CH_EN_OFFSET) | ~(3 << AVR32_DMACA_CHENREG_CH_EN_WE_OFFSET));
+    AVR32_DMACA.DMACFGREG.dma_en = 0;
+    while(!is_dma_ram_2_mci_complete());
+	while(!is_dma_ram_2_usb_complete());
+	while(!is_dma_usb_2_ram_complete());
+	while(!is_dma_mci_2_ram_complete());
+	taskEXIT_CRITICAL();
+}
+
 static void dma_mci_2_ram_crypted (void* ram, size_t size, unsigned int BlockNr_u32)
 {
     // int *pRam = ram;
@@ -1720,21 +1731,45 @@ U32 BlockNr_u32;
                 dma_ram_2_usb (&sector_buf_1, SD_MMC_SECTOR_SIZE);
             }
             // Wait completion of both stages.
-            while (!is_dma_mci_2_ram_complete ());
-
-            // AES Test
-            // STICK20_ram_aes_ram(STICK20_MCI_TO_AES_TO_RAM,SD_MMC_SECTOR_SIZE/4,(unsigned int *)sector_buf_0, pSTICK20_AES_BUFFER);
-            // CI_LocalPrintf("-");
-
-            while (!is_dma_ram_2_usb_complete ());
+			Bool res1 = busy_wait(is_dma_mci_2_ram_complete);
+			Bool res2 = busy_wait(is_dma_ram_2_usb_complete);
+            if (!( res1 && res2)){
+                stop_dma();
+                BlockNr_u32--;
+                nb_sector++;
+                buffer_id = (buffer_id+1)%2;
+				taskENTER_CRITICAL ();
+				xSemaphoreGive (AES_semphr);
+				taskEXIT_CRITICAL ();
+                continue;
+            }
 
         }
         else
         {
             b_last_state_full = TRUE;
             // Wait completion of first stage only.
-            while (!is_dma_mci_2_ram_complete ());
-
+            //while (!is_dma_mci_2_ram_complete ());			// FIXME got stuck here on after 1 hour of using data 
+			/** data for the failed case:
+			b_last_state_full	1	Bool@0x923e ([R7]-6)
+			buffer_id	1	U8@0x923f ([R7]-5)
+			BlockNr_u32	6086273	U32@0x9240 ([R7]-4)
+			slot	0	U8@0x9238 ([R7]-12)
+			nb_sector	127	U16@0x9234 ([R7]-16)
+			StartBlockNr_u32	6086272	U32@0x9230 ([R7]-20)
+			*/
+			//busy_wait(is_dma_mci_2_ram_complete);
+			
+			 if (!busy_wait(is_dma_mci_2_ram_complete)){
+                stop_dma();
+                BlockNr_u32--;
+                nb_sector++;
+                buffer_id = (buffer_id+1)%2;
+				taskENTER_CRITICAL ();
+				xSemaphoreGive (AES_semphr);
+				taskEXIT_CRITICAL ();
+                continue;
+            }
         }
 
         taskENTER_CRITICAL ();
@@ -1770,7 +1805,7 @@ U32 BlockNr_u32;
         dma_ram_2_usb (&sector_buf_0, SD_MMC_SECTOR_SIZE);
     }
 
-    while (!is_dma_ram_2_usb_complete ());
+    busy_wait(is_dma_ram_2_usb_complete);
 
     taskENTER_CRITICAL ();
     xSemaphoreGive (AES_semphr);
@@ -1840,8 +1875,13 @@ U32 BlockNr_u32;
             BlockNr_u32++;
 
             // Wait completion of both stages.
-            while (!is_dma_usb_2_ram_complete ());
-            while (!is_dma_ram_2_mci_complete ());
+            if (!(busy_wait(is_dma_usb_2_ram_complete) && busy_wait(is_dma_ram_2_mci_complete) )){
+                stop_dma();
+                BlockNr_u32--;
+                nb_sector++;
+                buffer_id = (buffer_id+1)%2;
+                continue;
+            }
 
             // AES Test
             // STICK20_ram_aes_ram(STICK20_RAM_TO_AES_TO_MCI,SD_MMC_SECTOR_SIZE/4,(unsigned int *)sector_buf_0, pSTICK20_AES_BUFFER);
@@ -1852,9 +1892,7 @@ U32 BlockNr_u32;
         {
             b_last_state_full = TRUE;
             // Wait completion of the first stage only.
-            while (!is_dma_usb_2_ram_complete ())
-            {
-            }
+            busy_wait (is_dma_usb_2_ram_complete);
         }
 
         taskENTER_CRITICAL ();
@@ -1882,7 +1920,7 @@ U32 BlockNr_u32;
         dma_ram_2_mci (&sector_buf_0, SD_MMC_SECTOR_SIZE, BlockNr_u32);
     }
 
-    while (!is_dma_ram_2_mci_complete ());
+    busy_wait(is_dma_ram_2_mci_complete);
 
     taskENTER_CRITICAL ();
     xSemaphoreGive (AES_semphr);
