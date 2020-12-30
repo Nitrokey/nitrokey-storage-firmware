@@ -185,6 +185,7 @@ all: firmware.hex $(FIRMWARE)
 $(FIRMWARE): firmware.hex
 	cp $< $@
 
+.PHONY: clean
 clean:
 	-rm $(OBJS) $(OBJSASM)
 
@@ -203,3 +204,20 @@ USB_MASS.elf: $(OBJS) $(OBJSASM)
 firmware.hex: USB_MASS.elf
 	ls -l $<
 	avr-objcopy -R .eeprom -O ihex $< $@
+
+.PHONY: flash
+flash: firmware.hex
+	lsusb | grep 20a0:
+	sudo dfu-programmer at32uc3a3256s erase
+	sleep 1
+	sudo dfu-programmer at32uc3a3256s flash --suppress-bootloader-mem firmware.hex
+	sleep 1
+	-sudo dfu-programmer at32uc3a3256s launch
+	sleep 1
+	lsusb | grep 20a0:
+	date
+
+.PHONY: help
+help:
+	@echo "Targets:"
+	@grep "^[\.\w]*:" -P Makefile --color=yes
