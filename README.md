@@ -19,6 +19,7 @@ Install the following tools in this order:
 
 ### Linux
 
+#### GUI
 The compile procedure is as follows (tested on ArchLinux but should work on any
 other GNU/Linux OS):
 1. Clone this git project (`git clone https://github.com/Nitrokey/nitrokey-storage-firmware.git`)
@@ -28,6 +29,18 @@ other GNU/Linux OS):
 5. Rename `pm_240.h` in the git project folder to `pm_231.h`. Make a backup of `as4e-ide/plugins/com.atmel.avr.toolchains.linux.x86_64_3.0.0.201009140852/os/linux/x86_64/avr32/include/avr32/pm_231.h`. Replace that `pm_231.h` with the renamed `pm_240.h`.
 6. In AVR32 Studio select Project | Build All.
 7. The builded file is now in the folder `Debug` of the git project folder.
+
+#### Command Line
+
+```
+# setup
+TOOLCHAIN_PATH=as4e-ide
+T_SUBPATH=plugins/com.atmel.avr.toolchains.linux.x86_64_3.0.0.201009140852/os/linux/x86_64/avr32/include/avr32/
+mv $(TOOLCHAIN_PATH)/$(T_SUBPATH)/pm_231.h{,~} -v
+cp pm_240.h $(TOOLCHAIN_PATH)/$(T_SUBPATH)/pm_231.h
+# firmware build
+cd src && make CC=path/to/avr32-gcc
+```
 
 #### Converting to .HEX file
 Before flashing there may be a need to convert binary file to .hex. If it was not done automatically execute the following in Debug or Release directory:
