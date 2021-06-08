@@ -189,6 +189,14 @@ $(FIRMWARE): firmware.hex
 clean:
 	-rm $(OBJS) $(OBJSASM)
 
+.PHONY: build-docker-toolchain
+build-docker-toolchain:
+	docker build .. -t nk-storage-build --build-arg TOOLCHAIN_LINK=${download_toolchain}
+
+.PHONY: docker-make
+docker-make:
+	docker run -i --rm -v $(PWD)/..:/app nk-storage-build make -C src CC=/avr32-gcc
+
 USB_MASS.elf: $(OBJS) $(OBJSASM)
 	$(RUNLINK) -o$@ $^  $(RUNLINK2)
 	ls -lh $@
