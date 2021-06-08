@@ -23,7 +23,7 @@ Install the following tools in this order:
 The compile procedure is as follows (tested on ArchLinux but should work on any
 other GNU/Linux OS):
 1. Clone this git project (`git clone https://github.com/Nitrokey/nitrokey-storage-firmware.git`)
-2. Download and extract [AVR32 Studio](http://www.atmel.com/tools/Archive/AVR32STUDIO2_6.aspx). Example archive filename: `avr32studio-ide-2.6.0.753-linux.gtk.x86_64.zip`. At the moment no newer version seems to be available for Linux.
+2. Download and extract [AVR32 Studio](https://www.microchip.com/mplab/avr-support/avr-and-sam-downloads-archive). Example archive filename: `avr32studio-ide-2.6.0.753-linux.gtk.x86_64.zip`. At the moment no newer version seems to be available for Linux.
 3. Start AVR32 Studio by executing `avr32studio` in the extracted folder.
 4. Import project into AVR32 Studio: File | Import... | General | Existing Projects into Workspace | Choose the folder of downloaded git project.
 5. Rename `pm_240.h` in the git project folder to `pm_231.h`. Make a backup of `as4e-ide/plugins/com.atmel.avr.toolchains.linux.x86_64_3.0.0.201009140852/os/linux/x86_64/avr32/include/avr32/pm_231.h`. Replace that `pm_231.h` with the renamed `pm_240.h`.
@@ -35,12 +35,13 @@ other GNU/Linux OS):
 ```
 # setup
 TOOLCHAIN_PATH=as4e-ide
-T_SUBPATH=plugins/com.atmel.avr.toolchains.linux.x86_64_3.0.0.201009140852/os/linux/x86_64/avr32/include/avr32/
+T_SUBPATH=plugins/com.atmel.avr.toolchains.linux.x86_64_3.0.0.201009140852/os/linux/x86_64/avr32/include/avr32
 mv $(TOOLCHAIN_PATH)/$(T_SUBPATH)/pm_231.h{,~} -v
 cp pm_240.h $(TOOLCHAIN_PATH)/$(T_SUBPATH)/pm_231.h
 # firmware build
 cd src && make CC=path/to/avr32-gcc
 ```
+
 
 #### Converting to .HEX file
 Before flashing there may be a need to convert binary file to .hex. If it was not done automatically execute the following in Debug or Release directory:
