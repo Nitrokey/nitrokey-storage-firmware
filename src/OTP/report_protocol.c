@@ -1874,7 +1874,7 @@ u8 slot_no = report[CMD_GC_SLOT_NUMBER_OFFSET];
 
 u8 cmd_write_config (u8 * report, u8 * output)
 {
-u8 slot_tmp[64];                // this is will be the new slot contents
+u8 slot_tmp[GLOBAL_CONFIG_SIZE];                // this is will be the new slot contents
 
     memset (slot_tmp, 0, 5);
 
