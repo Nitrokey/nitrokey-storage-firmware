@@ -28,18 +28,12 @@
 
 u8 WriteAESStorageKeyToUserPage (u8 * data);
 u8 ReadAESStorageKeyToUserPage (u8 * data);
-u8 WriteMatrixColumsUserPWToUserPage (u8 * data);
-u8 ReadMatrixColumsUserPWFromUserPage (u8 * data);
-u8 WriteMatrixColumsAdminPWFromUserPage (u8 * data);
-u8 ReadMatrixColumsAdminPWFromUserPage (u8 * data);
 u8 WriteStickConfigurationToUserPage (void);
 u8 ReadStickConfigurationFromUserPage (void);
 u8 InitStickConfigurationToUserPage_u8 (void);
 
 u8 WriteHiddenVolumeSlotKey (u8 * data);
 u8 ReadHiddenVolumeSlotsKey (u8 * data);
-
-u8 ReadMatrixColumsUserPWFromUserPage (u8 * data);
 
 u8 Read_ReadWriteStatusEncryptedVolume_u8 (void);
 u8 Write_ReadWriteStatusEncryptedVolume_u8 (u8 NewStatus_u8);
