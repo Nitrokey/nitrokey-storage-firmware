@@ -456,6 +456,7 @@ u32 DecryptKeyViaSmartcard_u32 (u8 * StorageKey_pu8)
 
 u32 IsStorageKeyEmpty_u32(const u8 * StorageKey_pu8){
     // check if retrieved key is all-zeroes
+    // TODO make it constant time check
     int keyByte;
     for (keyByte = 0; keyByte < sizeof(StorageKey_pu8); keyByte++) {
         if (StorageKey_pu8[keyByte] != 0) {
