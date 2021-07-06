@@ -68,6 +68,7 @@
  Local declarations
 
 *******************************************************************************/
+void CalculateAndSaveStorageKeyHash_u32(const u8 * StorageKey_pu8);
 
 
 /*******************************************************************************
@@ -123,6 +124,8 @@ u8 Buffer_au8[AES_KEYSIZE_256_BIT];
     HexPrint (AES_KEYSIZE_256_BIT, StorageKey_au8);
     CI_LocalPrintf ("\r\n");
 #endif
+
+    CalculateAndSaveStorageKeyHash_u32(StorageKey_au8);
 
     memcpy (Buffer_au8, StorageKey_au8, AES_KEYSIZE_256_BIT);
 
