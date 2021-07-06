@@ -69,7 +69,6 @@
 #include "DFU_test.h"
 #include "../USER_INTERFACE/file_io.h"
 #include "OTP_Test.h"
-#include "../HighLevelFunctions/MatrixPassword.h"
 #include "../HighLevelFunctions/HandleAesStorageKey.h"
 #include "SD_Test.h"
 #include "../HighLevelFunctions/HiddenVolume.h"

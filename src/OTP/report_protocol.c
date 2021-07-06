@@ -443,144 +443,6 @@ u8 Stick20HIDSendProductionInfos (u8 * output)
     return (TRUE);
 }
 
-/*******************************************************************************
-
-  Stick20HIDInitSendMatrixData
-
-  Reviews
-  Date      Reviewer        Info
-  16.08.13  RB              First review
-
-*******************************************************************************/
-
-u8 Stick20HIDSendMatrixState_u8 = 0;
-u8* Stick20HIDSendMatrixDataBlock_au8 = NULL;
-
-u8 Stick20HIDInitSendMatrixData (u8 * PasswordMatrixData_au8)
-{
-    CI_StringOut ("Init SendMatrix\r\n");
-
-    Stick20HIDSendMatrixState_u8 = 1;
-    Stick20HIDSendMatrixDataBlock_au8 = PasswordMatrixData_au8;
-
-    return (TRUE);
-}
-
-/*******************************************************************************
-
-  Stick20HIDSendMatrixData
-
-  Password matrix HID Block
-
-  Byte
-  0       Status
-          0 - IDEL
-          1 - Start new Block
-          2 - Data  0-19
-          3 - Data 20-39
-          4 - Data 40-59
-          5 - Data 60-79
-          6 - Data 80-99
-          7 - All Data send, CRC
-  1-20    Data or CRC
-
-  Reviews
-  Date      Reviewer        Info
-  16.08.13  RB              First review
-
-*******************************************************************************/
-
-u8 Stick20HIDSendMatrixData (u8 * output)
-{
-u32 calculated_crc32;
-
-    HID_Stick20SendData_st.SendDataType_u8 = OUTPUT_CMD_STICK20_SEND_DATA_TYPE_PW_DATA;
-
-    switch (Stick20HIDSendMatrixState_u8)
-    {
-        case 0:    // IDLE - wait
-            break;
-        case 1:
-            CI_StringOut ("SendMatrix S1\r\n");
-            HID_Stick20SendData_st.SendData_u8[0] = 1;  // Set state in sendblock
-            HID_Stick20SendData_st.FollowBytesFlag_u8 = 1;  // Yes
-            HID_Stick20SendData_st.SendSize_u8 = 1;
-            Stick20HIDSendMatrixState_u8 = 2;   // Next state
-            break;
-        case 2:
-            CI_StringOut ("SendMatrix S2\r\n");
-            HID_Stick20SendData_st.SendData_u8[0] = 2;  // Set state in sendblock
-            memcpy (&HID_Stick20SendData_st.SendData_u8[1], &Stick20HIDSendMatrixDataBlock_au8[0], 20);
-            HID_Stick20SendData_st.FollowBytesFlag_u8 = 1;  // Yes
-            HID_Stick20SendData_st.SendSize_u8 = 21;
-            Stick20HIDSendMatrixState_u8 = 3;   // Next state
-            break;
-        case 3:
-            CI_StringOut ("SendMatrix S3\r\n");
-            HID_Stick20SendData_st.SendData_u8[0] = 3;  // Set state in sendblock
-            memcpy (&HID_Stick20SendData_st.SendData_u8[1], &Stick20HIDSendMatrixDataBlock_au8[20], 20);
-            HID_Stick20SendData_st.FollowBytesFlag_u8 = 1;  // Yes
-            HID_Stick20SendData_st.SendSize_u8 = 21;
-            Stick20HIDSendMatrixState_u8 = 4;   // Next state
-            break;
-        case 4:
-            CI_StringOut ("SendMatrix S4\r\n");
-            HID_Stick20SendData_st.SendData_u8[0] = 4;  // Set state in sendblock
-            memcpy (&HID_Stick20SendData_st.SendData_u8[1], &Stick20HIDSendMatrixDataBlock_au8[40], 20);
-            HID_Stick20SendData_st.FollowBytesFlag_u8 = 1;  // Yes
-            HID_Stick20SendData_st.SendSize_u8 = 21;
-            Stick20HIDSendMatrixState_u8 = 5;   // Next state
-            break;
-        case 5:
-            CI_StringOut ("SendMatrix S5\r\n");
-            HID_Stick20SendData_st.SendData_u8[0] = 5;  // Set state in sendblock
-            memcpy (&HID_Stick20SendData_st.SendData_u8[1], &Stick20HIDSendMatrixDataBlock_au8[60], 20);
-            HID_Stick20SendData_st.FollowBytesFlag_u8 = 1;  // Yes
-            HID_Stick20SendData_st.SendSize_u8 = 21;
-            Stick20HIDSendMatrixState_u8 = 6;   // Next state
-            break;
-        case 6:
-            CI_StringOut ("SendMatrix S6\r\n");
-            HID_Stick20SendData_st.SendData_u8[0] = 6;  // Set state in sendblock
-            memcpy (&HID_Stick20SendData_st.SendData_u8[1], &Stick20HIDSendMatrixDataBlock_au8[80], 20);
-            HID_Stick20SendData_st.FollowBytesFlag_u8 = 1;  // Yes
-            HID_Stick20SendData_st.SendSize_u8 = 1;
-            Stick20HIDSendMatrixState_u8 = 7;   // Next state
-            break;
-        case 7:
-            CI_StringOut ("SendMatrix S7\r\n");
-            HID_Stick20SendData_st.SendData_u8[0] = 7;  // Set state in sendblock
-
-            // Build CRC over matrix password data
-            calculated_crc32 = generateCRC_len (Stick20HIDSendMatrixDataBlock_au8, 100 / 4);
-            HID_Stick20SendData_st.SendData_u8[1] = calculated_crc32 & 0xFF;
-            HID_Stick20SendData_st.SendData_u8[2] = (calculated_crc32 >> 8) & 0xFF;
-            HID_Stick20SendData_st.SendData_u8[3] = (calculated_crc32 >> 16) & 0xFF;
-            HID_Stick20SendData_st.SendData_u8[4] = (calculated_crc32 >> 24) & 0xFF;
-
-            HID_Stick20SendData_st.FollowBytesFlag_u8 = 0;  // No
-            HID_Stick20SendData_st.SendSize_u8 = 5;
-            Stick20HIDSendMatrixState_u8 = 0;   // Next state - idle
-            break;
-        default:
-            break;
-    }
-
-    HID_Stick20SendData_st.SendCounter_u8 += 1;
-
-    // Copy send data to transfer struct
-    memcpy (&output[OUTPUT_CMD_RESULT_STICK20_DATA_START], (void *) &HID_Stick20SendData_st, sizeof (HID_Stick20SendData_est));
-
-    // Build CRC, can overwritten by new CRC computation
-    calculated_crc32 = generateCRC (output);
-
-    output[OUTPUT_CRC_OFFSET] = calculated_crc32 & 0xFF;
-    output[OUTPUT_CRC_OFFSET + 1] = (calculated_crc32 >> 8) & 0xFF;
-    output[OUTPUT_CRC_OFFSET + 2] = (calculated_crc32 >> 16) & 0xFF;
-    output[OUTPUT_CRC_OFFSET + 3] = (calculated_crc32 >> 24) & 0xFF;
-
-    return (TRUE);
-}
 
 /*******************************************************************************
 
@@ -1036,38 +898,6 @@ u8 text[10];
                     memcpy (HID_String_au8, &report[1], 33);
                     break;
 
-#ifdef HID_PASSWORD_MARTIX_AKTIV
-                case STICK20_CMD_SEND_PASSWORD_MATRIX:
-                    CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_MATRIX\r\n");
-
-                    StartStick20Command (STICK20_CMD_SEND_PASSWORD_MATRIX);
-
-                    // Transfer data to other context
-                    HID_CmdGet_u8 = HTML_CMD_SEND_PASSWORD_MATRIX;
-                    memcpy (HID_String_au8, &report[1], 33);
-                    break;
-
-                case STICK20_CMD_SEND_PASSWORD_MATRIX_PINDATA:
-                    CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_MATRIX_PINDATA\r\n");
-
-                    StartStick20Command (STICK20_CMD_SEND_PASSWORD_MATRIX_PINDATA);
-
-                    // Transfer data to other context
-                    HID_CmdGet_u8 = HTML_CMD_SEND_PASSWORD_MATRIX_PINDATA;
-                    memcpy (HID_String_au8, &report[1], 33);
-                    break;
-
-                case STICK20_CMD_SEND_PASSWORD_MATRIX_SETUP:
-                    CI_StringOut ("Get STICK20_CMD_SEND_PASSWORD_MATRIX_SETUP\r\n");
-
-                    StartStick20Command (STICK20_CMD_SEND_PASSWORD_MATRIX_SETUP);
-
-                    // Transfer data to other context
-                    HID_CmdGet_u8 = HTML_CMD_SEND_PASSWORD_MATRIX_SETUP;
-                    memcpy (HID_String_au8, &report[1], 33);
-                    break;
-#endif
-
                 case STICK20_CMD_GET_DEVICE_STATUS:
                     CI_StringOut ("Get STICK20_CMD_GET_DEVICE_STATUS\r\n");
 
@@ -1291,13 +1121,6 @@ u8 text[10];
         memcpy (&output[OUTPUT_CMD_RESULT_STICK20_STATUS_START], (void *) &HID_Stick20Status_st, sizeof (HID_Stick20Status_est));
 
     }
-
-    // Stick 20 Send password matrix ?
-    if (0 != Stick20HIDSendMatrixState_u8)
-    {
-        Stick20HIDSendMatrixData (output);
-    }
-
 
     calculated_crc32 = generateCRC (output);
 
