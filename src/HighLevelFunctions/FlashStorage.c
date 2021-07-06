@@ -70,8 +70,8 @@ typeStick20Configuration_st StickConfiguration_st;
 
    Byte 
    0 - 31 AES Storage key
-   32 - 51 Matrix columns for user password
-   52 - 71 Matrix columns for admin password 
+   32 - 51 AES Storage key control sum
+   52 - 71 reserved
    72 - 101 Stick Configuration 
    102 - 133 Base for AES key hidden volume (32 byte) 
    134 - 137 ID of sd card (4 byte) 
