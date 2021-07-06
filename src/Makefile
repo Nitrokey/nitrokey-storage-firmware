@@ -18,7 +18,6 @@ SRCS:= \
 	$(SRCDIR)/HighLevelFunctions/FlashStorage.c   \
 	$(SRCDIR)/HighLevelFunctions/HandleAesStorageKey.c   \
 	$(SRCDIR)/HighLevelFunctions/HiddenVolume.c   \
-	$(SRCDIR)/HighLevelFunctions/MatrixPassword.c   \
 	$(SRCDIR)/HighLevelFunctions/password_safe.c   \
 	$(SRCDIR)/INTERNAL_WORK/internal_work.c   \
 	$(SRCDIR)/nitrokey.c   \
