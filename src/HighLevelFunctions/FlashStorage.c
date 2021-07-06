@@ -178,8 +178,11 @@ u8 WriteStorageKeyHashToUserPage (u8 * data)
 }
 
 
-u8 ReadStorageKeyHashFromUserPage (u8 * data)
+u8 ReadStorageKeyHashFromUserPage (u8 * data, const u32 buf_size)
 {
+    if (sizeof(user_page->storage_key_hash) > buf_size) {
+        return (FALSE);
+    }
     memcpy (data, (void *) (user_page->storage_key_hash), sizeof(user_page->storage_key_hash));
     return (TRUE);
 }

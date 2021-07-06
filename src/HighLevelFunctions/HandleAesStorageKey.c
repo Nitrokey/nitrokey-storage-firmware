@@ -38,6 +38,7 @@
 #include "HandleAesStorageKey.h"
 #include "password_safe.h"
 #include "HiddenVolume.h"
+#include "../OTP/hmac-sha1.h"
 
 /*******************************************************************************
 
@@ -456,10 +457,27 @@ u32 DecryptKeyViaSmartcard_u32 (u8 * StorageKey_pu8)
 
 u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     // 1. get the hash from the flashstorage unit
+    u8 StorageKeyHashSaved[20];
+    u8 StorageKeyHashCalculated[20];
+    ReadStorageKeyHashFromUserPage(StorageKeyHashSaved, sizeof StorageKeyHashSaved);
+
     // 2. run hashing
+    const int KeyLengthBytes = 32;
+    hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
+
     // 3. compare constant time
+    if (memcmp(StorageKeyHashSaved, StorageKeyHashCalculated, sizeof StorageKeyHashSaved) == 0) {
+        return (TRUE);
+    }
 
     return (FALSE);
+}
+
+void CalculateAndSaveStorageKeyHash_u32(const u8 * StorageKey_pu8){
+    u8 StorageKeyHashCalculated[20];
+    hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, 32*8, StorageKey_pu8, 32*8);
+    WriteStorageKeyHashToUserPage(StorageKeyHashCalculated);
+    memset_safe(StorageKeyHashCalculated, 0, sizeof StorageKeyHashCalculated);
 }
 
 u32 IsStorageKeyEmpty_u32(const u8 * StorageKey_pu8){
