@@ -454,6 +454,14 @@ u32 DecryptKeyViaSmartcard_u32 (u8 * StorageKey_pu8)
     return (TRUE);
 }
 
+u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
+    // 1. get the hash from the flashstorage unit
+    // 2. run hashing
+    // 3. compare constant time
+
+    return (FALSE);
+}
+
 u32 IsStorageKeyEmpty_u32(const u8 * StorageKey_pu8){
     // check if retrieved key is all-zeroes
     // TODO make it constant time check
@@ -484,6 +492,11 @@ u32 IsStorageKeyEmpty_u32(const u8 * StorageKey_pu8){
 
 u32 GetStorageKey_u32 (u8 * UserPW_pu8, u8 * StorageKey_pu8)
 {
+    if (FALSE == CheckStorageKey_u8())
+    {
+        return (FALSE);
+    }
+
     /* Enable smartcard */
     if (FALSE == LA_OpenPGP_V20_Test_SendUserPW2 (UserPW_pu8))
     {
@@ -502,6 +515,11 @@ u32 GetStorageKey_u32 (u8 * UserPW_pu8, u8 * StorageKey_pu8)
     }
 
     if (TRUE == IsStorageKeyEmpty_u32(StorageKey_pu8))
+    {
+        return (FALSE);
+    }
+
+    if (TRUE == CheckStorageKeyHash_u32(StorageKey_pu8))
     {
         return (FALSE);
     }
