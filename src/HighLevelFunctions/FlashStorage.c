@@ -86,8 +86,8 @@ typeStick20Configuration_st StickConfiguration_st;
 
 typedef struct {
     u8 AES_key[32];
-    u8 matrix_user[20];
-    u8 matrix_admin[20];
+    u8 reserved_2[20];
+    u8 reserved[20];
     u8 stick_configuration[30];
     u8 hidden_volume_AES_key_base[32];
     u8 sdcard_id[4];
