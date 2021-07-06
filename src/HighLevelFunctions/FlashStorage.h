@@ -29,7 +29,7 @@
 u8 WriteAESStorageKeyToUserPage (u8 * data);
 u8 ReadAESStorageKeyToUserPage (u8 * data);
 u8 WriteStorageKeyHashToUserPage (u8 * data);
-u8 ReadStorageKeyHashFromUserPage (u8 * data);
+u8 ReadStorageKeyHashFromUserPage (u8 * data, u32 buf_size);
 u8 WriteStickConfigurationToUserPage (void);
 u8 ReadStickConfigurationFromUserPage (void);
 u8 InitStickConfigurationToUserPage_u8 (void);
