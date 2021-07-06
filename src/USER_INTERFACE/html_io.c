@@ -259,22 +259,10 @@ void HID_ExcuteCmd (void)
 
                 CI_TickLocalPrintf ("Get key for crypted volume\r\n");
 
-                u8 isKeyZero = TRUE;
                 u8 isKeyValid = GetStorageKey_u32 (&HID_String_au8[1], StorageKey_pu8);
 
-                // check if retrieved key is all-zeroes
-                if (TRUE == isKeyValid) {
-                    u8 keyByte;
-                    for (keyByte = 0; keyByte < sizeof(StorageKey_pu8); keyByte++) {
-                        if (StorageKey_pu8[keyByte] != 0) {
-                            isKeyZero = FALSE;
-                            break;
-                        }
-                    }
-                }
-
                 // Terminate mounting procedure if key could not be retrieved or is all-zero
-                if (FALSE == isKeyValid || TRUE == isKeyZero) {
+                if (FALSE == isKeyValid) {
                     UpdateStick20Command (CMD_STATUS_AES_DEC_FAILED, 0);
                     HID_NextPasswordIsHiddenPassword_u32 = FALSE;
                     break;
