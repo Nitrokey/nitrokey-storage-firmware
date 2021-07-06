@@ -86,7 +86,7 @@ typeStick20Configuration_st StickConfiguration_st;
 
 typedef struct {
     u8 AES_key[32];
-    u8 reserved_2[20];
+    u8 storage_key_hash[20];
     u8 reserved[20];
     u8 stick_configuration[30];
     u8 hidden_volume_AES_key_base[32];
@@ -170,6 +170,19 @@ u8 ReadAESStorageKeyToUserPage (u8 * data)
     return (TRUE);
 }
 
+
+u8 WriteStorageKeyHashToUserPage (u8 * data)
+{
+    flashc_memcpy (user_page->storage_key_hash, data, sizeof(user_page->storage_key_hash), TRUE);
+    return (TRUE);
+}
+
+
+u8 ReadStorageKeyHashFromUserPage (u8 * data)
+{
+    memcpy (data, (void *) (user_page->storage_key_hash), sizeof(user_page->storage_key_hash));
+    return (TRUE);
+}
 
 /*******************************************************************************
 
