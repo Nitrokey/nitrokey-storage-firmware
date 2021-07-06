@@ -214,7 +214,7 @@ firmware.hex: USB_MASS.elf
 
 .PHONY: flash
 flash: firmware.hex
-	lsusb | grep 20a0:
+	lsusb | grep 03eb:
 	sudo dfu-programmer at32uc3a3256s erase
 	sleep 1
 	sudo dfu-programmer at32uc3a3256s flash --suppress-bootloader-mem firmware.hex
@@ -223,6 +223,16 @@ flash: firmware.hex
 	sleep 1
 	lsusb | grep 20a0:
 	date
+
+LIBNK=
+TP=-xv
+.PHONY: enable_bootloader
+enable_bootloader:
+	cd $(LIBNK)/unittest && pytest $(TP) test_storage.py -k "enable_firmware"
+
+.PHONY: run_tests
+run_tests:
+	cd $(LIBNK)/unittest && pytest $(TP) test_storage.py --template=html1/index.html --report=report.html && notify-send --urgency=low "finished" || notify-send --urgency=low "failed" && xdg-open report.html && false
 
 .PHONY: help
 help:
