@@ -37,9 +37,12 @@ firmware.hex: USB_MASS.elf
 	ls -l $<
 	avr-objcopy -R .eeprom -O ihex $< $@
 
+BOOTLOADER_VID := 03eb
 .PHONY: flash
 flash: firmware.hex
-	lsusb | grep 03eb:
+	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
+	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
+	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
 	sudo dfu-programmer at32uc3a3256s erase
 	sleep 1
 	sudo dfu-programmer at32uc3a3256s flash --suppress-bootloader-mem firmware.hex
@@ -63,3 +66,10 @@ run_tests:
 help:
 	@echo "Targets:"
 	@grep "^[\.\w]*:" -P Makefile --color=yes
+
+.PHONY: devloop
+devloop: | all enable_bootloader flash
+	@echo done
+
+
+-include local.mk
