@@ -458,6 +458,22 @@ u32 DecryptKeyViaSmartcard_u32 (u8 * StorageKey_pu8)
     return (TRUE);
 }
 
+int memcmp_safe(const u8 *a, size_t a_len, const u8 *b, size_t b_len){
+    // constant time, buffer length checked compare
+    // returns  0 on the same content of both buffers
+    //          -1 on different buffer sizes
+    //          +a on xor calculated differences
+    // NOT a drop-in replacement for memcmp
+    if (a_len != b_len) {
+        return -1;
+    }
+    int diff = 0, i;
+    for (i = 0; i < a_len; ++i) {
+        diff |= a[i] ^ b[i];
+    }
+    return diff;
+}
+
 u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     // 1. get the hash from the flashstorage unit
     u8 StorageKeyHashSaved[20];
@@ -468,8 +484,8 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     const int KeyLengthBytes = 32;
     hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
 
-    // 3. compare constant time
-    if (memcmp(StorageKeyHashSaved, StorageKeyHashCalculated, sizeof StorageKeyHashSaved) == 0) {
+    // 3. compare (TODO constant time)
+    if (memcmp_safe(StorageKeyHashSaved, sizeof StorageKeyHashSaved, StorageKeyHashCalculated, sizeof StorageKeyHashCalculated) == 0) {
         return (TRUE);
     }
 
