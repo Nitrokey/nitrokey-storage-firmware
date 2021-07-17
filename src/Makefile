@@ -232,7 +232,7 @@ enable_bootloader:
 
 .PHONY: run_tests
 run_tests:
-	cd $(LIBNK)/unittest && pytest $(TP) test_storage.py --template=html1/index.html --report=report.html && notify-send --urgency=low "finished" || notify-send --urgency=low "failed" && xdg-open report.html && false
+	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py --template=html1/index.html --report=report.html && notify-send --urgency=low "finished" || notify-send --urgency=low "failed" && xdg-open report.html && false
 
 .PHONY: help
 help:
