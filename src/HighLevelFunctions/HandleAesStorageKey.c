@@ -458,7 +458,7 @@ u32 DecryptKeyViaSmartcard_u32 (u8 * StorageKey_pu8)
     return (TRUE);
 }
 
-int memcmp_safe(u8 *a, size_t a_len, u8 *b, size_t b_len){
+int memcmp_safe(const u8 *a, size_t a_len, const u8 *b, size_t b_len){
     // constant time, buffer length checked compare
     // returns  0 on the same content of both buffers
     //          -1 on different buffer sizes
