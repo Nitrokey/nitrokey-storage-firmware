@@ -65,7 +65,7 @@ run_tests:
 .PHONY: run_tests_quick
 TESTS=encrypted
 run_tests_quick:
-	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py -vx -k "$(TESTS)"
+	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py -k "$(TESTS)"
 
 
 .PHONY: help
