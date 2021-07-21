@@ -494,7 +494,8 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
 
 void CalculateAndSaveStorageKeyHash_u32(const u8 * StorageKey_pu8){
     u8 StorageKeyHashCalculated[20];
-    hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, 32*8, StorageKey_pu8, 32*8);
+    const int KeyLengthBytes = 32;
+    hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
     WriteStorageKeyHashToUserPage(StorageKeyHashCalculated);
     memset_safe(StorageKeyHashCalculated, 0, sizeof StorageKeyHashCalculated);
 }
