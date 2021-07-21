@@ -63,7 +63,7 @@ run_tests:
 	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py --template=html1/index.html --report=report.html && notify-send --urgency=low "finished" || notify-send --urgency=low "failed" && xdg-open report.html && false
 
 .PHONY: run_tests_quick
-TESTS=encrypted
+TESTS=status
 run_tests_quick:
 	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py -k "$(TESTS)"
 
@@ -74,7 +74,7 @@ help:
 	@grep "^[\.\w]*:" -P Makefile --color=yes
 
 .PHONY: devloop
-devloop: | all enable_bootloader flash
+devloop: | all enable_bootloader flash run_tests_quick
 	@echo done
 
 
