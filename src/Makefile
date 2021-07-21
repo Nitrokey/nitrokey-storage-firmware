@@ -62,6 +62,12 @@ enable_bootloader:
 run_tests:
 	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py --template=html1/index.html --report=report.html && notify-send --urgency=low "finished" || notify-send --urgency=low "failed" && xdg-open report.html && false
 
+.PHONY: run_tests_quick
+TESTS=encrypted
+run_tests_quick:
+	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py -vx -k "$(TESTS)"
+
+
 .PHONY: help
 help:
 	@echo "Targets:"
