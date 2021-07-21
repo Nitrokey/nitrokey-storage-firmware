@@ -475,10 +475,16 @@ int memcmp_safe(const u8 *a, size_t a_len, const u8 *b, size_t b_len){
 }
 
 u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
+    /**
+     * Return TRUE on success, and FALSE if the hash is invalid or could not be fetched
+     */
     // 1. get the hash from the flashstorage unit
     u8 StorageKeyHashSaved[20];
     u8 StorageKeyHashCalculated[20];
-    ReadStorageKeyHashFromUserPage(StorageKeyHashSaved, sizeof StorageKeyHashSaved);
+    int res = ReadStorageKeyHashFromUserPage(StorageKeyHashSaved, sizeof StorageKeyHashSaved);
+    if (res != TRUE) {
+        return (FALSE);
+    }
 
     // 2. run hashing
     const int KeyLengthBytes = 32;
@@ -528,6 +534,7 @@ u32 IsStorageKeyEmpty_u32(const u8 * StorageKey_pu8){
 
 *******************************************************************************/
 
+#define STORAGE_KEY_SIZE (32)
 u32 GetStorageKey_u32 (u8 * UserPW_pu8, u8 * StorageKey_pu8)
 {
     if (FALSE == CheckStorageKey_u8())
@@ -557,7 +564,7 @@ u32 GetStorageKey_u32 (u8 * UserPW_pu8, u8 * StorageKey_pu8)
         return (FALSE);
     }
 
-    if (TRUE == CheckStorageKeyHash_u32(StorageKey_pu8))
+    if (FALSE == CheckStorageKeyHash_u32(StorageKey_pu8))
     {
         return (FALSE);
     }
