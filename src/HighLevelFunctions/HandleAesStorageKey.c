@@ -506,16 +506,17 @@ void CalculateAndSaveStorageKeyHash_u32(const u8 * StorageKey_pu8){
     memset_safe(StorageKeyHashCalculated, 0, sizeof StorageKeyHashCalculated);
 }
 
-u32 IsStorageKeyEmpty_u32(const u8 * StorageKey_pu8){
+u32 IsStorageKeyEmpty_u32(const u8 * StorageKey_pu8, size_t StorageKey_len){
     // check if retrieved key is all-zeroes
-    // TODO make it constant time check
-    int keyByte;
-    for (keyByte = 0; keyByte < sizeof(StorageKey_pu8); keyByte++) {
-        if (StorageKey_pu8[keyByte] != 0) {
-            return (FALSE);
-        }
+    int diff = 0, i;
+    for (i = 0; i < StorageKey_len; ++i) {
+        diff |= StorageKey_pu8[i];
     }
-    return (TRUE);
+    if (diff == 0) {
+        return (TRUE);
+    }
+
+    return (FALSE);
 }
 
 /*******************************************************************************
@@ -559,7 +560,7 @@ u32 GetStorageKey_u32 (u8 * UserPW_pu8, u8 * StorageKey_pu8)
         return (FALSE);
     }
 
-    if (TRUE == IsStorageKeyEmpty_u32(StorageKey_pu8))
+    if (TRUE == IsStorageKeyEmpty_u32(StorageKey_pu8, STORAGE_KEY_SIZE))
     {
         return (FALSE);
     }
