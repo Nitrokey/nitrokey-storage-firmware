@@ -462,7 +462,7 @@ int memcmp_safe(const u8 *a, size_t a_len, const u8 *b, size_t b_len){
     // constant time, buffer length checked compare
     // returns  0 on the same content of both buffers
     //          -1 on different buffer sizes
-    //          +a on xor calculated differences
+    //          +a on xor calculated differences, 1..255
     // NOT a drop-in replacement for memcmp
     if (a_len != b_len) {
         return -1;
@@ -484,7 +484,7 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     const int KeyLengthBytes = 32;
     hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
 
-    // 3. compare (TODO constant time)
+    // 3. compare constant time
     if (memcmp_safe(StorageKeyHashSaved, sizeof StorageKeyHashSaved, StorageKeyHashCalculated, sizeof StorageKeyHashCalculated) == 0) {
         return (TRUE);
     }
