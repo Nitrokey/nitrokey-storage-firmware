@@ -301,6 +301,8 @@ s32 Ret_s32;
     // Flush and close the file
     file_flush ();
 
+    FAI_MarkLunAsChanged(0);
+
     return (TRUE);
 }
 
