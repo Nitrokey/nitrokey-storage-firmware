@@ -375,6 +375,18 @@ u8 InitStatusFiles_u8 (void)
     return (TRUE);
 }
 
+
+#define FILEIO_DEBUG_FILE "debug.txt"
+
+u8 WriteStrToDebugFile (u8 *String_pu8)
+{
+    SD_UncryptedFileIO_Init_u8 ();
+    FileIO_AppendText_u8((u8 *) FILEIO_DEBUG_FILE, String_pu8);
+    file_flush();
+
+    return (TRUE);
+}
+
 /*******************************************************************************
 
   IBN_FileIo_Tests
