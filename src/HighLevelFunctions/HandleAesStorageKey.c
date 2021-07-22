@@ -483,13 +483,13 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     printf_file(__FUNCTION__);
     u8 StorageKeyHashSaved[20];
     u8 StorageKeyHashCalculated[20];
-    int res = ReadStorageKeyHashFromUserPage(StorageKeyHashSaved, sizeof StorageKeyHashSaved);
+    int res = ReadStorageKeyHashFromUserPage(StorageKeyHashSaved, sizeof (StorageKeyHashSaved));
     if (res != TRUE) {
         return (FALSE);
     }
 
     // 2. run hashing
-    const int KeyLengthBytes = 32;
+    const int KeyLengthBytes = AES_KEYSIZE_256_BIT;
     hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
 
     const u8* p = StorageKeyHashSaved;
@@ -510,7 +510,7 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
 void CalculateAndSaveStorageKeyHash_u32(const u8 * StorageKey_pu8){
     printf_file(__FUNCTION__);
     u8 StorageKeyHashCalculated[20];
-    const int KeyLengthBytes = 32;
+    const int KeyLengthBytes = AES_KEYSIZE_256_BIT;
     hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
     WriteStorageKeyHashToUserPage(StorageKeyHashCalculated);
     const u8* p = StorageKeyHashCalculated;
