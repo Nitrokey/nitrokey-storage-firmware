@@ -126,7 +126,7 @@ u8 Buffer_au8[AES_KEYSIZE_256_BIT];
     CI_LocalPrintf ("\r\n");
 #endif
 
-    CalculateAndSaveStorageKeyHash_u32(StorageKey_au8);
+    ClearStorageKeyHash();
 
     memcpy (Buffer_au8, StorageKey_au8, AES_KEYSIZE_256_BIT);
 
@@ -475,6 +475,23 @@ int memcmp_safe(const u8 *a, size_t a_len, const u8 *b, size_t b_len){
     return diff;
 }
 
+void ClearStorageKeyHash(void){
+    u8 empty_buffer[20] = {};
+    WriteStorageKeyHashToUserPage(empty_buffer);
+}
+
+int CheckIfIsValidStorageKeyHash_u32(void){
+    u8 StorageKeyHashSaved[20];
+    int res = ReadStorageKeyHashFromUserPage(StorageKeyHashSaved, sizeof (StorageKeyHashSaved));
+    if (res != TRUE) {
+        return FALSE;
+    }
+    if (IsBufferEmpty_u32(StorageKeyHashSaved, sizeof StorageKeyHashSaved) == TRUE) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
 u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     /**
      * Return TRUE on success, and FALSE if the hash is invalid or could not be fetched
@@ -486,6 +503,13 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     int res = ReadStorageKeyHashFromUserPage(StorageKeyHashSaved, sizeof (StorageKeyHashSaved));
     if (res != TRUE) {
         return (FALSE);
+    }
+
+    if (CheckIfIsValidStorageKeyHash_u32() == FALSE) {
+        printf_file("Empty StorageKey hash detected, save new one");
+        dump_arr("StorageKey_pu8", StorageKey_pu8, AES_KEYSIZE_256_BIT);
+        CalculateAndSaveStorageKeyHash_u32(StorageKey_pu8);
+        return TRUE;
     }
 
     // 2. run hashing
@@ -517,13 +541,14 @@ void CalculateAndSaveStorageKeyHash_u32(const u8 * StorageKey_pu8){
     memset_safe(StorageKeyHashCalculated, 0, sizeof StorageKeyHashCalculated);
 }
 
-u32 IsStorageKeyEmpty_u32(const u8 * StorageKey_pu8, size_t StorageKey_len){
-    // check if retrieved key is all-zeroes
-    int diff = 0, i;
+u32 IsBufferEmpty_u32(const u8 * StorageKey_pu8, size_t StorageKey_len){
+    // check if buffer is filled with zeroes or 0xFFs
+    int diff = 0, i, diff_FF = 0xFF;
     for (i = 0; i < StorageKey_len; ++i) {
         diff |= StorageKey_pu8[i];
+        diff_FF &= StorageKey_pu8[i];
     }
-    if (diff == 0) {
+    if (diff == 0 || diff_FF == 0xFF) {
         return (TRUE);
     }
 
@@ -573,7 +598,7 @@ u32 GetStorageKey_u32 (u8 * UserPW_pu8, u8 * StorageKey_pu8)
         return (FALSE);
     }
 
-    if (TRUE == IsStorageKeyEmpty_u32(StorageKey_pu8, STORAGE_KEY_SIZE))
+    if (TRUE == IsBufferEmpty_u32(StorageKey_pu8, STORAGE_KEY_SIZE))
     {
         return (FALSE);
     }
