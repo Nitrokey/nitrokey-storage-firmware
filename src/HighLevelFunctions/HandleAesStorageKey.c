@@ -480,6 +480,7 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
      * Return TRUE on success, and FALSE if the hash is invalid or could not be fetched
      */
     // 1. get the hash from the flashstorage unit
+    printf_file(__FUNCTION__);
     u8 StorageKeyHashSaved[20];
     u8 StorageKeyHashCalculated[20];
     int res = ReadStorageKeyHashFromUserPage(StorageKeyHashSaved, sizeof StorageKeyHashSaved);
@@ -491,6 +492,13 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     const int KeyLengthBytes = 32;
     hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
 
+    const u8* p = StorageKeyHashSaved;
+    printf_file("HashSaved: %x %x %x %x\n", p[0], p[1], p[2], p[3]);
+    p = StorageKeyHashCalculated;
+    printf_file("HashCalc: %x %x %x %x\n", p[0], p[1], p[2], p[3]);
+    p = StorageKey_pu8;
+    printf_file("StorageKey_pu8: %x %x %x %x\n", p[0], p[1], p[2], p[3]);
+
     // 3. compare constant time
     if (memcmp_safe(StorageKeyHashSaved, sizeof StorageKeyHashSaved, StorageKeyHashCalculated, sizeof StorageKeyHashCalculated) == 0) {
         return (TRUE);
@@ -500,10 +508,15 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
 }
 
 void CalculateAndSaveStorageKeyHash_u32(const u8 * StorageKey_pu8){
+    printf_file(__FUNCTION__);
     u8 StorageKeyHashCalculated[20];
     const int KeyLengthBytes = 32;
     hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
     WriteStorageKeyHashToUserPage(StorageKeyHashCalculated);
+    const u8* p = StorageKeyHashCalculated;
+    printf_file("CalcSave: %x %x %x %x\n", p[0], p[1], p[2], p[3]);
+    p = StorageKey_pu8;
+    printf_file("StorageKey_pu8: %x %x %x %x\n", p[0], p[1], p[2], p[3]);
     memset_safe(StorageKeyHashCalculated, 0, sizeof StorageKeyHashCalculated);
 }
 
@@ -539,6 +552,8 @@ u32 IsStorageKeyEmpty_u32(const u8 * StorageKey_pu8, size_t StorageKey_len){
 #define STORAGE_KEY_SIZE (32)
 u32 GetStorageKey_u32 (u8 * UserPW_pu8, u8 * StorageKey_pu8)
 {
+    printf_file(__FUNCTION__);
+
     if (FALSE == CheckStorageKey_u8())
     {
         return (FALSE);
