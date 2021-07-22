@@ -31,6 +31,8 @@
 #define TRUE		1
 #define FALSE   0
 
+#define DEBUG_FILE
+
 
 
 // Define to activate A_Muster specific handling
