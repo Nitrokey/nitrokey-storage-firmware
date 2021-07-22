@@ -263,7 +263,7 @@ void HID_ExcuteCmd (void)
 
                 // Terminate mounting procedure if key could not be retrieved or is all-zero
                 if (FALSE == isKeyValid) {
-                    UpdateStick20Command (CMD_STATUS_AES_DEC_FAILED, 0);
+                    UpdateStick20Command (OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD, 0); // FIXME correct error to OUTPUT_CMD_STICK20_STATUS_SMARTCARD_ERROR once libnitrokey handles it
                     HID_NextPasswordIsHiddenPassword_u32 = FALSE;
                     break;
                 }
