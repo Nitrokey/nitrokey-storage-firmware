@@ -65,7 +65,7 @@ run_tests:
 .PHONY: run_tests_quick
 TESTS=status
 run_tests_quick:
-	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py -k "$(TESTS)"
+	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_pro.py test_storage.py -k "$(TESTS)"
 
 
 .PHONY: help
