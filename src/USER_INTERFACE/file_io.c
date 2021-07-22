@@ -408,9 +408,15 @@ int printf_file (char* szFormat, ...)
     return (L_OK);
 }
 
+
+void dump_arr(const char* name, const u8* p, const size_t size){
+    printf_file("%s: %x %x %x %x\n", name, p[0], p[1], p[2], p[3]);
+}
+
 #else
 u8 WriteStrToDebugFile (u8 *String_pu8){return TRUE;}
 int printf_file (char* szFormat, ...){return (L_OK);}
+#define dump_arr
 
 #endif
 

@@ -492,12 +492,9 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     const int KeyLengthBytes = AES_KEYSIZE_256_BIT;
     hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
 
-    const u8* p = StorageKeyHashSaved;
-    printf_file("HashSaved: %x %x %x %x\n", p[0], p[1], p[2], p[3]);
-    p = StorageKeyHashCalculated;
-    printf_file("HashCalc: %x %x %x %x\n", p[0], p[1], p[2], p[3]);
-    p = StorageKey_pu8;
-    printf_file("StorageKey_pu8: %x %x %x %x\n", p[0], p[1], p[2], p[3]);
+    dump_arr("HashSaved", StorageKeyHashSaved, sizeof StorageKeyHashSaved);
+    dump_arr("HashCalc", StorageKeyHashCalculated, sizeof StorageKeyHashCalculated);
+    dump_arr("StorageKey_pu8", StorageKey_pu8, AES_KEYSIZE_256_BIT);
 
     // 3. compare constant time
 //    if (memcmp_safe(StorageKeyHashSaved, sizeof StorageKeyHashSaved, StorageKeyHashCalculated, sizeof StorageKeyHashCalculated) == 0) {
@@ -514,10 +511,9 @@ void CalculateAndSaveStorageKeyHash_u32(const u8 * StorageKey_pu8){
     const int KeyLengthBytes = AES_KEYSIZE_256_BIT;
     hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
     WriteStorageKeyHashToUserPage(StorageKeyHashCalculated);
-    const u8* p = StorageKeyHashCalculated;
-    printf_file("CalcSave: %x %x %x %x\n", p[0], p[1], p[2], p[3]);
-    p = StorageKey_pu8;
-    printf_file("StorageKey_pu8: %x %x %x %x\n", p[0], p[1], p[2], p[3]);
+
+    dump_arr("CalcSave", StorageKeyHashCalculated, sizeof(StorageKeyHashCalculated));
+    dump_arr("StorageKey_pu8", StorageKey_pu8, sizeof StorageKey_pu8);
     memset_safe(StorageKeyHashCalculated, 0, sizeof StorageKeyHashCalculated);
 }
 

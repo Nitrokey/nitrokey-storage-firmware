@@ -28,11 +28,13 @@
 #ifndef FILE_IO_H_
 #define FILE_IO_H_
 
+#include <stddef.h>
 #include "tools.h"
 
 u8 FileIO_SaveAppImage_u8 (void);
 u8 WriteStrToDebugFile (u8 *String_pu8);
 int printf_file (char* szFormat, ...);
+void dump_arr(const char* name, const u8* p, const size_t size);
 
 void IBN_FileIo_Tests (u8 nParamsGet_u8, u8 CMD_u8, u32 Param_u32, u32 Param_1_u32, u32 Param_2_u32);
 
