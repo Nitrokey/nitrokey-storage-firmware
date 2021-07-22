@@ -378,8 +378,6 @@ u8 InitStatusFiles_u8 (void)
     return (TRUE);
 }
 
-#define DEBUG_FILE
-
 #ifdef DEBUG_FILE
 
 #define FILEIO_DEBUG_FILE "debug.txt"
