@@ -523,8 +523,10 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     // 3. compare constant time
 //    if (memcmp_safe(StorageKeyHashSaved, sizeof StorageKeyHashSaved, StorageKeyHashCalculated, sizeof StorageKeyHashCalculated) == 0) {
     if (memcmp(StorageKeyHashSaved, StorageKeyHashCalculated, sizeof StorageKeyHashCalculated) == 0) {
+        printf_file("Hash sum confirmed");
         return (TRUE);
     }
+    printf_file("Hashsum invalid");
 
     return (FALSE);
 }
