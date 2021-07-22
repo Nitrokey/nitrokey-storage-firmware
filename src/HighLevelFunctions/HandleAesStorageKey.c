@@ -24,6 +24,7 @@
  *      Author: RB
  */
 
+#include "USER_INTERFACE/file_io.h"
 #include "string.h"
 #include "aes.h"
 #include "flashc.h"
