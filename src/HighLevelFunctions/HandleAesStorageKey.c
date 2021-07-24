@@ -497,7 +497,7 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
      * Return TRUE on success, and FALSE if the hash is invalid or could not be fetched
      */
     // 1. get the hash from the flashstorage unit
-    printf_file(__FUNCTION__);
+    debug_file_printf(__FUNCTION__);
     u8 StorageKeyHashSaved[20];
     u8 StorageKeyHashCalculated[20];
     int res = ReadStorageKeyHashFromUserPage(StorageKeyHashSaved, sizeof (StorageKeyHashSaved));
@@ -506,8 +506,8 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     }
 
     if (CheckIfIsValidStorageKeyHash_u32() == FALSE) {
-        printf_file("Empty StorageKey hash detected, save new one");
-        dump_arr("StorageKey_pu8", StorageKey_pu8, AES_KEYSIZE_256_BIT);
+        debug_file_printf("Empty StorageKey hash detected, save new one");
+        debug_file_dump_arr("StorageKey_pu8", StorageKey_pu8, AES_KEYSIZE_256_BIT);
         CalculateAndSaveStorageKeyHash_u32(StorageKey_pu8);
         return TRUE;
     }
@@ -516,29 +516,29 @@ u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
     const int KeyLengthBytes = AES_KEYSIZE_256_BIT;
     hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
 
-    dump_arr("HashSaved", StorageKeyHashSaved, sizeof StorageKeyHashSaved);
-    dump_arr("HashCalc", StorageKeyHashCalculated, sizeof StorageKeyHashCalculated);
-    dump_arr("StorageKey_pu8", StorageKey_pu8, AES_KEYSIZE_256_BIT);
+    debug_file_dump_arr("HashSaved", StorageKeyHashSaved, sizeof StorageKeyHashSaved);
+    debug_file_dump_arr("HashCalc", StorageKeyHashCalculated, sizeof StorageKeyHashCalculated);
+    debug_file_dump_arr("StorageKey_pu8", StorageKey_pu8, AES_KEYSIZE_256_BIT);
 
     // 3. compare constant time
     if (memcmp_safe(StorageKeyHashSaved, sizeof StorageKeyHashSaved, StorageKeyHashCalculated, sizeof StorageKeyHashCalculated) == 0) {
-        printf_file("Hash sum confirmed");
+        debug_file_printf("Hash sum confirmed");
         return (TRUE);
     }
-    printf_file("Hashsum invalid");
+    debug_file_printf("Hashsum invalid");
 
     return (FALSE);
 }
 
 void CalculateAndSaveStorageKeyHash_u32(const u8 * StorageKey_pu8){
-    printf_file(__FUNCTION__);
+    debug_file_printf(__FUNCTION__);
     u8 StorageKeyHashCalculated[20];
     const int KeyLengthBytes = AES_KEYSIZE_256_BIT;
     hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
     WriteStorageKeyHashToUserPage(StorageKeyHashCalculated);
 
-    dump_arr("CalcSave", StorageKeyHashCalculated, sizeof(StorageKeyHashCalculated));
-    dump_arr("StorageKey_pu8", StorageKey_pu8, sizeof StorageKey_pu8);
+    debug_file_dump_arr("CalcSave", StorageKeyHashCalculated, sizeof(StorageKeyHashCalculated));
+    debug_file_dump_arr("StorageKey_pu8", StorageKey_pu8, sizeof StorageKey_pu8);
     memset_safe(StorageKeyHashCalculated, 0, sizeof StorageKeyHashCalculated);
 }
 
@@ -575,7 +575,7 @@ u32 IsBufferEmpty_u32(const u8 * StorageKey_pu8, size_t StorageKey_len){
 #define STORAGE_KEY_SIZE (32)
 u32 GetStorageKey_u32 (u8 * UserPW_pu8, u8 * StorageKey_pu8)
 {
-    printf_file(__FUNCTION__);
+    debug_file_printf(__FUNCTION__);
 
     if (FALSE == CheckStorageKey_u8())
     {

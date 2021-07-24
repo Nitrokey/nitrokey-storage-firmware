@@ -395,7 +395,7 @@ u8 WriteStrToDebugFile (u8 *String_pu8)
 }
 
 
-int printf_file (char* szFormat, ...)
+int debug_file_printf (char* szFormat, ...)
 {
     u8 szBuffer[MAX_TEXT_LENGTH]; // on task stack
     va_list args;
@@ -407,14 +407,14 @@ int printf_file (char* szFormat, ...)
 }
 
 
-void dump_arr(const char* name, const u8* p, const size_t size){
+void debug_file_dump_arr(const char* name, const u8* p, const size_t size){
     printf_file("%s: %x %x %x %x\n", name, p[0], p[1], p[2], p[3]);
 }
 
 #else
 u8 WriteStrToDebugFile (u8 *String_pu8){return TRUE;}
-int printf_file (char* szFormat, ...){return (L_OK);}
-#define dump_arr
+int debug_file_printf (char* szFormat, ...){return (L_OK);}
+void debug_file_dump_arr(const char* name, const u8* p, const size_t size){};
 
 #endif
 
