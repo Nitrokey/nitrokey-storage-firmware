@@ -258,10 +258,12 @@ s32 Ret_s32;
 
 *******************************************************************************/
 
+#include "HighLevelFunctions/HiddenVolume.h"
+
 #define FILEIO_STATUS_DIR        "status"
 #define FILEIO_IMAGE_FILE        "firmware.bin"
 #define FILEIO_IMAGE_START       0x80000000
-#define FILEIO_IMAGE_SIZE        (498*512)  // 0x3E400 // Don't save the hidden volume and OTP data area below - 0x40000 - // 256 k
+#define FILEIO_IMAGE_SIZE        (USER_DATA_START*512)  // 0x3E400 // Don't save the hidden volume and OTP data area below - 0x40000 - // 256 k
 #define FILEIO_IMAGE_BLOCKSIZE   4096
 
 u8 FileIO_SaveAppImage_u8 (void)
