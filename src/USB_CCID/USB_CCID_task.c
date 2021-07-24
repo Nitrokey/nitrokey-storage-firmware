@@ -123,6 +123,7 @@ static void USB_CCID_SendDataToUSB (void);
 
 void USB_CCID_send_INT_Message (void)
 {
+    return;
     unsigned short Message_u16;
     int i, i1;
     /* todo while (Is_usb_endpoint_stall_requested(EP_CCID_IN)) { if (Is_usb_setup_received()) usb_process_request(); }
@@ -144,7 +145,9 @@ void USB_CCID_send_INT_Message (void)
 
     Usb_reset_endpoint_fifo_access (EP_CCID_INT);
 
-    Message_u16 = 0x5003;
+//    Message_u16 = 0x5003;
+//    Message_u16 = 0x5002;
+    Message_u16 = 0x50 << 8 | 0b10;
 
     i = Usb_byte_count (EP_CCID_INT);
 
@@ -431,13 +434,16 @@ void USB_CCID_task (void* pvParameters)
         if (!Is_device_enumerated ())
             continue;
 
+        USB_CCID_send_INT_Message ();   // We are always online
+        continue;
+
         // If smartcard is ready send it over usb
         if (TRUE == Startup_b)
         {
             Startup_b = FALSE;
             // CI_LocalPrintf ("USB_CCID : USB CCID started - %d\n",xTaskGetTickCount());
             DelayMs (2000);  // Wait 100 ms
-            USB_CCID_send_INT_Message ();   // We are always online
+//            USB_CCID_send_INT_Message ();   // We are always online
         }
 
         // If we receive something in the OUT endpoint, parse it

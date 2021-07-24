@@ -750,6 +750,7 @@ u8 RDR_to_PC_SlotStatus_CardStopped_u8 (u8 ErrorCode_u8)
 
 u8 PC_to_RDR_IccPowerOn_u8 (t_USB_CCID_data_st * USB_CCID_data_pst)
 {
+    return CCID_ERROR_HW_ERROR;
     if (0 != USB_CCID_data_pst->USB_data[CCID_OFFSET_SLOT])
     {
         return (CCID_ERROR_BAD_SLOT);
