@@ -57,7 +57,7 @@ def main():
     #     firmware[i] = 0x42
 
     data = bytes_from_file('random.bin')
-    data = itertools.repeat(0x42, USER_PAGE_START-maximum_byte)
+    # data = itertools.repeat(0x42, USER_PAGE_START-maximum_byte)
     data = list(data)
     firmware[maximum_byte:USER_PAGE_START] = data[0:USER_PAGE_START-maximum_byte]
 
