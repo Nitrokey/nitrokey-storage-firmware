@@ -3,7 +3,7 @@ include build.mk
 GIT=$(shell git describe)
 FIRMWARE=nitrokey-storage-$(GIT).hex
 
-all: firmware.hex $(FIRMWARE) firmware_info
+all: firmware.hex $(FIRMWARE) firmware_info firmware.lss
 	ls -lh $<
 
 $(FIRMWARE): firmware.hex
@@ -36,6 +36,9 @@ USB_MASS.elf: $(OBJS) $(OBJSASM)
 .PHONY: firmware_info
 firmware_info: firmware.hex
 	-@python -c "import intelhex; i = intelhex.IntelHex(); i.loadfile(open('$^'), format='hex'); b = len(i)/1024; a = b / (495*512/1024) * 100; print(f'*** Flash occupied: {round(a)+1}% ({round(b)+1}kB)')"
+
+firmware.lss: USB_MASS.elf
+	$(OBJDUMP) -h -S $< > $@
 
 firmware.hex: USB_MASS.elf
 	ls -l $<
