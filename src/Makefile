@@ -35,7 +35,7 @@ USB_MASS.elf: $(OBJS) $(OBJSASM)
 
 .PHONY: firmware_info
 firmware_info: firmware.hex
-	-@python -c "import intelhex; i = intelhex.IntelHex(); i.loadfile(open('$^'), format='hex'); b = len(i)/1024; a = b / (495*512/1024) * 100; print(f'*** Flash occupied: {round(a)+1}% ({round(b)+1}kB)')"
+	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/$<
 
 firmware.lss: USB_MASS.elf
 	$(OBJDUMP) -h -S $< > $@
