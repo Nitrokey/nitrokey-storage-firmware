@@ -4,6 +4,8 @@ import click
 import intelhex
 
 FLASH_START = 0x80000000
+
+# these paths are for the future use for parsing the user page start
 PATH_LINKER = 'src/SOFTWARE_FRAMEWORK/UTILS/LINKER_SCRIPTS/AT32UC3A3/256/GCC/link_uc3a3256.lds'
 PATH_HEADER = 'src/global.h'
 # FIRMWARE_FILE = '../src/firmware.hex'
