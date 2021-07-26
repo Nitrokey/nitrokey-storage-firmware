@@ -1,5 +1,11 @@
 CC:=./avr32-gcc
 
+PREFIX=avr32
+CCPATH=$(shell dirname $(shell readlink -f $(CC)) )
+OBJDUMP:=$(CCPATH)/$(PREFIX)-objdump
+OBJCOPY:=$(CCPATH)/$(PREFIX)-objcopy
+
+
 SRCDIR=.
 
 SRCS:= \

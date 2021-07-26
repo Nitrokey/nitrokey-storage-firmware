@@ -42,7 +42,7 @@ firmware.lss: USB_MASS.elf
 
 firmware.hex: USB_MASS.elf
 	ls -l $<
-	avr-objcopy -R .eeprom -O ihex $< $@
+	$(OBJCOPY) -R .eeprom -O ihex $< $@
 
 BOOTLOADER_VID := 03eb
 .PHONY: flash
