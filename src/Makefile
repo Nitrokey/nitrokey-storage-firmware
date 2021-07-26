@@ -46,13 +46,13 @@ firmware.hex: USB_MASS.elf
 
 BOOTLOADER_VID := 03eb
 .PHONY: flash
-flash: firmware.hex
+flash: $(FIRMWARE)
 	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
 	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
 	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
 	sudo dfu-programmer at32uc3a3256s erase
 	sleep 1
-	sudo dfu-programmer at32uc3a3256s flash --suppress-bootloader-mem firmware.hex
+	sudo dfu-programmer at32uc3a3256s flash --suppress-bootloader-mem $<
 	sleep 1
 	-sudo dfu-programmer at32uc3a3256s launch
 	sleep 1
