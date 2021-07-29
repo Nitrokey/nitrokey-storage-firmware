@@ -290,7 +290,11 @@ u8 InitStickConfigurationToUserPage_u8 (void)
     taskENTER_CRITICAL ();
 
     StickConfiguration_st.MagicNumber_StickConfig_u16 = MAGIC_NUMBER_STICK20_CONFIG;
+#ifdef DEBUG_FILE
+    StickConfiguration_st.ReadWriteFlagUncryptedVolume_u8 = READ_WRITE_ACTIVE;
+#else
     StickConfiguration_st.ReadWriteFlagUncryptedVolume_u8 = READ_ONLY_ACTIVE;
+#endif
     StickConfiguration_st.ReadWriteFlagCryptedVolume_u8 = READ_WRITE_ACTIVE;
     StickConfiguration_st.ReadWriteFlagHiddenVolume_u8 = READ_WRITE_ACTIVE;
     StickConfiguration_st.FirmwareLocked_u8 = 0;
