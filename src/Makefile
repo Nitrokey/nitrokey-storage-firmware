@@ -3,7 +3,7 @@ include build.mk
 GIT=$(shell git describe)
 FIRMWARE=nitrokey-storage-$(GIT).hex
 
-all: firmware.hex $(FIRMWARE) firmware_info firmware.lss
+all: firmware.hex $(FIRMWARE) firmware_info firmware.lss firmware-extended.hex
 	ls -lh $<
 
 $(FIRMWARE): firmware.hex
@@ -39,6 +39,9 @@ firmware_info: firmware.hex
 
 firmware.lss: USB_MASS.elf
 	$(OBJDUMP) -h -S $< > $@
+
+firmware-extended.hex: firmware.hex
+	-cd ../tools && pipenv install && pipenv run ./randomize_empty_space.py status --firmware-file ../src/$<
 
 firmware.hex: USB_MASS.elf
 	ls -l $<
