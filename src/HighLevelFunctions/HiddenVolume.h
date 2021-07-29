@@ -33,7 +33,7 @@
 #define FLASH_START           0x80000000    // AVR
 
 
-
+#include "global.h"
 #define HV_FLASH_START_PAGE     497
 #define HV_MAGIC_NUMBER_SIZE    4
 #define HV_SALT_SIZE            32

@@ -34,6 +34,7 @@
 // Requires UV to be read-write for use
 //#define DEBUG_FILE
 
+#define USER_DATA_START         (497-2) // add 2 pages of spare space
 
 
 // Define to activate A_Muster specific handling

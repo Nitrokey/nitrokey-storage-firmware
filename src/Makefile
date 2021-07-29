@@ -3,8 +3,8 @@ include build.mk
 GIT=$(shell git describe)
 FIRMWARE=nitrokey-storage-$(GIT).hex
 
-all: firmware.hex $(FIRMWARE)
-	ls -lh $^
+all: firmware.hex $(FIRMWARE) firmware_info firmware.lss
+	ls -lh $<
 
 $(FIRMWARE): firmware.hex
 	cp $< $@
@@ -33,19 +33,26 @@ USB_MASS.elf: $(OBJS) $(OBJSASM)
 	@echo "*** $< > $@"
 	@$(RUNASM) -o $@ $<
 
+.PHONY: firmware_info
+firmware_info: firmware.hex
+	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/$<
+
+firmware.lss: USB_MASS.elf
+	$(OBJDUMP) -h -S $< > $@
+
 firmware.hex: USB_MASS.elf
 	ls -l $<
-	avr-objcopy -R .eeprom -O ihex $< $@
+	$(OBJCOPY) -R .eeprom -O ihex $< $@
 
 BOOTLOADER_VID := 03eb
 .PHONY: flash
-flash: firmware.hex
+flash: $(FIRMWARE)
 	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
 	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
 	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
 	sudo dfu-programmer at32uc3a3256s erase
 	sleep 1
-	sudo dfu-programmer at32uc3a3256s flash --suppress-bootloader-mem firmware.hex
+	sudo dfu-programmer at32uc3a3256s flash --suppress-bootloader-mem $<
 	sleep 1
 	-sudo dfu-programmer at32uc3a3256s launch
 	sleep 1
