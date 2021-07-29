@@ -34,14 +34,19 @@ USB_MASS.elf: $(OBJS) $(OBJSASM)
 	@$(RUNASM) -o $@ $<
 
 .PHONY: firmware_info
-firmware_info: firmware.hex
-	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/$<
+firmware_info: | pipenv firmware.hex
+	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/firmware.hex
 
 firmware.lss: USB_MASS.elf
 	$(OBJDUMP) -h -S $< > $@
 
-firmware-extended.hex: firmware.hex
-	cd ../tools && pipenv install && pipenv run ./randomize_empty_space.py status --firmware-file ../src/$<
+pipenv:
+	cd ../tools && pipenv --rm
+	cd ../tools && pipenv install --python `which python3`
+	touch $@
+
+firmware-extended.hex: | pipenv firmware.hex
+	cd ../tools && pipenv run ./randomize_empty_space.py fill-empty --random-data random.bin --firmware-file ../src/firmware.hex --output-file-name ../src/firmware-extended
 
 firmware.hex: USB_MASS.elf
 	ls -l $<
