@@ -70,8 +70,8 @@ typeStick20Configuration_st StickConfiguration_st;
 
    Byte 
    0 - 31 AES Storage key
-   32 - 51 Matrix columns for user password
-   52 - 71 Matrix columns for admin password 
+   32 - 51 AES Storage key control sum
+   52 - 71 reserved
    72 - 101 Stick Configuration 
    102 - 133 Base for AES key hidden volume (32 byte) 
    134 - 137 ID of sd card (4 byte) 
@@ -86,8 +86,8 @@ typeStick20Configuration_st StickConfiguration_st;
 
 typedef struct {
     u8 AES_key[32];
-    u8 matrix_user[20];
-    u8 matrix_admin[20];
+    u8 reserved_2[20];
+    u8 reserved[20];
     u8 stick_configuration[30];
     u8 hidden_volume_AES_key_base[32];
     u8 sdcard_id[4];
@@ -170,70 +170,6 @@ u8 ReadAESStorageKeyToUserPage (u8 * data)
     return (TRUE);
 }
 
-
-/*******************************************************************************
-
-  WriteMatrixColumsUserPWToUserPage
-
-  Reviews
-  Date      Reviewer        Info
-  16.08.13  RB              First review
-
-*******************************************************************************/
-
-u8 WriteMatrixColumsUserPWToUserPage (u8 * data)
-{
-    flashc_memcpy (user_page->matrix_user, data, sizeof(user_page->matrix_user), TRUE);
-    return (TRUE);
-}
-
-/*******************************************************************************
-
-  ReadMatrixColumsUserPWFromUserPage
-
-  Reviews
-  Date      Reviewer        Info
-  16.08.13  RB              First review
-
-*******************************************************************************/
-
-u8 ReadMatrixColumsUserPWFromUserPage (u8 * data)
-{
-    memcpy (data, (void *) (user_page->matrix_user), sizeof(user_page->matrix_user));
-    return (TRUE);
-}
-
-/*******************************************************************************
-
-  WriteMatrixColumsAdminPWFromUserPage
-
-  Reviews
-  Date      Reviewer        Info
-  16.08.13  RB              First review
-
-*******************************************************************************/
-
-u8 WriteMatrixColumsAdminPWFromUserPage (u8 * data)
-{
-    flashc_memcpy (user_page->matrix_admin, data, sizeof(user_page->matrix_admin), TRUE);
-    return (TRUE);
-}
-
-/*******************************************************************************
-
-  ReadMatrixColumsAdminPWFromUserPage
-
-  Reviews
-  Date      Reviewer        Info
-  16.08.13  RB              First review
-
-*******************************************************************************/
-
-u8 ReadMatrixColumsAdminPWFromUserPage (u8 * data)
-{
-    memcpy (data, (void *) (user_page->matrix_admin), sizeof(user_page->matrix_admin));
-    return (TRUE);
-}
 
 /*******************************************************************************
 

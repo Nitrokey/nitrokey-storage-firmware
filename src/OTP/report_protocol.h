@@ -93,9 +93,9 @@
 #define STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN       (STICK20_CMD_START_VALUE +  9)
 #define STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN      (STICK20_CMD_START_VALUE + 10)
 
-#define STICK20_CMD_SEND_PASSWORD_MATRIX                (STICK20_CMD_START_VALUE + 11)
-#define STICK20_CMD_SEND_PASSWORD_MATRIX_PINDATA        (STICK20_CMD_START_VALUE + 12)
-#define STICK20_CMD_SEND_PASSWORD_MATRIX_SETUP          (STICK20_CMD_START_VALUE + 13)
+#define STICK20_CMD_RESERVED1                           (STICK20_CMD_START_VALUE + 11)
+#define STICK20_CMD_RESERVED2                           (STICK20_CMD_START_VALUE + 12)
+#define STICK20_CMD_RESERVED3                           (STICK20_CMD_START_VALUE + 13)
 
 #define STICK20_CMD_GET_DEVICE_STATUS                   (STICK20_CMD_START_VALUE + 14)
 #define STICK20_CMD_SEND_DEVICE_STATUS                  (STICK20_CMD_START_VALUE + 15)
@@ -196,7 +196,7 @@
 #define OUTPUT_CMD_STICK20_STATUS_BUSY                      2
 #define OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD            3
 #define OUTPUT_CMD_STICK20_STATUS_BUSY_PROGRESSBAR          4
-#define OUTPUT_CMD_STICK20_STATUS_PASSWORD_MATRIX_READY     5
+#define OUTPUT_CMD_STICK20_STATUS_RESERVED                  5
 #define OUTPUT_CMD_STICK20_STATUS_NO_USER_PASSWORD_UNLOCK   6
 #define OUTPUT_CMD_STICK20_STATUS_SMARTCARD_ERROR           7
 #define OUTPUT_CMD_STICK20_STATUS_SECURITY_BIT_ACTIVE       8
@@ -213,14 +213,6 @@ typedef struct
 void SetStick20Interface (u8 Command_u8);
 void UpdateStick20Command (u8 Status_u8, u8 ProgressBarValue_u8);
 
-
-#define OUTPUT_CMD_STICK20_MAX_MATRIX_ROWS  20
-
-typedef struct
-{
-    u8 PasswordLen_u8;
-    u8 PasswordRowData_u8[OUTPUT_CMD_STICK20_MAX_MATRIX_ROWS];
-} HID_Stick20SetupMatrix_est;
 
 
 #define OUTPUT_CMD_STICK20_SEND_DATA_SIZE            25
@@ -246,13 +238,6 @@ typedef struct
 } HID_Stick20SendData_est;
 
 void Stick20HIDSendDebugData (u8 * output);
-
-/* For Stick 20 - Matrix transfer */
-/*
-   #define OUTPUT_CMD_STICK20_MATRIX_DATA_SIZE 25
-
-   typedef struct { unsigned char Counter_u8; unsigned char BlockNo_u8; unsigned char SendSize_u8; unsigned char
-   MatrixData_u8[OUTPUT_CMD_STICK20_SEND_DATA_SIZE]; } HID_Stick20Matrix_est; */
 
 
 /*
@@ -429,7 +414,5 @@ extern u8 HID_GetReport_Value[KEYBOARD_FEATURE_COUNT];
 extern u8 HID_SetReport_Value_tmp[KEYBOARD_FEATURE_COUNT];
 extern u8 HID_GetReport_Value_tmp[KEYBOARD_FEATURE_COUNT];
 
-
-u8 Stick20HIDInitSendMatrixData (u8 * PasswordMatrixData_au8);
 
 u8 CheckSystemtime (u32 Newtimestamp_u32);

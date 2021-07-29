@@ -94,7 +94,6 @@ static void hid_get_descriptor (U8 size_of_report, const U8 * p_usb_hid_report);
 #define CI_Print8BitValue(...)
 #endif
 
-u8 Stick20HIDSendMatrixData (u8 * output);
 u8 Stick20HIDSendProductionInfos (u8 * output);
 extern volatile u8 Stick20HIDSendConfigurationState_u8;
 
@@ -225,7 +224,6 @@ void Keyboard_SetReport_Output (void)
 
 
 void Stick20HIDSendDebugData (u8 * output);
-extern u8 Stick20HIDSendMatrixState_u8;
 
 u8* Keyboard_GetReport_Feature (u16 Length)
 {
@@ -240,12 +238,7 @@ u8* Keyboard_GetReport_Feature (u16 Length)
 
         memcpy ((void *) HID_GetReport_Value, HID_GetReport_Value_tmp, KEYBOARD_FEATURE_COUNT);
 
-        // Send password matrix ?
-        if (0 != Stick20HIDSendMatrixState_u8)
-        {
-            Stick20HIDSendMatrixData (HID_GetReport_Value);
-        }
-        else if (STICK20_SEND_STATUS_PIN == Stick20HIDSendConfigurationState_u8)
+        if (STICK20_SEND_STATUS_PIN == Stick20HIDSendConfigurationState_u8)
         {
             Stick20HIDSendAccessStatusData (HID_GetReport_Value);
         }

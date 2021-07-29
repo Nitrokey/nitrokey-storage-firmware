@@ -57,9 +57,9 @@
 
 #define HTML_CMD_EXPORT_BINARY                      20
 
-#define HTML_CMD_SEND_PASSWORD_MATRIX                21
-#define HTML_CMD_SEND_PASSWORD_MATRIX_PINDATA        22
-#define HTML_CMD_SEND_PASSWORD_MATRIX_SETUP          23
+#define HTML_CMD_RESERVED                           21
+#define HTML_CMD_RESERVED2                          22
+#define HTML_CMD_RESERVED3                          23
 
 #define HTML_SEND_HIDDEN_VOLUME_SETUP                24 // Old version
 #define HTML_CMD_SEND_PASSWORD                       25
