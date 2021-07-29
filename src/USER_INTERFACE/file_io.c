@@ -26,6 +26,7 @@
 
 
 
+#include <stdarg.h>
 #include "board.h"
 
 #ifdef FREERTOS_USED
@@ -300,6 +301,8 @@ s32 Ret_s32;
     // Flush and close the file
     file_flush ();
 
+    FAI_MarkLunAsChanged(0);
+
     return (TRUE);
 }
 
@@ -374,6 +377,46 @@ u8 InitStatusFiles_u8 (void)
 
     return (TRUE);
 }
+
+#ifdef DEBUG_FILE
+
+#define FILEIO_DEBUG_FILE "debug.txt"
+
+u8 WriteStrToDebugFile (u8 *String_pu8)
+{
+    SD_UncryptedFileIO_Init_u8 ();
+    FileIO_AppendText_u8((u8 *) FILEIO_DEBUG_FILE, String_pu8);
+    FileIO_AppendText_u8((u8 *) FILEIO_DEBUG_FILE, "\r\n");
+    file_flush();
+//    FileIO_UpdateToHost_v ();
+    FAI_MarkLunAsChanged(0);
+
+    return (TRUE);
+}
+
+
+int debug_file_printf (char* szFormat, ...)
+{
+    u8 szBuffer[MAX_TEXT_LENGTH]; // on task stack
+    va_list args;
+    va_start (args, szFormat);
+    vsnprintf ((char *) szBuffer, MAX_TEXT_LENGTH - 1, szFormat, args);
+    va_end(args);
+    WriteStrToDebugFile (szBuffer);
+    return (L_OK);
+}
+
+
+void debug_file_dump_arr(const char* name, const u8* p, const size_t size){
+    printf_file("%s: %x %x %x %x\n", name, p[0], p[1], p[2], p[3]);
+}
+
+#else
+u8 WriteStrToDebugFile (u8 *String_pu8){return TRUE;}
+int debug_file_printf (char* szFormat, ...){return (L_OK);}
+void debug_file_dump_arr(const char* name, const u8* p, const size_t size){};
+
+#endif
 
 /*******************************************************************************
 

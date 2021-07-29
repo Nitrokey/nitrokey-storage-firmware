@@ -24,6 +24,7 @@
  *      Author: RB
  */
 
+#include "USER_INTERFACE/file_io.h"
 #include "string.h"
 #include "aes.h"
 #include "flashc.h"
@@ -38,6 +39,7 @@
 #include "HandleAesStorageKey.h"
 #include "password_safe.h"
 #include "HiddenVolume.h"
+#include "../OTP/hmac-sha1.h"
 
 /*******************************************************************************
 
@@ -67,6 +69,7 @@
  Local declarations
 
 *******************************************************************************/
+void CalculateAndSaveStorageKeyHash_u32(const u8 * StorageKey_pu8);
 
 
 /*******************************************************************************
@@ -122,6 +125,8 @@ u8 Buffer_au8[AES_KEYSIZE_256_BIT];
     HexPrint (AES_KEYSIZE_256_BIT, StorageKey_au8);
     CI_LocalPrintf ("\r\n");
 #endif
+
+    ClearStorageKeyHash();
 
     memcpy (Buffer_au8, StorageKey_au8, AES_KEYSIZE_256_BIT);
 
@@ -454,6 +459,103 @@ u32 DecryptKeyViaSmartcard_u32 (u8 * StorageKey_pu8)
     return (TRUE);
 }
 
+int memcmp_safe(const u8 *a, size_t a_len, const u8 *b, size_t b_len){
+    // constant time, buffer length checked compare
+    // returns  0 on the same content of both buffers
+    //          -1 on different buffer sizes
+    //          +a on xor calculated differences, 1..255
+    // NOT a drop-in replacement for memcmp
+    if (a_len != b_len) {
+        return -1;
+    }
+    int diff = 0, i;
+    for (i = 0; i < a_len; ++i) {
+        diff |= a[i] ^ b[i];
+    }
+    return diff;
+}
+
+void ClearStorageKeyHash(void){
+    u8 empty_buffer[20] = {};
+    WriteStorageKeyHashToUserPage(empty_buffer);
+}
+
+int CheckIfIsValidStorageKeyHash_u32(void){
+    u8 StorageKeyHashSaved[20];
+    int res = ReadStorageKeyHashFromUserPage(StorageKeyHashSaved, sizeof (StorageKeyHashSaved));
+    if (res != TRUE) {
+        return FALSE;
+    }
+    if (IsBufferEmpty_u32(StorageKeyHashSaved, sizeof StorageKeyHashSaved) == TRUE) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+u32 CheckStorageKeyHash_u32(const u8 * StorageKey_pu8){
+    /**
+     * Return TRUE on success, and FALSE if the hash is invalid or could not be fetched
+     */
+    // 1. get the hash from the flashstorage unit
+    debug_file_printf(__FUNCTION__);
+    u8 StorageKeyHashSaved[20];
+    u8 StorageKeyHashCalculated[20];
+    int res = ReadStorageKeyHashFromUserPage(StorageKeyHashSaved, sizeof (StorageKeyHashSaved));
+    if (res != TRUE) {
+        return (FALSE);
+    }
+
+    if (CheckIfIsValidStorageKeyHash_u32() == FALSE) {
+        debug_file_printf("Empty StorageKey hash detected, save new one");
+        debug_file_dump_arr("StorageKey_pu8", StorageKey_pu8, AES_KEYSIZE_256_BIT);
+        CalculateAndSaveStorageKeyHash_u32(StorageKey_pu8);
+        return TRUE;
+    }
+
+    // 2. run hashing
+    const int KeyLengthBytes = AES_KEYSIZE_256_BIT;
+    hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
+
+    debug_file_dump_arr("HashSaved", StorageKeyHashSaved, sizeof StorageKeyHashSaved);
+    debug_file_dump_arr("HashCalc", StorageKeyHashCalculated, sizeof StorageKeyHashCalculated);
+    debug_file_dump_arr("StorageKey_pu8", StorageKey_pu8, AES_KEYSIZE_256_BIT);
+
+    // 3. compare constant time
+    if (memcmp_safe(StorageKeyHashSaved, sizeof StorageKeyHashSaved, StorageKeyHashCalculated, sizeof StorageKeyHashCalculated) == 0) {
+        debug_file_printf("Hash sum confirmed");
+        return (TRUE);
+    }
+    debug_file_printf("Hashsum invalid");
+
+    return (FALSE);
+}
+
+void CalculateAndSaveStorageKeyHash_u32(const u8 * StorageKey_pu8){
+    debug_file_printf(__FUNCTION__);
+    u8 StorageKeyHashCalculated[20];
+    const int KeyLengthBytes = AES_KEYSIZE_256_BIT;
+    hmac_sha1(StorageKeyHashCalculated, StorageKey_pu8, KeyLengthBytes * 8, StorageKey_pu8, KeyLengthBytes * 8);
+    WriteStorageKeyHashToUserPage(StorageKeyHashCalculated);
+
+    debug_file_dump_arr("CalcSave", StorageKeyHashCalculated, sizeof(StorageKeyHashCalculated));
+    debug_file_dump_arr("StorageKey_pu8", StorageKey_pu8, sizeof StorageKey_pu8);
+    memset_safe(StorageKeyHashCalculated, 0, sizeof StorageKeyHashCalculated);
+}
+
+u32 IsBufferEmpty_u32(const u8 * StorageKey_pu8, size_t StorageKey_len){
+    // check if buffer is filled with zeroes or 0xFFs
+    int diff = 0, i, diff_FF = 0xFF;
+    for (i = 0; i < StorageKey_len; ++i) {
+        diff |= StorageKey_pu8[i];
+        diff_FF &= StorageKey_pu8[i];
+    }
+    if (diff == 0 || diff_FF == 0xFF) {
+        return (TRUE);
+    }
+
+    return (FALSE);
+}
+
 /*******************************************************************************
 
   GetStorageKey_u32
@@ -470,8 +572,16 @@ u32 DecryptKeyViaSmartcard_u32 (u8 * StorageKey_pu8)
 
 *******************************************************************************/
 
+#define STORAGE_KEY_SIZE (32)
 u32 GetStorageKey_u32 (u8 * UserPW_pu8, u8 * StorageKey_pu8)
 {
+    debug_file_printf(__FUNCTION__);
+
+    if (FALSE == CheckStorageKey_u8())
+    {
+        return (FALSE);
+    }
+
     /* Enable smartcard */
     if (FALSE == LA_OpenPGP_V20_Test_SendUserPW2 (UserPW_pu8))
     {
@@ -485,6 +595,16 @@ u32 GetStorageKey_u32 (u8 * UserPW_pu8, u8 * StorageKey_pu8)
     ReadAESStorageKeyToUserPage (StorageKey_pu8);
 
     if (FALSE == DecryptKeyViaSmartcard_u32 (StorageKey_pu8))
+    {
+        return (FALSE);
+    }
+
+    if (TRUE == IsBufferEmpty_u32(StorageKey_pu8, STORAGE_KEY_SIZE))
+    {
+        return (FALSE);
+    }
+
+    if (FALSE == CheckStorageKeyHash_u32(StorageKey_pu8))
     {
         return (FALSE);
     }

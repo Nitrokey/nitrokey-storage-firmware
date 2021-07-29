@@ -71,7 +71,7 @@ typeStick20Configuration_st StickConfiguration_st;
    Byte 
    0 - 31 AES Storage key
    32 - 51 AES Storage key control sum
-   52 - 71 reserved
+   52 - 71 reserved - free to use in the future solutions
    72 - 101 Stick Configuration 
    102 - 133 Base for AES key hidden volume (32 byte) 
    134 - 137 ID of sd card (4 byte) 
@@ -86,7 +86,7 @@ typeStick20Configuration_st StickConfiguration_st;
 
 typedef struct {
     u8 AES_key[32];
-    u8 reserved_2[20];
+    u8 storage_key_hash[20];
     u8 reserved[20];
     u8 stick_configuration[30];
     u8 hidden_volume_AES_key_base[32];
@@ -170,6 +170,22 @@ u8 ReadAESStorageKeyToUserPage (u8 * data)
     return (TRUE);
 }
 
+
+u8 WriteStorageKeyHashToUserPage (u8 * data)
+{
+    flashc_memcpy (user_page->storage_key_hash, data, sizeof(user_page->storage_key_hash), TRUE);
+    return (TRUE);
+}
+
+
+u8 ReadStorageKeyHashFromUserPage (u8 * data, const u32 buf_size)
+{
+    if (sizeof(user_page->storage_key_hash) > buf_size) {
+        return (FALSE);
+    }
+    memcpy (data, (void *) (user_page->storage_key_hash), sizeof(user_page->storage_key_hash));
+    return (TRUE);
+}
 
 /*******************************************************************************
 
@@ -274,7 +290,11 @@ u8 InitStickConfigurationToUserPage_u8 (void)
     taskENTER_CRITICAL ();
 
     StickConfiguration_st.MagicNumber_StickConfig_u16 = MAGIC_NUMBER_STICK20_CONFIG;
+#ifdef DEBUG_FILE
+    StickConfiguration_st.ReadWriteFlagUncryptedVolume_u8 = READ_WRITE_ACTIVE;
+#else
     StickConfiguration_st.ReadWriteFlagUncryptedVolume_u8 = READ_ONLY_ACTIVE;
+#endif
     StickConfiguration_st.ReadWriteFlagCryptedVolume_u8 = READ_WRITE_ACTIVE;
     StickConfiguration_st.ReadWriteFlagHiddenVolume_u8 = READ_WRITE_ACTIVE;
     StickConfiguration_st.FirmwareLocked_u8 = 0;
