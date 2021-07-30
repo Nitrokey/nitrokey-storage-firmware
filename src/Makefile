@@ -2,12 +2,26 @@ include build.mk
 
 GIT=$(shell git describe)
 FIRMWARE=nitrokey-storage-$(GIT).hex
+FIRMWARE_CLEAN=nitrokey-storage-$(GIT)-reproducible.hex
+HASHFN=sha256sum
 
-all: firmware.hex $(FIRMWARE) firmware_info firmware.lss firmware-extended.hex
-	ls -lh $<
+all: $(FIRMWARE_CLEAN) $(FIRMWARE) firmware_info firmware.lss $(HASHFN)
+	-rm firmware.hex firmware-extended.hex
+	ls -lh *hex *sha256sum $(HASHFN)
+	@cat $(HASHFN)
+
+#%.sha256sum: %
+#	sha256sum $< > $@
+
+$(HASHFN): $(FIRMWARE_CLEAN) $(FIRMWARE)
+	sha256sum $^ > $@
 
 $(FIRMWARE): firmware-extended.hex
 	cp $< $@
+
+.PHONY: clean_artifacts
+clean_artifacts:
+	-rm *sha256sum *hex $(HASHFN)
 
 .PHONY: clean
 clean:
@@ -34,9 +48,9 @@ USB_MASS.elf: $(OBJS) $(OBJSASM)
 	@$(RUNASM) -o $@ $<
 
 .PHONY: firmware_info
-firmware_info: | pipenv firmware.hex
-	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/firmware.hex
-	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/firmware-extended.hex
+firmware_info: | pipenv $(FIRMWARE_CLEAN) $(FIRMWARE)
+	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/$(FIRMWARE_CLEAN)
+	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/$(FIRMWARE)
 
 firmware.lss: USB_MASS.elf
 	$(OBJDUMP) -h -S $< > $@
@@ -47,10 +61,10 @@ pipenv:
 	cd ../tools && pipenv install --python `which python3`
 	touch $@
 
-firmware-extended.hex: | pipenv firmware.hex
-	cd ../tools && pipenv run ./randomize_empty_space.py fill-empty --random-data random.bin --firmware-file ../src/firmware.hex --output-file-name ../src/firmware-extended
+firmware-extended.hex: | pipenv $(FIRMWARE_CLEAN)
+	cd ../tools && pipenv run ./randomize_empty_space.py fill-empty --random-data random.bin --firmware-file ../src/$(FIRMWARE_CLEAN) --output-file-name ../src/firmware-extended
 
-firmware.hex: USB_MASS.elf
+$(FIRMWARE_CLEAN): USB_MASS.elf clean_artifacts
 	ls -l $<
 	$(OBJCOPY) -R .eeprom -O ihex $< $@
 
