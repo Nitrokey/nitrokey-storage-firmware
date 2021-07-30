@@ -11,7 +11,7 @@ $(FIRMWARE): firmware-extended.hex
 
 .PHONY: clean
 clean:
-	-rm $(OBJS) $(OBJSASM)
+	-rm $(OBJS) $(OBJSASM) $(STATEFILES)
 
 .PHONY: build-docker-toolchain
 build-docker-toolchain:
@@ -40,8 +40,9 @@ firmware_info: | pipenv firmware.hex
 firmware.lss: USB_MASS.elf
 	$(OBJDUMP) -h -S $< > $@
 
+STATEFILES += pipenv
 pipenv:
-	cd ../tools && pipenv --rm
+	-cd ../tools && pipenv --rm
 	cd ../tools && pipenv install --python `which python3`
 	touch $@
 
