@@ -36,6 +36,7 @@ USB_MASS.elf: $(OBJS) $(OBJSASM)
 .PHONY: firmware_info
 firmware_info: | pipenv firmware.hex
 	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/firmware.hex
+	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/firmware-extended.hex
 
 firmware.lss: USB_MASS.elf
 	$(OBJDUMP) -h -S $< > $@
