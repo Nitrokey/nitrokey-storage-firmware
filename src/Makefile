@@ -78,6 +78,7 @@ enable_bootloader:
 .PHONY: run_tests
 run_tests:
 	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py --template=html1/index.html --report=report.html && notify-send --urgency=low "finished" || notify-send --urgency=low "failed" && xdg-open report.html && false
+	cp $(LIBNK)/unittest/report.html .
 
 .PHONY: run_tests_quick
 TESTS=status
@@ -94,5 +95,12 @@ help:
 devloop: | all enable_bootloader flash run_tests_quick
 	@echo done
 
+RELEASEDIR=release
+.PHONY: release
+release: all
+	mkdir -p $(RELEASEDIR)
+	rm ./$(RELEASEDIR)/*
+	mv -v *.hex $(RELEASEDIR)
+	ls $(RELEASEDIR)
 
 -include local.mk
