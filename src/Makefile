@@ -3,16 +3,17 @@ include build.mk
 GIT=$(shell git describe)
 FIRMWARE=nitrokey-storage-$(GIT).hex
 FIRMWARE_CLEAN=nitrokey-storage-$(GIT)-reproducible.hex
+HASHFN=sha256sum
 
-all: $(FIRMWARE_CLEAN) $(FIRMWARE) firmware_info firmware.lss sha256sum
+all: $(FIRMWARE_CLEAN) $(FIRMWARE) firmware_info firmware.lss $(HASHFN)
 	-rm firmware.hex firmware-extended.hex
-	ls -lh *hex *sha256sum
-	@cat sha256sum
+	ls -lh *hex *sha256sum $(HASHFN)
+	@cat $(HASHFN)
 
 #%.sha256sum: %
 #	sha256sum $< > $@
 
-sha256sum: $(FIRMWARE_CLEAN) $(FIRMWARE)
+$(HASHFN): $(FIRMWARE_CLEAN) $(FIRMWARE)
 	sha256sum $^ > $@
 
 $(FIRMWARE): firmware-extended.hex
@@ -20,7 +21,7 @@ $(FIRMWARE): firmware-extended.hex
 
 .PHONY: clean_artifacts
 clean_artifacts:
-	-rm *sha256sum *hex
+	-rm *sha256sum *hex $(HASHFN)
 
 .PHONY: clean
 clean:
