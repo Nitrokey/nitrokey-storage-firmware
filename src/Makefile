@@ -3,15 +3,15 @@ include build.mk
 GIT=$(shell git describe)
 FIRMWARE=nitrokey-storage-$(GIT).hex
 
-all: firmware.hex $(FIRMWARE) firmware_info firmware.lss
+all: firmware.hex $(FIRMWARE) firmware_info firmware.lss firmware-extended.hex
 	ls -lh $<
 
-$(FIRMWARE): firmware.hex
+$(FIRMWARE): firmware-extended.hex
 	cp $< $@
 
 .PHONY: clean
 clean:
-	-rm $(OBJS) $(OBJSASM)
+	-rm $(OBJS) $(OBJSASM) $(STATEFILES)
 
 .PHONY: build-docker-toolchain
 build-docker-toolchain:
@@ -34,11 +34,21 @@ USB_MASS.elf: $(OBJS) $(OBJSASM)
 	@$(RUNASM) -o $@ $<
 
 .PHONY: firmware_info
-firmware_info: firmware.hex
-	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/$<
+firmware_info: | pipenv firmware.hex
+	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/firmware.hex
+	-cd ../tools && pipenv run ./randomize_empty_space.py status --firmware-file ../src/firmware-extended.hex
 
 firmware.lss: USB_MASS.elf
 	$(OBJDUMP) -h -S $< > $@
+
+STATEFILES += pipenv
+pipenv:
+	-cd ../tools && pipenv --rm
+	cd ../tools && pipenv install --python `which python3`
+	touch $@
+
+firmware-extended.hex: | pipenv firmware.hex
+	cd ../tools && pipenv run ./randomize_empty_space.py fill-empty --random-data random.bin --firmware-file ../src/firmware.hex --output-file-name ../src/firmware-extended
 
 firmware.hex: USB_MASS.elf
 	ls -l $<
@@ -68,6 +78,7 @@ enable_bootloader:
 .PHONY: run_tests
 run_tests:
 	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py --template=html1/index.html --report=report.html && notify-send --urgency=low "finished" || notify-send --urgency=low "failed" && xdg-open report.html && false
+	cp $(LIBNK)/unittest/report.html .
 
 .PHONY: run_tests_quick
 TESTS=status
@@ -84,5 +95,12 @@ help:
 devloop: | all enable_bootloader flash run_tests_quick
 	@echo done
 
+RELEASEDIR=release
+.PHONY: release
+release: all
+	mkdir -p $(RELEASEDIR)
+	rm ./$(RELEASEDIR)/*
+	mv -v *.hex $(RELEASEDIR)
+	ls $(RELEASEDIR)
 
 -include local.mk

@@ -1,5 +1,6 @@
 FROM ubuntu:latest
-RUN apt-get update && apt-get install unzip make wget binutils-avr git -qy
+RUN apt-get update -q \
+    && apt-get install -qy unzip make wget git python3 pipenv
 # COPY avr32studio-ide-2.6.0
 ARG TOOLCHAIN_LINK=
 RUN cd / && wget ${TOOLCHAIN_LINK} -O toolchain.zip -q && \

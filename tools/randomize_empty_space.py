@@ -59,8 +59,8 @@ def status(firmware_file):
               type=click.File('r'))
 @click.option("--random-data", prompt="Random data path", help="Random data path", default="random.bin",
               type=click.File('rb'))
-@click.option("--output-file-prefix", prompt="Output file name prefix", help="Output file name prefix", default="firmware-extended")
-def fill_empty(firmware_file, random_data, output_file_prefix):
+@click.option("--output-file-name", prompt="Output file name", help="Output file name (without extension)", default="firmware-extended")
+def fill_empty(firmware_file, random_data, output_file_name):
     """Fill empty firmware space with the provided random file data content."""
     firmware = intelhex.IntelHex()
     firmware.loadfile(firmware_file, format='hex')
@@ -91,10 +91,10 @@ def fill_empty(firmware_file, random_data, output_file_prefix):
     calculate_occupation(firmware)
 
     ext = "{.bin,.hex}"
-    print(f'*** Saving to {output_file_prefix}{ext}')
-    with open('%s.hex' % output_file_prefix, 'w+') as f:
+    print(f'*** Saving to {output_file_name}{ext}')
+    with open('%s.hex' % output_file_name, 'w+') as f:
         firmware.write_hex_file(f)
-    with open('%s.bin' % output_file_prefix, 'bw+') as f:
+    with open('%s.bin' % output_file_name, 'bw+') as f:
         firmware.tobinfile(f)
 
 
@@ -104,3 +104,4 @@ cli.add_command(status)
 if __name__ == '__main__':
     print(f'Assuming user page starts at: {hex(USER_PAGE_START)} ({(USER_PAGE_START - FLASH_START) / 1024} kB)')
     cli()
+    print('Done')
