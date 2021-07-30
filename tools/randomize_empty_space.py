@@ -104,3 +104,4 @@ cli.add_command(status)
 if __name__ == '__main__':
     print(f'Assuming user page starts at: {hex(USER_PAGE_START)} ({(USER_PAGE_START - FLASH_START) / 1024} kB)')
     cli()
+    print('Done')
