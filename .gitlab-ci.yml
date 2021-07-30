@@ -29,7 +29,8 @@ build:
     - make docker-make
   after_script:
     - wget $icon_server/checkmark/$CI_COMMIT_REF_NAME/$CI_COMMIT_SHA/$CI_JOB_NAME/$CI_JOB_STATUS/${CI_JOB_URL#*/*/*/}
-    - cd src && make release RELEASEDIR=../artifacts
+    - mkdir -p artifacts
+    - cp ./src/*.hex artifacts
   artifacts:
     paths:
       - artifacts
