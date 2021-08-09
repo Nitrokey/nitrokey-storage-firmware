@@ -293,6 +293,10 @@ s32 Ret_s32;
         Ret_s32 = write (FileID_s32, (u8 *) (FILEIO_IMAGE_START + i * FILEIO_IMAGE_BLOCKSIZE), FILEIO_IMAGE_BLOCKSIZE);
     }
 
+    if (FILEIO_IMAGE_SIZE % FILEIO_IMAGE_BLOCKSIZE != 0) {
+        Ret_s32 = write(FileID_s32, (u8 *) (FILEIO_IMAGE_START + i * FILEIO_IMAGE_BLOCKSIZE), FILEIO_IMAGE_SIZE % FILEIO_IMAGE_BLOCKSIZE);
+    }
+
     // Close file
     Ret_s32 = close (FileID_s32);
     if (-1 == Ret_s32)
