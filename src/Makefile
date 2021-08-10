@@ -114,7 +114,7 @@ RELEASEDIR=release
 release: all
 	mkdir -p $(RELEASEDIR)
 	rm ./$(RELEASEDIR)/*
-	mv -v *.hex $(RELEASEDIR)
+	mv -v *.hex $(HASHFN) $(RELEASEDIR)
 	ls $(RELEASEDIR)
 
 -include local.mk
