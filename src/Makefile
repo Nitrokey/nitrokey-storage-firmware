@@ -25,7 +25,7 @@ clean_artifacts:
 
 .PHONY: clean
 clean:
-	-rm $(OBJS) $(OBJSASM) $(STATEFILES)
+	-rm $(OBJS) $(OBJSASM) $(STATEFILES)  firmware.lss
 
 .PHONY: build-docker-toolchain
 build-docker-toolchain:
