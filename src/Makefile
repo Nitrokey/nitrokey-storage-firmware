@@ -25,7 +25,7 @@ clean_artifacts:
 
 .PHONY: clean
 clean:
-	-rm $(OBJS) $(OBJSASM) $(STATEFILES)
+	-rm $(OBJS) $(OBJSASM) $(STATEFILES)  firmware.lss
 
 .PHONY: build-docker-toolchain
 build-docker-toolchain:
@@ -114,7 +114,7 @@ RELEASEDIR=release
 release: all
 	mkdir -p $(RELEASEDIR)
 	rm ./$(RELEASEDIR)/*
-	mv -v *.hex $(RELEASEDIR)
+	mv -v *.hex $(HASHFN) $(RELEASEDIR)
 	ls $(RELEASEDIR)
 
 -include local.mk
