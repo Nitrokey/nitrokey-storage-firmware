@@ -1,7 +1,7 @@
 # Nitrokey Storage Firmware Checksum Tool
 
 ## Description
-Due to some peculiarities of how flash storage treats empty memory cells, a simple diff of an objdump of the downloaded firmware will look differently than the exported binary from the Nitrokey Storage. There are some extra steps needed to fill in the blank spots of the binary and make both files comparable. To make this a little more convenient, there is script that takes care of that and generates the necessary SHA512 checksums for both files.
+Due to some peculiarities of how flash storage treats empty memory cells, a simple diff of an objdump of the downloaded firmware will look differently than the exported binary from the Nitrokey Storage. There are some extra steps needed to fill in the blank spots of the binary and make both files comparable. To make this a little more convenient, there is script that takes care of that and generates the necessary SHA256 checksums for both files.
 
 ## Usage
 The script exists as a bash script for Linux and as a Batch Script for Windows. The tool relies on the use of [SRecord] to create comparable binaries.
