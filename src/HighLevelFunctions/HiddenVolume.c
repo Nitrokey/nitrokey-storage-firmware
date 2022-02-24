@@ -774,7 +774,13 @@ HiddenVolumeKeySlot_tst SlotData_st;
         }
     }
 
-    if (HV_SLOT_COUNT <= HV_Setup_st->SlotNr_u8)
+    if (HV_SLOT_COUNT <= HV_Setup_st->SlotNr_u8      // 0..3
+        || HV_Setup_st->StartBlockPercent_u8 >= HV_Setup_st->EndBlockPercent_u8     // StartBlockPercent_u8 < EndBlockPercent_u8
+        || HV_Setup_st->StartBlockPercent_u8 > 99  // 0..99
+        || HV_Setup_st->EndBlockPercent_u8 == 0     // 1..100
+        || HV_Setup_st->EndBlockPercent_u8 > 100    // 1..100
+        || HV_Setup_st->HiddenVolumePassword_au8[sizeof HV_Setup_st->HiddenVolumePassword_au8-1] != 0   // "0" terminated C-string
+    )
     {
         CI_LocalPrintf ("Wrong slot nr\r\n");
         return (HIDDEN_VOLUME_OUTPUT_STATUS_WRONG_PASSWORD);
