@@ -1772,6 +1772,13 @@ u8 slot_no = report[CMD_WTS_SLOT_NUMBER_OFFSET];
 u8 slot_tmp[sizeof(OTP_slot)];
 u8 text_au8[10];
 
+    // check for valid slot number
+    if (!is_HOTP_slot_number(slot_no) && !is_TOTP_slot_number(slot_no))
+    {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
+        return 1;
+    }
+
     memset_safe (slot_tmp, 0xFF, sizeof(OTP_slot));
 
     if (is_HOTP_slot_number(slot_no))  // HOTP slot
@@ -1796,10 +1803,6 @@ u8 text_au8[10];
         CI_StringOut ("\r\n");
 
         write_to_slot (slot_tmp,(u8*) get_totp_slot_addr(slot_no));
-    }
-    else
-    {
-        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
     }
 
     return 0;
