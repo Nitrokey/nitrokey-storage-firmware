@@ -1716,6 +1716,20 @@ u8 slot_tmp[64];                // this is will be the new slot contents
 
     memcpy (slot_tmp, report + 1, 5);
 
+    // validate input before processing
+    // allow HOTP slots 0..1, 2 (for the potential future use), 0xFF for invalid/starting value
+    const write_config_st * cfg = (write_config_st*) slot_tmp;
+    if (
+        (cfg->numlock > 2 && cfg->numlock != 0xFF) ||
+        (cfg->capslock > 2 && cfg->capslock != 0xFF) ||
+        (cfg->scrolllock > 2 && cfg->scrolllock != 0xFF) ||
+        (cfg->enable_user_password > 2) ||
+        (cfg->delete_user_password > 2)
+    ) {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_UNKNOWN_ERROR;
+        return 1;
+    }
+
     {
 u8 text_au8[10];
 u32 i;

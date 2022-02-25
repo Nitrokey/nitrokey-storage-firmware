@@ -416,3 +416,13 @@ extern u8 HID_GetReport_Value_tmp[KEYBOARD_FEATURE_COUNT];
 
 
 u8 CheckSystemtime (u32 Newtimestamp_u32);
+
+
+// as taken from libnitrokey 3.6+
+typedef struct write_config_st {
+    u8 numlock;     /** 0-1: HOTP slot number from which the code will be get on double press, other value (2, 0xFF) - function disabled */
+    u8 capslock;    /** same as numlock */
+    u8 scrolllock;  /** same as numlock */
+    u8 enable_user_password; // 0..1
+    u8 delete_user_password; // 0..1
+} write_config_st;
