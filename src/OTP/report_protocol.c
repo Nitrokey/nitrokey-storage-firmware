@@ -565,6 +565,10 @@ static u8 initOldStatus = FALSE;
                 cmd_send_OTP_data_payload const * const otp_data = (cmd_send_OTP_data_payload*) (report+1);
                 if(TRUE == is_valid_admin_temp_password(otp_data->temporary_admin_password))
                 {
+                    if (otp_data->type != 'N' && otp_data->type != 'S') {
+                        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_UNKNOWN_ERROR;
+                        break;
+                    }
                     if (FALSE == write_to_slot_transaction_started)
                     {
                         memset((void *) &local_slot_content, 0, sizeof(local_slot_content));
@@ -1277,6 +1281,12 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
         output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NO_NAME_ERROR;
         return 1;
     }
+    // check for valid slot number
+    if (!is_HOTP_slot_number(slot_no) && !is_TOTP_slot_number(slot_no))
+    {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
+        return 1;
+    }
 
     // check if slot data is HOTP
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
@@ -1313,11 +1323,6 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
 
         write_to_slot ((u8*) new_slot_data, get_totp_slot_addr(slot_no));
     }
-    else
-    {
-        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
-        return 1;
-    }
 
     return 0;
 }
@@ -1337,6 +1342,13 @@ u8 cmd_read_slot_name (u8 * report, u8 * output)
 {
 u8 text[10];
 u8 slot_no = report[1];
+
+    // check for valid slot number
+    if (!is_HOTP_slot_number(slot_no) && !is_TOTP_slot_number(slot_no))
+    {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
+        return 1;
+    }
 
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
@@ -1381,10 +1393,6 @@ u8 slot_no = report[1];
             return 1;
         }
     }
-    else
-    {
-        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
-    }
 
     return 0;
 }
@@ -1405,6 +1413,13 @@ u8 slot_no = report[CMD_RS_SLOT_NUMBER_OFFSET];
 u8 format_version = report[CMD_RS_VERSION_OFFSET];
 u64 counter;
 char buf[20] = {};
+
+    // check for valid slot number
+    if (!is_HOTP_slot_number(slot_no) && !is_TOTP_slot_number(slot_no))
+    {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
+        return 1;
+    }
 
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
@@ -1468,11 +1483,6 @@ char buf[20] = {};
             output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_SLOT_NOT_PROGRAMMED;
             return 1;
         }
-    }
-    else
-    {
-        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
-        return 1;
     }
     return 0;
 }
@@ -1619,12 +1629,19 @@ u8 cmd_get_code (u8 * report, u8 * output)
 {
     // u64 challenge = getu64(report + CMD_GC_CHALLENGE_OFFSET);
 u64 timestamp = getu64 (report + CMD_GC_TIMESTAMP_OFFSET);
-u8 interval = report[CMD_GC_INTERVAL_OFFSET];
+u8 interval = report[CMD_GC_INTERVAL_OFFSET];   // TODO u8 limits possible maximum interval
 u32 result = 0;
     /*
        CI_LocalPrintf ("challenge:" ); HexPrint (8,(unsigned char*)report + CMD_GC_CHALLENGE_OFFSET); CI_LocalPrintf ("\n\r"); */
 
 u8 slot_no = report[CMD_GC_SLOT_NUMBER_OFFSET];
+
+    // check for valid slot number
+    if (!is_HOTP_slot_number(slot_no) && !is_TOTP_slot_number(slot_no))
+    {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
+        return 1;
+    }
 
     const u8 is_HOTP_reserved = (slot_no & 0x0F) == NUMBER_OF_HOTP_SLOTS - 1; //last one is reserved
     if (TRUE == is_HOTP_slot_number(slot_no) && FALSE == is_HOTP_reserved)   // HOTP slot
@@ -1676,10 +1693,6 @@ u8 slot_no = report[CMD_GC_SLOT_NUMBER_OFFSET];
         {
             output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_SLOT_NOT_PROGRAMMED;
         }
-    }
-    else
-    {
-        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
     }
 
     return 0;

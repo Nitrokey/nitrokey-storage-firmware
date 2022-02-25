@@ -278,7 +278,7 @@ static const int CMD_ERASE_SLOT_PASSWORD_OFFSET = 2;
 
 typedef struct {
     u8 temporary_admin_password[25];
-    u8 type; //0-secret, 1-name
+    u8 type; //S-secret, N-name
     u8 id; //multiple reports
     u8 data[30]; //data, does not need null termination
 } __packed cmd_send_OTP_data_payload;
