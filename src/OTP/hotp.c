@@ -54,6 +54,11 @@
 #include "hmac-sha1.h"
 #include "LED_test.h"
 
+#ifdef FREERTOS_USED
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+#endif
 
 /*******************************************************************************
 
@@ -988,6 +993,7 @@ void backup_data (u8 * data, u16 len, u32 addr)
 u16 dummy_u16;
 u32 dummy_u32;
 
+    taskENTER_CRITICAL();
     // New erase by flash memset
     flashc_memset8 ((void *) BACKUP_PAGE_ADDRESS, 0xFF, FLASH_PAGE_SIZE, TRUE);
 
@@ -999,6 +1005,7 @@ u32 dummy_u32;
     dummy_u32 = addr;
     flashc_memcpy ((void *) (BACKUP_PAGE_ADDRESS + BACKUP_ADDRESS_OFFSET), (void *) &dummy_u32, 4, FALSE);  // Area is erased
 
+    taskEXIT_CRITICAL();
 }
 
 /*******************************************************************************
@@ -1053,6 +1060,7 @@ void write_to_slot (u8 * data, u8 * addr)
     const u16 offset = (u16) addr - SLOTS_ADDRESS;
 
     LED_GreenOn ();
+    taskENTER_CRITICAL();
 
     // copy all slot data from Flash to RAM
     memcpy (page_buffer, (u8*) SLOTS_ADDRESS, FLASH_PAGE_SIZE * 3);
@@ -1094,6 +1102,7 @@ void write_to_slot (u8 * data, u8 * addr)
     dummy_u16 = 0x4F4B;
     flashc_memcpy ((void *) (BACKUP_PAGE_ADDRESS + BACKUP_OK_OFFSET), (void *) &dummy_u16, 2, TRUE);
 
+    taskEXIT_CRITICAL ();
     LED_GreenOff ();
 
 }
@@ -1115,6 +1124,7 @@ void write_to_config (u8 * data, u8 len)
     u16 dummy_u16;
 
     LED_GreenOn ();
+    taskENTER_CRITICAL();
 
     // copy all slot data from Flash to RAM
     memcpy (page_buffer, (u8*) SLOTS_ADDRESS, FLASH_PAGE_SIZE * 3);
@@ -1132,6 +1142,7 @@ void write_to_config (u8 * data, u8 len)
     dummy_u16 = 0x4F4B;
     flashc_memcpy ((void *) (BACKUP_PAGE_ADDRESS + BACKUP_OK_OFFSET), (void *) &dummy_u16, 2, TRUE);
 
+    taskEXIT_CRITICAL();
     LED_GreenOff ();
 
 }
