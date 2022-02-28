@@ -960,6 +960,7 @@ u8 text[10];
                     break;
 
                 case STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN:
+                    // TODO superseded, remove
                     CI_StringOut ("Get STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN\r\n");
 
                     StartStick20Command (STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN);
@@ -970,6 +971,7 @@ u8 text[10];
                     break;
 
                 case STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN:
+                    // TODO superseded, remove
                     CI_StringOut ("Get STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN\r\n");
 
                     StartStick20Command (STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN);
@@ -1010,6 +1012,8 @@ u8 text[10];
                     break;
 
                 case STICK20_CMD_SEND_CLEAR_STICK_KEYS_NOT_INITIATED:
+                    // TODO discuss, should this command be available for user
+                    // TODO discuss, if password is needed (currently not set)
                     CI_StringOut ("Get STICK20_CMD_SEND_CLEAR_STICK_KEYS_NOT_INITIATED\r\n");
 
                     StartStick20Command (STICK20_CMD_SEND_CLEAR_STICK_KEYS_NOT_INITIATED);
