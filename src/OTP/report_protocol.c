@@ -700,6 +700,7 @@ u8 text[10];
                 cmd_set_time (report, output);
                 break;
 
+#ifdef DEBUG
             case CMD_TEST_COUNTER:
                 CI_StringOut ("Get CMD_TEST_COUNTER\r\n");
                 cmd_test_counter (report, output);
@@ -709,6 +710,7 @@ u8 text[10];
                 CI_StringOut ("Get CMD_TEST_TIME\r\n");
                 cmd_test_time (report, output);
                 break;
+#endif
 
             case CMD_GET_PW_SAFE_SLOT_STATUS:
                 CI_StringOut ("Get CMD_GET_PW_SAFE_SLOT_STATUS\r\n");
@@ -750,15 +752,18 @@ u8 text[10];
                 cmd_getPasswordSafeEnable (report, output);
                 break;
 
+#ifdef DEBUG_UNUSED
             case CMD_PW_SAFE_INIT_KEY:
                 CI_StringOut ("Get CMD_PW_SAFE_INIT_KEY\r\n");
                 cmd_getPasswordSafeInitKey (report, output);
                 break;
 
             case CMD_PW_SAFE_SEND_DATA:
+                // send PWS slot over the keyboard interface
                 CI_StringOut ("Get CMD_PW_SAFE_SEND_DATA\r\n");
                 cmd_getPasswordSafeSendData (report, output);
                 break;
+#endif
 
             case CMD_SD_CARD_HIGH_WATERMARK:
                 CI_StringOut ("Get CMD_SD_CARD_HIGH_WATERMARK\r\n");
@@ -779,11 +784,13 @@ u8 text[10];
                 CI_StringOut ("Get CMD_FACTORY_RESET\r\n");
                 cmd_getFactoryReset (report, output);
                 break;
+
+#ifdef DEBUG_UNUSED
             case CMD_RESET_STICK :
                 CI_StringOut ("Get CMD_RESET_STICK\r\n");
 //                cmd_getResetStick (report, output);
                 break;
-
+#endif
 
             default:
                 if ((STICK20_CMD_START_VALUE > cmd_type) || (STICK20_CMD_END_VALUE < cmd_type))
