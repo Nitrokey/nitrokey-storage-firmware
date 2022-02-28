@@ -779,7 +779,7 @@ HiddenVolumeKeySlot_tst SlotData_st;
         || HV_Setup_st->StartBlockPercent_u8 > 99  // 0..99
         || HV_Setup_st->EndBlockPercent_u8 == 0     // 1..100
         || HV_Setup_st->EndBlockPercent_u8 > 100    // 1..100
-        || HV_Setup_st->HiddenVolumePassword_au8[sizeof HV_Setup_st->HiddenVolumePassword_au8-1] != 0   // "0" terminated C-string
+        || FALSE == verify_cstring_nonempty(HV_Setup_st->HiddenVolumePassword_au8, MAX_HIDDEN_VOLUME_PASSOWORD_SIZE)    // "0" terminated C-string
     )
     {
         CI_LocalPrintf ("Wrong slot nr\r\n");
