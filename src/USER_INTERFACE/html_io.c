@@ -637,8 +637,8 @@ void HID_ExcuteCmd (void)
             // Clear password
             HID_AdminPasswordEnabled_u32 = FALSE;
             HID_UserPasswordEnabled_u32 = FALSE;
-            memset_safe (HID_UserPassword_au8, 0, HID_PASSWORD_LEN);
-            memset_safe (HID_AdminPassword_au8, 0, HID_PASSWORD_LEN);
+            memset_safe (HID_UserPassword_au8, 0, sizeof HID_UserPassword_au8);
+            memset_safe (HID_AdminPassword_au8, 0, sizeof HID_AdminPassword_au8);
             break;
 
         case HTML_CMD_CLEAR_NEW_SD_CARD_FOUND:
