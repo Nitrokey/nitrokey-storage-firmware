@@ -91,7 +91,7 @@ const u8 AES_DummyKey_au8[32] = "00000000000000000000000000000000";
 
 *******************************************************************************/
 
-#define DEBUG_HTML_IO
+//#define DEBUG_HTML_IO
 
 #ifdef DEBUG_HTML_IO
 #else

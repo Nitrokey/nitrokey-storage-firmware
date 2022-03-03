@@ -47,10 +47,21 @@
 
 *******************************************************************************/
 
-#define LOCAL_DEBUG
+//#define LOCAL_DEBUG
 // #define LOCAL_DEBUG_CHECK_KEY_GENERATION
 
 #define AES_KEYSIZE_256_BIT     32  // 32 * 8 = 256
+
+#ifdef LOCAL_DEBUG
+#else
+#define debug_file_printf(...)
+#define CI_LocalPrintf(...)
+#define CI_TickLocalPrintf(...)
+#define CI_StringOut(...)
+#define CI_Print8BitValue(...)
+#define HexPrint(...)
+#endif
+
 
 /*******************************************************************************
 

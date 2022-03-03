@@ -66,6 +66,15 @@
 #include "HighLevelFunctions/password_safe.h"
 #include "hotp.h"
 
+#ifdef DEBUG_HOTP
+#else
+#define CI_LocalPrintf(...)
+#define CI_TickLocalPrintf(...)
+#define CI_StringOut(...)
+#define CI_Print8BitValue(...)
+#define HexPrint(...)
+#endif
+
 
 /*******************************************************************************
 
