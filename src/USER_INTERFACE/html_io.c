@@ -251,7 +251,7 @@ void HID_ExcuteCmd (void)
             break;
 
         case HTML_CMD_ENABLE_AES_LUN:
-            if (   TRUE == verify_cstring(&HID_String_au8[1], USER_PIN_MAX_LEN)
+            if (   TRUE == verify_cstring_nonempty(&HID_String_au8[1], USER_PIN_MAX_LEN)
                     && TRUE == IW_SendToSC_PW1 (&HID_String_au8[1])
                     )
             {
@@ -312,7 +312,7 @@ void HID_ExcuteCmd (void)
                 break;
             }
 */
-            if (    verify_cstring(&HID_String_au8[1], FIRMWARE_PASS_MAX_LEN)
+            if (    verify_cstring_nonempty(&HID_String_au8[1], FIRMWARE_PASS_MAX_LEN)
                     && TRUE == CheckUpdatePin (&HID_String_au8[1], strlen ((char*)&HID_String_au8[1])))
             {
                 CI_TickLocalPrintf ("good bye\r\n");
@@ -329,7 +329,7 @@ void HID_ExcuteCmd (void)
             break;
 
         case HTML_CMD_FILL_SD_WITH_RANDOM_CHARS:
-            if (    TRUE == verify_cstring(&HID_String_au8[2], ADMIN_PIN_MAX_LEN)
+            if (    TRUE == verify_cstring_nonempty(&HID_String_au8[2], ADMIN_PIN_MAX_LEN)
                     && TRUE == IW_SendToSC_PW3 (&HID_String_au8[2]))
             {
                 CI_TickLocalPrintf ("Fill SD card with random numbers - it runs very long, 1 GB ca. 4 minutes\r\n");
@@ -378,7 +378,7 @@ void HID_ExcuteCmd (void)
             // Get w AES key for hidden volume - we use always the password that was send
             memset (StorageKey_pu8, 0, 32);
             ret_u8 = HIDDEN_VOLUME_OUTPUT_STATUS_WRONG_PASSWORD;
-            if (TRUE == verify_cstring(&HID_String_au8[1], USER_PIN_MAX_LEN)) {
+            if (TRUE == verify_cstring_nonempty(&HID_String_au8[1], USER_PIN_MAX_LEN)) {
                 ret_u8 = GetHiddenVolumeKeyFromUserpassword ((u8 *) & HID_String_au8[1], StorageKey_pu8);
             }
             switch (ret_u8)
@@ -429,7 +429,7 @@ void HID_ExcuteCmd (void)
 
 
         case HTML_CMD_EXPORT_BINARY:
-            if (    verify_cstring(&HID_String_au8[1], FIRMWARE_PASS_MAX_LEN)
+            if (    verify_cstring_nonempty(&HID_String_au8[1], FIRMWARE_PASS_MAX_LEN)
                     && TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
             {
                 CI_TickLocalPrintf ("Export binary\r\n");
@@ -462,7 +462,7 @@ void HID_ExcuteCmd (void)
             StickKeysNotInitiated_u8   = StickConfiguration_st.StickKeysNotInitiated_u8;
 
             CI_TickLocalPrintf ("Generate new keys Old State KNI %d, SDF %d\r\n",StickKeysNotInitiated_u8,SdCardFilledWithRandoms_u8);
-            if (    TRUE == verify_cstring(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
+            if (    TRUE == verify_cstring_nonempty(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
                     && TRUE == BuildStorageKeys_u32 ((u8 *) & HID_String_au8[1]))
             {
                 SetSdEncryptedCardEnableState (FALSE);
@@ -565,14 +565,14 @@ void HID_ExcuteCmd (void)
             switch (HID_String_au8[0])
             {
                 case 'P':
-                    if (TRUE == verify_cstring(&HID_String_au8[1], USER_PIN_MAX_LEN)) {
+                    if (TRUE == verify_cstring_nonempty(&HID_String_au8[1], USER_PIN_MAX_LEN)) {
                         ret_u8 = IW_SendToSC_PW1 (&HID_String_au8[1]);
                         HID_UserPasswordEnabled_u32 = ret_u8;
                         strncpy ((char *) HID_UserPassword_au8, (char *) &HID_String_au8[1], HID_PASSWORD_LEN);
                     }
                     break;
                 case 'A':
-                    if (TRUE == verify_cstring(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)) {
+                    if (TRUE == verify_cstring_nonempty(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)) {
                         ret_u8 = IW_SendToSC_PW3 (&HID_String_au8[1]);
                         HID_AdminPasswordEnabled_u32 = ret_u8;
                         strncpy ((char *) HID_AdminPassword_au8, (char *) &HID_String_au8[1], HID_PASSWORD_LEN);
@@ -599,7 +599,7 @@ void HID_ExcuteCmd (void)
             {
                 case 'P':
                     if (TRUE == HID_UserPasswordEnabled_u32
-                        && TRUE == verify_cstring(&HID_String_au8[1], USER_PIN_MAX_LEN)
+                        && TRUE == verify_cstring_nonempty(&HID_String_au8[1], USER_PIN_MAX_LEN)
                         )
                     {
                         ret_u8 = LA_OpenPGP_V20_Test_ChangeUserPin (HID_UserPassword_au8, &HID_String_au8[1]);
@@ -611,7 +611,7 @@ void HID_ExcuteCmd (void)
                     break;
                 case 'A':
                     if (TRUE == HID_AdminPasswordEnabled_u32
-                        && TRUE == verify_cstring(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
+                        && TRUE == verify_cstring_nonempty(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
                         )
                     {
                         ret_u8 = LA_OpenPGP_V20_Test_ChangeAdminPin (HID_AdminPassword_au8, &HID_String_au8[1]);
@@ -643,7 +643,7 @@ void HID_ExcuteCmd (void)
 
         case HTML_CMD_CLEAR_NEW_SD_CARD_FOUND:
             CI_TickLocalPrintf ("Get HTML_CMD_CLEAR_NEW_SD_CARD_FOUND\r\n");
-            if (    TRUE == verify_cstring(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
+            if (    TRUE == verify_cstring_nonempty(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
                     && TRUE == IW_SendToSC_PW3 (&HID_String_au8[1])
                     )
             {
@@ -707,7 +707,7 @@ void HID_ExcuteCmd (void)
         case HTML_CMD_CLEAR_LOCK_STICK_HARDWARE:
             CI_TickLocalPrintf ("Get HTML_CMD_CLEAR_LOCK_STICK_HARDWARE\r\n");
             // TODO check firmware password here, as this is not related to the user data but MCU
-            if (    TRUE == verify_cstring(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
+            if (    TRUE == verify_cstring_nonempty(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
                     && TRUE == IW_SendToSC_PW3 (&HID_String_au8[1])
                     )
             {
@@ -743,7 +743,7 @@ void HID_ExcuteCmd (void)
             CI_TickLocalPrintf ("Get HTML_CMD_CHANGE_UPDATE_PIN\r\n");
 
             if (
-                    TRUE == verify_cstring(&HID_String_au8[1], FIRMWARE_PASS_MAX_LEN)
+                    TRUE == verify_cstring_nonempty(&HID_String_au8[1], FIRMWARE_PASS_MAX_LEN)
                     && TRUE == CheckUpdatePin (&HID_String_au8[1], strlen ((char*)&HID_String_au8[1]))
                     )
             {
@@ -769,7 +769,7 @@ void HID_ExcuteCmd (void)
         case HTML_CMD_ENABLE_ADMIN_READONLY_UNCRYPTED_LUN:
             CI_TickLocalPrintf ("Set readonly to unencrypted volume ADMIN\r\n");
             if (
-                    TRUE == verify_cstring(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
+                    TRUE == verify_cstring_nonempty(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
                     && TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
             {
                 SetSdUncryptedCardEnableState (FALSE);  // Disable access
@@ -791,7 +791,7 @@ void HID_ExcuteCmd (void)
         case HTML_CMD_ENABLE_ADMIN_READWRITE_UNCRYPTED_LUN:
             CI_TickLocalPrintf ("Set readwrite to unencrypted volume ADMIN\r\n");
             if (
-                    TRUE == verify_cstring(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
+                    TRUE == verify_cstring_nonempty(&HID_String_au8[1], ADMIN_PIN_MAX_LEN)
                     && TRUE == IW_SendToSC_PW3 (&HID_String_au8[1]))
             {
                 SetSdUncryptedCardEnableState (FALSE);  // Disable access

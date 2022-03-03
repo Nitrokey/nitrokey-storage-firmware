@@ -639,7 +639,7 @@ u8 PWS_EnableAccess (u8 * password)
 
     CI_LocalPrintf ("PWS_EnableAccess: ");
 
-    if (FALSE == verify_cstring(password, USER_PIN_MAX_LEN)) {
+    if (FALSE == verify_cstring_nonempty(password, USER_PIN_MAX_LEN)) {
         return (PWS_RETURN_WRONG_PASSWORD);
     }
 
