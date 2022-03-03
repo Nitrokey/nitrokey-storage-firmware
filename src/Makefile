@@ -87,7 +87,7 @@ LIBNK=
 TP=-xv
 .PHONY: enable_bootloader
 enable_bootloader:
-	cd $(LIBNK)/unittest && pytest $(TP) test_storage.py -k "enable_firmware" --run-skipped
+	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py -k "enable_firmware" --run-skipped
 
 .PHONY: run_tests
 run_tests:
