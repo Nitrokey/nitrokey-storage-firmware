@@ -1246,6 +1246,8 @@ u32 i;
 
 *******************************************************************************/
 
+u8 GetSmartCardStatus (typeStick20Configuration_st * Status_st);
+
 void cmd_get_password_retry_count (u8 * report, u8 * output)
 {
     GetSmartCardStatus (&StickConfiguration_st);
@@ -1432,7 +1434,7 @@ u8 cmd_read_slot (u8 * report, u8 * output)
 u8 slot_no = report[CMD_RS_SLOT_NUMBER_OFFSET];
 u8 format_version = report[CMD_RS_VERSION_OFFSET];
 u64 counter;
-char buf[20] = {};
+u8 buf[20] = {};
 
     // check for valid slot number
     if (!is_HOTP_slot_number(slot_no) && !is_TOTP_slot_number(slot_no))
@@ -1543,7 +1545,7 @@ u8 cmd_verify_code(u8 *report, u8 *output) {
   else
   {
 	  LED_ClearFlashing();
-	  LED_RedFlashNTimes(1000);
+	  LED_RedFlashNTimes(0xFF);
   }
   output[OUTPUT_CMD_RESULT_OFFSET] = (u8) (code_correct ? 1 : 0);
   output[OUTPUT_CMD_RESULT_OFFSET+1] = (u8) result;

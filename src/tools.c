@@ -852,11 +852,11 @@ Bool busy_wait(Bool (*function)()) {
 
 // validate for the cstring, with maxlen
 u8 verify_cstring(u8 * s, u8 maxlen){
-    u8 size = strnlen(s, maxlen);
+    u8 size = strnlen((char*) s, maxlen);
     return s[size] == 0;
 }
 
 u8 verify_cstring_nonempty(u8 * s, u8 maxlen){
-    u8 size = strnlen(s, maxlen);
+    u8 size = strnlen((char*)s, maxlen);
     return size > 0 && s[size] == 0;
 }

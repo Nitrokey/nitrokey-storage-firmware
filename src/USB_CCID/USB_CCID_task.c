@@ -111,6 +111,8 @@ t_USB_CCID_data_st USB_CCID_data_st;
 static void USB_CCID_GetDataFromUSB (void);
 static void USB_CCID_SendDataToUSB (void);
 
+u8 read_configuration_or_init_u8(void);
+
 /*******************************************************************************
 
   USB_CCID_send_INT_Message
