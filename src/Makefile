@@ -70,13 +70,13 @@ $(FIRMWARE_CLEAN): USB_MASS.elf clean_artifacts
 
 BOOTLOADER_VID := 03eb
 .PHONY: flash
-flash: $(FIRMWARE)
+flash:
 	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
 	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
 	lsusb | grep ${BOOTLOADER_VID}: || sleep 1
 	sudo dfu-programmer at32uc3a3256s erase
 	sleep 1
-	sudo dfu-programmer at32uc3a3256s flash --suppress-bootloader-mem $<
+	sudo dfu-programmer at32uc3a3256s flash --suppress-bootloader-mem $(FIRMWARE)
 	sleep 1
 	-sudo dfu-programmer at32uc3a3256s launch
 	sleep 1
@@ -87,7 +87,7 @@ LIBNK=
 TP=-xv
 .PHONY: enable_bootloader
 enable_bootloader:
-	cd $(LIBNK)/unittest && pytest $(TP) test_storage.py -k "enable_firmware" --run-skipped
+	cd $(LIBNK)/unittest && pipenv run pytest $(TP) test_storage.py -k "enable_firmware" --run-skipped
 
 .PHONY: run_tests
 run_tests:

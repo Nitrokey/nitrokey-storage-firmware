@@ -639,6 +639,10 @@ u8 PWS_EnableAccess (u8 * password)
 
     CI_LocalPrintf ("PWS_EnableAccess: ");
 
+    if (FALSE == verify_cstring_nonempty(password, USER_PIN_MAX_LEN)) {
+        return (PWS_RETURN_WRONG_PASSWORD);
+    }
+
     Ret_u32 = LA_SC_SendVerify (2, (unsigned char *) password); // 2 = user pw
     if (TRUE != Ret_u32)
     {

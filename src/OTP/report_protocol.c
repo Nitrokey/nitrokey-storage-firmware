@@ -66,6 +66,15 @@
 #include "HighLevelFunctions/password_safe.h"
 #include "hotp.h"
 
+#ifdef DEBUG_HOTP
+#else
+#define CI_LocalPrintf(...)
+#define CI_TickLocalPrintf(...)
+#define CI_StringOut(...)
+#define CI_Print8BitValue(...)
+#define HexPrint(...)
+#endif
+
 
 /*******************************************************************************
 
@@ -565,6 +574,10 @@ static u8 initOldStatus = FALSE;
                 cmd_send_OTP_data_payload const * const otp_data = (cmd_send_OTP_data_payload*) (report+1);
                 if(TRUE == is_valid_admin_temp_password(otp_data->temporary_admin_password))
                 {
+                    if (otp_data->type != 'N' && otp_data->type != 'S') {
+                        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_UNKNOWN_ERROR;
+                        break;
+                    }
                     if (FALSE == write_to_slot_transaction_started)
                     {
                         memset((void *) &local_slot_content, 0, sizeof(local_slot_content));
@@ -696,6 +709,7 @@ u8 text[10];
                 cmd_set_time (report, output);
                 break;
 
+#ifdef DEBUG
             case CMD_TEST_COUNTER:
                 CI_StringOut ("Get CMD_TEST_COUNTER\r\n");
                 cmd_test_counter (report, output);
@@ -705,6 +719,7 @@ u8 text[10];
                 CI_StringOut ("Get CMD_TEST_TIME\r\n");
                 cmd_test_time (report, output);
                 break;
+#endif
 
             case CMD_GET_PW_SAFE_SLOT_STATUS:
                 CI_StringOut ("Get CMD_GET_PW_SAFE_SLOT_STATUS\r\n");
@@ -746,15 +761,18 @@ u8 text[10];
                 cmd_getPasswordSafeEnable (report, output);
                 break;
 
+#ifdef DEBUG_UNUSED
             case CMD_PW_SAFE_INIT_KEY:
                 CI_StringOut ("Get CMD_PW_SAFE_INIT_KEY\r\n");
                 cmd_getPasswordSafeInitKey (report, output);
                 break;
 
             case CMD_PW_SAFE_SEND_DATA:
+                // send PWS slot over the keyboard interface
                 CI_StringOut ("Get CMD_PW_SAFE_SEND_DATA\r\n");
                 cmd_getPasswordSafeSendData (report, output);
                 break;
+#endif
 
             case CMD_SD_CARD_HIGH_WATERMARK:
                 CI_StringOut ("Get CMD_SD_CARD_HIGH_WATERMARK\r\n");
@@ -775,11 +793,13 @@ u8 text[10];
                 CI_StringOut ("Get CMD_FACTORY_RESET\r\n");
                 cmd_getFactoryReset (report, output);
                 break;
+
+#ifdef DEBUG_UNUSED
             case CMD_RESET_STICK :
                 CI_StringOut ("Get CMD_RESET_STICK\r\n");
 //                cmd_getResetStick (report, output);
                 break;
-
+#endif
 
             default:
                 if ((STICK20_CMD_START_VALUE > cmd_type) || (STICK20_CMD_END_VALUE < cmd_type))
@@ -949,6 +969,7 @@ u8 text[10];
                     break;
 
                 case STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN:
+                    // TODO superseded, remove
                     CI_StringOut ("Get STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN\r\n");
 
                     StartStick20Command (STICK20_CMD_ENABLE_READONLY_UNCRYPTED_LUN);
@@ -959,6 +980,7 @@ u8 text[10];
                     break;
 
                 case STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN:
+                    // TODO superseded, remove
                     CI_StringOut ("Get STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN\r\n");
 
                     StartStick20Command (STICK20_CMD_ENABLE_READWRITE_UNCRYPTED_LUN);
@@ -999,6 +1021,8 @@ u8 text[10];
                     break;
 
                 case STICK20_CMD_SEND_CLEAR_STICK_KEYS_NOT_INITIATED:
+                    // TODO discuss, should this command be available for user
+                    // TODO discuss, if password is needed (currently not set)
                     CI_StringOut ("Get STICK20_CMD_SEND_CLEAR_STICK_KEYS_NOT_INITIATED\r\n");
 
                     StartStick20Command (STICK20_CMD_SEND_CLEAR_STICK_KEYS_NOT_INITIATED);
@@ -1222,6 +1246,8 @@ u32 i;
 
 *******************************************************************************/
 
+u8 GetSmartCardStatus (typeStick20Configuration_st * Status_st);
+
 void cmd_get_password_retry_count (u8 * report, u8 * output)
 {
     GetSmartCardStatus (&StickConfiguration_st);
@@ -1277,6 +1303,12 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
         output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_NO_NAME_ERROR;
         return 1;
     }
+    // check for valid slot number
+    if (!is_HOTP_slot_number(slot_no) && !is_TOTP_slot_number(slot_no))
+    {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
+        return 1;
+    }
 
     // check if slot data is HOTP
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
@@ -1313,11 +1345,6 @@ u8 cmd_write_to_slot (u8 * new_slot, u8 * output)
 
         write_to_slot ((u8*) new_slot_data, get_totp_slot_addr(slot_no));
     }
-    else
-    {
-        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
-        return 1;
-    }
 
     return 0;
 }
@@ -1337,6 +1364,13 @@ u8 cmd_read_slot_name (u8 * report, u8 * output)
 {
 u8 text[10];
 u8 slot_no = report[1];
+
+    // check for valid slot number
+    if (!is_HOTP_slot_number(slot_no) && !is_TOTP_slot_number(slot_no))
+    {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
+        return 1;
+    }
 
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
@@ -1381,10 +1415,6 @@ u8 slot_no = report[1];
             return 1;
         }
     }
-    else
-    {
-        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
-    }
 
     return 0;
 }
@@ -1404,7 +1434,14 @@ u8 cmd_read_slot (u8 * report, u8 * output)
 u8 slot_no = report[CMD_RS_SLOT_NUMBER_OFFSET];
 u8 format_version = report[CMD_RS_VERSION_OFFSET];
 u64 counter;
-char buf[20] = {};
+u8 buf[20] = {};
+
+    // check for valid slot number
+    if (!is_HOTP_slot_number(slot_no) && !is_TOTP_slot_number(slot_no))
+    {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
+        return 1;
+    }
 
     if (is_HOTP_slot_number(slot_no))   // HOTP slot
     {
@@ -1469,11 +1506,6 @@ char buf[20] = {};
             return 1;
         }
     }
-    else
-    {
-        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
-        return 1;
-    }
     return 0;
 }
 
@@ -1513,7 +1545,7 @@ u8 cmd_verify_code(u8 *report, u8 *output) {
   else
   {
 	  LED_ClearFlashing();
-	  LED_RedFlashNTimes(1000);
+	  LED_RedFlashNTimes(0xFF);
   }
   output[OUTPUT_CMD_RESULT_OFFSET] = (u8) (code_correct ? 1 : 0);
   output[OUTPUT_CMD_RESULT_OFFSET+1] = (u8) result;
@@ -1619,12 +1651,19 @@ u8 cmd_get_code (u8 * report, u8 * output)
 {
     // u64 challenge = getu64(report + CMD_GC_CHALLENGE_OFFSET);
 u64 timestamp = getu64 (report + CMD_GC_TIMESTAMP_OFFSET);
-u8 interval = report[CMD_GC_INTERVAL_OFFSET];
+u8 interval = report[CMD_GC_INTERVAL_OFFSET];   // TODO u8 limits possible maximum interval
 u32 result = 0;
     /*
        CI_LocalPrintf ("challenge:" ); HexPrint (8,(unsigned char*)report + CMD_GC_CHALLENGE_OFFSET); CI_LocalPrintf ("\n\r"); */
 
 u8 slot_no = report[CMD_GC_SLOT_NUMBER_OFFSET];
+
+    // check for valid slot number
+    if (!is_HOTP_slot_number(slot_no) && !is_TOTP_slot_number(slot_no))
+    {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
+        return 1;
+    }
 
     const u8 is_HOTP_reserved = (slot_no & 0x0F) == NUMBER_OF_HOTP_SLOTS - 1; //last one is reserved
     if (TRUE == is_HOTP_slot_number(slot_no) && FALSE == is_HOTP_reserved)   // HOTP slot
@@ -1677,10 +1716,6 @@ u8 slot_no = report[CMD_GC_SLOT_NUMBER_OFFSET];
             output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_SLOT_NOT_PROGRAMMED;
         }
     }
-    else
-    {
-        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
-    }
 
     return 0;
 }
@@ -1702,6 +1737,20 @@ u8 slot_tmp[64];                // this is will be the new slot contents
     memset (slot_tmp, 0, 5);
 
     memcpy (slot_tmp, report + 1, 5);
+
+    // validate input before processing
+    // allow HOTP slots 0..1, 2 (for the potential future use), 0xFF for invalid/starting value
+    const write_config_st * cfg = (write_config_st*) slot_tmp;
+    if (
+        (cfg->numlock > 2 && cfg->numlock != 0xFF) ||
+        (cfg->capslock > 2 && cfg->capslock != 0xFF) ||
+        (cfg->scrolllock > 2 && cfg->scrolllock != 0xFF) ||
+        (cfg->enable_user_password > 2) ||
+        (cfg->delete_user_password > 2)
+    ) {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_UNKNOWN_ERROR;
+        return 1;
+    }
 
     {
 u8 text_au8[10];
@@ -1745,6 +1794,13 @@ u8 slot_no = report[CMD_WTS_SLOT_NUMBER_OFFSET];
 u8 slot_tmp[sizeof(OTP_slot)];
 u8 text_au8[10];
 
+    // check for valid slot number
+    if (!is_HOTP_slot_number(slot_no) && !is_TOTP_slot_number(slot_no))
+    {
+        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
+        return 1;
+    }
+
     memset_safe (slot_tmp, 0xFF, sizeof(OTP_slot));
 
     if (is_HOTP_slot_number(slot_no))  // HOTP slot
@@ -1769,10 +1825,6 @@ u8 text_au8[10];
         CI_StringOut ("\r\n");
 
         write_to_slot (slot_tmp,(u8*) get_totp_slot_addr(slot_no));
-    }
-    else
-    {
-        output[OUTPUT_CMD_STATUS_OFFSET] = CMD_STATUS_WRONG_SLOT;
     }
 
     return 0;

@@ -72,6 +72,10 @@ void memset_safe(void *const pnt, unsigned char val, const u32 len);
 #include "compiler.h"
 Bool busy_wait(Bool (*function)());
 
+u8 verify_cstring(u8 * s, u8 maxlen);
+u8 verify_cstring_nonempty(u8 * s, u8 maxlen);
+
+
 typedef struct
 {
     u32 MSD_ReadCalls_u32;
@@ -97,5 +101,9 @@ extern USB_Log_tst USB_Log_st;
 #error "not supported"
 //#define aligned (#pragma data_alignment = 4)
 #endif
+
+#define USER_PIN_MAX_LEN    (30)
+#define ADMIN_PIN_MAX_LEN    (30)
+#define FIRMWARE_PASS_MAX_LEN    (30)
 
 #endif /* TOOLS_H_ */
